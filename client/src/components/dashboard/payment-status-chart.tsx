@@ -11,7 +11,7 @@ const total = data.reduce((sum, item) => sum + item.value, 0);
 export default function PaymentStatusChart() {
   return (
     <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-      <div className="mb-6">
+      <div className="mb-6 pb-4 border-b border-gray-200">
         <h3 className="text-lg font-semibold text-gray-900">Betalingsstatus</h3>
         <p className="text-sm text-gray-500">Verdeling van betalingen</p>
       </div>

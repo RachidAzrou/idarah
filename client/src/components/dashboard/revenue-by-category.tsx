@@ -22,7 +22,7 @@ export default function IncomeByCategoryCard() {
   return (
     <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm col-span-full" style={{ boxShadow: '0 6px 16px rgba(2,6,23,0.08)' }}>
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
         <div>
           <h3 className="text-lg font-semibold text-gray-900 font-['Poppins']">Inkomsten per Categorie</h3>
           <p className="text-sm text-gray-500 font-['Poppins']">Lidgelden opgesplitst per lidcategorie</p>

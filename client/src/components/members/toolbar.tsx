@@ -158,7 +158,7 @@ export function Toolbar({
                   type="date"
                   value={joinDateFrom}
                   onChange={(e) => onJoinDateFromChange(e.target.value)}
-                  className="w-[140px] h-9 border-gray-200"
+                  className="w-[160px] h-9 border-gray-200"
                   placeholder="Van datum"
                   data-testid="join-date-from"
                 />
@@ -167,7 +167,7 @@ export function Toolbar({
                   type="date"
                   value={joinDateTo}
                   onChange={(e) => onJoinDateToChange(e.target.value)}
-                  className="w-[140px] h-9 border-gray-200"
+                  className="w-[160px] h-9 border-gray-200"
                   placeholder="Tot datum"
                   data-testid="join-date-to"
                 />

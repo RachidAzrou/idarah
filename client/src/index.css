@@ -189,6 +189,6 @@
   
   /* Content area styles */
   .content-area {
-    @apply max-w-7xl mx-auto px-6 py-4 h-[calc(100vh-4rem)] overflow-auto;
+    @apply max-w-7xl mx-auto px-6 py-4 h-[calc(100vh-3rem)] overflow-auto;
   }
 }

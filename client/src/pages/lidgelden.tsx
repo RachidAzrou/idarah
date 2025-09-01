@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { Link } from "wouter";
 import { KpiCards } from "@/components/fees/kpi-cards";
+import { NewFeeDialog } from "@/components/fees/new-fee-dialog";
 import { Toolbar } from "@/components/fees/toolbar";
 import { FeesTable } from "@/components/fees/fees-table";
 import { FeeDetailSlideout } from "@/components/fees/fee-detail-slideout";
@@ -40,6 +41,7 @@ export default function Lidgelden() {
   const [showDetailSlideout, setShowDetailSlideout] = useState(false);
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [showSepaDialog, setShowSepaDialog] = useState(false);
+  const [showNewFeeDialog, setShowNewFeeDialog] = useState(false);
 
   // Apply filters and sorting
   const filteredFees = useMemo(() => {
@@ -207,12 +209,13 @@ export default function Lidgelden() {
             onOnlyOverdueChange={setOnlyOverdue}
             onResetFilters={resetAllFilters}
             newButton={
-              <Link href="/lidgelden/nieuw">
-                <Button className="flex items-center gap-2">
-                  <Plus className="h-4 w-4" />
-                  Nieuw lidgeld
-                </Button>
-              </Link>
+              <Button 
+                className="flex items-center gap-2"
+                onClick={() => setShowNewFeeDialog(true)}
+              >
+                <Plus className="h-4 w-4" />
+                Nieuw lidgeld
+              </Button>
             }
           />
         </div>
@@ -263,6 +266,15 @@ export default function Lidgelden() {
           onClose={() => setShowSepaDialog(false)}
           fees={selectedFees}
           onGenerate={handleSepaGenerate}
+        />
+
+        <NewFeeDialog
+          open={showNewFeeDialog}
+          onOpenChange={setShowNewFeeDialog}
+          onSuccess={() => {
+            // Refresh data or handle success
+            window.location.reload();
+          }}
         />
       </div>
     </main>

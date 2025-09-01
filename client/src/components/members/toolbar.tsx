@@ -164,7 +164,7 @@ export function Toolbar({
                     <Button
                       variant="outline"
                       className={cn(
-                        "w-[160px] h-9 justify-start text-left font-normal border-gray-200",
+                        "w-[180px] h-9 justify-start text-left font-normal border-gray-200",
                         !joinDateFrom && "text-muted-foreground"
                       )}
                       data-testid="join-date-from"
@@ -194,7 +194,7 @@ export function Toolbar({
                     <Button
                       variant="outline"
                       className={cn(
-                        "w-[160px] h-9 justify-start text-left font-normal border-gray-200",
+                        "w-[180px] h-9 justify-start text-left font-normal border-gray-200",
                         !joinDateTo && "text-muted-foreground"
                       )}
                       data-testid="join-date-to"

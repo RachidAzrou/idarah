@@ -543,9 +543,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
                     />
                   )}
 
-                  <div className="text-center py-4 text-gray-500">
-                    <p>Organisatie instellingen worden automatisch toegepast na het aanmaken van het lid.</p>
-                  </div>
+                  
                 </div>
               </TabsContent>
 

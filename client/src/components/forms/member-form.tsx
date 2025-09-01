@@ -320,6 +320,20 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
 
                   <FormField
                     control={form.control}
+                    name="bus"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Bus (optioneel)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="A" {...field} data-testid="input-bus" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
                     name="postalCode"
                     render={({ field }) => (
                       <FormItem>

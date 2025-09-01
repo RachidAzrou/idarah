@@ -15,18 +15,10 @@ export default function Dashboard() {
         <main className="flex-1 py-4">
           <div className="px-4 sm:px-6 lg:px-8 w-full">
             {/* Page Header */}
-            <div className="sm:flex sm:items-center sm:justify-between mb-6">
+            <div className="mb-6">
               <div>
                 <h1 className="text-2xl font-bold text-gray-900" data-testid="page-title">Dashboard</h1>
                 <p className="mt-1 text-sm text-gray-700">Overzicht van jouw moskee ledenbeheer</p>
-              </div>
-              <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-                <Link href="/leden">
-                  <Button className="inline-flex items-center gap-x-2 rounded-lg px-4 py-2" data-testid="button-new-member">
-                    <Plus className="h-4 w-4" />
-                    Nieuw Lid
-                  </Button>
-                </Link>
               </div>
             </div>
 

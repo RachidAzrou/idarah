@@ -223,27 +223,29 @@ export default function FinancePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-7xl mx-auto p-6 space-y-8">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-              Financiën
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">
-              Overzicht van inkomsten en uitgaven
-            </p>
+    <main className="flex-1 py-4">
+      <div className="px-4 sm:px-6 lg:px-8 w-full">
+        {/* Page Header */}
+        <div className="mb-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900" data-testid="page-title">
+                Financiën
+              </h1>
+              <p className="mt-1 text-sm text-gray-700">
+                Overzicht van inkomsten en uitgaven
+              </p>
+            </div>
+            <Button 
+              onClick={() => setShowNewTransactionDialog(true)}
+              className="gap-2"
+              size="lg"
+              data-testid="button-new-transaction-header"
+            >
+              <Plus className="h-5 w-5" />
+              Nieuwe transactie
+            </Button>
           </div>
-          <Button 
-            onClick={() => setShowNewTransactionDialog(true)}
-            className="gap-2"
-            size="lg"
-            data-testid="button-new-transaction-header"
-          >
-            <Plus className="h-5 w-5" />
-            Nieuwe transactie
-          </Button>
         </div>
 
         {/* Main Content Tabs */}
@@ -346,6 +348,6 @@ export default function FinancePage() {
           variant="destructive"
         />
       </div>
-    </div>
+    </main>
   );
 }

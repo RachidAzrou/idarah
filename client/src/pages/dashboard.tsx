@@ -53,16 +53,8 @@ export default function Dashboard() {
             </div>
 
             {/* Bottom Row */}
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
+            <div className="mb-6">
               <DueDates />
-              {/* Placeholder voor toekomstige content */}
-              <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-                <div className="text-center py-8">
-                  <div className="text-gray-400 text-sm">
-                    Ruimte voor aanvullende widgets
-                  </div>
-                </div>
-              </div>
             </div>
 
             {/* Recent Activities - Full width at bottom */}

@@ -13,8 +13,8 @@ interface ToolbarProps {
   onStatusFilterChange: (value: string) => void;
   categoryFilter: string;
   onCategoryFilterChange: (value: string) => void;
-  genderFilter: string;
-  onGenderFilterChange: (value: string) => void;
+  votingRightsFilter: string;
+  onVotingRightsFilterChange: (value: string) => void;
   joinDateFrom: string;
   onJoinDateFromChange: (value: string) => void;
   joinDateTo: string;
@@ -35,8 +35,8 @@ export function Toolbar({
   onStatusFilterChange,
   categoryFilter,
   onCategoryFilterChange,
-  genderFilter,
-  onGenderFilterChange,
+  votingRightsFilter,
+  onVotingRightsFilterChange,
   joinDateFrom,
   onJoinDateFromChange,
   joinDateTo,
@@ -127,14 +127,14 @@ export function Toolbar({
                 </SelectContent>
               </Select>
 
-              <Select value={genderFilter} onValueChange={onGenderFilterChange}>
-                <SelectTrigger className="w-[160px] h-9 border-gray-200" data-testid="gender-filter">
-                  <SelectValue placeholder="Alle geslachten" />
+              <Select value={votingRightsFilter} onValueChange={onVotingRightsFilterChange}>
+                <SelectTrigger className="w-[180px] h-9 border-gray-200" data-testid="voting-rights-filter">
+                  <SelectValue placeholder="Alle stemgerechtigden" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Alle geslachten</SelectItem>
-                  <SelectItem value="M">Man</SelectItem>
-                  <SelectItem value="V">Vrouw</SelectItem>
+                  <SelectItem value="all">Alle stemgerechtigden</SelectItem>
+                  <SelectItem value="yes">Stemgerechtigd</SelectItem>
+                  <SelectItem value="no">Niet stemgerechtigd</SelectItem>
                 </SelectContent>
               </Select>
 

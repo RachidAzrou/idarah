@@ -32,7 +32,7 @@ export default function Leden() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
-  const [genderFilter, setGenderFilter] = useState("all");
+  const [votingRightsFilter, setVotingRightsFilter] = useState("all");
   const [joinDateFrom, setJoinDateFrom] = useState("");
   const [joinDateTo, setJoinDateTo] = useState("");
   const [paymentStatusFilter, setPaymentStatusFilter] = useState("all");
@@ -81,8 +81,10 @@ export default function Leden() {
       // Category filter  
       const categoryMatch = categoryFilter === "all" || member.category === categoryFilter;
       
-      // Gender filter
-      const genderMatch = genderFilter === "all" || member.gender === genderFilter;
+      // Voting rights filter (based on age and category)
+      const votingRightsMatch = votingRightsFilter === "all" || 
+        (votingRightsFilter === "yes" && (member.category === "VOLWASSEN" || member.category === "SENIOR")) ||
+        (votingRightsFilter === "no" && (member.category === "STUDENT" || member.category === "JEUGD"));
       
       // Date range filter
       let dateMatch = true;
@@ -121,11 +123,11 @@ export default function Leden() {
         }
       }
       
-      return searchMatch && statusMatch && categoryMatch && genderMatch && 
+      return searchMatch && statusMatch && categoryMatch && votingRightsMatch && 
              dateMatch && paymentMatch && categoryAdvancedMatch && 
              statusAdvancedMatch && genderAdvancedMatch && dateAdvancedMatch;
     });
-  }, [members, searchTerm, statusFilter, categoryFilter, genderFilter, joinDateFrom, joinDateTo, paymentStatusFilter, advancedFilters]);
+  }, [members, searchTerm, statusFilter, categoryFilter, votingRightsFilter, joinDateFrom, joinDateTo, paymentStatusFilter, advancedFilters]);
   
   // Pagination
   const totalMembers = filteredMembers.length;
@@ -182,7 +184,7 @@ export default function Leden() {
     setSearchTerm("");
     setStatusFilter("all");
     setCategoryFilter("all");
-    setGenderFilter("all");
+    setVotingRightsFilter("all");
     setJoinDateFrom("");
     setJoinDateTo("");
     setPaymentStatusFilter("all");
@@ -220,8 +222,8 @@ export default function Leden() {
           onStatusFilterChange={setStatusFilter}
           categoryFilter={categoryFilter}
           onCategoryFilterChange={setCategoryFilter}
-          genderFilter={genderFilter}
-          onGenderFilterChange={setGenderFilter}
+          votingRightsFilter={votingRightsFilter}
+          onVotingRightsFilterChange={setVotingRightsFilter}
           joinDateFrom={joinDateFrom}
           onJoinDateFromChange={setJoinDateFrom}
           joinDateTo={joinDateTo}

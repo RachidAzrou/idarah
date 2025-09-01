@@ -34,30 +34,30 @@ export default function Dashboard() {
             <ModernKpiCards />
 
             {/* Charts Row 1 */}
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-4 md:mb-6">
               <RevenueChart />
               <PaymentStatusChart />
             </div>
 
             {/* Revenue by Category - Full width */}
-            <div className="mb-6">
+            <div className="mb-4 md:mb-6">
               <RevenueByCategoryChart />
             </div>
 
             {/* Charts Row 2 */}
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 mb-4 md:mb-6">
               <MembersByCategoryChart />
-              <div className="xl:col-span-2">
+              <div className="lg:col-span-2">
                 <AgeGenderChart />
               </div>
             </div>
 
             {/* Bottom Row */}
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-4 md:mb-6">
               <DueDates />
               {/* Placeholder voor toekomstige content */}
-              <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-                <div className="text-center py-8">
+              <div className="bg-white rounded-2xl border border-gray-200 p-4 md:p-6 shadow-sm">
+                <div className="text-center py-6 md:py-8">
                   <div className="text-gray-400 text-sm">
                     Ruimte voor aanvullende widgets
                   </div>
@@ -66,7 +66,7 @@ export default function Dashboard() {
             </div>
 
             {/* Recent Activities - Full width at bottom */}
-            <div className="mb-6">
+            <div className="mb-4 md:mb-6">
               <RecentActivities />
             </div>
           </div>

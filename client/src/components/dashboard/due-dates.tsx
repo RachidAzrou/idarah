@@ -1,4 +1,5 @@
-import { Calendar, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
+import { BiCalendarExclamation } from 'react-icons/bi';
 import { Button } from '@/components/ui/button';
 
 const dueDates = [
@@ -51,7 +52,7 @@ export default function DueDates() {
         {dueDates.map((item) => (
           <div key={item.id} className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center flex-shrink-0">
-              <Calendar className="h-4 w-4 text-blue-600" />
+              <BiCalendarExclamation className="h-4 w-4 text-blue-600" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-gray-900">

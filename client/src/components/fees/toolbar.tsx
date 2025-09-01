@@ -1,8 +1,16 @@
-import { Search, Download, Upload, CreditCard, Plus } from "lucide-react";
+import { Search, Download, Upload, CreditCard, Plus, CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format } from "date-fns";
+import { nl } from "date-fns/locale";
+import { cn } from "@/lib/utils";
+import { RiResetLeftFill } from "react-icons/ri";
 
 interface ToolbarProps {
   searchTerm: string;
@@ -13,13 +21,27 @@ interface ToolbarProps {
   onYearFilterChange: (value: string) => void;
   methodFilter: string;
   onMethodFilterChange: (value: string) => void;
+  categoryFilter: string;
+  onCategoryFilterChange: (value: string) => void;
+  amountMin?: number;
+  onAmountMinChange: (value: number | undefined) => void;
+  amountMax?: number;
+  onAmountMaxChange: (value: number | undefined) => void;
+  paidFrom?: Date;
+  onPaidFromChange: (date: Date | undefined) => void;
+  paidTo?: Date;
+  onPaidToChange: (date: Date | undefined) => void;
+  onlyWithMandate: boolean;
+  onOnlyWithMandateChange: (value: boolean) => void;
+  onlyOverdue: boolean;
+  onOnlyOverdueChange: (value: boolean) => void;
+  onResetFilters: () => void;
   selectedCount: number;
   sepaSelectedCount: number;
   onExport: () => void;
   onImport: () => void;
   onGenerateSepa: () => void;
   onBulkMarkPaid: () => void;
-  filtersDrawer?: React.ReactNode;
   newButton?: React.ReactNode;
 }
 
@@ -32,13 +54,27 @@ export function Toolbar({
   onYearFilterChange,
   methodFilter,
   onMethodFilterChange,
+  categoryFilter,
+  onCategoryFilterChange,
+  amountMin,
+  onAmountMinChange,
+  amountMax,
+  onAmountMaxChange,
+  paidFrom,
+  onPaidFromChange,
+  paidTo,
+  onPaidToChange,
+  onlyWithMandate,
+  onOnlyWithMandateChange,
+  onlyOverdue,
+  onOnlyOverdueChange,
+  onResetFilters,
   selectedCount,
   sepaSelectedCount,
   onExport,
   onImport,
   onGenerateSepa,
   onBulkMarkPaid,
-  filtersDrawer,
   newButton,
 }: ToolbarProps) {
   const currentYear = new Date().getFullYear();
@@ -80,7 +116,6 @@ export function Toolbar({
                 <Upload className="h-4 w-4 mr-2" />
                 Import
               </Button>
-              {filtersDrawer && filtersDrawer}
               {newButton && newButton}
             </div>
           </div>
@@ -126,6 +161,125 @@ export function Toolbar({
                   <SelectItem value="CASH">Contant</SelectItem>
                 </SelectContent>
               </Select>
+
+              <Select value={categoryFilter} onValueChange={onCategoryFilterChange}>
+                <SelectTrigger className="w-[170px] h-9 border-gray-200" data-testid="category-filter">
+                  <SelectValue placeholder="Alle categorieën" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alle categorieën</SelectItem>
+                  <SelectItem value="STUDENT">Student</SelectItem>
+                  <SelectItem value="VOLWASSEN">Volwassen</SelectItem>
+                  <SelectItem value="SENIOR">Senior</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Second row of filters */}
+            <div className="flex flex-wrap gap-3 items-center">
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-600">Bedrag:</span>
+                <Input
+                  type="number"
+                  placeholder="Min €"
+                  value={amountMin || ""}
+                  onChange={(e) => onAmountMinChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                  className="w-[100px] h-9 border-gray-200"
+                  data-testid="amount-min"
+                />
+                <span className="text-sm text-gray-400">tot</span>
+                <Input
+                  type="number"
+                  placeholder="Max €"
+                  value={amountMax || ""}
+                  onChange={(e) => onAmountMaxChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                  className="w-[100px] h-9 border-gray-200"
+                  data-testid="amount-max"
+                />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-600">Betaald op:</span>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-[140px] h-9 justify-start text-left font-normal border-gray-200",
+                        !paidFrom && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {paidFrom ? format(paidFrom, "dd/MM/yyyy", { locale: nl }) : "Van datum"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar
+                      mode="single"
+                      selected={paidFrom}
+                      onSelect={onPaidFromChange}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+                <span className="text-sm text-gray-400">tot</span>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-[140px] h-9 justify-start text-left font-normal border-gray-200",
+                        !paidTo && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {paidTo ? format(paidTo, "dd/MM/yyyy", { locale: nl }) : "Tot datum"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar
+                      mode="single"
+                      selected={paidTo}
+                      onSelect={onPaidToChange}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="onlyWithMandate"
+                    checked={onlyWithMandate}
+                    onCheckedChange={onOnlyWithMandateChange}
+                  />
+                  <Label htmlFor="onlyWithMandate" className="text-sm">
+                    Alleen met SEPA-mandaat
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="onlyOverdue"
+                    checked={onlyOverdue}
+                    onCheckedChange={onOnlyOverdueChange}
+                  />
+                  <Label htmlFor="onlyOverdue" className="text-sm">
+                    Alleen achterstallig
+                  </Label>
+                </div>
+              </div>
+
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={onResetFilters}
+                className="h-9 px-3 border-gray-200 hover:border-gray-300"
+                data-testid="reset-filters-button"
+              >
+                <RiResetLeftFill className="h-4 w-4 mr-2" />
+                Reset filters
+              </Button>
             </div>
 
             {/* Bulk Actions */}

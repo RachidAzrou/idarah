@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { KpiCards } from "@/components/fees/kpi-cards";
 import { Toolbar } from "@/components/fees/toolbar";
-import { FiltersDrawer } from "@/components/fees/filters-drawer";
 import { FeesTable } from "@/components/fees/fees-table";
 import { FeeDetailSlideout } from "@/components/fees/fee-detail-slideout";
 import { ImportDialog } from "@/components/fees/import-dialog";
@@ -22,17 +21,13 @@ export default function Lidgelden() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [yearFilter, setYearFilter] = useState("all");
   const [methodFilter, setMethodFilter] = useState("all");
-  const [advancedFilters, setAdvancedFilters] = useState({
-    periodFrom: undefined as Date | undefined,
-    periodTo: undefined as Date | undefined,
-    categories: [] as string[],
-    amountMin: undefined as number | undefined,
-    amountMax: undefined as number | undefined,
-    paidFrom: undefined as Date | undefined,
-    paidTo: undefined as Date | undefined,
-    onlyWithMandate: false,
-    onlyOverdue: false,
-  });
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [amountMin, setAmountMin] = useState<number | undefined>();
+  const [amountMax, setAmountMax] = useState<number | undefined>();
+  const [paidFrom, setPaidFrom] = useState<Date | undefined>();
+  const [paidTo, setPaidTo] = useState<Date | undefined>();
+  const [onlyWithMandate, setOnlyWithMandate] = useState(false);
+  const [onlyOverdue, setOnlyOverdue] = useState(false);
 
   // Table state
   const [page, setPage] = useState(1);
@@ -52,12 +47,18 @@ export default function Lidgelden() {
       status: statusFilter,
       year: yearFilter,
       method: methodFilter,
-      ...advancedFilters,
+      categories: categoryFilter === "all" ? [] : [categoryFilter],
+      amountMin,
+      amountMax,
+      paidFrom,
+      paidTo,
+      onlyWithMandate,
+      onlyOverdue,
     };
     
     const filtered = filterFees(allFees, filters);
     return sortFees(filtered, sortBy, sortOrder);
-  }, [allFees, searchTerm, statusFilter, yearFilter, methodFilter, advancedFilters, sortBy, sortOrder]);
+  }, [allFees, searchTerm, statusFilter, yearFilter, methodFilter, categoryFilter, amountMin, amountMax, paidFrom, paidTo, onlyWithMandate, onlyOverdue, sortBy, sortOrder]);
 
   // Paginate results
   const paginatedResult = useMemo(() => {
@@ -144,18 +145,18 @@ export default function Lidgelden() {
     URL.revokeObjectURL(url);
   };
 
-  const resetAdvancedFilters = () => {
-    setAdvancedFilters({
-      periodFrom: undefined,
-      periodTo: undefined,
-      categories: [],
-      amountMin: undefined,
-      amountMax: undefined,
-      paidFrom: undefined,
-      paidTo: undefined,
-      onlyWithMandate: false,
-      onlyOverdue: false,
-    });
+  const resetAllFilters = () => {
+    setSearchTerm("");
+    setStatusFilter("all");
+    setYearFilter("all");
+    setMethodFilter("all");
+    setCategoryFilter("all");
+    setAmountMin(undefined);
+    setAmountMax(undefined);
+    setPaidFrom(undefined);
+    setPaidTo(undefined);
+    setOnlyWithMandate(false);
+    setOnlyOverdue(false);
   };
 
   return (
@@ -189,13 +190,21 @@ export default function Lidgelden() {
             onImport={() => setShowImportDialog(true)}
             onGenerateSepa={handleGenerateSepa}
             onBulkMarkPaid={handleBulkMarkPaid}
-            filtersDrawer={
-              <FiltersDrawer
-                filters={advancedFilters}
-                onFiltersChange={setAdvancedFilters as any}
-                onReset={resetAdvancedFilters}
-              />
-            }
+            categoryFilter={categoryFilter}
+            onCategoryFilterChange={setCategoryFilter}
+            amountMin={amountMin}
+            onAmountMinChange={setAmountMin}
+            amountMax={amountMax}
+            onAmountMaxChange={setAmountMax}
+            paidFrom={paidFrom}
+            onPaidFromChange={setPaidFrom}
+            paidTo={paidTo}
+            onPaidToChange={setPaidTo}
+            onlyWithMandate={onlyWithMandate}
+            onOnlyWithMandateChange={setOnlyWithMandate}
+            onlyOverdue={onlyOverdue}
+            onOnlyOverdueChange={setOnlyOverdue}
+            onResetFilters={resetAllFilters}
             newButton={
               <Button className="flex items-center gap-2">
                 <Plus className="h-4 w-4" />

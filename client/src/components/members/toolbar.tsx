@@ -104,7 +104,7 @@ export function Toolbar({
           <div className="flex flex-col gap-4">
             <div className="flex flex-wrap gap-3">
               <Select value={statusFilter} onValueChange={onStatusFilterChange}>
-                <SelectTrigger className="w-[140px] h-9 border-gray-200" data-testid="status-filter">
+                <SelectTrigger className="w-[160px] h-9 border-gray-200" data-testid="status-filter">
                   <SelectValue placeholder="Alle statussen" />
                 </SelectTrigger>
                 <SelectContent>
@@ -115,7 +115,7 @@ export function Toolbar({
               </Select>
 
               <Select value={categoryFilter} onValueChange={onCategoryFilterChange}>
-                <SelectTrigger className="w-[140px] h-9 border-gray-200" data-testid="category-filter">
+                <SelectTrigger className="w-[170px] h-9 border-gray-200" data-testid="category-filter">
                   <SelectValue placeholder="Alle categorieën" />
                 </SelectTrigger>
                 <SelectContent>
@@ -128,22 +128,22 @@ export function Toolbar({
               </Select>
 
               <Select value={genderFilter} onValueChange={onGenderFilterChange}>
-                <SelectTrigger className="w-[120px] h-9 border-gray-200" data-testid="gender-filter">
-                  <SelectValue placeholder="Geslacht" />
+                <SelectTrigger className="w-[140px] h-9 border-gray-200" data-testid="gender-filter">
+                  <SelectValue placeholder="Alle geslachten" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Alle</SelectItem>
+                  <SelectItem value="all">Alle geslachten</SelectItem>
                   <SelectItem value="M">Man</SelectItem>
                   <SelectItem value="V">Vrouw</SelectItem>
                 </SelectContent>
               </Select>
 
               <Select value={paymentStatusFilter} onValueChange={onPaymentStatusFilterChange}>
-                <SelectTrigger className="w-[140px] h-9 border-gray-200" data-testid="payment-status-filter">
-                  <SelectValue placeholder="Betaalstatus" />
+                <SelectTrigger className="w-[160px] h-9 border-gray-200" data-testid="payment-status-filter">
+                  <SelectValue placeholder="Alle betaalstatussen" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Alle</SelectItem>
+                  <SelectItem value="all">Alle betaalstatussen</SelectItem>
                   <SelectItem value="PAID">Betaald</SelectItem>
                   <SelectItem value="OPEN">Open</SelectItem>
                   <SelectItem value="OVERDUE">Achterstallig</SelectItem>

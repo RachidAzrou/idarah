@@ -223,7 +223,7 @@ export function TransactionsTable({
                   <StatusChip type={transaction.type} />
                 </TableCell>
                 <TableCell>{transaction.category}</TableCell>
-                <TableCell className={transaction.memberName ? "text-blue-600 dark:text-blue-400" : "text-gray-400"}>
+                <TableCell className={transaction.memberName ? "text-gray-900 dark:text-gray-100" : "text-gray-400"}>
                   {transaction.memberName || '-'}
                 </TableCell>
                 <TableCell className={`text-right font-medium ${transaction.type === 'INCOME' 

@@ -34,7 +34,7 @@ export default function Dashboard() {
             <ModernKpiCards />
 
             {/* Charts Row 1 */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
               <RevenueChart />
               <PaymentStatusChart />
             </div>
@@ -45,15 +45,15 @@ export default function Dashboard() {
             </div>
 
             {/* Charts Row 2 */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-              <div className="lg:col-span-2">
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
+              <div className="xl:col-span-2">
                 <MembersByCategoryChart />
               </div>
               <AgeGenderChart />
             </div>
 
             {/* Bottom Row */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
               <DueDates />
               {/* Placeholder voor toekomstige content */}
               <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">

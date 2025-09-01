@@ -45,7 +45,7 @@ export default function ModernKpiCards() {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-5 gap-4 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-6">
         {[...Array(5)].map((_, i) => (
           <Skeleton key={i} className="h-20 rounded-xl" />
         ))}
@@ -88,7 +88,7 @@ export default function ModernKpiCards() {
   ];
 
   return (
-    <div className="grid grid-cols-5 gap-4 mb-6">
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-6">
       {kpiData.map((kpi, index) => (
         <KpiCard
           key={index}

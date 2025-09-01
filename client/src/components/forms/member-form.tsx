@@ -132,7 +132,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
                       <FormItem>
                         <FormLabel>Voornaam</FormLabel>
                         <FormControl>
-                          <Input placeholder="Voornaam" {...field} data-testid="input-firstname" />
+                          <Input placeholder="bijv. Mohamed" {...field} data-testid="input-firstname" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -146,7 +146,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
                       <FormItem>
                         <FormLabel>Achternaam</FormLabel>
                         <FormControl>
-                          <Input placeholder="Achternaam" {...field} data-testid="input-lastname" />
+                          <Input placeholder="bijv. El-Amrani" {...field} data-testid="input-lastname" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -219,7 +219,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
                       <FormItem>
                         <FormLabel>E-mailadres (optioneel)</FormLabel>
                         <FormControl>
-                          <Input type="email" placeholder="email@example.com" {...field} data-testid="input-email" />
+                          <Input type="email" placeholder="mohamed@telenet.be" {...field} data-testid="input-email" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -233,7 +233,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
                       <FormItem>
                         <FormLabel>Telefoon (optioneel)</FormLabel>
                         <FormControl>
-                          <Input placeholder="+32 xxx xx xx xx" {...field} data-testid="input-phone" />
+                          <Input placeholder="+32 2 123 45 67" {...field} data-testid="input-phone" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -251,7 +251,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
                       <FormItem>
                         <FormLabel>Straat (optioneel)</FormLabel>
                         <FormControl>
-                          <Input placeholder="Straatnaam" {...field} data-testid="input-street" />
+                          <Input placeholder="Wetstraat" {...field} data-testid="input-street" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -265,7 +265,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
                       <FormItem>
                         <FormLabel>Nummer (optioneel)</FormLabel>
                         <FormControl>
-                          <Input placeholder="123" {...field} data-testid="input-number" />
+                          <Input placeholder="16" {...field} data-testid="input-number" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -349,7 +349,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
                       <FormItem>
                         <FormLabel>IBAN (optioneel)</FormLabel>
                         <FormControl>
-                          <Input placeholder="BE xx xxxx xxxx xxxx" {...field} data-testid="input-iban" />
+                          <Input placeholder="BE68 5390 0754 7034" {...field} data-testid="input-iban" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

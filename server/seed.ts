@@ -8,7 +8,7 @@ async function seedDatabase() {
 
   try {
     // 1. Create demo tenant (mosque)
-    const [existingTenant] = await db.select().from(tenants).where(eq(tenants.slug, "demo-moskee"));
+    const [existingTenant] = await db.select().from(tenants).where(eq(tenants.slug, "al-nour-brussel"));
     
     let tenantId: string;
     if (existingTenant) {
@@ -16,8 +16,8 @@ async function seedDatabase() {
       console.log("✅ Demo tenant already exists");
     } else {
       const [newTenant] = await db.insert(tenants).values({
-        name: "Demo Moskee",
-        slug: "demo-moskee",
+        name: "Moskee Al-Nour Brussel",
+        slug: "al-nour-brussel",
         primaryColor: "#2563EB"
       }).returning();
       tenantId = newTenant.id;
@@ -27,23 +27,23 @@ async function seedDatabase() {
     // 2. Create demo users for each role
     const demoUsers = [
       {
-        email: "superadmin@demo.nl",
+        email: "superadmin@moskee.be",
         password: "demo123",
         name: "Super Administrator",
         role: "SUPERADMIN" as const,
         description: "Volledige toegang tot alle organisaties en systeem instellingen"
       },
       {
-        email: "beheerder@demo.nl", 
+        email: "beheerder@moskee.be", 
         password: "demo123",
-        name: "Ahmed Al-Beheerder",
+        name: "Ahmed El-Hassani",
         role: "BEHEERDER" as const,
-        description: "Beheerder van Demo Moskee met volledige toegang tot organisatie"
+        description: "Beheerder van Demo Moskee Brussel met volledige toegang tot organisatie"
       },
       {
-        email: "medewerker@demo.nl",
+        email: "medewerker@moskee.be",
         password: "demo123", 
-        name: "Fatima Medewerker",
+        name: "Fatima Bouchouchi",
         role: "MEDEWERKER" as const,
         description: "Medewerker met beperkte toegang tot leden en basis functies"
       }
@@ -78,9 +78,9 @@ async function seedDatabase() {
     console.log("┌─────────────────┬─────────────────────┬─────────────┬──────────────────────────────────────────────┐");
     console.log("│ Rol             │ Email               │ Wachtwoord  │ Beschrijving                                 │");
     console.log("├─────────────────┼─────────────────────┼─────────────┼──────────────────────────────────────────────┤");
-    console.log("│ SUPERADMIN      │ superadmin@demo.nl  │ demo123     │ Volledige toegang tot alle organisaties      │");
-    console.log("│ BEHEERDER       │ beheerder@demo.nl   │ demo123     │ Beheerder van Demo Moskee                    │");
-    console.log("│ MEDEWERKER      │ medewerker@demo.nl  │ demo123     │ Medewerker met beperkte toegang              │");
+    console.log("│ SUPERADMIN      │ superadmin@moskee.be │ demo123     │ Volledige toegang tot alle organisaties      │");
+    console.log("│ BEHEERDER       │ beheerder@moskee.be │ demo123     │ Beheerder van Al-Nour Brussel                │");
+    console.log("│ MEDEWERKER      │ medewerker@moskee.be │ demo123     │ Medewerker met beperkte toegang              │");
     console.log("└─────────────────┴─────────────────────┴─────────────┴──────────────────────────────────────────────┘");
 
   } catch (error) {

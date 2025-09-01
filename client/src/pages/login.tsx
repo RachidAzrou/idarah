@@ -80,7 +80,7 @@ export default function Login() {
                     autoComplete="email"
                     required
                     className="pl-10"
-                    placeholder="jouw@email.com"
+                    placeholder="naam@moskee.be"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     data-testid="input-email"

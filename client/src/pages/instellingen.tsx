@@ -312,7 +312,7 @@ export default function Instellingen() {
                               <FormItem>
                                 <FormLabel>Organisatienaam</FormLabel>
                                 <FormControl>
-                                  <Input placeholder="Moskee Al-Noor" {...field} data-testid="input-org-name" />
+                                  <Input placeholder="Moskee Al-Nour Brussel" {...field} data-testid="input-org-name" />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -326,7 +326,7 @@ export default function Instellingen() {
                               <FormItem>
                                 <FormLabel>URL Identificatie</FormLabel>
                                 <FormControl>
-                                  <Input placeholder="moskee-al-noor" {...field} data-testid="input-org-slug" />
+                                  <Input placeholder="al-nour-brussel" {...field} data-testid="input-org-slug" />
                                 </FormControl>
                                 <FormDescription>
                                   Gebruikt voor unieke identificatie in URL's
@@ -588,7 +588,7 @@ export default function Instellingen() {
                                 <FormItem>
                                   <FormLabel>Naam</FormLabel>
                                   <FormControl>
-                                    <Input placeholder="Volledige naam" {...field} data-testid="input-user-name" />
+                                    <Input placeholder="Ahmed Benali" {...field} data-testid="input-user-name" />
                                   </FormControl>
                                   <FormMessage />
                                 </FormItem>
@@ -602,7 +602,7 @@ export default function Instellingen() {
                                 <FormItem>
                                   <FormLabel>E-mailadres</FormLabel>
                                   <FormControl>
-                                    <Input type="email" placeholder="gebruiker@email.com" {...field} data-testid="input-user-email" />
+                                    <Input type="email" placeholder="gebruiker@moskee.be" {...field} data-testid="input-user-email" />
                                   </FormControl>
                                   <FormMessage />
                                 </FormItem>
@@ -743,7 +743,7 @@ export default function Instellingen() {
                                   <FormItem>
                                     <FormLabel>Regelnaam</FormLabel>
                                     <FormControl>
-                                      <Input placeholder="Stemrecht lidmaatschap" {...field} data-testid="input-rule-name" />
+                                      <Input placeholder="Stemrecht voor volwassen leden" {...field} data-testid="input-rule-name" />
                                     </FormControl>
                                     <FormMessage />
                                   </FormItem>

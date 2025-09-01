@@ -37,7 +37,7 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-sidebar-border bg-sidebar backdrop-blur supports-[backdrop-filter]:bg-sidebar/95">
-      <div className="w-full flex h-12 items-center px-4">
+      <div className="w-full flex h-12 items-center px-4 sm:px-6 lg:px-8">
         {/* Logo - helemaal links */}
         <div className="flex items-center">
           <Link href="/dashboard" className="flex items-center space-x-3">

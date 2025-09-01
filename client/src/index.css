@@ -210,6 +210,6 @@
   
   /* Content area styles */
   .content-area {
-    @apply max-w-7xl mx-auto px-6 py-4 h-[calc(100vh-3rem)] overflow-auto;
+    @apply w-full h-[calc(100vh-3rem)] overflow-auto;
   }
 }

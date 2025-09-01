@@ -16,7 +16,7 @@ export default function PaymentStatusChart() {
         <p className="text-sm text-gray-500">Verdeling van betalingen</p>
       </div>
       
-      <div className="relative h-48 mb-6">
+      <div className="relative h-64 mb-6">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
@@ -25,8 +25,8 @@ export default function PaymentStatusChart() {
               cy="75%"
               startAngle={180}
               endAngle={0}
-              innerRadius={60}
-              outerRadius={90}
+              innerRadius={80}
+              outerRadius={120}
               paddingAngle={2}
               dataKey="value"
             >

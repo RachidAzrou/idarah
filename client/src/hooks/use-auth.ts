@@ -11,7 +11,13 @@ interface AuthState {
 }
 
 export function useAuth(): AuthState {
-  const [token, setToken] = useState<string | null>(localStorage.getItem("authToken"));
+  const [token, setToken] = useState<string | null>(() => {
+    // Check localStorage when initializing
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem("authToken");
+    }
+    return null;
+  });
   const [hasAuthError, setHasAuthError] = useState(false);
   const queryClient = useQueryClient();
 
@@ -19,17 +25,29 @@ export function useAuth(): AuthState {
     queryKey: ["/api/auth/me"],
     enabled: !!token && !hasAuthError,
     retry: false,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes (was cacheTime)
   });
 
   // Handle authentication errors by clearing invalid tokens
   useEffect(() => {
     if (error && token && !hasAuthError) {
+      console.log("Authentication error detected, clearing token");
       setHasAuthError(true);
-      localStorage.removeItem("authToken");
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem("authToken");
+      }
       setToken(null);
       queryClient.clear();
     }
   }, [error, token, hasAuthError, queryClient]);
+
+  // Reset auth error when token changes (for retry)
+  useEffect(() => {
+    if (token && hasAuthError) {
+      setHasAuthError(false);
+    }
+  }, [token, hasAuthError]);
 
   const loginMutation = useMutation({
     mutationFn: async ({ email, password }: { email: string; password: string }) => {
@@ -37,8 +55,11 @@ export function useAuth(): AuthState {
       return response.json();
     },
     onSuccess: (data) => {
-      localStorage.setItem("authToken", data.token);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem("authToken", data.token);
+      }
       setToken(data.token);
+      setHasAuthError(false);
       queryClient.setQueryData(["/api/auth/me"], data.user);
     },
   });
@@ -46,38 +67,15 @@ export function useAuth(): AuthState {
   const logoutMutation = useMutation({
     mutationFn: () => apiRequest("POST", "/api/auth/logout"),
     onSuccess: () => {
-      localStorage.removeItem("authToken");
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem("authToken");
+      }
       setToken(null);
+      setHasAuthError(false);
       queryClient.clear();
     },
   });
 
-  // Set authorization header for requests
-  useEffect(() => {
-    if (token) {
-      const originalRequest = apiRequest;
-      // Override apiRequest to include authorization header
-      (window as any).apiRequest = async (method: string, url: string, data?: unknown) => {
-        const headers: Record<string, string> = data ? { "Content-Type": "application/json" } : {};
-        if (token) {
-          headers.Authorization = `Bearer ${token}`;
-        }
-
-        const res = await fetch(url, {
-          method,
-          headers,
-          body: data ? JSON.stringify(data) : undefined,
-          credentials: "include",
-        });
-
-        if (!res.ok) {
-          const text = (await res.text()) || res.statusText;
-          throw new Error(`${res.status}: ${text}`);
-        }
-        return res;
-      };
-    }
-  }, [token]);
 
   const login = async (email: string, password: string) => {
     try {
@@ -90,15 +88,20 @@ export function useAuth(): AuthState {
 
   const logout = () => {
     // Immediate cleanup regardless of API response
-    localStorage.removeItem("authToken");
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem("authToken");
+    }
     setToken(null);
+    setHasAuthError(false);
     queryClient.clear();
     
     // Also try the API logout but don't wait for it
     logoutMutation.mutate();
     
     // Force redirect to login
-    window.location.href = "/login";
+    if (typeof window !== 'undefined') {
+      window.location.href = "/login";
+    }
   };
 
   return {

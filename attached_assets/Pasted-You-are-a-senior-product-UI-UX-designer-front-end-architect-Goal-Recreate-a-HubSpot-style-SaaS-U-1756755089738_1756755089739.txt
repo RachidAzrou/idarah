@@ -1,0 +1,204 @@
+You are a senior product UI/UX designer + front-end architect.
+Goal: Recreate a HubSpot-style SaaS UI/UX (layout, patterns, components, micro-interactions) but customize it for my Membership Management app (multi-tenant, Belgium). Keep the clarity and IA of HubSpot, not their branding. Use Poppins font and custom colors (green primary, blue secondary). Generate a complete project skeleton and design system that I can “push my app into”.
+
+0) Tech + output format
+
+Stack: Next.js 14+ (App Router), React 18, TypeScript strict, TailwindCSS, shadcn/ui, lucide-react.
+
+Output:
+
+File/folder structure (tree)
+
+All key code files (layout shell, pages, components, tokens, Tailwind config)
+
+Design tokens (CSS variables + Tailwind theme extension)
+
+Example screens (Dashboard, Members list, New Member wizard, Fees, Transactions, Public Screens manager, Settings, Profile)
+
+Notes on UX patterns, accessibility, and micro-interactions
+
+Constraints: Clean, professional, accessible (WCAG AA), responsive, keyboard-friendly, minimal dependencies.
+
+1) Brand & Visual System (HubSpot-like, but ours)
+
+Typography: Poppins for all UI text; clear hierarchy (Display, H1…H6, Body, Caption) with sizes/line-height.
+
+Colors:
+
+Base surfaces: white / subtle grays.
+
+Primary accent: green #0F9D58 (buttons, actives, focus ring).
+
+Secondary accent: blue #2563EB (links/info).
+
+Text: #111827 (primary), #4B5563 (secondary).
+
+Status: success #22C55E, info #3B82F6, warning #F59E0B, error #EF4444.
+
+Borders #E5E7EB; focus ring = 2px green @ 40% opacity (no layout shift).
+
+Radii: default 16px (cards/inputs), 6px (chips), 20px (hero/cards xl).
+
+Shadows: sm/md/lg (soft, not flashy) for elevation cues.
+
+Spacing scale: 4/8/12/16/20/24/32/40.
+
+Iconography: lucide (linear, consistent). Use color sparingly.
+
+2) Layout IA (HubSpot-style shell)
+
+Topbar (global): white, 56–64px; left: logo + tenant switcher; center: global search (⌘K/CTRL-K); right: notifications, help, profile menu. Subtle bottom border.
+
+Sidebar (collapsible): dark slate background, icons + labels; active item shows a thin green bar and subtle highlight. Sections: Dashboard, Members, Fees, Finance, Public Screens, Settings, Profile.
+
+Content area: constrained to max-width 1440–1536, generous white space, card-first.
+
+Responsive: sidebar collapses < 1024px; mobile shows hamburger → sheet.
+
+3) Components (shadcn/ui based)
+
+Build polished, reusable primitives with clear states (default/hover/focus/active/disabled/error):
+
+Buttons: primary (green), secondary (gray), ghost, destructive (red).
+
+Inputs: text, email, tel, date, select (combobox), textarea, checkbox, radio, toggle, slider.
+
+Navigation: topbar, sidebar item, breadcrumbs, tabs.
+
+Data display: card, KPI card, table (sticky header, sortable cols, row hover, selection checkboxes), badge/chip (status colors), empty state, skeleton loader.
+
+Overlays: modal, drawer/slide-over, toast, tooltip, popover, command palette (⌘K).
+
+Charts (styling only): line, bar, donut (rounded, soft gridlines, hover tooltip).
+
+Utilities: 3-dots row actions menu, pagination, file upload (dropzone styling placeholder), search input with shortcut hint.
+
+4) Pages & example UIs (wire-realistic)
+
+Implement pages with HubSpot-like clarity and spacing. Add placeholder data + loading/empty/error states.
+
+Dashboard
+
+4 KPI cards (Active Members, Paid %, Outstanding, MTD Revenue)
+
+Line chart (Income vs Expenses), Donut (Paid vs Open)
+
+Recent Notifications list (right column or bottom)
+
+Members list
+
+Table: name, member no., category, status badge (Active/Inactive), fee status chip (Paid/Open/Overdue), actions (View/Edit)
+
+Filters: category, status, search; bulk actions on selected rows
+
+New Member wizard (4 steps)
+
+Personal → Address → Financial → Consents; progress bar + auto-save; inline validation
+
+Review step with summary + Confirm
+
+Fees overview
+
+Table: period, amount, method, status; bulk select; CTA “Generate SEPA”
+
+Slide-over with fee details and “Mark Paid”
+
+Transactions
+
+Table with type, category, amount, date, member (optional); filters panel; export buttons
+
+Public Screens manager
+
+List of screens with type (Payment Matrix / Announcements), token/URL, active toggle, config form
+
+Settings
+
+Tabs: Organization, Branding (tenant color preview), Fees, Security, Rules
+
+Forms with validation and previews
+
+Profile
+
+User info, password change, notification prefs
+
+5) UX patterns & micro-interactions (HubSpot vibe)
+
+Command palette: ⌘K/CTRL-K to search entities (Members, Fees, Transactions).
+
+Toasts: compact, top-right, border in status color, auto-dismiss.
+
+Row hover: subtle background lift; shows 3-dots actions.
+
+Buttons: hover = slight elevation + 2% tint; active = compressed shadow.
+
+Forms: inline errors under fields; disabled states obvious; required indicators subtle.
+
+Empty states: icon + one-liner + primary CTA (consistent).
+
+Loading: skeletons for cards, table rows, and form sections.
+
+Keyboard: Enter = primary action; Esc closes overlays; logical tab order.
+
+A11y: ARIA labels for icon-only buttons, focus visible, AA contrast, no content shift on focus.
+
+6) Theming & Tailwind
+
+Provide CSS variables for tokens in globals.css.
+
+Map tokens in tailwind.config.ts (colors, borderRadius, boxShadow, fontFamily).
+
+Bridge shadcn/ui theme to our variables (primary = green).
+
+7) Project scaffold (files to generate)
+
+app/layout.tsx (wrap with shell), app/page.tsx (Dashboard)
+
+Pages: app/members/page.tsx, app/members/new/page.tsx, app/fees/page.tsx, app/finance/page.tsx, app/public-screens/page.tsx, app/settings/page.tsx, app/profile/page.tsx
+
+Shell: components/shell/topbar.tsx, components/shell/sidebar.tsx, components/shell/app-shell.tsx
+
+UI primitives: components/ui/* (button, input, select, table, badge, card, modal, drawer, toast, tooltip, tabs, command) using shadcn patterns
+
+Charts styling helpers: components/charts/* (with placeholder Recharts usage notes)
+
+Utilities: components/search/command-palette.tsx, components/data/data-table.tsx (sortable, selectable)
+
+Styling: app/globals.css, styles/shadcn-override.css
+
+Config: tailwind.config.ts, postcss.config.js, tsconfig.json
+
+Mock data + hooks for demo: lib/mock/*, lib/hooks/use-toast.ts, lib/utils.ts
+
+8) Acceptance criteria
+
+Layout matches a HubSpot-style IA: topbar, collapsible sidebar, card-based content, clean spacing.
+
+Poppins applied globally; color system uses our green/blue accents (no orange).
+
+All components have proper hover/focus/active/disabled/error states and pass WCAG AA.
+
+Command palette (⌘K) opens and filters mock entities.
+
+Tables support sorting, selection, row actions, and empty/loading/error states.
+
+Example pages render with cohesive styling and sensible defaults.
+
+Code is TypeScript-strict, modular, and easy to extend.
+
+9) Deliver exactly
+
+The file tree and complete code for all files above.
+
+A short README explaining how to run (pnpm i && pnpm dev) and where to add pages/features.
+
+Notes on how to swap tenant colors (CSS variables) and extend the design tokens.
+
+No placeholder lorem where real labels help comprehension—use realistic labels and copy.
+
+Important reminders:
+
+Keep it clean, professional, modern; lots of white space.
+
+Don’t mimic HubSpot’s orange branding.
+
+Make it easy for me to “push my app into it” by keeping routes and components generic and well-named.

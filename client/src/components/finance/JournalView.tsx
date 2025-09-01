@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { formatDateBE, formatCurrencyBE } from "@/lib/format";
 import { Transaction } from "@/lib/mock/transactions";
 import { MethodChip } from "@/components/ui/MethodChip";
+import { CiInboxOut, CiInboxIn } from "react-icons/ci";
 
 interface JournalViewProps {
   transactions: Transaction[];
@@ -134,7 +135,10 @@ export function JournalView({ transactions }: JournalViewProps) {
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
           <div className="p-6 pb-4 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Debet (Uitgaven)</h3>
+              <div className="flex items-center gap-2">
+                <CiInboxOut className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Debet (Uitgaven)</h3>
+              </div>
               <span className="text-sm text-gray-500 dark:text-gray-400">{debitTransactions.length} transacties</span>
             </div>
           </div>
@@ -173,7 +177,10 @@ export function JournalView({ transactions }: JournalViewProps) {
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
           <div className="p-6 pb-4 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Credit (Inkomsten)</h3>
+              <div className="flex items-center gap-2">
+                <CiInboxIn className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Credit (Inkomsten)</h3>
+              </div>
               <span className="text-sm text-gray-500 dark:text-gray-400">{creditTransactions.length} transacties</span>
             </div>
           </div>

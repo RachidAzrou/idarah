@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Search, Download, Upload, CreditCard, Plus, CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -77,8 +78,62 @@ export function Toolbar({
   onBulkMarkPaid,
   newButton,
 }: ToolbarProps) {
+  const [fromDateInput, setFromDateInput] = useState("");
+  const [toDateInput, setToDateInput] = useState("");
+  const [fromPopoverOpen, setFromPopoverOpen] = useState(false);
+  const [toPopoverOpen, setToPopoverOpen] = useState(false);
+
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 5 }, (_, i) => currentYear - i);
+
+  const formatDateInput = (value: string) => {
+    // Remove all non-numeric characters
+    const numbers = value.replace(/\D/g, '');
+    
+    // Apply DD/MM/YYYY formatting
+    if (numbers.length <= 2) {
+      return numbers;
+    } else if (numbers.length <= 4) {
+      return `${numbers.slice(0, 2)}/${numbers.slice(2)}`;
+    } else {
+      return `${numbers.slice(0, 2)}/${numbers.slice(2, 4)}/${numbers.slice(4, 8)}`;
+    }
+  };
+
+  const parseDate = (dateString: string): Date | undefined => {
+    const cleanString = dateString.replace(/\D/g, '');
+    if (cleanString.length === 8) {
+      const day = parseInt(cleanString.slice(0, 2));
+      const month = parseInt(cleanString.slice(2, 4)) - 1; // Month is 0-indexed
+      const year = parseInt(cleanString.slice(4, 8));
+      
+      const date = new Date(year, month, day);
+      if (date.getDate() === day && date.getMonth() === month && date.getFullYear() === year) {
+        return date;
+      }
+    }
+    return undefined;
+  };
+
+  const handleFromDateInput = (value: string) => {
+    const formatted = formatDateInput(value);
+    setFromDateInput(formatted);
+    
+    const parsedDate = parseDate(formatted);
+    if (parsedDate) {
+      onPaidFromChange(parsedDate);
+    }
+  };
+
+  const handleToDateInput = (value: string) => {
+    const formatted = formatDateInput(value);
+    setToDateInput(formatted);
+    
+    const parsedDate = parseDate(formatted);
+    if (parsedDate) {
+      onPaidToChange(parsedDate);
+    }
+  };
 
   return (
     <Card className="mb-6">
@@ -200,51 +255,183 @@ export function Toolbar({
 
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-600">Betaald op:</span>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-[140px] h-9 justify-start text-left font-normal border-gray-200",
-                        !paidFrom && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {paidFrom ? format(paidFrom, "dd/MM/yyyy", { locale: nl }) : "Van datum"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <Calendar
-                      mode="single"
-                      selected={paidFrom}
-                      onSelect={onPaidFromChange}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
+                
+                <div className="relative">
+                  <Input
+                    value={fromDateInput || (paidFrom ? format(paidFrom, "dd/MM/yyyy", { locale: nl }) : "")}
+                    onChange={(e) => handleFromDateInput(e.target.value)}
+                    placeholder="DD/MM/YYYY"
+                    className="w-[140px] h-9 border-gray-200 pr-10"
+                    data-testid="paid-date-from"
+                    maxLength={10}
+                  />
+                  <Popover open={fromPopoverOpen} onOpenChange={setFromPopoverOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0 hover:bg-gray-100"
+                        onClick={() => setFromPopoverOpen(true)}
+                      >
+                        <CalendarIcon className="h-4 w-4" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start" side="bottom">
+                      <div className="p-3 border-b">
+                        <div className="flex items-center justify-between space-x-2">
+                          <Select
+                            value={paidFrom ? paidFrom.getMonth().toString() : ""}
+                            onValueChange={(month) => {
+                              const currentDate = paidFrom || new Date();
+                              const newDate = new Date(currentDate.getFullYear(), parseInt(month), currentDate.getDate());
+                              onPaidFromChange(newDate);
+                              setFromDateInput("");
+                            }}
+                          >
+                            <SelectTrigger className="w-[120px] h-8">
+                              <SelectValue placeholder="Maand" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {Array.from({ length: 12 }, (_, i) => (
+                                <SelectItem key={i} value={i.toString()}>
+                                  {format(new Date(2000, i, 1), "MMMM", { locale: nl })}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Select
+                            value={paidFrom ? paidFrom.getFullYear().toString() : ""}
+                            onValueChange={(year) => {
+                              const currentDate = paidFrom || new Date();
+                              const newDate = new Date(parseInt(year), currentDate.getMonth(), currentDate.getDate());
+                              onPaidFromChange(newDate);
+                              setFromDateInput("");
+                            }}
+                          >
+                            <SelectTrigger className="w-[80px] h-8">
+                              <SelectValue placeholder="Jaar" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {Array.from({ length: 10 }, (_, i) => {
+                                const year = new Date().getFullYear() - i;
+                                return (
+                                  <SelectItem key={year} value={year.toString()}>
+                                    {year}
+                                  </SelectItem>
+                                );
+                              })}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      <Calendar
+                        mode="single"
+                        selected={paidFrom}
+                        onSelect={(date) => {
+                          onPaidFromChange(date);
+                          setFromDateInput("");
+                          setFromPopoverOpen(false);
+                        }}
+                        locale={nl}
+                        month={paidFrom || new Date()}
+                        onMonthChange={(month) => onPaidFromChange(month)}
+                        showOutsideDays={false}
+                        className="p-3"
+                        defaultMonth={new Date()}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                
                 <span className="text-sm text-gray-400">tot</span>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-[140px] h-9 justify-start text-left font-normal border-gray-200",
-                        !paidTo && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {paidTo ? format(paidTo, "dd/MM/yyyy", { locale: nl }) : "Tot datum"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <Calendar
-                      mode="single"
-                      selected={paidTo}
-                      onSelect={onPaidToChange}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
+                
+                <div className="relative">
+                  <Input
+                    value={toDateInput || (paidTo ? format(paidTo, "dd/MM/yyyy", { locale: nl }) : "")}
+                    onChange={(e) => handleToDateInput(e.target.value)}
+                    placeholder="DD/MM/YYYY"
+                    className="w-[140px] h-9 border-gray-200 pr-10"
+                    data-testid="paid-date-to"
+                    maxLength={10}
+                  />
+                  <Popover open={toPopoverOpen} onOpenChange={setToPopoverOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0 hover:bg-gray-100"
+                        onClick={() => setToPopoverOpen(true)}
+                      >
+                        <CalendarIcon className="h-4 w-4" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start" side="bottom">
+                      <div className="p-3 border-b">
+                        <div className="flex items-center justify-between space-x-2">
+                          <Select
+                            value={paidTo ? paidTo.getMonth().toString() : ""}
+                            onValueChange={(month) => {
+                              const currentDate = paidTo || new Date();
+                              const newDate = new Date(currentDate.getFullYear(), parseInt(month), currentDate.getDate());
+                              onPaidToChange(newDate);
+                              setToDateInput("");
+                            }}
+                          >
+                            <SelectTrigger className="w-[120px] h-8">
+                              <SelectValue placeholder="Maand" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {Array.from({ length: 12 }, (_, i) => (
+                                <SelectItem key={i} value={i.toString()}>
+                                  {format(new Date(2000, i, 1), "MMMM", { locale: nl })}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Select
+                            value={paidTo ? paidTo.getFullYear().toString() : ""}
+                            onValueChange={(year) => {
+                              const currentDate = paidTo || new Date();
+                              const newDate = new Date(parseInt(year), currentDate.getMonth(), currentDate.getDate());
+                              onPaidToChange(newDate);
+                              setToDateInput("");
+                            }}
+                          >
+                            <SelectTrigger className="w-[80px] h-8">
+                              <SelectValue placeholder="Jaar" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {Array.from({ length: 10 }, (_, i) => {
+                                const year = new Date().getFullYear() - i;
+                                return (
+                                  <SelectItem key={year} value={year.toString()}>
+                                    {year}
+                                  </SelectItem>
+                                );
+                              })}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      <Calendar
+                        mode="single"
+                        selected={paidTo}
+                        onSelect={(date) => {
+                          onPaidToChange(date);
+                          setToDateInput("");
+                          setToPopoverOpen(false);
+                        }}
+                        locale={nl}
+                        month={paidTo || new Date()}
+                        onMonthChange={(month) => onPaidToChange(month)}
+                        disabled={(date) => paidFrom ? date < paidFrom : false}
+                        showOutsideDays={false}
+                        className="p-3"
+                        defaultMonth={new Date()}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
               </div>
 
               <div className="flex items-center space-x-4">

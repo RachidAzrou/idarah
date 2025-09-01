@@ -252,7 +252,7 @@ export default function Leden() {
 
         {/* New Member Dialog */}
         <Dialog open={showNewMemberDialog} onOpenChange={setShowNewMemberDialog}>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-6xl max-h-[95vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <FiUserPlus className="h-5 w-5" />

@@ -46,15 +46,14 @@ export default function Dashboard() {
 
             {/* Charts Row 2 */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-              <MembersByCategoryChart />
-              <AgeGenderChart />
-              <div className="lg:col-span-1">
-                <RecentActivities />
+              <div className="lg:col-span-2">
+                <MembersByCategoryChart />
               </div>
+              <AgeGenderChart />
             </div>
 
             {/* Bottom Row */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
               <DueDates />
               {/* Placeholder voor toekomstige content */}
               <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
@@ -64,6 +63,11 @@ export default function Dashboard() {
                   </div>
                 </div>
               </div>
+            </div>
+
+            {/* Recent Activities - Full width at bottom */}
+            <div className="mb-6">
+              <RecentActivities />
             </div>
           </div>
         </main>

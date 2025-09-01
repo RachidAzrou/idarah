@@ -1,0 +1,154 @@
+Build a reusable dashboard card “Leeftijd en Geslacht” showing stacked horizontal bars for age buckets with male (blue) and female (purple) segments, a top-right total, legends, and per-row percentage labels. Use Poppins and a calm blue/purple palette.
+Stack: Next.js 14 (App Router), React 18, TypeScript (strict), TailwindCSS, shadcn/ui, lucide-react, Poppins.
+
+0) Lever precies dit
+
+Maak onderstaande bestanden met volledige code:
+
+app/(app)/dashboard/page.tsx – rendert de kaart in een container.
+
+components/dashboard/AgeGenderCard.tsx – hoofdcomponent van de kaart.
+
+components/charts/StackedBars.tsx – presentational component voor gestapelde horizontale balken met afgeronde uiteinden.
+
+lib/mock/age-gender.ts – mock data (buckets, male/female aantallen, totale som + per-row %).
+
+app/globals.css – Poppins import + basis CSS variabelen.
+
+tailwind.config.ts – tokens (kleuren, fonts, radius, shadow).
+
+styles/shadcn-override.css – map primary naar blauw.
+
+README.md – run-instructies (pnpm i && pnpm dev) en theming tips.
+
+1) Visuele specificaties (exact aanhouden)
+
+Card container
+
+Achtergrond #FFFFFF, border #E5E7EB (1px), radius 16px, shadow 0 6px 16px rgba(2,6,23,.08), padding 24px (boven/onder) en 28px (zijden).
+
+Header
+
+Linksboven:
+
+Titel: “Leeftijd en Geslacht” — Poppins 20px, semibold, kleur #0F172A.
+
+Subtitel: “Statistieken” — Poppins 14px, regular, #64748B.
+
+Rechtsboven (in de header): Totaal: label 14px #64748B, eronder groot getal 32–40px, bold, #0F172A.
+
+Onder de header: dunne divider #E2E8F0.
+
+Legenda (onder header, links uitgelijnd)
+
+Dot + label Man (blauw) en Vrouw (paars).
+
+Dot diameter 10–12px, labels Poppins 14–16px, kleur #475569.
+
+Rijen (één per leeftijdsgroep)
+
+Leeftijdslabels links: <18, 18–30, 30–50, 50–65, +65 — Poppins 14px, #475569.
+
+Track (achtergrondbalk): volle breedte min marges, hoogte 18px, radius 9999px, kleur #F4F6FA (lichtblauwgrijs).
+
+Segments:
+
+Man: blauw #3B82F6 (basis), aanzet mag iets donkerder #1E40AF in een zachte left→right gradient.
+
+Vrouw: paars #C084FC (basis) richting #A855F7 (cap).
+
+Beide segments hebben radius 9999px, en gap van 2px tussen segmenten (of overlappende caps met schaduw) zodat de aansluiting zacht oogt.
+
+Animatie: width-transitie duration-200 ease-out.
+
+Rechts per rij: percentage van de totale populatie (bv. 34,8%) — 14–16px, #475569, rechts uitgelijnd en verticaal gecentreerd met de balk.
+
+Afstanden
+
+Verticale afstand tussen rijen: 18–22px.
+
+Binnenmarges respecteren: links labelkolom 64–80px; rechts valuekolom 56–72px.
+
+2) Kleuren & tokens (blauw/paars)
+
+Tekst: #0F172A (primair), #64748B (secundair), #475569 (labels).
+
+Blue (Man): #1E40AF (dark), #3B82F6 (base), #93C5FD (light).
+
+Purple (Vrouw): #7C3AED (dark), #A855F7 (base), #E9D5FF (light).
+
+Track: #F4F6FA; Border: #E5E7EB.
+
+Focus ring: rgba(59,130,246,.4).
+
+3) Data (mock) — lib/mock/age-gender.ts
+export const ageGender = {
+  total: 1300,
+  buckets: [
+    { label: '<18',   male: 28,  female: 22 },   // 3.2%
+    { label: '18–30', male: 410, female: 365 },  // 28.8%
+    { label: '30–50', male: 455, female: 399 },  // 34.8%
+    { label: '50–65', male: 310, female: 0   +  // adjust
+                       0 + 0 + 0 + 0 + 0 + 0 }, // placeholder, replace with e.g. 0
+    // Better example numbers (replace previous line):
+    // { label: '50–65', male: 260, female: 49 }, // 23.8%
+    { label: '+65',   male: 140, female: 34 },   // 13.4%
+  ],
+};
+
+
+Opmerking: Bereken per rij: rowTotal = male + female; percentrij = rowTotal / total. Bereken ook segmentbreedtes: widthMale = (male / rowTotal) * 100%, widthFemale = (female / rowTotal) * 100%.
+
+(Vul de exacte waarden voor 50–65 in zoals in jouw dataset; in het voorbeeld is dat 23,8% van 1300 ≈ 309 totaal, b.v. male 260 / female 49.)
+
+4) Gedrag & toegankelijkheid
+
+Respecteer prefers-reduced-motion → zet animaties uit.
+
+Alle interactieve elementen hebben aria-label.
+
+Card is tabIndex=0 met duidelijke focus-ring (geen layout-shift).
+
+Percentages formatteren met Intl.NumberFormat('nl-BE', { style: 'percent', maximumFractionDigits: 1 }) of handmatig 34,8%.
+
+Labels worden niet afgekapt; wrap op kleine schermen.
+
+Responsief: <768px verhuis je het Totaal onder de titel; labels en percentages blijven goed leesbaar.
+
+5) Implementatie-details
+
+StackedBars.tsx ontvangt props:
+
+type Bucket = { label: string; male: number; female: number; percent: number };
+type Props = {
+  buckets: Bucket[];
+  colors?: { male: string; female: string; track: string };
+};
+
+
+Render per bucket:
+
+Links labelkolom.
+
+Midden een container track (relative) met twee absolutely positioned segments (male & female) met afgeronde caps.
+
+Rechts percentage (uit percent), horizontaal gecentreerd met bar hoogte.
+
+Utility: calcPercents(buckets, total) → verrijkt elke bucket met percent.
+
+Utility: cn() helper voor className concatenation.
+
+Tests (korte unit) voor sommen en percentberekening zijn welkom maar optioneel.
+
+6) Acceptatiecriteria
+
+Visueel gelijk aan de beschrijving: afgeronde, gestapelde balken per leeftijdsgroep; blauw (Man) en paars (Vrouw); totaal rechtsboven; percentrij rechts.
+
+Pixel-consistentie: vaste bar-hoogte, gelijke verticale spacing, labels netjes uitgelijnd.
+
+TypeScript-strict, geen any.
+
+Werkt vloeiend van 320px tot breed scherm zonder overflows.
+
+Output nu de volledige code voor alle genoemde bestanden, klaar om te runnen met pnpm i && pnpm dev.
+Kies bij onduidelijkheden verstandige defaults die de rustige, professionele stijl behouden.

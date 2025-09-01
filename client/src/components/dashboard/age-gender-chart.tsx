@@ -1,78 +1,70 @@
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from 'recharts';
+import React from 'react';
+import { StackedBars } from '@/components/charts/stacked-bars';
+import { ageGender } from '@/lib/mock/age-gender';
+import { calcPercents } from '@/lib/utils/age-gender';
 
-const data = [
-  { ageGroup: '<18', male: 45, female: 38, total: 83 },
-  { ageGroup: '18-30', male: 120, female: 95, total: 215 },
-  { ageGroup: '30-50', male: 180, female: 165, total: 345 },
-  { ageGroup: '50-65', male: 145, female: 125, total: 270 },
-  { ageGroup: '65+', male: 85, female: 95, total: 180 },
-];
+export default function AgeGenderCard() {
+  const { total, buckets } = ageGender;
+  const enrichedBuckets = calcPercents(buckets, total);
 
-export default function AgeGenderChart() {
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-      <div className="mb-6 pb-4 border-b border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900">Leeftijd en Geslacht</h3>
-        <p className="text-sm text-gray-500">Statistieken</p>
-      </div>
-      
-      <div className="h-64 mb-4">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart
-            data={data}
-            layout="horizontal"
-            margin={{ top: 20, right: 30, left: 40, bottom: 5 }}
-          >
-            <XAxis 
-              type="number"
-              axisLine={false}
-              tickLine={false}
-              tick={{ fontSize: 12, fill: '#64748B' }}
-            />
-            <YAxis 
-              type="category"
-              dataKey="ageGroup"
-              axisLine={false}
-              tickLine={false}
-              tick={{ fontSize: 12, fill: '#64748B' }}
-            />
-            <Bar 
-              dataKey="male" 
-              stackId="gender"
-              fill="#2563EB"
-              radius={[0, 0, 0, 0]}
-            />
-            <Bar 
-              dataKey="female" 
-              stackId="gender"
-              fill="#A855F7"
-              radius={[0, 4, 4, 0]}
-            />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-
-      <div className="flex items-center justify-center space-x-6 mb-4">
-        <div className="flex items-center space-x-2">
-          <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
-          <span className="text-sm text-gray-700">Man</span>
-        </div>
-        <div className="flex items-center space-x-2">
-          <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-          <span className="text-sm text-gray-700">Vrouw</span>
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        {data.map((item, index) => (
-          <div key={index} className="flex items-center justify-between text-sm">
-            <span className="font-medium text-gray-700">{item.ageGroup}</span>
-            <span className="text-gray-900 font-semibold">
-              {((item.total / 1247) * 100).toFixed(1)}%
-            </span>
+    <div 
+      className="bg-white rounded-2xl border border-gray-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-40"
+      style={{ 
+        boxShadow: '0 6px 16px rgba(2,6,23,0.08)',
+        padding: '24px 28px'
+      }}
+      tabIndex={0}
+    >
+      {/* Header with Total */}
+      <div className="mb-6 pb-4" style={{ borderBottom: '1px solid #E2E8F0' }}>
+        <div className="flex items-start justify-between">
+          <div>
+            <h3 className="text-lg font-semibold font-['Poppins']" style={{ color: '#0F172A' }}>
+              Leeftijd en Geslacht
+            </h3>
+            <p className="text-sm font-['Poppins']" style={{ color: '#64748B' }}>
+              Statistieken
+            </p>
           </div>
-        ))}
+          <div className="text-right">
+            <div className="text-sm font-['Poppins']" style={{ color: '#64748B' }}>
+              Totaal
+            </div>
+            <div 
+              className="text-3xl font-bold font-['Poppins']" 
+              style={{ color: '#0F172A' }}
+            >
+              {new Intl.NumberFormat('nl-BE').format(total)}
+            </div>
+          </div>
+        </div>
       </div>
+
+      {/* Legend */}
+      <div className="flex items-center space-x-6 mb-6">
+        <div className="flex items-center space-x-2">
+          <div 
+            className="w-3 h-3 rounded-full" 
+            style={{ backgroundColor: '#3B82F6' }}
+          ></div>
+          <span className="text-sm font-['Poppins']" style={{ color: '#475569' }}>
+            Man
+          </span>
+        </div>
+        <div className="flex items-center space-x-2">
+          <div 
+            className="w-3 h-3 rounded-full" 
+            style={{ backgroundColor: '#A855F7' }}
+          ></div>
+          <span className="text-sm font-['Poppins']" style={{ color: '#475569' }}>
+            Vrouw
+          </span>
+        </div>
+      </div>
+
+      {/* Stacked Bars */}
+      <StackedBars buckets={enrichedBuckets} />
     </div>
   );
 }

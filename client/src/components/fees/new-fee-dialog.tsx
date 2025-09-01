@@ -2,10 +2,11 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "@/hooks/use-toast";
-import { Plus } from "lucide-react";
+import { Plus, User, Calendar, CreditCard, Settings } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { SectionCard } from "@/components/ui/section-card";
@@ -29,6 +30,7 @@ interface NewFeeDialogProps {
 export function NewFeeDialog({ open, onOpenChange, onSuccess }: NewFeeDialogProps) {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [activeTab, setActiveTab] = useState("member");
 
   const form = useForm<NewFeeFormData>({
     resolver: zodResolver(NewFeeSchema),
@@ -161,88 +163,115 @@ export function NewFeeDialog({ open, onOpenChange, onSuccess }: NewFeeDialogProp
 
           <Form {...form}>
             <form onSubmit={(e) => e.preventDefault()}>
-              {/* Main Layout */}
+              {/* Main Layout with Tabs */}
               <div className="grid lg:grid-cols-[1fr,420px] gap-6">
-                {/* Left Column - Form */}
+                {/* Left Column - Form with Tabs */}
                 <div className="space-y-6">
-                  {/* Member Selection */}
-                  <SectionCard 
-                    title="Lid" 
-                    description="Selecteer het lid voor dit lidgeld"
-                  >
-                    <MemberSelect
-                      value={watchedValues.memberId}
-                      onChange={(memberId) => setValue('memberId', memberId)}
-                      error={errors.memberId?.message}
-                    />
-                  </SectionCard>
+                  <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                    <TabsList className="grid w-full grid-cols-4">
+                      <TabsTrigger value="member" className="flex items-center gap-2">
+                        <User className="h-4 w-4" />
+                        Lid
+                      </TabsTrigger>
+                      <TabsTrigger value="period" className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4" />
+                        Periode
+                      </TabsTrigger>
+                      <TabsTrigger value="payment" className="flex items-center gap-2">
+                        <CreditCard className="h-4 w-4" />
+                        Betaling
+                      </TabsTrigger>
+                      <TabsTrigger value="options" className="flex items-center gap-2">
+                        <Settings className="h-4 w-4" />
+                        Opties
+                      </TabsTrigger>
+                    </TabsList>
 
-                  {/* Period */}
-                  <SectionCard 
-                    title="Termijn & Periode" 
-                    description="Kies de betalingstermijn en periode"
-                  >
-                    <PeriodPicker
-                      term={watchedValues.term}
-                      onTermChange={handleTermChange}
-                      startDate={watchedValues.startDate}
-                      onStartDateChange={handleStartDateChange}
-                      endDate={watchedValues.endDate}
-                      onEndDateChange={(date) => setValue('endDate', date)}
-                      errors={{
-                        term: errors.term?.message,
-                        startDate: errors.startDate?.message,
-                        endDate: errors.endDate?.message,
-                      }}
-                    />
-                  </SectionCard>
+                    <div className="min-h-[400px] py-6">
+                      <TabsContent value="member" className="space-y-4 mt-0">
+                        <SectionCard 
+                          title="Lid" 
+                          description="Selecteer het lid voor dit lidgeld"
+                        >
+                          <MemberSelect
+                            value={watchedValues.memberId}
+                            onChange={(memberId) => setValue('memberId', memberId)}
+                            error={errors.memberId?.message}
+                          />
+                        </SectionCard>
+                      </TabsContent>
 
-                  {/* Method & Amount */}
-                  <SectionCard 
-                    title="Methode & Bedrag" 
-                    description="Kies de betalingsmethode en bedrag"
-                  >
-                    <div className="space-y-6">
-                      <MethodTerm
-                        method={watchedValues.method}
-                        onMethodChange={(method) => setValue('method', method)}
-                        iban={watchedValues.iban}
-                        onIbanChange={(iban) => setValue('iban', iban)}
-                        errors={{
-                          method: errors.method?.message,
-                          iban: errors.iban?.message,
-                        }}
-                      />
-                      
-                      <AmountInput
-                        value={watchedValues.amount}
-                        onChange={(amount) => setValue('amount', amount)}
-                        error={errors.amount?.message}
-                      />
+                      <TabsContent value="period" className="space-y-4 mt-0">
+                        <SectionCard 
+                          title="Termijn & Periode" 
+                          description="Kies de betalingstermijn en periode"
+                        >
+                          <PeriodPicker
+                            term={watchedValues.term}
+                            onTermChange={handleTermChange}
+                            startDate={watchedValues.startDate}
+                            onStartDateChange={handleStartDateChange}
+                            endDate={watchedValues.endDate}
+                            onEndDateChange={(date) => setValue('endDate', date)}
+                            errors={{
+                              term: errors.term?.message,
+                              startDate: errors.startDate?.message,
+                              endDate: errors.endDate?.message,
+                            }}
+                          />
+                        </SectionCard>
+                      </TabsContent>
+
+                      <TabsContent value="payment" className="space-y-4 mt-0">
+                        <SectionCard 
+                          title="Methode & Bedrag" 
+                          description="Kies de betalingsmethode en bedrag"
+                        >
+                          <div className="space-y-6">
+                            <MethodTerm
+                              method={watchedValues.method}
+                              onMethodChange={(method) => setValue('method', method)}
+                              iban={watchedValues.iban}
+                              onIbanChange={(iban) => setValue('iban', iban)}
+                              errors={{
+                                method: errors.method?.message,
+                                iban: errors.iban?.message,
+                              }}
+                            />
+                            
+                            <AmountInput
+                              value={watchedValues.amount}
+                              onChange={(amount) => setValue('amount', amount)}
+                              error={errors.amount?.message}
+                            />
+                          </div>
+                        </SectionCard>
+                      </TabsContent>
+
+                      <TabsContent value="options" className="space-y-4 mt-0">
+                        <SectionCard 
+                          title="Opties" 
+                          description="Aanvullende instellingen"
+                        >
+                          <div className="space-y-4">
+                            <div className="space-y-2">
+                              <Label className="text-sm font-medium">Notitie (optioneel)</Label>
+                              <Textarea
+                                value={watchedValues.note || ''}
+                                onChange={(e) => setValue('note', e.target.value)}
+                                placeholder="Voeg een notitie toe..."
+                                className="min-h-[80px] border-gray-200"
+                                maxLength={500}
+                              />
+                              <p className="text-xs text-gray-500">
+                                Maximaal 500 karakters
+                              </p>
+                            </div>
+                          </div>
+                        </SectionCard>
+                      </TabsContent>
                     </div>
-                  </SectionCard>
-
-                  {/* Options */}
-                  <SectionCard 
-                    title="Opties" 
-                    description="Aanvullende instellingen"
-                  >
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <Label className="text-sm font-medium">Notitie (optioneel)</Label>
-                        <Textarea
-                          value={watchedValues.note || ''}
-                          onChange={(e) => setValue('note', e.target.value)}
-                          placeholder="Voeg een notitie toe..."
-                          className="min-h-[80px] border-gray-200"
-                          maxLength={500}
-                        />
-                        <p className="text-xs text-gray-500">
-                          Maximaal 500 karakters
-                        </p>
-                      </div>
-                    </div>
-                  </SectionCard>
+                  </Tabs>
                 </div>
 
                 {/* Right Column - Preview */}

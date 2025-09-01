@@ -58,14 +58,9 @@ export default function PubliekeSchermen() {
           <div className="px-4 sm:px-6 lg:px-8">
             {/* Page Header */}
             <div className="sm:flex sm:items-center sm:justify-between mb-8">
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-purple-100 rounded-xl flex items-center justify-center">
-                  <Monitor className="h-5 w-5 text-purple-600" />
-                </div>
-                <div>
-                  <h1 className="text-3xl font-bold text-gray-900" data-testid="page-title">Publieke Schermen</h1>
-                  <p className="mt-2 text-sm text-gray-700">Beheer informatiedisplays en digitale mededelingenborden</p>
-                </div>
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900" data-testid="page-title">Publieke Schermen</h1>
+                <p className="mt-2 text-sm text-gray-700">Beheer informatiedisplays en digitale mededelingenborden</p>
               </div>
               <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
                 <Dialog open={showNewScreenDialog} onOpenChange={setShowNewScreenDialog}>

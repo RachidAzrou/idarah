@@ -207,27 +207,19 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
     <Card className="w-full max-w-4xl mx-auto">
       
       <CardContent>
-        <div className="mb-6 p-4 border border-dashed border-gray-300 rounded-lg bg-gray-50">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-sm font-medium text-gray-900">Snelle invoer via EID</h3>
-              <p className="text-xs text-gray-500 mt-1">
-                Scan je Belgische identiteitskaart om automatisch gegevens in te vullen
-              </p>
-            </div>
-            <Button
-              type="button"
-              onClick={handleEIDScan}
-              disabled={isScanning}
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-2"
-              data-testid="button-eid-scan"
-            >
-              <CreditCard className="h-4 w-4" />
-              {isScanning ? "Scannen..." : "Scan EID"}
-            </Button>
-          </div>
+        <div className="mb-6 flex justify-end">
+          <Button
+            type="button"
+            onClick={handleEIDScan}
+            disabled={isScanning}
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-2"
+            data-testid="button-eid-scan"
+          >
+            <CreditCard className="h-4 w-4" />
+            {isScanning ? "Scannen..." : "Scan EID"}
+          </Button>
         </div>
         
         <Form {...form}>

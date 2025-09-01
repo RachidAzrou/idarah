@@ -226,11 +226,8 @@ export function TransactionsTable({
                 <TableCell className={transaction.memberName ? "text-gray-900 dark:text-gray-100" : "text-gray-400"}>
                   {transaction.memberName || '-'}
                 </TableCell>
-                <TableCell className={`text-right font-medium ${transaction.type === 'INCOME' 
-                  ? 'text-green-600 dark:text-green-400' 
-                  : 'text-red-600 dark:text-red-400'
-                }`}>
-                  {formatCurrencyBE(transaction.amount)}
+                <TableCell className="text-right font-medium text-gray-900 dark:text-gray-100">
+                  {transaction.type === 'INCOME' ? '+' : '-'}{formatCurrencyBE(transaction.amount)}
                 </TableCell>
                 <TableCell>
                   <MethodChip method={transaction.method} />

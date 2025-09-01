@@ -36,7 +36,7 @@ export default function Navbar() {
   const { user, logout } = useAuth();
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-40 w-full border-b border-sidebar-border bg-sidebar/95 backdrop-blur supports-[backdrop-filter]:bg-sidebar/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
         <div className="flex items-center space-x-8">
@@ -44,7 +44,7 @@ export default function Navbar() {
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
               <Building2 className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="text-lg font-semibold text-foreground">Ledenbeheer</span>
+            <span className="text-lg font-semibold text-sidebar-foreground">Ledenbeheer</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -60,8 +60,8 @@ export default function Navbar() {
                   className={cn(
                     "flex items-center gap-x-2 px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200",
                     isActive
-                      ? "bg-primary text-primary-foreground shadow-sm"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                      ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-sm"
+                      : "text-sidebar-foreground hover:text-sidebar-foreground hover:bg-sidebar-accent"
                   )}
                   data-testid={`nav-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
                 >
@@ -77,13 +77,13 @@ export default function Navbar() {
         <div className="flex flex-1 justify-center max-w-md mx-8">
           <div className="relative w-full">
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-              <Search className="h-4 w-4 text-muted-foreground" />
+              <Search className="h-4 w-4 text-sidebar-foreground/70" />
             </div>
             <Input
               id="search-field"
               className={cn(
-                "w-full pl-10 pr-16 h-9 bg-muted/50 border-0 focus-visible:bg-background",
-                "placeholder:text-muted-foreground text-sm"
+                "w-full pl-10 pr-16 h-9 bg-sidebar-accent border-0 focus-visible:bg-sidebar text-sidebar-foreground",
+                "placeholder:text-sidebar-foreground/70 text-sm"
               )}
               placeholder="Zoek alles... (⌘K)"
               type="search"
@@ -91,7 +91,7 @@ export default function Navbar() {
               data-testid="search-input"
             />
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-              <kbd className="hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100 sm:flex">
+              <kbd className="hidden h-5 select-none items-center gap-1 rounded border border-sidebar-border bg-sidebar px-1.5 font-mono text-[10px] font-medium text-sidebar-foreground/70 opacity-100 sm:flex">
                 <Command className="h-3 w-3" />K
               </kbd>
             </div>
@@ -149,10 +149,10 @@ export default function Navbar() {
                     </span>
                   </div>
                   <div className="hidden sm:flex flex-col items-start">
-                    <span className="text-xs font-medium text-foreground">{user.name}</span>
-                    <span className="text-xs text-muted-foreground">{user.role}</span>
+                    <span className="text-xs font-medium text-sidebar-foreground">{user.name}</span>
+                    <span className="text-xs text-sidebar-foreground/70">{user.role}</span>
                   </div>
-                  <ChevronDown className="h-3 w-3 text-muted-foreground" />
+                  <ChevronDown className="h-3 w-3 text-sidebar-foreground/70" />
                   <span className="sr-only">Open user menu</span>
                 </Button>
               </DropdownMenuTrigger>

@@ -2,7 +2,6 @@ import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { KpiCards } from "@/components/fees/kpi-cards";
-import { Charts } from "@/components/fees/charts";
 import { Toolbar } from "@/components/fees/toolbar";
 import { FiltersDrawer } from "@/components/fees/filters-drawer";
 import { FeesTable } from "@/components/fees/fees-table";
@@ -184,9 +183,6 @@ export default function Lidgelden() {
 
       {/* KPI Cards */}
       <KpiCards fees={allFees} />
-
-      {/* Charts */}
-      <Charts fees={allFees} />
 
       {/* Toolbar */}
       <Toolbar

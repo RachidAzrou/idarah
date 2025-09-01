@@ -223,22 +223,14 @@ export function TransactionsTable({
                   <StatusChip type={transaction.type} />
                 </TableCell>
                 <TableCell>{transaction.category}</TableCell>
-                <TableCell>
-                  {transaction.memberName ? (
-                    <span className="text-blue-600 dark:text-blue-400">
-                      {transaction.memberName}
-                    </span>
-                  ) : (
-                    <span className="text-gray-400">-</span>
-                  )}
+                <TableCell className={transaction.memberName ? "text-blue-600 dark:text-blue-400" : "text-gray-400"}>
+                  {transaction.memberName || '-'}
                 </TableCell>
-                <TableCell className="text-right font-medium">
-                  <span className={transaction.type === 'INCOME' 
-                    ? 'text-green-600 dark:text-green-400' 
-                    : 'text-red-600 dark:text-red-400'
-                  }>
-                    {formatCurrencyBE(transaction.amount)}
-                  </span>
+                <TableCell className={`text-right font-medium ${transaction.type === 'INCOME' 
+                  ? 'text-green-600 dark:text-green-400' 
+                  : 'text-red-600 dark:text-red-400'
+                }`}>
+                  {formatCurrencyBE(transaction.amount)}
                 </TableCell>
                 <TableCell>
                   <MethodChip method={transaction.method} />

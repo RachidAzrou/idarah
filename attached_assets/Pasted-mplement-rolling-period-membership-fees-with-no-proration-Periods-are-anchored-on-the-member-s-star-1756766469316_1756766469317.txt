@@ -1,0 +1,221 @@
+mplement rolling period membership fees with no proration. Periods are anchored on the member’s start day and run exactly one month/year forward (end = nextStart − 1 ms), Europe/Brussels timezone. Ensure idempotency, catch-up, and first-fee on member creation.
+
+0) Deliverables (full runnable code)
+
+DB (Prisma)
+
+Add billingAnchorAt DateTime? to MemberFinancialSettings (or Member).
+
+Keep unique key on MembershipFee(tenantId, memberId, periodStart, periodEnd).
+
+Server logic
+
+lib/server/time.ts — Brussels helpers (date-fns + date-fns-tz).
+
+lib/server/fees/anchor.ts — get/set billing anchor.
+
+lib/server/fees/periods.ts — rolling period math:
+
+rollingMonthly(anchor: Date, asOf: Date): { start: Date; end: Date }
+
+rollingYearly(anchor: Date, asOf: Date): { start: Date; end: Date }
+
+nextRollingPeriod(start: Date, term: 'MONTHLY'|'YEARLY'): { start: Date; end: Date }
+
+lib/server/fees/generator.ts
+
+ensureCurrentRollingFeeForMember(memberId, asOf?)
+
+backfillRollingFeesForMember(memberId, fromDate?, toDate?)
+
+generateTenantFees(tenantId, asOf?, strategy: 'current'|'catchup')
+
+lib/server/fees/first-fee.ts
+
+createFirstFeeForMember(memberId, asOf?) → sets anchor and creates first rolling fee.
+
+API routes
+
+app/api/jobs/fees/generate/route.ts — POST { tenantId?, asOf?, strategy? } (Authorization header check).
+
+app/api/members/create/route.ts — creates member (+ settings/mandate), sets anchor, creates first fee.
+
+Tests (Vitest)
+
+tests/fees/periods.rolling.test.ts
+
+tests/fees/generator.rolling.test.ts
+
+Docs
+
+README.md — explains rolling vs calendar, migration, CRON samples.
+
+1) Exact rules (NO proration)
+
+Monthly:
+
+Given anchor A (local Brussels time), the current period for asOf belongs to the interval [S, E] where
+S = the latest monthly boundary ≤ asOf, stepping by “add 1 month (clamped to month end) keeping the local time of A”.
+E = nextStart(S) − 1 ms.
+
+Yearly: same idea with years.
+
+Clamp rule: If day doesn’t exist (e.g., 31 → Feb), clamp to last day of target month at the same local time.
+
+Contiguity: next.start = prev.end + 1 ms.
+
+Anchor source: billingAnchorAt ?? member.joinDate ?? now(Brussels) (store at first creation).
+
+Idempotent upsert on (tenantId, memberId, periodStart, periodEnd).
+
+2) Implement these helpers (TypeScript)
+
+lib/server/time.ts
+
+beNow(): Date
+
+toBeZoned(date: Date): Date
+
+toUtcISO(d: Date): string // persist as ISO
+
+Use date-fns + date-fns-tz with "Europe/Brussels".
+
+lib/server/fees/periods.ts
+
+import { addMonths, addYears, isAfter, subMilliseconds } from 'date-fns';
+import { zonedTimeToUtc, utcToZonedTime } from 'date-fns-tz';
+
+const TZ = 'Europe/Brussels';
+
+function clampDay(year: number, monthIndex0: number, day: number): Date {
+  // Create date; JS auto-clamps overflow days (31 → next month),
+  // so build on the 1st, then set day min(lastDay, desired).
+  const base = new Date(Date.UTC(year, monthIndex0 + 1, 0, 0, 0, 0, 0)); // last day of month in UTC
+  const last = base.getUTCDate();
+  const d = Math.min(last, day);
+  return new Date(Date.UTC(year, monthIndex0, d, 0, 0, 0, 0));
+}
+
+export function addMonthsClamped(beAnchor: Date, months: number): Date {
+  // Keep local wall-clock day/hour/min/sec of anchor in Brussels.
+  const z = utcToZonedTime(beAnchor, TZ);
+  const y = z.getFullYear();
+  const m = z.getMonth();
+  const d = z.getDate();
+  const hh = z.getHours(), mm = z.getMinutes(), ss = z.getSeconds(), ms = z.getMilliseconds();
+
+  const target = clampDay(y, m + months, d);
+  target.setUTCHours(hh, mm, ss, ms);
+  return zonedTimeToUtc(target, TZ);
+}
+
+export function addYearsClamped(beAnchor: Date, years: number): Date {
+  const z = utcToZonedTime(beAnchor, TZ);
+  const y = z.getFullYear();
+  const m = z.getMonth();
+  const d = z.getDate();
+  const hh = z.getHours(), mm = z.getMinutes(), ss = z.getSeconds(), ms = z.getMilliseconds();
+
+  const target = clampDay(y + years, m, d);
+  target.setUTCHours(hh, mm, ss, ms);
+  return zonedTimeToUtc(target, TZ);
+}
+
+export function floorToRollingStart(anchor: Date, asOf: Date, term: 'MONTHLY'|'YEARLY'): Date {
+  let start = anchor;
+  if (isAfter(start, asOf)) {
+    // If anchor is in the future, current period is [anchor, anchor+term)
+    return anchor;
+  }
+  if (term === 'MONTHLY') {
+    // Compute how many months between anchor and asOf approximately, then correct.
+    // Rough step: try jumping close using calendar math, then walk back/forward one step if needed.
+    let s = anchor;
+    // Jump in big steps:
+    const zA = utcToZonedTime(anchor, TZ);
+    const zB = utcToZonedTime(asOf, TZ);
+    const approxMonths = (zB.getFullYear() - zA.getFullYear()) * 12 + (zB.getMonth() - zA.getMonth());
+    s = addMonthsClamped(anchor, approxMonths);
+    if (isAfter(s, asOf)) s = addMonthsClamped(anchor, approxMonths - 1);
+    // Walk forward until next > asOf
+    while (!isAfter(addMonthsClamped(s, 1), asOf)) {
+      s = addMonthsClamped(s, 1);
+    }
+    return s;
+  } else {
+    let s = anchor;
+    const zA = utcToZonedTime(anchor, TZ);
+    const zB = utcToZonedTime(asOf, TZ);
+    const approxYears = (zB.getFullYear() - zA.getFullYear());
+    s = addYearsClamped(anchor, approxYears);
+    if (isAfter(s, asOf)) s = addYearsClamped(anchor, approxYears - 1);
+    while (!isAfter(addYearsClamped(s, 1), asOf)) {
+      s = addYearsClamped(s, 1);
+    }
+    return s;
+  }
+}
+
+export function rollingMonthly(anchor: Date, asOf: Date) {
+  const start = floorToRollingStart(anchor, asOf, 'MONTHLY');
+  const nextStart = addMonthsClamped(start, 1);
+  const end = subMilliseconds(nextStart, 1);
+  return { start, end, nextStart };
+}
+
+export function rollingYearly(anchor: Date, asOf: Date) {
+  const start = floorToRollingStart(anchor, asOf, 'YEARLY');
+  const nextStart = addYearsClamped(start, 1);
+  const end = subMilliseconds(nextStart, 1);
+  return { start, end, nextStart };
+}
+
+export function nextRollingPeriod(start: Date, term: 'MONTHLY'|'YEARLY') {
+  const nextStart = term === 'MONTHLY' ? addMonthsClamped(start, 1) : addYearsClamped(start, 1);
+  const end = subMilliseconds(nextStart, 1);
+  return { start: nextStart, end };
+}
+
+3) Generator behavior (no proration)
+
+Amounts remain fixed (e.g., €10 monthly, €120 yearly) regardless of mid-month/year start.
+
+On member creation:
+
+Set billingAnchorAt = joinDate ?? beNow().
+
+Compute current rolling period from the anchor and create the first OPEN fee.
+
+Job (/api/jobs/fees/generate):
+
+'current': ensure the fee for the current rolling period exists.
+
+'catchup': iterate from anchor to asOf creating any missing periods.
+
+Idempotent upsert using the unique key; skip inactive members.
+
+4) Tests to include
+
+Monthly anchor 2025-03-15 10:00 → current for 2025-06-01 is 2025-05-15 10:00..2025-06-14 09:59:59.999.
+
+Monthly anchor 2025-01-31 09:00 → nextStart in Feb clamps to 28/29; end = day before nextStart, same local time minus 1 ms.
+
+Yearly anchor 2025-03-10 10:00 → end 2026-03-09 09:59:59.999.
+
+DST boundaries in Europe/Brussels don’t create gaps/overlaps; periods remain contiguous.
+
+Re-running generator doesn’t duplicate fees.
+
+5) Acceptance criteria
+
+Starting mid-month/year does not shorten the period; it simply runs to the same day next month/year.
+
+Periods are contiguous and timezone-correct.
+
+First fee on new member is created using the anchor.
+
+Generator supports 'current' and 'catchup'.
+
+All tests pass.
+
+Output the full code for the files above, TypeScript-strict, ready to run. If something is ambiguous, choose safe defaults that preserve contiguous rolling periods and idempotency.

@@ -1,0 +1,208 @@
+Update the automatic Membership Fee generator to use rolling periods anchored to a member’s start date (“billing anchor”), not calendar boundaries. Respect Europe/Brussels timezone. Ensure idempotency, catch-up, and first-fee on member creation still work.
+
+0) What to change (high level)
+
+Replace calendar periods with rolling periods:
+
+Monthly: [anchor, anchor + 1 month), end is the same day next month minus 1 ms.
+
+Yearly: [anchor, anchor + 1 year), end is the same day next year minus 1 ms.
+
+The anchor is the member’s start date (join date) or the date we first created a fee. It’s stored so we can continue contiguous periods even if the app restarts.
+
+Edge cases handled: months with fewer days (28/29/30/31), DST in Europe/Brussels.
+
+1) Deliverables (full runnable code)
+
+DB & Prisma
+
+Migration: add billingAnchorAt DateTime? to MemberFinancialSettings (or Member) to store the anchor in Europe/Brussels time.
+
+Keep the unique key on MembershipFee(tenantId, memberId, periodStart, periodEnd).
+
+Server logic
+
+lib/server/fees/anchor.ts
+
+getBillingAnchor(member): Date — returns existing billingAnchorAt or derives from join date / first fee.
+
+setBillingAnchor(memberId, date): Promise<void>
+
+lib/server/fees/periods.ts
+
+rollingMonthlyPeriod(anchor: Date, asOf: Date): { start: Date; end: Date }
+
+rollingYearlyPeriod(anchor: Date, asOf: Date): { start: Date; end: Date }
+
+nextRollingPeriod(start: Date, term: 'MONTHLY'|'YEARLY'): { start: Date; end: Date }
+
+contains(date, start, end): boolean // inclusive start, inclusive end
+
+lib/server/fees/generator.ts (update)
+
+ensureCurrentRollingFeeForMember(memberId, asOf?)
+
+backfillRollingFeesForMember(memberId, fromDate?, toDate?)
+
+generateTenantFees(tenantId, asOf?, strategy: 'current'|'catchup')
+
+lib/server/time.ts — keep Europe/Brussels helpers (date-fns + date-fns-tz).
+
+lib/server/money.ts — unchanged (amounts), but expose hook to compute amount per period if you later want prorata (we keep no proration for now).
+
+API routes
+
+app/api/jobs/fees/generate/route.ts — unchanged path, but now uses rolling functions.
+
+app/api/members/create/route.ts — on creation:
+
+set billingAnchorAt = joinDate ?? now(Europe/Brussels)
+
+create the first rolling fee based on that anchor
+
+Tests (Vitest)
+
+tests/fees/periods.rolling.test.ts — rolling month/year math with anchors:
+
+2025-01-15 monthly → ends 2025-02-14 23:59:59.999
+
+2025-01-31 monthly → Feb end clamps to 2025-02-28/29 handling (same day semantics: use addMonths + clamp to last day, end = nextStart − 1 ms)
+
+2025-03-10 yearly → ends 2026-03-09 23:59:59.999
+
+DST transitions in Europe/Brussels
+
+tests/fees/generator.rolling.test.ts — idempotency & catch-up using anchors.
+
+Docs
+
+README.md — explain rolling periods vs calendar, how anchor works, and how to migrate existing members.
+
+2) Rolling period spec (exact rules)
+
+Anchor date (zone-aware): The billing anchor is stored as a local date/time in Europe/Brussels. Persist as ISO UTC, but always compute with tz.
+
+Monthly rolling
+
+start = the latest rolling period boundary <= asOf, derived from anchor
+
+end = start + 1 calendar month (same local time) − 1 ms
+
+If anchor is on the 31st and target month has fewer days, use date-fns addMonths then clamp to the last day of the month at the same local time, end = nextStart − 1 ms.
+
+Yearly rolling
+
+start = the latest annual boundary <= asOf with same day/month as anchor
+
+end = start + 1 calendar year − 1 ms
+
+Subsequent periods are contiguous using nextRollingPeriod(start, term) so there are no gaps/overlaps.
+
+Idempotency stays on (tenantId, memberId, periodStart, periodEnd).
+
+3) Implementation details (show the exact functions)
+
+Implement with date-fns + date-fns-tz:
+
+toBeZoned(date) — convert/interpret a JS Date as Europe/Brussels.
+
+addMonthsClamped(anchor, n) — add months, clamp day to end-of-month if needed.
+
+floorToRollingStart(anchor, asOf, term):
+
+For MONTHLY: move from anchor in month steps until nextStart > asOf, pick the last start.
+
+For YEARLY: same idea in year steps.
+
+Use integer loop but cap iterations (e.g., 600) for safety; or compute delta via years/months math and then back/forward adjust.
+
+Example (monthly):
+
+Anchor: 2025-03-17 10:00 Europe/Brussels
+
+As-of: 2025-06-01 09:00 →
+
+Periods: [03-17..04-16], [04-17..05-16], [05-17..06-16] → current is 05-17..06-16
+
+Example (yearly):
+
+Anchor: 2025-05-20 10:00 → first period 2025-05-20..2026-05-19 (23:59:59.999)
+
+4) Generator behavior (unchanged semantics, new math)
+
+ensureCurrentRollingFeeForMember(memberId, asOf?)
+
+Load member + financial settings (term, method, iban/mandate), tenantId, active.
+
+If no billingAnchorAt → set it to member.joinDate ?? asOf.
+
+Compute current rolling period from anchor + asOf + term.
+
+Upsert fee (OPEN) with default amount (e.g., €10 monthly / €120 yearly) and method (SEPA if settings & active mandate).
+
+Return { created: 0|1, feeId }.
+
+backfillRollingFeesForMember(memberId, fromDate?, toDate?)
+
+Start from anchor; iterate periods until end <= toDate (default asOf).
+
+Create missing periods (skip duplicates).
+
+Respect member.active (skip inactive).
+
+generateTenantFees(tenantId, asOf?, strategy)
+
+Same API as vóór de wijziging; now based on rolling periods.
+
+5) API usage & CRON (same endpoints)
+
+POST /api/jobs/fees/generate body:
+
+{ "tenantId": "t_123", "asOf": "2025-09-02T10:00:00+02:00", "strategy": "catchup" }
+
+
+Still protected with Authorization: Bearer ${CRON_SECRET}.
+
+Use Vercel Cron (or Replit cron) to run daily (safety) + hourly (optional), both idempotent.
+
+6) Migration & data consistency
+
+For existing members without billingAnchorAt:
+
+Backfill strategy: set billingAnchorAt to:
+
+The oldest existing fee’s periodStart if present, else
+
+The member.joinDate if present, else
+
+now (Europe/Brussels).
+
+From then on, all new fees will follow the rolling schedule.
+
+7) Acceptance criteria
+
+Creating a member with:
+
+MONTHLY, start 2025-03-15 → first fee 2025-03-15..2025-04-14.
+
+YEARLY, start 2025-03-15 → first fee 2025-03-15..2026-03-14.
+
+Member paying on 2025-03-31 (MONTHLY) results in the first fee 2025-03-31..2025-04-30 (non-leap); in leap context, Feb clamps.
+
+Subsequent periods are contiguous (next start = previous end + 1 ms).
+
+Generator is idempotent (re-running doesn’t create duplicates).
+
+Catch-up fills missing rolling periods up to asOf.
+
+All computations are Europe/Brussels aware; tests cover DST/leap cases.
+
+Now output all code files listed above, TypeScript-strict, ready to run with:
+
+pnpm i
+pnpm prisma migrate dev
+pnpm test
+pnpm dev
+
+
+If anything is ambiguous, choose safe defaults that keep rolling periods contiguous, timezone-correct, and idempotent.

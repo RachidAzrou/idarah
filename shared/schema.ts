@@ -61,16 +61,23 @@ export const members = pgTable("members", {
   postalCode: text("postal_code"),
   city: text("city"),
   country: text("country"),
-  active: boolean("active").default(true).notNull(),
+  joinDate: timestamp("join_date"),
+  isActive: boolean("is_active").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 export const memberFinancialSettings = pgTable("member_financial_settings", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   memberId: varchar("member_id").notNull().unique(),
-  paymentMethod: paymentMethodEnum("payment_method").notNull(),
+  preferredMethod: paymentMethodEnum("preferred_method").notNull(),
+  preferredTerm: paymentTermEnum("preferred_term").notNull(),
+  monthlyAmount: decimal("monthly_amount", { precision: 10, scale: 2 }).notNull().default('0'),
+  yearlyAmount: decimal("yearly_amount", { precision: 10, scale: 2 }).notNull().default('0'),
   iban: text("iban"),
-  paymentTerm: paymentTermEnum("payment_term").notNull(),
+  sepaMandate: text("sepa_mandate"),
+  billingAnchorAt: timestamp("billing_anchor_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export const mandates = pgTable("mandates", {
@@ -86,15 +93,22 @@ export const membershipFees = pgTable("membership_fees", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   tenantId: varchar("tenant_id").notNull(),
   memberId: varchar("member_id").notNull(),
+  memberNumber: text("member_number").notNull(),
+  memberName: text("member_name").notNull(),
   periodStart: timestamp("period_start").notNull(),
   periodEnd: timestamp("period_end").notNull(),
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
   status: feeStatusEnum("status").default('OPEN').notNull(),
   method: paymentMethodEnum("method"),
+  sepaEligible: boolean("sepa_eligible").default(false).notNull(),
   paidAt: timestamp("paid_at"),
   sepaBatchId: varchar("sepa_batch_id"),
+  note: text("note"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+}, (table) => ({
+  // Unique constraint on tenant, member, and period
+  uniquePeriod: sql`UNIQUE (${table.tenantId}, ${table.memberId}, ${table.periodStart}, ${table.periodEnd})`,
+}));
 
 export const transactions = pgTable("transactions", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),

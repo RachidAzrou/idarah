@@ -8,6 +8,8 @@ import { memberService } from "./services/member";
 import { feeService } from "./services/fee";
 import { financialService } from "./services/financial";
 import { insertUserSchema, insertMemberSchema, insertMembershipFeeSchema } from "@shared/schema";
+import { generateFeesHandler } from "./api/jobs/fees/generate";
+import { createMemberHandler } from "./api/members/create";
 import { z } from "zod";
 
 const loginSchema = z.object({
@@ -219,6 +221,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch SEPA exports" });
     }
   });
+
+  // Rolling fees API routes
+  app.post("/api/jobs/fees/generate", generateFeesHandler);
+  
+  // Enhanced member creation with rolling fees
+  app.post("/api/members/create", authMiddleware, tenantMiddleware, createMemberHandler);
 
   const httpServer = createServer(app);
   return httpServer;

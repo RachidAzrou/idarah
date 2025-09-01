@@ -470,25 +470,27 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
                     )}
                   />
 
-                  {form.watch("organization.interestedInActiveRole") && (
-                    <FormField
-                      control={form.control}
-                      name="organization.roleDescription"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>In welke rol zie jij jezelf de moskee helpen?</FormLabel>
-                          <FormControl>
-                            <Input 
-                              placeholder="Beschrijf je gewenste rol..." 
-                              {...field} 
-                              data-testid="input-role-description" 
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  )}
+                  <FormField
+                    control={form.control}
+                    name="organization.roleDescription"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className={!form.watch("organization.interestedInActiveRole") ? "text-gray-400" : ""}>
+                          In welke rol zie jij jezelf de moskee helpen?
+                        </FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="Beschrijf je gewenste rol..." 
+                            {...field} 
+                            disabled={!form.watch("organization.interestedInActiveRole")}
+                            className={!form.watch("organization.interestedInActiveRole") ? "bg-gray-100 text-gray-400" : ""}
+                            data-testid="input-role-description" 
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
                   
                 </div>

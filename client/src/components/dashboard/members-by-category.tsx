@@ -1,65 +1,91 @@
-import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+import React from 'react';
+import { ConcentricRings } from '@/components/charts/concentric-rings';
+import { membersByCategory } from '@/lib/mock/members-by-category';
 
-const data = [
-  { name: 'Senior', value: 320, color: '#1E40AF', percentage: 25.7 },
-  { name: 'Volwassene', value: 650, color: '#3B82F6', percentage: 52.1 },
-  { name: 'Student', value: 420, color: '#93C5FD', percentage: 22.2 },
-];
+export default function MembersByCategoryCard() {
+  const { total, categories } = membersByCategory;
 
-const total = data.reduce((sum, item) => sum + item.value, 0);
-
-export default function MembersByCategoryChart() {
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-      <div className="mb-6 pb-4 border-b border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900">Leden per Categorie</h3>
-        <p className="text-sm text-gray-500">Statistieken</p>
-      </div>
-      
-      <div className="relative h-48 mb-6">
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie
-              data={data}
-              cx="50%"
-              cy="50%"
-              innerRadius={50}
-              outerRadius={80}
-              paddingAngle={2}
-              dataKey="value"
-            >
-              {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.color} />
-              ))}
-            </Pie>
-          </PieChart>
-        </ResponsiveContainer>
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <div className="text-2xl font-bold text-gray-900">{total.toLocaleString('nl-BE')}</div>
-          <div className="text-sm text-gray-500">Totaal Leden</div>
-        </div>
+    <div 
+      className="bg-white rounded-2xl border border-gray-200 shadow-sm tabindex-0 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-40"
+      style={{ 
+        boxShadow: '0 6px 16px rgba(2,6,23,0.08)',
+        padding: '24px 28px'
+      }}
+      tabIndex={0}
+    >
+      {/* Header */}
+      <div className="mb-6 pb-4" style={{ borderBottom: '1px solid #E2E8F0' }}>
+        <h3 className="text-lg font-semibold font-['Poppins']" style={{ color: '#0F172A' }}>
+          Leden per Categorie
+        </h3>
+        <p className="text-sm font-['Poppins']" style={{ color: '#64748B' }}>
+          Statistieken
+        </p>
       </div>
 
-      <div className="space-y-3">
-        {data.map((item, index) => (
-          <div key={index} className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <div 
-                className="w-3 h-3 rounded-full" 
-                style={{ backgroundColor: item.color }}
-              ></div>
-              <span className="text-sm font-medium text-gray-700">{item.name}</span>
+      {/* Content Layout */}
+      <div className="flex flex-col md:flex-row items-start gap-8">
+        {/* Left side - Chart */}
+        <div className="flex-shrink-0">
+          <ConcentricRings categories={categories} size={280} />
+        </div>
+
+        {/* Right side - Total + Legend */}
+        <div className="flex-1 min-w-0 space-y-6">
+          {/* Large Total */}
+          <div className="text-center md:text-left">
+            <div 
+              className="text-5xl font-bold font-['Poppins']" 
+              style={{ color: '#0F172A' }}
+            >
+              {new Intl.NumberFormat('nl-BE').format(total)}
             </div>
-            <div className="text-right">
-              <div className="text-sm font-semibold text-gray-900">
-                {item.value.toLocaleString('nl-BE')}
-              </div>
-              <div className="text-xs text-gray-500">
-                {item.percentage}%
-              </div>
+            <div 
+              className="text-sm font-['Poppins'] mt-1" 
+              style={{ color: '#64748B' }}
+            >
+              Totaal leden
             </div>
           </div>
-        ))}
+
+          {/* Divider */}
+          <div style={{ borderTop: '1px solid #E2E8F0' }}></div>
+
+          {/* Legend */}
+          <div className="space-y-4">
+            {categories.map((category, index) => (
+              <div key={category.key} className="flex items-center justify-between" style={{ minHeight: '48px' }}>
+                <div className="flex items-center space-x-3">
+                  <div 
+                    className="w-3 h-3 rounded-full flex-shrink-0"
+                    style={{ backgroundColor: category.color }}
+                  ></div>
+                  <span 
+                    className="text-base font-['Poppins']" 
+                    style={{ color: '#475569' }}
+                  >
+                    {category.label}
+                  </span>
+                </div>
+                <div className="text-right">
+                  <div 
+                    className="text-lg font-semibold font-['Poppins']" 
+                    style={{ color: '#0F172A' }}
+                  >
+                    {new Intl.NumberFormat('nl-BE').format(category.count)}
+                  </div>
+                  <div 
+                    className="text-xs font-['Poppins']" 
+                    style={{ color: '#94A3B8' }}
+                  >
+                    {category.percent}%
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

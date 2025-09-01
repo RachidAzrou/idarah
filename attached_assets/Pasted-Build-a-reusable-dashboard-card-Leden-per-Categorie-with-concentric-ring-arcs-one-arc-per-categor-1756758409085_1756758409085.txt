@@ -1,0 +1,140 @@
+Build a reusable dashboard card “Leden per Categorie” with concentric ring arcs (one arc per category), a large total on the right, and a legend with counts & percentages. Use a blue theme (no orange/green).
+Stack: Next.js 14 (App Router), React 18, TypeScript (strict), TailwindCSS, shadcn/ui, Poppins. (No heavy chart lib—render arcs with SVG for precise control of rounded caps and gaps.)
+
+Deliver exactly
+
+Create the following files with complete code:
+
+app/(app)/dashboard/page.tsx – renders the card inside a container.
+
+components/dashboard/MembersByCategoryCard.tsx – main card component.
+
+components/charts/ConcentricRings.tsx – pure SVG concentric ring chart with rounded caps.
+
+lib/mock/members-by-category.ts – mock data (counts + percentages + total).
+
+app/globals.css – import Poppins + CSS vars.
+
+tailwind.config.ts – map tokens (colors, radius, shadows).
+
+styles/shadcn-override.css – map primary to blue.
+
+README.md – run instructions (pnpm i && pnpm dev) and theming notes.
+
+Visual spec (match precisely)
+
+Card container
+
+Background #FFFFFF, border #E5E7EB (1px), radius 16px, shadow 0 6px 16px rgba(2,6,23,.08), padding 24px (top) / 28px (sides) / 24px (bottom).
+
+Header (left aligned)
+
+Title: “Leden per Categorie” — Poppins 18px, semibold, color #0F172A.
+
+Subtitle: “Statistieken” — Poppins 14px, regular, color #64748B.
+
+A thin divider line under header: #E2E8F0.
+
+Layout (content)
+
+Left side (chart): concentric ring chart ~ 280px x 280px.
+
+Right side (totals + legend):
+
+Large total number in bold (48px, #0F172A), label “Totaal leden” onder het getal (14px, #64748B).
+
+Divider.
+
+Legend (vertical): 3 rijen met dot, label, count right aligned en percentage onder count in #94A3B8.
+
+Color palette (blue theme)
+
+Text: #0F172A (primary), #64748B (secondary).
+
+Rings (monochrome blues for clear differentiation):
+
+Senior: Navy Blue #1E3A8A
+
+Standaard: Royal Blue #3B82F6
+
+Student: Cyan-Blue #06B6D4
+
+Ring tracks (background): #E9EDF5 (light bluish grey).
+
+Focus ring: 2px rgba(37, 99, 235, 0.4).
+
+Concentric ring chart details
+
+SVG centered; three separate arcs (outer = Senior, middle = Standaard, inner = Student).
+
+Each ring: thickness 14–16px, rounded end caps, start angle ≈ -60°, end angle proportional to percentage (max sweep ≤ 300°) to keep a visible gap.
+
+Background tracks drawn as full circles behind each arc.
+
+Slight drop-shadow filter for subtle depth (optional).
+
+Animation: on mount, arcs should ease-out from 0 to their sweep in ~400ms; respect prefers-reduced-motion.
+
+Accessibility: give the <svg> role="img" + aria-label="Leden per categorie"; each arc has <title> with label + percentage.
+
+Legend rows
+
+Dot with the same color as the ring (12px circle).
+
+Label left (Poppins 16px, #475569).
+
+Right-aligned count (Poppins 18px, semibold, #0F172A).
+
+Under the count: percentage (12–13px, #94A3B8).
+
+Row height ~48px; subtle separator lines are fine.
+
+Data (mock) — lib/mock/members-by-category.ts
+export const membersByCategory = {
+  total: 1247,
+  categories: [
+    { key: 'senior',    label: 'Senior',    count: 420, percent: 33.7 },
+    { key: 'standaard', label: 'Standaard', count: 600, percent: 48.1 },
+    { key: 'student',   label: 'Student',   count: 227, percent: 18.2 },
+  ],
+};
+
+
+Percentages sum ~100 but don’t need to be exact. Use percent to compute arc sweep.
+
+Implementation notes
+
+SVG math: function polarToCartesian(cx, cy, r, angleDeg) + describeArc(cx,cy,r,startAngle,endAngle) to draw a path with A r r 0 largeArcFlag 1 x y.
+
+Convert percent to degrees with sweep = clamp(percent/100 * 300, 0, 300). Start angle = -60°, end angle = start + sweep.
+
+Radii: outer 110, middle 86, inner 62 (adjust to 280×280 viewBox).
+
+Stroke-linecap = round; stroke-width = 14 (outer), 14 (middle), 14 (inner) for visual consistency.
+
+Add a light white mask at the center to create a “ring” look (or separate background strokes).
+
+Numbers locale: format counts with Intl.NumberFormat('nl-BE').
+
+Accessibility & UX
+
+Keyboard-focusable card container (tabIndex=0) with visible focus ring (no layout shift).
+
+All icon-only elements have aria-label.
+
+Colors meet WCAG AA against white background.
+
+Mobile: when width < 768px, place total above legend, chart left; keep adequate spacing.
+
+Acceptance criteria
+
+Visual match to spec: white card, three blue rings with rounded caps, big total on the right, legend with counts & percentages.
+
+Smooth mount animation; respects reduced-motion.
+
+TypeScript strict, no any.
+
+Component reusable with any 3–5 categories (rings should space automatically).
+
+Output now the full code for all files above, ready to run.
+If a detail is ambiguous, choose sensible defaults that keep the style calm, professional, and consistent with this spec.

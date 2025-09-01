@@ -17,8 +17,6 @@ const yearlyData = [
 export default function RevenueByCategoryChart() {
   const [isYearly, setIsYearly] = useState(false);
   const data = isYearly ? yearlyData : monthlyData;
-  
-  console.log('Revenue chart data:', data);
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm col-span-full">
@@ -51,33 +49,40 @@ export default function RevenueByCategoryChart() {
         </div>
       </div>
 
-      <div className="h-64 bg-gray-50 rounded-lg p-4">
-        {data.length > 0 ? (
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={data}
-              layout="horizontal"
-              margin={{ top: 20, right: 30, left: 80, bottom: 5 }}
-            >
-              <XAxis 
-                type="number"
-                tickFormatter={(value) => `€${(value / 1000).toFixed(0)}k`}
-              />
-              <YAxis 
-                type="category"
-                dataKey="category"
-              />
-              <Bar 
-                dataKey="revenue" 
-                fill="#2563EB"
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        ) : (
-          <div className="flex items-center justify-center h-full text-gray-500">
-            Grafiek wordt geladen...
-          </div>
-        )}
+      <div className="h-64">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart
+            data={data}
+            layout="horizontal"
+            margin={{ top: 20, right: 30, left: 80, bottom: 5 }}
+          >
+            <defs>
+              <linearGradient id="colorGradient" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor="#2563EB" />
+                <stop offset="100%" stopColor="#93C5FD" />
+              </linearGradient>
+            </defs>
+            <XAxis 
+              type="number"
+              axisLine={false}
+              tickLine={false}
+              tick={{ fontSize: 12, fill: '#64748B' }}
+              tickFormatter={(value) => `€${(value / 1000).toFixed(0)}k`}
+            />
+            <YAxis 
+              type="category"
+              dataKey="category"
+              axisLine={false}
+              tickLine={false}
+              tick={{ fontSize: 12, fill: '#64748B' }}
+            />
+            <Bar 
+              dataKey="revenue" 
+              fill="url(#colorGradient)"
+              radius={[0, 8, 8, 0]}
+            />
+          </BarChart>
+        </ResponsiveContainer>
       </div>
 
       <div className="mt-4 space-y-2">

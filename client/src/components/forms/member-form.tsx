@@ -153,8 +153,9 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-5">
+            <div className="pt-4">
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                <TabsList className="grid w-full grid-cols-5">
                 <TabsTrigger value="personal" data-testid="tab-personal">Persoonlijk</TabsTrigger>
                 <TabsTrigger value="address" data-testid="tab-address">Adres</TabsTrigger>
                 <TabsTrigger value="financial" data-testid="tab-financial">Financieel</TabsTrigger>
@@ -665,6 +666,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
               </TabsContent>
               </div>
             </Tabs>
+            </div>
 
             <div className="flex justify-between pt-6 border-t">
               <Button

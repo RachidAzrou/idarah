@@ -4,7 +4,6 @@ import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { KpiCards } from "@/components/finance/KpiCards";
-import { Charts } from "@/components/finance/Charts";
 import { Toolbar } from "@/components/finance/Toolbar";
 import { FiltersDrawer } from "@/components/finance/FiltersDrawer";
 import { TransactionsTable } from "@/components/finance/TransactionsTable";
@@ -264,9 +263,6 @@ export default function FinancePage() {
           <TabsContent value="overview" className="space-y-8 mt-8">
             {/* KPI Cards */}
             <KpiCards />
-
-            {/* Charts */}
-            <Charts />
 
             {/* Toolbar */}
             <Toolbar

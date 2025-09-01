@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -53,6 +53,59 @@ export function Toolbar({
   onMoreFilters,
   className
 }: ToolbarProps) {
+  const [fromDateInput, setFromDateInput] = useState("");
+  const [toDateInput, setToDateInput] = useState("");
+  const [fromPopoverOpen, setFromPopoverOpen] = useState(false);
+  const [toPopoverOpen, setToPopoverOpen] = useState(false);
+
+  const formatDateInput = (value: string) => {
+    // Remove all non-numeric characters
+    const numbers = value.replace(/\D/g, '');
+    
+    // Apply DD/MM/YYYY formatting
+    if (numbers.length <= 2) {
+      return numbers;
+    } else if (numbers.length <= 4) {
+      return `${numbers.slice(0, 2)}/${numbers.slice(2)}`;
+    } else {
+      return `${numbers.slice(0, 2)}/${numbers.slice(2, 4)}/${numbers.slice(4, 8)}`;
+    }
+  };
+
+  const parseDate = (dateString: string): Date | undefined => {
+    const cleanString = dateString.replace(/\D/g, '');
+    if (cleanString.length === 8) {
+      const day = parseInt(cleanString.slice(0, 2));
+      const month = parseInt(cleanString.slice(2, 4)) - 1; // Month is 0-indexed
+      const year = parseInt(cleanString.slice(4, 8));
+      
+      const date = new Date(year, month, day);
+      if (date.getDate() === day && date.getMonth() === month && date.getFullYear() === year) {
+        return date;
+      }
+    }
+    return undefined;
+  };
+
+  const handleFromDateInput = (value: string) => {
+    const formatted = formatDateInput(value);
+    setFromDateInput(formatted);
+    
+    const parsedDate = parseDate(formatted);
+    if (parsedDate) {
+      onJoinDateFromChange(parsedDate);
+    }
+  };
+
+  const handleToDateInput = (value: string) => {
+    const formatted = formatDateInput(value);
+    setToDateInput(formatted);
+    
+    const parsedDate = parseDate(formatted);
+    if (parsedDate) {
+      onJoinDateToChange(parsedDate);
+    }
+  };
   return (
     <Card className={cn("mb-6", className)}>
       <CardContent className="p-6">
@@ -159,156 +212,182 @@ export function Toolbar({
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-600">Inschrijving:</span>
                 
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-[180px] h-9 justify-start text-left font-normal border-gray-200 cursor-pointer",
-                        !joinDateFrom && "text-muted-foreground"
-                      )}
-                      data-testid="join-date-from"
-                      type="button"
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {joinDateFrom ? format(joinDateFrom, "dd/MM/yyyy", { locale: nl }) : "Van datum"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start" side="bottom">
-                    <div className="p-3 border-b">
-                      <div className="flex items-center justify-between space-x-2">
-                        <Select
-                          value={joinDateFrom ? joinDateFrom.getMonth().toString() : ""}
-                          onValueChange={(month) => {
-                            const currentDate = joinDateFrom || new Date();
-                            const newDate = new Date(currentDate.getFullYear(), parseInt(month), 1);
-                            onJoinDateFromChange(newDate);
-                          }}
-                        >
-                          <SelectTrigger className="w-[120px] h-8">
-                            <SelectValue placeholder="Maand" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {Array.from({ length: 12 }, (_, i) => (
-                              <SelectItem key={i} value={i.toString()}>
-                                {format(new Date(2000, i, 1), "MMMM", { locale: nl })}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <Select
-                          value={joinDateFrom ? joinDateFrom.getFullYear().toString() : ""}
-                          onValueChange={(year) => {
-                            const currentDate = joinDateFrom || new Date();
-                            const newDate = new Date(parseInt(year), currentDate.getMonth(), 1);
-                            onJoinDateFromChange(newDate);
-                          }}
-                        >
-                          <SelectTrigger className="w-[80px] h-8">
-                            <SelectValue placeholder="Jaar" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {Array.from({ length: new Date().getFullYear() - 1999 }, (_, i) => {
-                              const year = 2000 + i;
-                              return (
-                                <SelectItem key={year} value={year.toString()}>
-                                  {year}
+                <div className="relative">
+                  <Input
+                    value={fromDateInput || (joinDateFrom ? format(joinDateFrom, "dd/MM/yyyy", { locale: nl }) : "")}
+                    onChange={(e) => handleFromDateInput(e.target.value)}
+                    placeholder="DD/MM/YYYY"
+                    className="w-[180px] h-9 border-gray-200 pr-10"
+                    data-testid="join-date-from"
+                    maxLength={10}
+                  />
+                  <Popover open={fromPopoverOpen} onOpenChange={setFromPopoverOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0 hover:bg-gray-100"
+                        onClick={() => setFromPopoverOpen(true)}
+                      >
+                        <CalendarIcon className="h-4 w-4" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start" side="bottom">
+                      <div className="p-3 border-b">
+                        <div className="flex items-center justify-between space-x-2">
+                          <Select
+                            value={joinDateFrom ? joinDateFrom.getMonth().toString() : ""}
+                            onValueChange={(month) => {
+                              const currentDate = joinDateFrom || new Date();
+                              const newDate = new Date(currentDate.getFullYear(), parseInt(month), currentDate.getDate());
+                              onJoinDateFromChange(newDate);
+                              setFromDateInput("");
+                            }}
+                          >
+                            <SelectTrigger className="w-[120px] h-8">
+                              <SelectValue placeholder="Maand" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {Array.from({ length: 12 }, (_, i) => (
+                                <SelectItem key={i} value={i.toString()}>
+                                  {format(new Date(2000, i, 1), "MMMM", { locale: nl })}
                                 </SelectItem>
-                              );
-                            })}
-                          </SelectContent>
-                        </Select>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Select
+                            value={joinDateFrom ? joinDateFrom.getFullYear().toString() : ""}
+                            onValueChange={(year) => {
+                              const currentDate = joinDateFrom || new Date();
+                              const newDate = new Date(parseInt(year), currentDate.getMonth(), currentDate.getDate());
+                              onJoinDateFromChange(newDate);
+                              setFromDateInput("");
+                            }}
+                          >
+                            <SelectTrigger className="w-[80px] h-8">
+                              <SelectValue placeholder="Jaar" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {Array.from({ length: 75 }, (_, i) => {
+                                const year = new Date().getFullYear() - i;
+                                return (
+                                  <SelectItem key={year} value={year.toString()}>
+                                    {year}
+                                  </SelectItem>
+                                );
+                              })}
+                            </SelectContent>
+                          </Select>
+                        </div>
                       </div>
-                    </div>
-                    <Calendar
-                      mode="single"
-                      selected={joinDateFrom}
-                      onSelect={onJoinDateFromChange}
-                      locale={nl}
-                      month={joinDateFrom}
-                      onMonthChange={(month) => onJoinDateFromChange(month)}
-                      showOutsideDays={false}
-                      className="p-3"
-                    />
-                  </PopoverContent>
-                </Popover>
+                      <Calendar
+                        mode="single"
+                        selected={joinDateFrom}
+                        onSelect={(date) => {
+                          onJoinDateFromChange(date);
+                          setFromDateInput("");
+                          setFromPopoverOpen(false);
+                        }}
+                        locale={nl}
+                        month={joinDateFrom || new Date()}
+                        onMonthChange={(month) => onJoinDateFromChange(month)}
+                        showOutsideDays={false}
+                        className="p-3"
+                        defaultMonth={new Date()}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
                 
                 <span className="text-sm text-gray-400">tot</span>
                 
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-[180px] h-9 justify-start text-left font-normal border-gray-200 cursor-pointer",
-                        !joinDateTo && "text-muted-foreground"
-                      )}
-                      data-testid="join-date-to"
-                      type="button"
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {joinDateTo ? format(joinDateTo, "dd/MM/yyyy", { locale: nl }) : "Tot datum"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start" side="bottom">
-                    <div className="p-3 border-b">
-                      <div className="flex items-center justify-between space-x-2">
-                        <Select
-                          value={joinDateTo ? joinDateTo.getMonth().toString() : ""}
-                          onValueChange={(month) => {
-                            const currentDate = joinDateTo || new Date();
-                            const newDate = new Date(currentDate.getFullYear(), parseInt(month), 1);
-                            onJoinDateToChange(newDate);
-                          }}
-                        >
-                          <SelectTrigger className="w-[120px] h-8">
-                            <SelectValue placeholder="Maand" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {Array.from({ length: 12 }, (_, i) => (
-                              <SelectItem key={i} value={i.toString()}>
-                                {format(new Date(2000, i, 1), "MMMM", { locale: nl })}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <Select
-                          value={joinDateTo ? joinDateTo.getFullYear().toString() : ""}
-                          onValueChange={(year) => {
-                            const currentDate = joinDateTo || new Date();
-                            const newDate = new Date(parseInt(year), currentDate.getMonth(), 1);
-                            onJoinDateToChange(newDate);
-                          }}
-                        >
-                          <SelectTrigger className="w-[80px] h-8">
-                            <SelectValue placeholder="Jaar" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {Array.from({ length: new Date().getFullYear() - 1999 }, (_, i) => {
-                              const year = 2000 + i;
-                              return (
-                                <SelectItem key={year} value={year.toString()}>
-                                  {year}
+                <div className="relative">
+                  <Input
+                    value={toDateInput || (joinDateTo ? format(joinDateTo, "dd/MM/yyyy", { locale: nl }) : "")}
+                    onChange={(e) => handleToDateInput(e.target.value)}
+                    placeholder="DD/MM/YYYY"
+                    className="w-[180px] h-9 border-gray-200 pr-10"
+                    data-testid="join-date-to"
+                    maxLength={10}
+                  />
+                  <Popover open={toPopoverOpen} onOpenChange={setToPopoverOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0 hover:bg-gray-100"
+                        onClick={() => setToPopoverOpen(true)}
+                      >
+                        <CalendarIcon className="h-4 w-4" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start" side="bottom">
+                      <div className="p-3 border-b">
+                        <div className="flex items-center justify-between space-x-2">
+                          <Select
+                            value={joinDateTo ? joinDateTo.getMonth().toString() : ""}
+                            onValueChange={(month) => {
+                              const currentDate = joinDateTo || new Date();
+                              const newDate = new Date(currentDate.getFullYear(), parseInt(month), currentDate.getDate());
+                              onJoinDateToChange(newDate);
+                              setToDateInput("");
+                            }}
+                          >
+                            <SelectTrigger className="w-[120px] h-8">
+                              <SelectValue placeholder="Maand" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {Array.from({ length: 12 }, (_, i) => (
+                                <SelectItem key={i} value={i.toString()}>
+                                  {format(new Date(2000, i, 1), "MMMM", { locale: nl })}
                                 </SelectItem>
-                              );
-                            })}
-                          </SelectContent>
-                        </Select>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Select
+                            value={joinDateTo ? joinDateTo.getFullYear().toString() : ""}
+                            onValueChange={(year) => {
+                              const currentDate = joinDateTo || new Date();
+                              const newDate = new Date(parseInt(year), currentDate.getMonth(), currentDate.getDate());
+                              onJoinDateToChange(newDate);
+                              setToDateInput("");
+                            }}
+                          >
+                            <SelectTrigger className="w-[80px] h-8">
+                              <SelectValue placeholder="Jaar" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {Array.from({ length: 75 }, (_, i) => {
+                                const year = new Date().getFullYear() - i;
+                                return (
+                                  <SelectItem key={year} value={year.toString()}>
+                                    {year}
+                                  </SelectItem>
+                                );
+                              })}
+                            </SelectContent>
+                          </Select>
+                        </div>
                       </div>
-                    </div>
-                    <Calendar
-                      mode="single"
-                      selected={joinDateTo}
-                      onSelect={onJoinDateToChange}
-                      locale={nl}
-                      month={joinDateTo}
-                      onMonthChange={(month) => onJoinDateToChange(month)}
-                      disabled={(date) => joinDateFrom ? date < joinDateFrom : false}
-                      showOutsideDays={false}
-                      className="p-3"
-                    />
-                  </PopoverContent>
-                </Popover>
+                      <Calendar
+                        mode="single"
+                        selected={joinDateTo}
+                        onSelect={(date) => {
+                          onJoinDateToChange(date);
+                          setToDateInput("");
+                          setToPopoverOpen(false);
+                        }}
+                        locale={nl}
+                        month={joinDateTo || new Date()}
+                        onMonthChange={(month) => onJoinDateToChange(month)}
+                        disabled={(date) => joinDateFrom ? date < joinDateFrom : false}
+                        showOutsideDays={false}
+                        className="p-3"
+                        defaultMonth={new Date()}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
               </div>
 
               <Button 

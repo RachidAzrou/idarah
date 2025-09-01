@@ -36,7 +36,7 @@ export default function Navbar() {
   const { user, logout } = useAuth();
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-sidebar-border bg-sidebar/95 backdrop-blur supports-[backdrop-filter]:bg-sidebar/60">
+    <header className="sticky top-0 z-40 w-full border-b border-sidebar-border bg-sidebar backdrop-blur supports-[backdrop-filter]:bg-sidebar/95">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
         <div className="flex items-center space-x-8">
@@ -103,7 +103,7 @@ export default function Navbar() {
           {/* Mobile Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="md:hidden h-9 w-9 focus-ring" data-testid="mobile-menu-button">
+              <Button variant="ghost" size="sm" className="md:hidden h-9 w-9 text-sidebar-foreground hover:bg-sidebar-accent focus-ring" data-testid="mobile-menu-button">
                 <Menu className="h-5 w-5" />
                 <span className="sr-only">Open navigation menu</span>
               </Button>
@@ -124,15 +124,15 @@ export default function Navbar() {
           </DropdownMenu>
 
           {/* Help */}
-          <Button variant="ghost" size="sm" className="hidden sm:flex h-9 w-9 focus-ring" data-testid="help-button">
+          <Button variant="ghost" size="sm" className="hidden sm:flex h-9 w-9 text-sidebar-foreground hover:bg-sidebar-accent focus-ring" data-testid="help-button">
             <HelpCircle className="h-4 w-4" />
             <span className="sr-only">Help</span>
           </Button>
 
           {/* Notifications */}
-          <Button variant="ghost" size="sm" className="relative h-9 w-9 focus-ring" data-testid="notifications-button">
+          <Button variant="ghost" size="sm" className="relative h-9 w-9 text-sidebar-foreground hover:bg-sidebar-accent focus-ring" data-testid="notifications-button">
             <Bell className="h-4 w-4" />
-            <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 w-5 text-xs flex items-center justify-center p-0 border-2 border-background" data-testid="notification-count">
+            <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 w-5 text-xs flex items-center justify-center p-0 border-2 border-sidebar" data-testid="notification-count">
               3
             </Badge>
             <span className="sr-only">View notifications</span>
@@ -142,7 +142,7 @@ export default function Navbar() {
           {user && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="flex items-center gap-x-2 h-9 px-3 focus-ring" data-testid="profile-button">
+                <Button variant="ghost" size="sm" className="flex items-center gap-x-2 h-9 px-3 text-sidebar-foreground hover:bg-sidebar-accent focus-ring" data-testid="profile-button">
                   <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center">
                     <span className="text-xs font-medium text-primary-foreground">
                       {getUserInitials(user.name)}

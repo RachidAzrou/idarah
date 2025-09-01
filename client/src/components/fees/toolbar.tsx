@@ -434,28 +434,6 @@ export function Toolbar({
                 </div>
               </div>
 
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="onlyWithMandate"
-                    checked={onlyWithMandate}
-                    onCheckedChange={onOnlyWithMandateChange}
-                  />
-                  <Label htmlFor="onlyWithMandate" className="text-sm">
-                    Alleen met SEPA-mandaat
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="onlyOverdue"
-                    checked={onlyOverdue}
-                    onCheckedChange={onOnlyOverdueChange}
-                  />
-                  <Label htmlFor="onlyOverdue" className="text-sm">
-                    Alleen achterstallig
-                  </Label>
-                </div>
-              </div>
 
               <Button 
                 variant="outline" 

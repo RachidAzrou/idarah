@@ -1,0 +1,237 @@
+Build the Lidgelden (Membership Fees) page for a Membership SaaS in a clean blue theme using Poppins. Implement KPIs, filters, a powerful data table, bulk actions (Markeer betaald, Genereer SEPA), an Import flow (CSV/MT940/CODA – mock parser), a detail slide-over, and exports.
+Stack: Next.js 14 (App Router), React 18, TypeScript (strict), TailwindCSS, shadcn/ui, lucide-react, Recharts, date-fns (nl-BE), Zod.
+
+0) Deliverables (full runnable code)
+
+Route
+
+app/(app)/fees/page.tsx — renders the full page layout.
+
+Dashboard widgets
+
+components/fees/KpiCards.tsx — 4 KPI’s (Openstaand €, Betaald %, Achterstallig €, Aantal facturen).
+
+components/fees/Charts.tsx — Donut (Paid/Open/Overdue) + Line (ontvangen per maand).
+
+Toolbar & filters
+
+components/fees/Toolbar.tsx — zoekbalk, snelle filters (Status, Jaar, Methode), knoppen Export, Import, Genereer SEPA.
+
+components/fees/FiltersDrawer.tsx — geavanceerde filters (Periode van/tot, Categorie, Bedrag min/max, Alleen met mandaat, Alleen SEPA).
+
+Data table
+
+components/fees/FeesTable.tsx — sortable/selectable table met paginatie.
+
+components/fees/RowActions.tsx — 3-dots menu (Markeer betaald, Bekijk detail, Wijzig methode).
+
+components/fees/DetailSlideOver.tsx — detailkaart met alle velden + actieknoppen.
+
+Flows
+
+components/fees/ImportDialog.tsx — upload CSV/MT940/CODA (mock), mapping preview, resultaatlijst + “Probeer te matchen”.
+
+components/fees/SepaBatchDialog.tsx — wizard: selecteer fees → controleer mandaten → geef batchRef → preview PAIN.008 XML (mock string) → Genereer.
+
+UI commons
+
+components/ui/StatusChip.tsx (OPEN/PAID/OVERDUE), components/ui/MethodChip.tsx (SEPA/OVERS/…)
+
+components/ui/EmptyState.tsx, components/ui/ErrorState.tsx, components/ui/SkeletonTable.tsx
+
+components/ui/ConfirmDialog.tsx, components/ui/ToastProvider.tsx
+
+Data & utils
+
+lib/mock/fees.ts — mock dataset (≈80 rijen) + helpers (filter, sort, paginate, markPaid, generateSepaXml, guessMatchesFromCsv).
+
+lib/format.ts — formatDateBE, formatCurrencyBE, formatIban
+
+lib/cn.ts, lib/csv.ts (eenvoudige CSV parser), lib/mt940.ts (mock parser)
+
+lib/zod.ts — schemas voor import/filters
+
+Theme/config
+
+app/globals.css (Poppins import + CSS variables)
+
+styles/shadcn-override.css (map --primary → blauw)
+
+tailwind.config.ts, postcss.config.js, tsconfig.json
+
+README.md — run (pnpm i && pnpm dev), theming, waar features te extensen naar echte API.
+
+1) UI/UX specificaties
+
+Visueel
+
+Poppins 400/500/600; basis kleuren: tekst #0F172A, secundair #64748B, primary blauw #2563EB, light #EEF2FF, border #E5E7EB.
+
+Cards & tabel: radius 16px, shadow 0 6px 16px rgba(2,6,23,.08).
+
+Focus ring: rgba(37,99,235,.4) (geen layout shift).
+
+Pagina-indeling
+
+Header: H1 “Lidgelden” + subtitel “Beheer je lidgelden en betalingen”.
+
+Rij 1: KpiCards (4 stuks).
+
+Rij 2: Links Donut betaald/open/overdue, rechts Line chart “Ontvangen per maand”.
+
+Rij 3: Toolbar (zoek + filters + knoppen).
+
+Rij 4: FeesTable (met footer paginatie).
+
+Import/SEPA dialogs on demand.
+
+Toolbar
+
+Zoek placeholder: Zoek op lidnummer, naam of periode…
+
+Quick filters (Select): Status (Alle, Open, Betaald, Achterstallig), Jaar, Methode (SEPA, Overschrijving, Bancontact, Cash).
+
+Knoppen: Export (CSV), Import (dialog), Genereer SEPA (dialog, disabled als geen SEPA-selectie).
+
+FiltersDrawer
+
+Velden: Periode van/tot (date), Categorie (multi), Bedrag min/max (€), Betaald op van/tot, “Alleen met SEPA-mandaat” (checkbox), “Alleen achterstallig”.
+
+CTA’s: Toepassen, Reset.
+
+Tabelkolommen
+
+checkbox
+
+Lidnummer (mono, bv. 0007)
+
+Lid (Naam Voornaam)
+
+Periode (dd-mm-jjjj — dd-mm-jjjj)
+
+Bedrag (€)
+
+Methode (MethodChip)
+
+Status (StatusChip: OPEN / PAID / OVERDUE)
+
+Betaald op (indien PAID)
+
+Acties (RowActions)
+
+RowActions
+
+Markeer betaald (alleen voor OPEN/OVERDUE → vraagt betaaldatum, default vandaag)
+
+Bekijk detail (opent DetailSlideOver)
+
+Wijzig methode (select, bv. SEPA → Overschrijving)
+
+DetailSlideOver
+
+Header: Lidnaam + bedrag + status.
+
+Inhoud: key-value secties (Algemeen, Betaling, Links: lidprofiel).
+
+Acties: Markeer betaald, Wijzig methode, Open in lijst.
+
+Bulk actions
+
+Als ≥1 geselecteerd → bulkbar: “X geselecteerd” + Markeer betaald, Genereer SEPA (alleen SEPA & OPEN), Export selectie.
+
+Charts
+
+Donut Paid/Open/Overdue (blauw / lichtblauw / rood) met legend + percentages.
+
+Line inkomende betalingen per maand (gelijnde blauwe curve met zachte gradient).
+
+Toegankelijkheid
+
+Icon-only heeft aria-label, tabelheaders scope="col".
+
+Keyboard: Space selecteert rij, Enter opent detail, Shift-klik range-select (optioneel).
+
+AA contrast, prefers-reduced-motion gerespecteerd.
+
+2) Businessregels (mock)
+
+Statusregels:
+
+OVERDUE = status === OPEN && vandaag > periodEnd
+
+PAID heeft paidAt waarde
+
+Markeer betaald: zet status=PAID, paidAt=gekozen datum, methode ongewijzigd.
+
+SEPA batch genereren (mock):
+
+Alleen rijen met method=SEPA, status=OPEN, en hasMandate=true.
+
+Vraag batchRef (bv. SEPA-2025-06-001).
+
+Toon preview van gegenereerde PAIN.008 XML (string) en sommeer totalAmount + numTx.
+
+Na bevestigen: update rijen met sepaBatchRef=batchRef en status blijft OPEN (bank verwerkt later).
+
+Import (CSV/MT940/CODA – mock):
+
+Upload → parse naar {date, amount, description, memberNumber?}.
+
+Matching-heuristiek: match op memberNumber in description óf op bedrag + periode.
+
+Toon matchresultaten (zeker / mogelijk / onbekend). Actie “Boek betaling” → zet corresponderende fee op PAID.
+
+3) Mock data & helpers
+
+lib/mock/fees.ts
+
+Genereer ~80 fees voor jaren 2023–2025 met mix van status en methodes.
+
+Record shape:
+
+export type FeeStatus = 'OPEN' | 'PAID' | 'OVERDUE';
+export type PaymentMethod = 'SEPA' | 'OVERSCHRIJVING' | 'BANCONTACT' | 'CASH';
+
+export type Fee = {
+  id: string;
+  memberId: string;
+  memberNumber: string; // "0007"
+  memberLastName: string;
+  memberFirstName: string;
+  periodStart: string; // ISO
+  periodEnd: string;   // ISO
+  amount: number;      // cents or number €
+  method: PaymentMethod;
+  status: FeeStatus;
+  paidAt?: string;
+  hasMandate?: boolean;
+  sepaBatchRef?: string;
+};
+
+
+Exporteer helpers: filterFees, sortFees, paginate, markPaid, generateSepaXml(selected), parseCsv, parseMt940, guessMatches.
+
+4) Acceptatiecriteria
+
+KPI’s tonen correcte aggregaties (som openstaand, % betaald, som overdue, aantal facturen).
+
+Donut + Line chart renderen met consistente blauw palet.
+
+Zoek + filters + sorteren + paginatie werken (client-side over mock).
+
+Markeer betaald (row + bulk) wijzigt status en datum.
+
+SEPA wizard valideert selectie en toont mock PAIN.008 preview met batchRef, totalAmount, numTx.
+
+Import dialoog parseert CSV/MT940 (mock), toont matches en kan fees op PAID zetten.
+
+Detail slide-over toont alle velden en acties.
+
+Leeg/laad/fout-states verzorgd, A11y & keyboard-navigatie oké.
+
+TypeScript-strict, geen any, nette mappenstructuur.
+
+Stijl consistent met de rest van de app (Poppins, radius 16, schaduwen, blauwe accenten).
+
+Output now the full code for all listed files, runnable with pnpm i && pnpm dev.
+Use Dutch (Belgium) labels and dd-mm-jjjj dates. If anything is ambiguous, choose sensible defaults that keep the interface calm, professional, and accessible.

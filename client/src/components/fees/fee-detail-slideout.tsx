@@ -1,0 +1,176 @@
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { Fee } from "@shared/fees-schema";
+import { formatCurrencyBE, formatDateBE, formatPeriodBE } from "@/lib/format";
+import { StatusChip } from "./status-chip";
+import { MethodChip } from "./method-chip";
+import { User, Calendar, CreditCard, FileText, Check, X } from "lucide-react";
+
+interface FeeDetailSlideoutProps {
+  fee: Fee | null;
+  open: boolean;
+  onClose: () => void;
+  onMarkPaid: (fee: Fee) => void;
+}
+
+export function FeeDetailSlideout({ fee, open, onClose, onMarkPaid }: FeeDetailSlideoutProps) {
+  if (!fee) return null;
+
+  const canMarkPaid = fee.status === "OPEN" || fee.status === "OVERDUE";
+
+  return (
+    <Sheet open={open} onOpenChange={onClose}>
+      <SheetContent className="w-96 overflow-y-auto">
+        <SheetHeader>
+          <SheetTitle>Lidgeld Detail</SheetTitle>
+          <SheetDescription>
+            Bekijk alle details van dit lidgeld
+          </SheetDescription>
+        </SheetHeader>
+
+        <div className="space-y-6 mt-6">
+          {/* Header Info */}
+          <div className="bg-gray-50 rounded-lg p-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="font-mono text-sm text-gray-600">#{fee.memberNumber}</span>
+              <StatusChip status={fee.status} />
+            </div>
+            <h3 className="font-semibold text-lg">
+              {fee.memberLastName}, {fee.memberFirstName}
+            </h3>
+            <p className="text-gray-600">
+              {formatPeriodBE(fee.periodStart, fee.periodEnd)}
+            </p>
+          </div>
+
+          {/* Financial Details */}
+          <div className="space-y-4">
+            <h4 className="font-medium flex items-center gap-2">
+              <CreditCard className="h-4 w-4" />
+              Financiële details
+            </h4>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <span className="text-gray-500">Bedrag</span>
+                <p className="font-semibold text-lg">{formatCurrencyBE(fee.amount)}</p>
+              </div>
+              <div>
+                <span className="text-gray-500">Methode</span>
+                <div className="mt-1">
+                  <MethodChip method={fee.method} />
+                </div>
+              </div>
+              <div>
+                <span className="text-gray-500">Vervaldatum</span>
+                <p className="font-medium">{formatDateBE(fee.dueDate)}</p>
+              </div>
+              <div>
+                <span className="text-gray-500">Categorie</span>
+                <p className="font-medium">{fee.category}</p>
+              </div>
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Member Details */}
+          <div className="space-y-4">
+            <h4 className="font-medium flex items-center gap-2">
+              <User className="h-4 w-4" />
+              Lid informatie
+            </h4>
+            <div className="space-y-3 text-sm">
+              <div>
+                <span className="text-gray-500">Naam</span>
+                <p className="font-medium">{fee.memberFirstName} {fee.memberLastName}</p>
+              </div>
+              <div>
+                <span className="text-gray-500">Lidnummer</span>
+                <p className="font-mono">{fee.memberNumber}</p>
+              </div>
+              <div>
+                <span className="text-gray-500">E-mail</span>
+                <p>{fee.memberEmail}</p>
+              </div>
+              <div>
+                <span className="text-gray-500">Telefoon</span>
+                <p>{fee.memberPhone}</p>
+              </div>
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Payment Details */}
+          {fee.status === "PAID" && fee.paidAt && (
+            <div className="space-y-4">
+              <h4 className="font-medium flex items-center gap-2">
+                <Check className="h-4 w-4" />
+                Betaling details
+              </h4>
+              <div className="space-y-3 text-sm">
+                <div>
+                  <span className="text-gray-500">Betaald op</span>
+                  <p className="font-medium">{formatDateBE(fee.paidAt)}</p>
+                </div>
+                {fee.transactionId && (
+                  <div>
+                    <span className="text-gray-500">Transactie ID</span>
+                    <p className="font-mono text-xs">{fee.transactionId}</p>
+                  </div>
+                )}
+                {fee.reference && (
+                  <div>
+                    <span className="text-gray-500">Referentie</span>
+                    <p className="font-mono text-xs">{fee.reference}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Notes */}
+          {fee.notes && (
+            <>
+              <Separator />
+              <div className="space-y-4">
+                <h4 className="font-medium flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  Opmerkingen
+                </h4>
+                <div className="bg-gray-50 rounded-lg p-3">
+                  <p className="text-sm">{fee.notes}</p>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Actions */}
+          <div className="pt-4 border-t">
+            <div className="flex gap-3">
+              {canMarkPaid && (
+                <Button 
+                  onClick={() => onMarkPaid(fee)}
+                  className="flex-1"
+                >
+                  <Check className="h-4 w-4 mr-2" />
+                  Markeer betaald
+                </Button>
+              )}
+              <Button 
+                onClick={onClose}
+                variant="outline"
+                className="flex-1"
+              >
+                <X className="h-4 w-4 mr-2" />
+                Sluiten
+              </Button>
+            </div>
+          </div>
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
+}

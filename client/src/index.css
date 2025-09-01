@@ -12,12 +12,12 @@
   --popover: hsl(0, 0%, 100%);
   --popover-foreground: hsl(221, 39%, 11%);
   
-  /* Primary: Green #0F9D58 */
-  --primary: hsl(147, 78%, 34%);
+  /* Primary: Blue #2563EB */
+  --primary: hsl(217, 91%, 60%);
   --primary-foreground: hsl(0, 0%, 100%);
   
-  /* Secondary: Blue #2563EB */
-  --secondary: hsl(217, 91%, 60%);
+  /* Secondary: Light Blue #3B82F6 */
+  --secondary: hsl(221, 83%, 53%);
   --secondary-foreground: hsl(0, 0%, 100%);
   
   /* Neutrals */
@@ -39,24 +39,24 @@
   /* Borders and inputs */
   --border: hsl(214, 32%, 91%);
   --input: hsl(214, 32%, 91%);
-  --ring: hsl(147, 78%, 34%);
+  --ring: hsl(217, 91%, 60%);
   
-  /* Charts using green and blue palette */
-  --chart-1: hsl(147, 78%, 34%);
-  --chart-2: hsl(217, 91%, 60%);
-  --chart-3: hsl(142, 71%, 45%);
-  --chart-4: hsl(221, 83%, 53%);
+  /* Charts using blue palette */
+  --chart-1: hsl(217, 91%, 60%);
+  --chart-2: hsl(221, 83%, 53%);
+  --chart-3: hsl(212, 100%, 50%);
+  --chart-4: hsl(207, 90%, 54%);
   --chart-5: hsl(38, 92%, 50%);
   
   /* Sidebar - dark slate theme */
   --sidebar: hsl(215, 28%, 17%);
   --sidebar-foreground: hsl(213, 31%, 91%);
-  --sidebar-primary: hsl(147, 78%, 34%);
+  --sidebar-primary: hsl(217, 91%, 60%);
   --sidebar-primary-foreground: hsl(0, 0%, 100%);
   --sidebar-accent: hsl(215, 25%, 25%);
   --sidebar-accent-foreground: hsl(213, 31%, 91%);
   --sidebar-border: hsl(215, 25%, 25%);
-  --sidebar-ring: hsl(147, 78%, 34%);
+  --sidebar-ring: hsl(217, 91%, 60%);
   
   /* Typography */
   --font-sans: "Poppins", ui-sans-serif, system-ui;
@@ -93,12 +93,12 @@
   --popover: hsl(215, 28%, 17%);
   --popover-foreground: hsl(213, 31%, 91%);
   
-  /* Primary: Lighter green for dark mode */
-  --primary: hsl(142, 71%, 45%);
+  /* Primary: Lighter blue for dark mode */
+  --primary: hsl(221, 83%, 53%);
   --primary-foreground: hsl(0, 0%, 100%);
   
-  /* Secondary: Lighter blue for dark mode */
-  --secondary: hsl(221, 83%, 53%);
+  /* Secondary: Even lighter blue for dark mode */
+  --secondary: hsl(212, 100%, 50%);
   --secondary-foreground: hsl(0, 0%, 100%);
   
   /* Neutrals for dark mode */
@@ -120,24 +120,24 @@
   /* Borders and inputs for dark mode */
   --border: hsl(215, 25%, 25%);
   --input: hsl(215, 25%, 25%);
-  --ring: hsl(142, 71%, 45%);
+  --ring: hsl(221, 83%, 53%);
   
   /* Charts for dark mode */
-  --chart-1: hsl(142, 71%, 45%);
-  --chart-2: hsl(221, 83%, 53%);
-  --chart-3: hsl(147, 78%, 34%);
-  --chart-4: hsl(217, 91%, 60%);
+  --chart-1: hsl(221, 83%, 53%);
+  --chart-2: hsl(212, 100%, 50%);
+  --chart-3: hsl(217, 91%, 60%);
+  --chart-4: hsl(207, 90%, 54%);
   --chart-5: hsl(38, 92%, 50%);
   
   /* Sidebar remains the same in dark mode */
   --sidebar: hsl(215, 28%, 17%);
   --sidebar-foreground: hsl(213, 31%, 91%);
-  --sidebar-primary: hsl(142, 71%, 45%);
+  --sidebar-primary: hsl(221, 83%, 53%);
   --sidebar-primary-foreground: hsl(0, 0%, 100%);
   --sidebar-accent: hsl(215, 25%, 25%);
   --sidebar-accent-foreground: hsl(213, 31%, 91%);
   --sidebar-border: hsl(215, 25%, 25%);
-  --sidebar-ring: hsl(142, 71%, 45%);
+  --sidebar-ring: hsl(221, 83%, 53%);
 }
 
 @layer base {

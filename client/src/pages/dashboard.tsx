@@ -7,10 +7,10 @@ import { Link } from "wouter";
 
 export default function Dashboard() {
   return (
-        <main className="flex-1 py-8">
+        <main className="flex-1 py-4">
           <div className="px-4 sm:px-6 lg:px-8">
             {/* Page Header */}
-            <div className="sm:flex sm:items-center sm:justify-between mb-8">
+            <div className="sm:flex sm:items-center sm:justify-between mb-4">
               <div>
                 <h1 className="text-3xl font-bold text-gray-900" data-testid="page-title">Dashboard</h1>
                 <p className="mt-2 text-sm text-gray-700">Overzicht van jouw moskee ledenbeheer</p>
@@ -29,7 +29,7 @@ export default function Dashboard() {
             <KpiCards />
 
             {/* Charts and Tables Row */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
               {/* Revenue Chart */}
               <Card>
                 <CardHeader className="mb-6">
@@ -37,7 +37,7 @@ export default function Dashboard() {
                   <p className="text-sm text-gray-500">Laatste 12 maanden</p>
                 </CardHeader>
                 <CardContent>
-                  <div className="h-64 bg-gray-50 rounded-xl flex items-center justify-center text-gray-500 text-sm" data-testid="revenue-chart-placeholder">
+                  <div className="h-40 bg-gray-50 rounded-xl flex items-center justify-center text-gray-500 text-sm" data-testid="revenue-chart-placeholder">
                     Grafiek: Maandelijkse inkomsten trend
                   </div>
                 </CardContent>

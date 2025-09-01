@@ -12,12 +12,12 @@ export default function AgeGenderCard() {
       className="bg-white rounded-2xl border border-gray-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-40"
       style={{ 
         boxShadow: '0 6px 16px rgba(2,6,23,0.08)',
-        padding: '24px 28px'
+        padding: '20px 24px'
       }}
       tabIndex={0}
     >
       {/* Header with Total */}
-      <div className="mb-6 pb-4" style={{ borderBottom: '1px solid #E2E8F0' }}>
+      <div className="mb-4 pb-3" style={{ borderBottom: '1px solid #E2E8F0' }}>
         <div className="flex items-start justify-between">
           <div>
             <h3 className="text-lg font-semibold font-['Poppins']" style={{ color: '#0F172A' }}>
@@ -42,7 +42,7 @@ export default function AgeGenderCard() {
       </div>
 
       {/* Legend */}
-      <div className="flex items-center space-x-6 mb-6">
+      <div className="flex items-center space-x-6 mb-4">
         <div className="flex items-center space-x-2">
           <div 
             className="w-3 h-3 rounded-full" 

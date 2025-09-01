@@ -28,16 +28,16 @@ export function StackedBars({
   className 
 }: StackedBarsProps) {
   return (
-    <div className={cn("space-y-5", className)}>
+    <div className={cn("space-y-3", className)}>
       {buckets.map((bucket, index) => {
         const rowTotal = bucket.male + bucket.female;
         const maleWidth = rowTotal > 0 ? (bucket.male / rowTotal) * 100 : 0;
         const femaleWidth = rowTotal > 0 ? (bucket.female / rowTotal) * 100 : 0;
         
         return (
-          <div key={index} className="flex items-center gap-4">
+          <div key={index} className="flex items-center gap-3">
             {/* Label */}
-            <div className="w-16 flex-shrink-0">
+            <div className="w-14 flex-shrink-0">
               <span className="text-sm font-['Poppins']" style={{ color: '#475569' }}>
                 {bucket.label}
               </span>
@@ -46,7 +46,7 @@ export function StackedBars({
             {/* Stacked Bar */}
             <div className="flex-1 relative">
               <div 
-                className="h-5 rounded-full relative overflow-hidden"
+                className="h-4 rounded-full relative overflow-hidden"
                 style={{ backgroundColor: colors.track }}
               >
                 {/* Male segment */}
@@ -75,7 +75,7 @@ export function StackedBars({
             </div>
             
             {/* Percentage */}
-            <div className="w-16 text-right">
+            <div className="w-14 text-right">
               <span className="text-sm font-['Poppins']" style={{ color: '#475569' }}>
                 {bucket.percent.toFixed(1)}%
               </span>

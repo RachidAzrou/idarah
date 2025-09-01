@@ -251,8 +251,6 @@ export default function Instellingen() {
     <div className="flex h-screen bg-gray-50">
       
       <div className="lg:pl-60 flex flex-col flex-1">
-        <Topbar />
-        
         <main className="flex-1 py-8">
           <div className="px-4 sm:px-6 lg:px-8">
             {/* Page Header */}

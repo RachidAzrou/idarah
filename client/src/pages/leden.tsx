@@ -33,8 +33,8 @@ export default function Leden() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [votingRightsFilter, setVotingRightsFilter] = useState("all");
-  const [joinDateFrom, setJoinDateFrom] = useState("");
-  const [joinDateTo, setJoinDateTo] = useState("");
+  const [joinDateFrom, setJoinDateFrom] = useState<Date | undefined>();
+  const [joinDateTo, setJoinDateTo] = useState<Date | undefined>();
   const [paymentStatusFilter, setPaymentStatusFilter] = useState("all");
   const [showNewMemberDialog, setShowNewMemberDialog] = useState(false);
   const [showFiltersDrawer, setShowFiltersDrawer] = useState(false);
@@ -91,10 +91,10 @@ export default function Leden() {
       if (joinDateFrom || joinDateTo) {
         const memberDate = new Date(member.createdAt);
         if (joinDateFrom) {
-          dateMatch = dateMatch && memberDate >= new Date(joinDateFrom);
+          dateMatch = dateMatch && memberDate >= joinDateFrom;
         }
         if (joinDateTo) {
-          dateMatch = dateMatch && memberDate <= new Date(joinDateTo);
+          dateMatch = dateMatch && memberDate <= joinDateTo;
         }
       }
       
@@ -185,8 +185,8 @@ export default function Leden() {
     setStatusFilter("all");
     setCategoryFilter("all");
     setVotingRightsFilter("all");
-    setJoinDateFrom("");
-    setJoinDateTo("");
+    setJoinDateFrom(undefined);
+    setJoinDateTo(undefined);
     setPaymentStatusFilter("all");
     setAdvancedFilters(initialFilters);
     setPage(1);

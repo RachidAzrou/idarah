@@ -3,7 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { Search, Download, Upload, Plus, SlidersHorizontal, Command } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { Search, Download, Upload, Plus, SlidersHorizontal, Command, CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { nl } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 
 interface ToolbarProps {
@@ -15,10 +19,10 @@ interface ToolbarProps {
   onCategoryFilterChange: (value: string) => void;
   votingRightsFilter: string;
   onVotingRightsFilterChange: (value: string) => void;
-  joinDateFrom: string;
-  onJoinDateFromChange: (value: string) => void;
-  joinDateTo: string;
-  onJoinDateToChange: (value: string) => void;
+  joinDateFrom: Date | undefined;
+  onJoinDateFromChange: (date: Date | undefined) => void;
+  joinDateTo: Date | undefined;
+  onJoinDateToChange: (date: Date | undefined) => void;
   paymentStatusFilter: string;
   onPaymentStatusFilterChange: (value: string) => void;
   onExport: () => void;
@@ -154,23 +158,65 @@ export function Toolbar({
             <div className="flex flex-wrap gap-3 items-center">
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-600">Inschrijving:</span>
-                <Input
-                  type="date"
-                  value={joinDateFrom}
-                  onChange={(e) => onJoinDateFromChange(e.target.value)}
-                  className="w-[160px] h-9 border-gray-200"
-                  placeholder="Van datum"
-                  data-testid="join-date-from"
-                />
+                
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-[160px] h-9 justify-start text-left font-normal border-gray-200",
+                        !joinDateFrom && "text-muted-foreground"
+                      )}
+                      data-testid="join-date-from"
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {joinDateFrom ? format(joinDateFrom, "dd/MM/yyyy", { locale: nl }) : "Van datum"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={joinDateFrom}
+                      onSelect={onJoinDateFromChange}
+                      initialFocus
+                      locale={nl}
+                      captionLayout="dropdown-buttons"
+                      fromYear={2000}
+                      toYear={new Date().getFullYear()}
+                    />
+                  </PopoverContent>
+                </Popover>
+                
                 <span className="text-sm text-gray-400">tot</span>
-                <Input
-                  type="date"
-                  value={joinDateTo}
-                  onChange={(e) => onJoinDateToChange(e.target.value)}
-                  className="w-[160px] h-9 border-gray-200"
-                  placeholder="Tot datum"
-                  data-testid="join-date-to"
-                />
+                
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-[160px] h-9 justify-start text-left font-normal border-gray-200",
+                        !joinDateTo && "text-muted-foreground"
+                      )}
+                      data-testid="join-date-to"
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {joinDateTo ? format(joinDateTo, "dd/MM/yyyy", { locale: nl }) : "Tot datum"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={joinDateTo}
+                      onSelect={onJoinDateToChange}
+                      initialFocus
+                      locale={nl}
+                      captionLayout="dropdown-buttons"
+                      fromYear={2000}
+                      toYear={new Date().getFullYear()}
+                      disabled={(date) => joinDateFrom ? date < joinDateFrom : false}
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
 
               <Button 

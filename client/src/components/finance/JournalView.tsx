@@ -37,7 +37,7 @@ export function JournalView({ transactions }: JournalViewProps) {
       <TableCell className="text-sm">{transaction.category}</TableCell>
       <TableCell className="text-sm">
         {transaction.memberName ? (
-          <span className="text-blue-600 dark:text-blue-400">
+          <span className="text-gray-900 dark:text-gray-100">
             {transaction.memberName}
           </span>
         ) : (
@@ -45,7 +45,9 @@ export function JournalView({ transactions }: JournalViewProps) {
         )}
       </TableCell>
       <TableCell className="text-sm">
-        <MethodChip method={transaction.method} />
+        {transaction.method === 'SEPA' ? 'SEPA' : 
+         transaction.method === 'OVERSCHRIJVING' ? 'Overschrijving' : 
+         transaction.method === 'BANCONTACT' ? 'Bancontact' : 'Contant'}
       </TableCell>
       <TableCell className="text-sm max-w-[150px] truncate">
         {transaction.description || '-'}
@@ -60,57 +62,70 @@ export function JournalView({ transactions }: JournalViewProps) {
     <div className="space-y-6">
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-red-600 dark:text-red-400">
-              Debet (Uitgaven)
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600 dark:text-red-400">
-              {formatCurrencyBE(totals.debit)}
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Debet (Uitgaven)</p>
+              <p className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1">{formatCurrencyBE(totals.debit)}</p>
+              <div className="flex items-center space-x-1">
+                <span className="text-xs font-medium text-red-600 dark:text-red-400">
+                  {debitTransactions.length} transacties
+                </span>
+              </div>
             </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              {debitTransactions.length} transacties
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-green-600 dark:text-green-400">
-              Credit (Inkomsten)
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-              {formatCurrencyBE(totals.credit)}
+            <div className="w-8 h-8 bg-red-50 dark:bg-red-900/20 rounded-full flex items-center justify-center">
+              <div className="h-4 w-4 text-red-600 dark:text-red-400 font-bold">-</div>
             </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              {creditTransactions.length} transacties
-            </p>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">
-              Saldo
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className={`text-2xl font-bold ${
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Credit (Inkomsten)</p>
+              <p className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1">{formatCurrencyBE(totals.credit)}</p>
+              <div className="flex items-center space-x-1">
+                <span className="text-xs font-medium text-green-600 dark:text-green-400">
+                  {creditTransactions.length} transacties
+                </span>
+              </div>
+            </div>
+            <div className="w-8 h-8 bg-green-50 dark:bg-green-900/20 rounded-full flex items-center justify-center">
+              <div className="h-4 w-4 text-green-600 dark:text-green-400 font-bold">+</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Saldo</p>
+              <p className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1">{formatCurrencyBE(Math.abs(totals.balance))}</p>
+              <div className="flex items-center space-x-1">
+                <span className={`text-xs font-medium ${
+                  totals.balance >= 0 
+                    ? 'text-green-600 dark:text-green-400' 
+                    : 'text-red-600 dark:text-red-400'
+                }`}>
+                  {totals.balance >= 0 ? 'Overschot' : 'Tekort'}
+                </span>
+              </div>
+            </div>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
               totals.balance >= 0 
-                ? 'text-green-600 dark:text-green-400' 
-                : 'text-red-600 dark:text-red-400'
+                ? 'bg-green-50 dark:bg-green-900/20' 
+                : 'bg-red-50 dark:bg-red-900/20'
             }`}>
-              {formatCurrencyBE(Math.abs(totals.balance))}
+              <div className={`h-4 w-4 font-bold ${
+                totals.balance >= 0 
+                  ? 'text-green-600 dark:text-green-400' 
+                  : 'text-red-600 dark:text-red-400'
+              }`}>
+                {totals.balance >= 0 ? '=' : '!'}
+              </div>
             </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              {totals.balance >= 0 ? 'Overschot' : 'Tekort'}
-            </p>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
       {/* Journal Tables */}

@@ -220,7 +220,7 @@ export function TransactionsTable({
                   {formatDateBE(transaction.date)}
                 </TableCell>
                 <TableCell>
-                  <StatusChip type={transaction.type} />
+                  {transaction.type === 'INCOME' ? 'Inkomsten' : 'Uitgaven'}
                 </TableCell>
                 <TableCell>{transaction.category}</TableCell>
                 <TableCell className={transaction.memberName ? "text-gray-900 dark:text-gray-100" : "text-gray-400"}>
@@ -230,7 +230,9 @@ export function TransactionsTable({
                   {transaction.type === 'INCOME' ? '+' : '-'}{formatCurrencyBE(transaction.amount)}
                 </TableCell>
                 <TableCell>
-                  <MethodChip method={transaction.method} />
+                  {transaction.method === 'SEPA' ? 'SEPA' : 
+                   transaction.method === 'OVERSCHRIJVING' ? 'Overschrijving' : 
+                   transaction.method === 'BANCONTACT' ? 'Bancontact' : 'Contant'}
                 </TableCell>
                 <TableCell className="max-w-[200px] truncate">
                   {transaction.description || '-'}

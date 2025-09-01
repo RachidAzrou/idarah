@@ -1,5 +1,4 @@
-import Sidebar from "./sidebar";
-import Topbar from "./topbar";
+import Navbar from "./navbar";
 import { CommandPalette } from "../command-palette";
 
 interface AppShellProps {
@@ -9,13 +8,10 @@ interface AppShellProps {
 export default function AppShell({ children }: AppShellProps) {
   return (
     <div className="min-h-screen bg-background">
-      <Sidebar />
-      <div className="lg:pl-64">
-        <Topbar />
-        <main className="content-area">
-          {children}
-        </main>
-      </div>
+      <Navbar />
+      <main className="content-area">
+        {children}
+      </main>
       <CommandPalette />
     </div>
   );

@@ -116,7 +116,8 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
                 <TabsTrigger value="organization" data-testid="tab-organization">Organisatie</TabsTrigger>
               </TabsList>
 
-              <TabsContent value="personal" className="space-y-4">
+              <div className="min-h-[420px] py-6">
+                <TabsContent value="personal" className="space-y-4 mt-0">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
@@ -235,7 +236,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
                 </div>
               </TabsContent>
 
-              <TabsContent value="address" className="space-y-4">
+              <TabsContent value="address" className="space-y-4 mt-0">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
@@ -309,7 +310,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
                 </div>
               </TabsContent>
 
-              <TabsContent value="financial" className="space-y-4">
+              <TabsContent value="financial" className="space-y-4 mt-0">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
@@ -373,11 +374,12 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
                 </div>
               </TabsContent>
 
-              <TabsContent value="organization" className="space-y-4">
+              <TabsContent value="organization" className="space-y-4 mt-0">
                 <div className="text-center py-8">
                   <p className="text-gray-500">Organisatie instellingen worden automatisch toegepast na het aanmaken van het lid.</p>
                 </div>
               </TabsContent>
+              </div>
             </Tabs>
 
             <div className="flex justify-between pt-6 border-t">

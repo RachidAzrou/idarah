@@ -131,29 +131,24 @@ export function JournalView({ transactions }: JournalViewProps) {
       {/* Journal Tables */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Debet (Uitgaven) */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-red-600 dark:text-red-400 flex items-center gap-2">
-              Debet (Uitgaven)
-              <Badge variant="outline" className="text-red-600 dark:text-red-400 border-red-200 dark:border-red-800">
-                {debitTransactions.length}
-              </Badge>
-            </CardTitle>
-            <CardDescription>
-              Alle uitgaande transacties
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+          <div className="p-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Debet (Uitgaven)</h3>
+              <span className="text-sm text-gray-500 dark:text-gray-400">{debitTransactions.length} transacties</span>
+            </div>
+          </div>
+          <div className="p-6">
+            <div className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-red-50 dark:bg-red-900/10">
-                    <TableHead className="text-xs">Datum</TableHead>
-                    <TableHead className="text-xs">Categorie</TableHead>
-                    <TableHead className="text-xs">Lid</TableHead>
-                    <TableHead className="text-xs">Methode</TableHead>
-                    <TableHead className="text-xs">Omschrijving</TableHead>
-                    <TableHead className="text-xs text-right">Bedrag</TableHead>
+                  <TableRow className="bg-gray-50 dark:bg-gray-900">
+                    <TableHead className="text-xs font-medium">Datum</TableHead>
+                    <TableHead className="text-xs font-medium">Categorie</TableHead>
+                    <TableHead className="text-xs font-medium">Lid</TableHead>
+                    <TableHead className="text-xs font-medium">Methode</TableHead>
+                    <TableHead className="text-xs font-medium">Omschrijving</TableHead>
+                    <TableHead className="text-xs font-medium text-right">Bedrag</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody className="max-h-80 overflow-y-auto">
@@ -171,44 +166,28 @@ export function JournalView({ transactions }: JournalViewProps) {
                 </TableBody>
               </Table>
             </div>
-            
-            {debitTransactions.length > 0 && (
-              <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/10 rounded-lg">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium">Totaal Debet:</span>
-                  <span className="text-lg font-bold text-red-600 dark:text-red-400">
-                    {formatCurrencyBE(totals.debit)}
-                  </span>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Credit (Inkomsten) */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-green-600 dark:text-green-400 flex items-center gap-2">
-              Credit (Inkomsten)
-              <Badge variant="outline" className="text-green-600 dark:text-green-400 border-green-200 dark:border-green-800">
-                {creditTransactions.length}
-              </Badge>
-            </CardTitle>
-            <CardDescription>
-              Alle inkomende transacties
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+          <div className="p-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Credit (Inkomsten)</h3>
+              <span className="text-sm text-gray-500 dark:text-gray-400">{creditTransactions.length} transacties</span>
+            </div>
+          </div>
+          <div className="p-6">
+            <div className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-green-50 dark:bg-green-900/10">
-                    <TableHead className="text-xs">Datum</TableHead>
-                    <TableHead className="text-xs">Categorie</TableHead>
-                    <TableHead className="text-xs">Lid</TableHead>
-                    <TableHead className="text-xs">Methode</TableHead>
-                    <TableHead className="text-xs">Omschrijving</TableHead>
-                    <TableHead className="text-xs text-right">Bedrag</TableHead>
+                  <TableRow className="bg-gray-50 dark:bg-gray-900">
+                    <TableHead className="text-xs font-medium">Datum</TableHead>
+                    <TableHead className="text-xs font-medium">Categorie</TableHead>
+                    <TableHead className="text-xs font-medium">Lid</TableHead>
+                    <TableHead className="text-xs font-medium">Methode</TableHead>
+                    <TableHead className="text-xs font-medium">Omschrijving</TableHead>
+                    <TableHead className="text-xs font-medium text-right">Bedrag</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody className="max-h-80 overflow-y-auto">
@@ -226,50 +205,33 @@ export function JournalView({ transactions }: JournalViewProps) {
                 </TableBody>
               </Table>
             </div>
-            
-            {creditTransactions.length > 0 && (
-              <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/10 rounded-lg">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium">Totaal Credit:</span>
-                  <span className="text-lg font-bold text-green-600 dark:text-green-400">
-                    {formatCurrencyBE(totals.credit)}
-                  </span>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
       {/* Balance Summary */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Journaal Saldo</CardTitle>
-          <CardDescription>
-            Overzicht van de balans tussen debet en credit
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+        <div className="p-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Journaal Saldo</h3>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Overzicht van de balans tussen debet en credit</p>
+        </div>
+        <div className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-            <div className="p-4 bg-red-50 dark:bg-red-900/10 rounded-lg">
-              <div className="text-2xl font-bold text-red-600 dark:text-red-400">
+            <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+              <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                 {formatCurrencyBE(totals.debit)}
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-400">Totaal Debet</div>
             </div>
             
-            <div className="p-4 bg-green-50 dark:bg-green-900/10 rounded-lg">
-              <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+            <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+              <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                 {formatCurrencyBE(totals.credit)}
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-400">Totaal Credit</div>
             </div>
             
-            <div className={`p-4 rounded-lg ${
-              totals.balance >= 0 
-                ? 'bg-green-50 dark:bg-green-900/10' 
-                : 'bg-red-50 dark:bg-red-900/10'
-            }`}>
+            <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
               <div className={`text-2xl font-bold ${
                 totals.balance >= 0 
                   ? 'text-green-600 dark:text-green-400' 
@@ -282,8 +244,8 @@ export function JournalView({ transactions }: JournalViewProps) {
               </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

@@ -14,7 +14,11 @@ export function removeAuthToken(): void {
   localStorage.removeItem("authToken");
 }
 
-export function getUserInitials(name: string): string {
+export function getUserInitials(name: string | undefined): string {
+  if (!name || typeof name !== 'string') {
+    return 'US'; // Default voor User
+  }
+  
   return name
     .split(" ")
     .map(part => part.charAt(0))

@@ -104,7 +104,7 @@ export function FeesTable({
                 />
               </TableHead>
               <SortableHeader field="memberNumber">Lidnummer</SortableHeader>
-              <SortableHeader field="memberName">Lid</SortableHeader>
+              <SortableHeader field="memberName">Naam</SortableHeader>
               <SortableHeader field="periodStart">Periode</SortableHeader>
               <SortableHeader field="amount">Bedrag</SortableHeader>
               <SortableHeader field="method">Methode</SortableHeader>

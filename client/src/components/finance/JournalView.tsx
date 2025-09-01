@@ -7,8 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { formatDateBE, formatCurrencyBE } from "@/lib/format";
 import { Transaction } from "@/lib/mock/transactions";
 import { MethodChip } from "@/components/ui/MethodChip";
-import { CiInboxOut, CiInboxIn } from "react-icons/ci";
-import { CgMathEqual } from "react-icons/cg";
+import { MdOutbox } from "react-icons/md";
+import { HiInboxIn, HiInbox } from "react-icons/hi";
 
 interface JournalViewProps {
   transactions: Transaction[];
@@ -76,7 +76,7 @@ export function JournalView({ transactions }: JournalViewProps) {
               </div>
             </div>
             <div className="w-8 h-8 bg-red-50 dark:bg-red-900/20 rounded-full flex items-center justify-center">
-              <CiInboxOut className="h-4 w-4 text-red-600 dark:text-red-400" />
+              <MdOutbox className="h-4 w-4 text-red-600 dark:text-red-400" />
             </div>
           </div>
         </div>
@@ -93,7 +93,7 @@ export function JournalView({ transactions }: JournalViewProps) {
               </div>
             </div>
             <div className="w-8 h-8 bg-green-50 dark:bg-green-900/20 rounded-full flex items-center justify-center">
-              <CiInboxIn className="h-4 w-4 text-green-600 dark:text-green-400" />
+              <HiInboxIn className="h-4 w-4 text-green-600 dark:text-green-400" />
             </div>
           </div>
         </div>
@@ -120,7 +120,7 @@ export function JournalView({ transactions }: JournalViewProps) {
                 ? 'bg-red-50 dark:bg-red-900/20'
                 : 'bg-gray-50 dark:bg-gray-900/20'
             }`}>
-              <CgMathEqual className={`h-4 w-4 ${
+              <HiInbox className={`h-4 w-4 ${
                 totals.balance > 0 
                   ? 'text-green-600 dark:text-green-400' 
                   : totals.balance < 0
@@ -139,7 +139,7 @@ export function JournalView({ transactions }: JournalViewProps) {
           <div className="p-6 pb-4 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <CiInboxOut className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                <MdOutbox className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Debet</h3>
               </div>
               <span className="text-sm text-gray-500 dark:text-gray-400">{debitTransactions.length} transacties</span>
@@ -181,7 +181,7 @@ export function JournalView({ transactions }: JournalViewProps) {
           <div className="p-6 pb-4 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <CiInboxIn className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                <HiInboxIn className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Credit</h3>
               </div>
               <span className="text-sm text-gray-500 dark:text-gray-400">{creditTransactions.length} transacties</span>

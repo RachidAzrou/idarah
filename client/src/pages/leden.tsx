@@ -1,7 +1,5 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import Sidebar from "@/components/layout/sidebar";
-import Topbar from "@/components/layout/topbar";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -54,10 +52,6 @@ export default function Leden() {
 
   if (isLoading) {
     return (
-      <div className="flex h-screen bg-gray-50">
-        <Sidebar />
-        <div className="lg:pl-60 flex flex-col flex-1">
-          <Topbar />
           <main className="flex-1 py-8">
             <div className="px-4 sm:px-6 lg:px-8">
               <div className="animate-pulse space-y-4">
@@ -67,18 +61,10 @@ export default function Leden() {
               </div>
             </div>
           </main>
-        </div>
-      </div>
     );
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <Sidebar />
-      
-      <div className="lg:pl-60 flex flex-col flex-1">
-        <Topbar />
-        
         <main className="flex-1 py-8">
           <div className="px-4 sm:px-6 lg:px-8">
             {/* Page Header */}
@@ -337,7 +323,5 @@ export default function Leden() {
             </Card>
           </div>
         </main>
-      </div>
-    </div>
   );
 }

@@ -1,7 +1,5 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import Sidebar from "@/components/layout/sidebar";
-import Topbar from "@/components/layout/topbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,10 +41,6 @@ export default function PubliekeSchermen() {
 
   if (isLoading) {
     return (
-      <div className="flex h-screen bg-gray-50">
-        <Sidebar />
-        <div className="lg:pl-60 flex flex-col flex-1">
-          <Topbar />
           <main className="flex-1 py-8">
             <div className="px-4 sm:px-6 lg:px-8">
               <div className="animate-pulse space-y-4">
@@ -56,18 +50,10 @@ export default function PubliekeSchermen() {
               </div>
             </div>
           </main>
-        </div>
-      </div>
     );
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <Sidebar />
-      
-      <div className="lg:pl-60 flex flex-col flex-1">
-        <Topbar />
-        
         <main className="flex-1 py-8">
           <div className="px-4 sm:px-6 lg:px-8">
             {/* Page Header */}
@@ -354,7 +340,5 @@ export default function PubliekeSchermen() {
             </Tabs>
           </div>
         </main>
-      </div>
-    </div>
   );
 }

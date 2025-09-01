@@ -1,5 +1,3 @@
-import Sidebar from "@/components/layout/sidebar";
-import Topbar from "@/components/layout/topbar";
 import KpiCards from "@/components/dashboard/kpi-cards";
 import RecentMembers from "@/components/dashboard/recent-members";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -9,12 +7,6 @@ import { Link } from "wouter";
 
 export default function Dashboard() {
   return (
-    <div className="flex h-screen bg-gray-50">
-      <Sidebar />
-      
-      <div className="lg:pl-60 flex flex-col flex-1">
-        <Topbar />
-        
         <main className="flex-1 py-8">
           <div className="px-4 sm:px-6 lg:px-8">
             {/* Page Header */}
@@ -155,7 +147,5 @@ export default function Dashboard() {
             </div>
           </div>
         </main>
-      </div>
-    </div>
   );
 }

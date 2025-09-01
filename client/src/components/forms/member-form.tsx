@@ -171,7 +171,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
                     name="firstName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Voornaam</FormLabel>
+                        <FormLabel>Voornaam *</FormLabel>
                         <FormControl>
                           <Input placeholder="bijv. Mohamed" {...field} data-testid="input-firstname" />
                         </FormControl>
@@ -185,7 +185,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
                     name="lastName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Achternaam</FormLabel>
+                        <FormLabel>Achternaam *</FormLabel>
                         <FormControl>
                           <Input placeholder="bijv. El-Amrani" {...field} data-testid="input-lastname" />
                         </FormControl>
@@ -199,7 +199,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
                     name="gender"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Geslacht</FormLabel>
+                        <FormLabel>Geslacht *</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger data-testid="select-gender">
@@ -221,7 +221,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
                     name="birthDate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Geboortedatum</FormLabel>
+                        <FormLabel>Geboortedatum *</FormLabel>
                         <Popover>
                           <PopoverTrigger asChild>
                             <FormControl>
@@ -307,7 +307,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
                     name="category"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Categorie</FormLabel>
+                        <FormLabel>Categorie *</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger data-testid="select-category">

@@ -3,7 +3,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 const data = [
   { name: 'Betaald', value: 1058, color: '#2563EB' },
   { name: 'Openstaand', value: 150, color: '#60A5FA' },
-  { name: 'Vervallen', value: 39, color: '#EF4444' },
+  { name: 'Achterstallig', value: 39, color: '#EF4444' },
 ];
 
 const total = data.reduce((sum, item) => sum + item.value, 0);

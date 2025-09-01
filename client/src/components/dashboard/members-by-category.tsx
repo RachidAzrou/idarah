@@ -33,8 +33,8 @@ export default function MembersByCategoryCard() {
 
         {/* Right side - Total + Legend */}
         <div className="flex-1 space-y-6">
-          {/* Large Total */}
-          <div className="text-center lg:text-left">
+          {/* Large Total - Centered */}
+          <div className="text-center">
             <div 
               className="text-4xl font-bold font-['Poppins']" 
               style={{ color: '#0F172A' }}

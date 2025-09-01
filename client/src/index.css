@@ -4,99 +4,140 @@
 @tailwind utilities;
 
 :root {
+  /* HubSpot-style design system */
   --background: hsl(0, 0%, 100%);
-  --foreground: hsl(224, 71%, 4%);
+  --foreground: hsl(221, 39%, 11%);
   --card: hsl(0, 0%, 100%);
-  --card-foreground: hsl(224, 71%, 4%);
+  --card-foreground: hsl(221, 39%, 11%);
   --popover: hsl(0, 0%, 100%);
-  --popover-foreground: hsl(224, 71%, 4%);
-  --primary: hsl(238, 75%, 59%);
-  --primary-foreground: hsl(0, 0%, 98%);
-  --secondary: hsl(220, 14%, 96%);
-  --secondary-foreground: hsl(220, 9%, 46%);
-  --muted: hsl(220, 14%, 96%);
-  --muted-foreground: hsl(220, 9%, 46%);
-  --accent: hsl(220, 14%, 96%);
-  --accent-foreground: hsl(220, 9%, 46%);
-  --destructive: hsl(0, 84%, 60%);
-  --destructive-foreground: hsl(0, 0%, 98%);
-  --border: hsl(220, 13%, 91%);
-  --input: hsl(220, 13%, 91%);
-  --ring: hsl(238, 75%, 59%);
-  --chart-1: hsl(238, 75%, 59%);
-  --chart-2: hsl(159, 78%, 36%);
-  --chart-3: hsl(42, 93%, 56%);
-  --chart-4: hsl(147, 78%, 42%);
-  --chart-5: hsl(341, 75%, 51%);
-  --sidebar: hsl(0, 0%, 100%);
-  --sidebar-foreground: hsl(224, 71%, 4%);
-  --sidebar-primary: hsl(238, 75%, 59%);
-  --sidebar-primary-foreground: hsl(0, 0%, 98%);
-  --sidebar-accent: hsl(220, 14%, 96%);
-  --sidebar-accent-foreground: hsl(220, 9%, 46%);
-  --sidebar-border: hsl(220, 13%, 91%);
-  --sidebar-ring: hsl(238, 75%, 59%);
+  --popover-foreground: hsl(221, 39%, 11%);
+  
+  /* Primary: Green #0F9D58 */
+  --primary: hsl(147, 78%, 34%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  
+  /* Secondary: Blue #2563EB */
+  --secondary: hsl(217, 91%, 60%);
+  --secondary-foreground: hsl(0, 0%, 100%);
+  
+  /* Neutrals */
+  --muted: hsl(220, 13%, 95%);
+  --muted-foreground: hsl(215, 16%, 47%);
+  --accent: hsl(220, 13%, 95%);
+  --accent-foreground: hsl(215, 16%, 47%);
+  
+  /* Status colors */
+  --destructive: hsl(0, 72%, 51%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+  --success: hsl(142, 71%, 45%);
+  --success-foreground: hsl(0, 0%, 100%);
+  --warning: hsl(38, 92%, 50%);
+  --warning-foreground: hsl(0, 0%, 100%);
+  --info: hsl(221, 83%, 53%);
+  --info-foreground: hsl(0, 0%, 100%);
+  
+  /* Borders and inputs */
+  --border: hsl(214, 32%, 91%);
+  --input: hsl(214, 32%, 91%);
+  --ring: hsl(147, 78%, 34%);
+  
+  /* Charts using green and blue palette */
+  --chart-1: hsl(147, 78%, 34%);
+  --chart-2: hsl(217, 91%, 60%);
+  --chart-3: hsl(142, 71%, 45%);
+  --chart-4: hsl(221, 83%, 53%);
+  --chart-5: hsl(38, 92%, 50%);
+  
+  /* Sidebar - dark slate theme */
+  --sidebar: hsl(215, 28%, 17%);
+  --sidebar-foreground: hsl(213, 31%, 91%);
+  --sidebar-primary: hsl(147, 78%, 34%);
+  --sidebar-primary-foreground: hsl(0, 0%, 100%);
+  --sidebar-accent: hsl(215, 25%, 25%);
+  --sidebar-accent-foreground: hsl(213, 31%, 91%);
+  --sidebar-border: hsl(215, 25%, 25%);
+  --sidebar-ring: hsl(147, 78%, 34%);
+  
+  /* Typography */
   --font-sans: "Poppins", ui-sans-serif, system-ui;
   --font-serif: Georgia, serif;
-  --font-mono: Menlo, monospace;
-  --radius: 12px;
-  --shadow-2xs: 0px 2px 0px 0px hsl(238, 75%, 59%, 0.00);
-  --shadow-xs: 0px 2px 0px 0px hsl(238, 75%, 59%, 0.00);
-  --shadow-sm: 0px 2px 0px 0px hsl(238, 75%, 59%, 0.00), 0px 1px 2px -1px hsl(238, 75%, 59%, 0.00);
-  --shadow: 0px 2px 0px 0px hsl(238, 75%, 59%, 0.00), 0px 1px 2px -1px hsl(238, 75%, 59%, 0.00);
-  --shadow-md: 0px 2px 0px 0px hsl(238, 75%, 59%, 0.00), 0px 2px 4px -1px hsl(238, 75%, 59%, 0.00);
-  --shadow-lg: 0px 2px 0px 0px hsl(238, 75%, 59%, 0.00), 0px 4px 6px -1px hsl(238, 75%, 59%, 0.00);
-  --shadow-xl: 0px 2px 0px 0px hsl(238, 75%, 59%, 0.00), 0px 8px 10px -1px hsl(238, 75%, 59%, 0.00);
-  --shadow-2xl: 0px 2px 0px 0px hsl(238, 75%, 59%, 0.00);
-  --tracking-normal: 0em;
-  --spacing: 0.25rem;
+  --font-mono: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas, "Courier New", monospace;
+  
+  /* Border radius - HubSpot style */
+  --radius: 16px;
+  /* HubSpot-style shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+  
+  /* Spacing scale */
+  --spacing-1: 0.25rem;
+  --spacing-2: 0.5rem;
+  --spacing-3: 0.75rem;
+  --spacing-4: 1rem;
+  --spacing-5: 1.25rem;
+  --spacing-6: 1.5rem;
+  --spacing-8: 2rem;
+  --spacing-10: 2.5rem;
 }
 
 .dark {
-  --background: hsl(0, 0%, 0%);
-  --foreground: hsl(200, 7%, 91%);
-  --card: hsl(228, 10%, 10%);
-  --card-foreground: hsl(0, 0%, 85%);
-  --popover: hsl(0, 0%, 0%);
-  --popover-foreground: hsl(200, 7%, 91%);
-  --primary: hsl(238, 88%, 53%);
+  /* Dark mode - HubSpot style */
+  --background: hsl(222, 84%, 5%);
+  --foreground: hsl(213, 31%, 91%);
+  --card: hsl(222, 84%, 5%);
+  --card-foreground: hsl(213, 31%, 91%);
+  --popover: hsl(215, 28%, 17%);
+  --popover-foreground: hsl(213, 31%, 91%);
+  
+  /* Primary: Lighter green for dark mode */
+  --primary: hsl(142, 71%, 45%);
   --primary-foreground: hsl(0, 0%, 100%);
-  --secondary: hsl(195, 15%, 95%);
-  --secondary-foreground: hsl(224, 71%, 4%);
-  --muted: hsl(0, 0%, 9%);
-  --muted-foreground: hsl(210, 3%, 46%);
-  --accent: hsl(206, 70%, 8%);
-  --accent-foreground: hsl(238, 88%, 53%);
-  --destructive: hsl(0, 84%, 60%);
+  
+  /* Secondary: Lighter blue for dark mode */
+  --secondary: hsl(221, 83%, 53%);
+  --secondary-foreground: hsl(0, 0%, 100%);
+  
+  /* Neutrals for dark mode */
+  --muted: hsl(215, 25%, 15%);
+  --muted-foreground: hsl(217, 10%, 64%);
+  --accent: hsl(215, 25%, 15%);
+  --accent-foreground: hsl(217, 10%, 64%);
+  
+  /* Status colors for dark mode */
+  --destructive: hsl(0, 62%, 63%);
   --destructive-foreground: hsl(0, 0%, 100%);
-  --border: hsl(210, 5%, 15%);
-  --input: hsl(208, 28%, 18%);
-  --ring: hsl(238, 75%, 59%);
-  --chart-1: hsl(238, 75%, 59%);
-  --chart-2: hsl(159, 78%, 36%);
-  --chart-3: hsl(42, 93%, 56%);
-  --chart-4: hsl(147, 78%, 42%);
-  --chart-5: hsl(341, 75%, 51%);
-  --sidebar: hsl(228, 10%, 10%);
-  --sidebar-foreground: hsl(0, 0%, 85%);
-  --sidebar-primary: hsl(238, 75%, 59%);
+  --success: hsl(142, 71%, 45%);
+  --success-foreground: hsl(0, 0%, 100%);
+  --warning: hsl(38, 92%, 50%);
+  --warning-foreground: hsl(0, 0%, 100%);
+  --info: hsl(221, 83%, 53%);
+  --info-foreground: hsl(0, 0%, 100%);
+  
+  /* Borders and inputs for dark mode */
+  --border: hsl(215, 25%, 25%);
+  --input: hsl(215, 25%, 25%);
+  --ring: hsl(142, 71%, 45%);
+  
+  /* Charts for dark mode */
+  --chart-1: hsl(142, 71%, 45%);
+  --chart-2: hsl(221, 83%, 53%);
+  --chart-3: hsl(147, 78%, 34%);
+  --chart-4: hsl(217, 91%, 60%);
+  --chart-5: hsl(38, 92%, 50%);
+  
+  /* Sidebar remains the same in dark mode */
+  --sidebar: hsl(215, 28%, 17%);
+  --sidebar-foreground: hsl(213, 31%, 91%);
+  --sidebar-primary: hsl(142, 71%, 45%);
   --sidebar-primary-foreground: hsl(0, 0%, 100%);
-  --sidebar-accent: hsl(206, 70%, 8%);
-  --sidebar-accent-foreground: hsl(238, 88%, 53%);
-  --sidebar-border: hsl(206, 16%, 26%);
-  --sidebar-ring: hsl(238, 75%, 59%);
-  --font-sans: "Poppins", ui-sans-serif, system-ui;
-  --font-serif: Georgia, serif;
-  --font-mono: Menlo, monospace;
-  --radius: 12px;
-  --shadow-2xs: 0px 2px 0px 0px hsl(238, 75%, 59%, 0.00);
-  --shadow-xs: 0px 2px 0px 0px hsl(238, 75%, 59%, 0.00);
-  --shadow-sm: 0px 2px 0px 0px hsl(238, 75%, 59%, 0.00), 0px 1px 2px -1px hsl(238, 75%, 59%, 0.00);
-  --shadow: 0px 2px 0px 0px hsl(238, 75%, 59%, 0.00), 0px 1px 2px -1px hsl(238, 75%, 59%, 0.00);
-  --shadow-md: 0px 2px 0px 0px hsl(238, 75%, 59%, 0.00), 0px 2px 4px -1px hsl(238, 75%, 59%, 0.00);
-  --shadow-lg: 0px 2px 0px 0px hsl(238, 75%, 59%, 0.00), 0px 4px 6px -1px hsl(238, 75%, 59%, 0.00);
-  --shadow-xl: 0px 2px 0px 0px hsl(238, 75%, 59%, 0.00), 0px 8px 10px -1px hsl(238, 75%, 59%, 0.00);
-  --shadow-2xl: 0px 2px 0px 0px hsl(238, 75%, 59%, 0.00);
+  --sidebar-accent: hsl(215, 25%, 25%);
+  --sidebar-accent-foreground: hsl(213, 31%, 91%);
+  --sidebar-border: hsl(215, 25%, 25%);
+  --sidebar-ring: hsl(142, 71%, 45%);
 }
 
 @layer base {
@@ -106,5 +147,48 @@
 
   body {
     @apply font-sans antialiased bg-background text-foreground;
+    font-feature-settings: "cv11", "cv02", "cv03", "cv04";
+  }
+  
+  /* HubSpot-style focus management */
+  :focus-visible {
+    @apply outline-none ring-2 ring-primary ring-offset-2 ring-offset-background;
+  }
+  
+  /* HubSpot-style button hover effects */
+  .btn-hover {
+    @apply transition-all duration-200 hover:shadow-md hover:-translate-y-px;
+  }
+  
+  /* Card hover effects */
+  .card-hover {
+    @apply transition-all duration-200 hover:shadow-md;
+  }
+  
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  /* HubSpot-style focus ring */
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2;
+  }
+  
+  /* Topbar styles */
+  .topbar {
+    @apply h-16 bg-background border-b border-border px-6 flex items-center justify-between;
+  }
+  
+  /* Sidebar styles */
+  .sidebar {
+    @apply bg-sidebar text-sidebar-foreground w-64 min-h-screen border-r border-sidebar-border;
+  }
+  
+  /* Content area styles */
+  .content-area {
+    @apply max-w-7xl mx-auto px-6 py-8;
   }
 }

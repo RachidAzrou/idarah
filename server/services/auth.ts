@@ -31,12 +31,10 @@ class AuthService {
 
       const token = this.generateToken(user.id);
       
+      const { passwordHash, ...userWithoutPassword } = user;
       return {
         success: true,
-        user: {
-          ...user,
-          passwordHash: undefined, // Don't send password hash
-        } as User,
+        user: userWithoutPassword as User,
         token,
       };
     } catch (error) {

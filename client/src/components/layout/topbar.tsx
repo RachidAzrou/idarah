@@ -1,57 +1,77 @@
-import { Search, Bell, Menu } from "lucide-react";
+import { Search, Bell, Menu, Command, HelpCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/use-auth";
 import { getUserInitials } from "@/lib/auth";
+import { cn } from "@/lib/utils";
 
 export default function Topbar() {
   const { user } = useAuth();
 
   return (
-    <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
+    <header className="topbar lg:pl-64">
       {/* Mobile menu button */}
-      <Button variant="ghost" size="sm" className="-m-2.5 p-2.5 text-gray-700 lg:hidden" data-testid="mobile-menu-button">
-        <Menu className="h-6 w-6" />
+      <Button variant="ghost" size="sm" className="-m-2.5 p-2.5 text-foreground lg:hidden focus-ring" data-testid="mobile-menu-button">
+        <Menu className="h-5 w-5" />
+        <span className="sr-only">Open sidebar</span>
       </Button>
 
-      <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-        {/* Search */}
-        <div className="relative flex flex-1 max-w-lg">
-          <Search className="pointer-events-none absolute inset-y-0 left-0 h-full w-5 text-gray-400 ml-3" />
-          <Input 
+      {/* Search */}
+      <div className="flex flex-1 justify-center">
+        <div className="relative w-full max-w-md">
+          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+            <Search className="h-4 w-4 text-muted-foreground" />
+          </div>
+          <Input
             id="search-field"
-            className="block h-full w-full border-0 py-0 pl-10 pr-0 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm bg-transparent"
-            placeholder="Zoek leden, lidgelden..."
+            className={cn(
+              "w-full pl-10 pr-16 h-9 bg-muted/50 border-0 focus-visible:bg-background",
+              "placeholder:text-muted-foreground text-sm"
+            )}
+            placeholder="Zoek alles... (⌘K)"
             type="search"
             name="search"
             data-testid="search-input"
           />
-        </div>
-
-        <div className="flex items-center gap-x-4 lg:gap-x-6">
-          {/* Notifications */}
-          <Button variant="ghost" size="sm" className="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500 relative" data-testid="notifications-button">
-            <Bell className="h-6 w-6" />
-            <Badge variant="destructive" className="absolute -top-1 -right-1 h-4 w-4 text-xs flex items-center justify-center p-0" data-testid="notification-count">
-              3
-            </Badge>
-          </Button>
-
-          {/* Profile dropdown */}
-          {user && (
-            <div className="relative">
-              <Button variant="ghost" size="sm" className="-m-1.5 flex items-center p-1.5" data-testid="profile-button">
-                <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                  <span className="text-sm font-medium text-primary-foreground">
-                    {getUserInitials(user.name)}
-                  </span>
-                </div>
-              </Button>
-            </div>
-          )}
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+            <kbd className="hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100 sm:flex">
+              <Command className="h-3 w-3" />K
+            </kbd>
+          </div>
         </div>
       </div>
-    </div>
+
+      <div className="flex items-center gap-x-3">
+        {/* Help */}
+        <Button variant="ghost" size="sm" className="h-9 w-9 focus-ring" data-testid="help-button">
+          <HelpCircle className="h-4 w-4" />
+          <span className="sr-only">Help</span>
+        </Button>
+
+        {/* Notifications */}
+        <Button variant="ghost" size="sm" className="relative h-9 w-9 focus-ring" data-testid="notifications-button">
+          <Bell className="h-4 w-4" />
+          <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 w-5 text-xs flex items-center justify-center p-0 border-2 border-background" data-testid="notification-count">
+            3
+          </Badge>
+          <span className="sr-only">View notifications</span>
+        </Button>
+
+        {/* Profile dropdown */}
+        {user && (
+          <div className="relative">
+            <Button variant="ghost" size="sm" className="h-9 w-9 focus-ring" data-testid="profile-button">
+              <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center">
+                <span className="text-xs font-medium text-primary-foreground">
+                  {getUserInitials(user.name)}
+                </span>
+              </div>
+              <span className="sr-only">Open user menu</span>
+            </Button>
+          </div>
+        )}
+      </div>
+    </header>
   );
 }

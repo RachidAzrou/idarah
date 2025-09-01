@@ -43,7 +43,7 @@ export default function RecentMembers() {
     );
   }
 
-  const recentMembers = members?.slice(0, 5) || [];
+  const recentMembers = (members as any[])?.slice(0, 5) || [];
 
   return (
     <Card data-testid="recent-members-card">

@@ -28,40 +28,47 @@ export default function KpiCards() {
     );
   }
 
-  const activePercentage = stats.totalMembers > 0 ? ((stats.activeMembers / stats.totalMembers) * 100).toFixed(1) : "0";
+  const mockStats = stats || {
+    totalMembers: 0,
+    activeMembers: 0,
+    totalRevenue: 0,
+    outstanding: 0
+  };
+
+  const activePercentage = mockStats.totalMembers > 0 ? ((mockStats.activeMembers / mockStats.totalMembers) * 100).toFixed(1) : "0";
 
   return (
     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
       <StatsCard
         title="Totaal Leden"
-        value={stats.totalMembers.toLocaleString("nl-BE")}
+        value={mockStats.totalMembers.toLocaleString("nl-BE")}
         trend={{ value: "+12% deze maand", positive: true }}
-        icon={<Users className="h-5 w-5 text-blue-600" />}
-        iconBgColor="bg-blue-100"
+        icon={<Users className="h-5 w-5 text-secondary" />}
+        iconBgColor="bg-secondary/10"
       />
 
       <StatsCard
         title="Actieve Leden"
-        value={stats.activeMembers.toLocaleString("nl-BE")}
+        value={mockStats.activeMembers.toLocaleString("nl-BE")}
         trend={{ value: `${activePercentage}% van totaal`, positive: true }}
-        icon={<UserCheck className="h-5 w-5 text-green-600" />}
-        iconBgColor="bg-green-100"
+        icon={<UserCheck className="h-5 w-5 text-primary" />}
+        iconBgColor="bg-primary/10"
       />
 
       <StatsCard
         title="Totaal Ontvangen"
-        value={`€${stats.totalRevenue.toLocaleString("nl-BE")}`}
+        value={`€${mockStats.totalRevenue.toLocaleString("nl-BE")}`}
         trend={{ value: "+8% deze maand", positive: true }}
-        icon={<Euro className="h-5 w-5 text-emerald-600" />}
-        iconBgColor="bg-emerald-100"
+        icon={<Euro className="h-5 w-5 text-success" />}
+        iconBgColor="bg-success/10"
       />
 
       <StatsCard
         title="Openstaand"
-        value={`€${stats.outstanding.toLocaleString("nl-BE")}`}
+        value={`€${mockStats.outstanding.toLocaleString("nl-BE")}`}
         trend={{ value: "-3% deze maand", positive: true }}
-        icon={<Clock className="h-5 w-5 text-orange-600" />}
-        iconBgColor="bg-orange-100"
+        icon={<Clock className="h-5 w-5 text-warning" />}
+        iconBgColor="bg-warning/10"
       />
     </div>
   );

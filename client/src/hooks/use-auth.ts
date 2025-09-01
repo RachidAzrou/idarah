@@ -82,7 +82,7 @@ export function useAuth(): AuthState {
   };
 
   return {
-    user: user || null,
+    user: (user as User) || null,
     loading: isLoading,
     login,
     logout,

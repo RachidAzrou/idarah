@@ -22,6 +22,7 @@ import { GoHome } from "react-icons/go";
 import { CiBank } from "react-icons/ci";
 import { BsBuildings } from "react-icons/bs";
 import { RiCheckboxMultipleLine } from "react-icons/ri";
+import { CreditCard } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -74,6 +75,7 @@ interface MemberFormProps {
 
 export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
   const [activeTab, setActiveTab] = useState("personal");
+  const [isScanning, setIsScanning] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -136,6 +138,55 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
     createMemberMutation.mutate(data);
   };
 
+  // Mock EID scan functionaliteit - in productie zou dit een echte EID reader library gebruiken
+  const handleEIDScan = async () => {
+    setIsScanning(true);
+    
+    try {
+      // Simulatie van EID scan - in productie zou dit een echte EID API aanroepen
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Mock EID gegevens (in productie komen deze van de EID reader)
+      const eidData = {
+        firstName: "Ahmed",
+        lastName: "Ben Mansour",
+        gender: "M" as const,
+        birthDate: new Date("1985-03-15"),
+        street: "Nieuwstraat",
+        number: "25",
+        bus: "",
+        postalCode: "2000",
+        city: "Antwerpen",
+        country: "België"
+      };
+      
+      // Vul form velden automatisch in
+      form.setValue("firstName", eidData.firstName);
+      form.setValue("lastName", eidData.lastName);
+      form.setValue("gender", eidData.gender);
+      form.setValue("birthDate", eidData.birthDate);
+      form.setValue("street", eidData.street);
+      form.setValue("number", eidData.number);
+      form.setValue("bus", eidData.bus);
+      form.setValue("postalCode", eidData.postalCode);
+      form.setValue("city", eidData.city);
+      form.setValue("country", eidData.country);
+      
+      toast({
+        title: "EID succesvol gescand",
+        description: "Persoonlijke en adresgegevens zijn automatisch ingevuld.",
+      });
+    } catch (error) {
+      toast({
+        title: "EID scan mislukt",
+        description: "Er is een probleem opgetreden bij het scannen van de EID. Probeer opnieuw.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsScanning(false);
+    }
+  };
+
   const nextTab = () => {
     const tabs = ["personal", "address", "financial", "organization", "permissions"];
     const currentIndex = tabs.indexOf(activeTab);
@@ -156,6 +207,29 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
     <Card className="w-full max-w-4xl mx-auto">
       
       <CardContent>
+        <div className="mb-6 p-4 border border-dashed border-gray-300 rounded-lg bg-gray-50">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-sm font-medium text-gray-900">Snelle invoer via EID</h3>
+              <p className="text-xs text-gray-500 mt-1">
+                Scan je Belgische identiteitskaart om automatisch gegevens in te vullen
+              </p>
+            </div>
+            <Button
+              type="button"
+              onClick={handleEIDScan}
+              disabled={isScanning}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2"
+              data-testid="button-eid-scan"
+            >
+              <CreditCard className="h-4 w-4" />
+              {isScanning ? "Scannen..." : "Scan EID"}
+            </Button>
+          </div>
+        </div>
+        
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div className="pt-4">

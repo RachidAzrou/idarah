@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Users, UserCheck, Euro, Clock, TrendingUp, TrendingDown } from "lucide-react";
+import { Users, UserCheck, Euro, Clock, TrendingUp, TrendingDown, Vote } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface KpiCardProps {
@@ -45,56 +45,50 @@ export default function ModernKpiCards() {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-6 gap-4 mb-6">
-        {[...Array(6)].map((_, i) => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4 mb-6">
+        {[...Array(5)].map((_, i) => (
           <Skeleton key={i} className="h-20 rounded-xl" />
         ))}
       </div>
     );
   }
 
-  // Mock data voor alle KPI cards
+  // KPI data voor de gewenste categorieën
   const kpiData = [
+    {
+      title: "Totaal Leden",
+      value: "1.247",
+      delta: { value: "+12 deze maand", positive: true },
+      icon: <Users className="h-4 w-4 text-blue-600" />
+    },
     {
       title: "Actieve Leden",
       value: "1.089",
       delta: { value: "+2,1% vs vorige maand", positive: true },
-      icon: <Users className="h-4 w-4 text-blue-600" />
-    },
-    {
-      title: "Nieuwe Leden",
-      value: "47",
-      delta: { value: "+12% deze maand", positive: true },
       icon: <UserCheck className="h-4 w-4 text-blue-600" />
     },
     {
-      title: "Totaal Inkomsten",
-      value: "€18.420",
-      delta: { value: "+8,3% vs vorige maand", positive: true },
+      title: "Stemgerechtigden",
+      value: "896",
+      delta: { value: "82,3% van totaal", positive: true },
+      icon: <Vote className="h-4 w-4 text-blue-600" />
+    },
+    {
+      title: "Openstaande Betalingen",
+      value: "€1.570",
+      delta: { value: "-8% vs vorige maand", positive: true },
+      icon: <Clock className="h-4 w-4 text-blue-600" />
+    },
+    {
+      title: "Inkomsten Deze Maand",
+      value: "€8.420",
+      delta: { value: "+15,3% vs vorige maand", positive: true },
       icon: <Euro className="h-4 w-4 text-blue-600" />
-    },
-    {
-      title: "Betaalde Facturen",
-      value: "91,6%",
-      delta: { value: "+2,1% vs vorige maand", positive: true },
-      icon: <Clock className="h-4 w-4 text-blue-600" />
-    },
-    {
-      title: "Openstaand",
-      value: "€1.250",
-      delta: { value: "-15% vs vorige maand", positive: true },
-      icon: <Clock className="h-4 w-4 text-blue-600" />
-    },
-    {
-      title: "Vervallen",
-      value: "€320",
-      delta: { value: "-5,2% vs vorige maand", positive: true },
-      icon: <TrendingDown className="h-4 w-4 text-blue-600" />
     }
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-6 gap-4 mb-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4 mb-6">
       {kpiData.map((kpi, index) => (
         <KpiCard
           key={index}

@@ -1,0 +1,183 @@
+1. KPI Cards (bovenaan grid)
+
+Layout: 5 à 6 rechthoekige kaarten naast elkaar in een grid (grid-cols-1 sm:grid-cols-2 xl:grid-cols-6), allemaal gelijke hoogte.
+
+Stijl:
+
+Achtergrond: wit
+
+Hoeken: afgerond (16px)
+
+Schaduw: zacht (0 4px 10px rgba(0,0,0,0.08))
+
+Border: subtiel lichtgrijs (#E5E7EB)
+
+Inhoud:
+
+Titel (boven): klein, medium weight (Poppins 14px, kleur #64748B)
+
+Waarde (groot): bold, 20–24px, donkerblauw #0F172A
+
+Delta/percentage: klein, kleur gebonden aan trend:
+
+Positief → blauw #2563EB + ↑ icoon
+
+Negatief → rood #EF4444 + ↓ icoon
+
+Meta/ondertitel: grijs (#64748B), bv. “vs vorige maand”
+
+Icon rechts: cirkelbadge met lichtblauwe achtergrond (#EEF2FF) en blauw icoon.
+
+Voorbeeld:
+
+Titel: “Actieve Leden”
+
+Waarde: “1.089”
+
+Delta: “+2,1% vs vorige maand” in blauw met ↑ icoon
+
+Rechts: klein user-icoon in badge
+
+2. Line Chart Card – Evolutie Inkomsten
+
+Kaartstijl: zelfde card look (wit, afgerond, schaduw).
+
+Titel: “Evolutie Inkomsten” + subtitel “Lidgelden per maand” bovenaan links.
+
+Chart: Recharts line chart.
+
+X-as: maanden (Jan, Feb, Mrt, Apr, Mei, Jun).
+
+Y-as: bedragen in €, ticks op €0 / €2.5k / €5k / €7.5k / €10k.
+
+Lijn: blauw #2563EB, 3px dik, afgeronde hoeken.
+
+Data points: cirkelpunten op lijn (wit gevuld met blauwe rand).
+
+Area fill: zachte blauwe gradient (#2563EB → transparant naar onder).
+
+Tooltip: witte popup, afgerond, met datum en bedrag.
+
+3. Gauge / Donut Chart – Betalingsstatus
+
+Kaartstijl: standaard card.
+
+Titel: “Betalingsstatus” + subtitel “Verdeling van betalingen”.
+
+Chart: semicircle (270° gauge).
+
+Slices:
+
+Betaald: donkerblauw #2563EB
+
+Openstaand: lichtblauw #60A5FA
+
+Vervallen: rood #EF4444
+
+Middenwaarde: groot getal (bv. “1247”), donkerblauw.
+
+Ondertekst: “Totaal Facturen” (grijs).
+
+Legenda onderaan:
+
+Kleine dot + label (“Betaald”, “Openstaand”, “Vervallen”)
+
+Getal ernaast (bv. “1058”, “150”, “39”)
+
+Labels in dezelfde kleuren als slices.
+
+4. Horizontal Bar Chart – Inkomsten per Categorie
+
+Kaartstijl: breed, hele rij.
+
+Titel: “Inkomsten per Categorie” + subtitel “Lidgelden opgesplitst per lidcategorie”.
+
+Toggle rechtsboven: “Maandelijks | Jaarlijks” (segmented control, active = blauw).
+
+Chart: horizontale balken met afgeronde uiteinden.
+
+Categorieën: Senior, Volwassene/Standaard, Student.
+
+Balkkleur: blauw gradient (#2563EB links → #93C5FD rechts).
+
+Achtergrond: subtiel grijs (#F3F4F6).
+
+Labels rechts: bedrag (€50k, €43k, …) + aantal leden.
+
+5. Donut Chart – Leden per Categorie
+
+Kaartstijl: kleinere vierkante kaart.
+
+Titel: “Leden per Categorie” + subtitel “Statistieken”.
+
+Chart: donut met 3 ringen (Senior, Volwassene, Student).
+
+Senior: donkerblauw #1E40AF
+
+Volwassene: medium blauw #3B82F6
+
+Student: lichtblauw #93C5FD
+
+Midden: totaal leden (“1247”).
+
+Legenda onder/naast chart: categorie + aantal + percentage.
+
+6. Horizontal Bars – Leeftijd & Geslacht
+
+Kaartstijl: standaard card, breedte half.
+
+Titel: “Leeftijd en Geslacht” + subtitel “Statistieken”.
+
+Chart: stacked horizontal bars per leeftijdsgroep (<18, 18–30, 30–50, 50–65, 65+).
+
+Male: blauw #2563EB
+
+Female: paars #A855F7
+
+Stacked per groep: breedte = percentage.
+
+Rechts: percentage-waarden (bv. “28,8%”).
+
+7. Activity List – Recente Activiteiten
+
+Kaartstijl: standaard, 2 kolommen grid.
+
+Titel: “Recente Activiteiten” + subtitel “Laatste wijzigingen en acties”.
+
+Items: lijst met avatar/icon links, tekst rechts.
+
+Voorbeeld:
+
+“Emma Janssen – Nieuw lid toegevoegd – 2 uur geleden”
+
+Icon: user in lichtblauwe cirkel.
+
+Subtekst grijs (#64748B), tijd rechts uitgelijnd.
+
+8. Due Dates List – Aankomende Vervaldagen
+
+Kaartstijl: gelijk aan activiteiten.
+
+Titel: “Aankomende Vervaldagen” + subtitel.
+
+Items: lijst van leden met label + vervaldatum.
+
+Voorbeeld: “Jan de Vries – Senior – 3 dagen”
+
+Status “Vandaag” = rood highlight.
+
+Icon: kalender in lichtblauwe cirkel.
+
+Footer: link “Bekijk alle vervaldagen” met + icoon.
+
+✨ Samenvattend
+
+Kaarten: wit, afgerond (16px), zachte schaduw, border lichtgrijs.
+
+Accent: blauw in alle grafieken, knoppen en deltas.
+
+Charts: Recharts, consistent blauwe kleurenrange (#1E40AF → #93C5FD).
+
+Status: blauw (positief/info), rood (fout/vervallen).
+
+UX: luchtig, veel witruimte, consistente legenda’s en tooltips.

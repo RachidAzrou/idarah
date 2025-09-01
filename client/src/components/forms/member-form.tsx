@@ -22,7 +22,7 @@ import { GoHome } from "react-icons/go";
 import { CiBank } from "react-icons/ci";
 import { BsBuildings } from "react-icons/bs";
 import { RiCheckboxMultipleLine } from "react-icons/ri";
-import { CreditCard } from "lucide-react";
+import { LuIdCard } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -207,7 +207,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
     <Card className="w-full max-w-4xl mx-auto">
       
       <CardContent>
-        <div className="mb-6 flex justify-end">
+        <div className="mb-3 flex justify-end">
           <Button
             type="button"
             onClick={handleEIDScan}
@@ -217,7 +217,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
             className="flex items-center gap-2"
             data-testid="button-eid-scan"
           >
-            <CreditCard className="h-4 w-4" />
+            <LuIdCard className="h-4 w-4" />
             {isScanning ? "Scannen..." : "Scan EID"}
           </Button>
         </div>

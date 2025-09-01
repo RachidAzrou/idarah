@@ -10,6 +10,7 @@ import { financialService } from "./services/financial";
 import { insertUserSchema, insertMemberSchema, insertMembershipFeeSchema } from "@shared/schema";
 import { generateFeesHandler } from "./api/jobs/fees/generate";
 import { createMemberHandler } from "./api/members/create";
+import publicScreensRouter from "./routes/public-screens";
 import { z } from "zod";
 
 const loginSchema = z.object({
@@ -227,6 +228,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Enhanced member creation with rolling fees
   app.post("/api/members/create", authMiddleware, tenantMiddleware, createMemberHandler);
+
+  // Public screens routes
+  app.use("/api/public-screens", authMiddleware, tenantMiddleware, publicScreensRouter);
 
   const httpServer = createServer(app);
   return httpServer;

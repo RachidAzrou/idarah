@@ -1,0 +1,283 @@
+Build the Public Screens module for a Membership SaaS in a clean blue theme (Poppins), using Next.js 14 (App Router), TypeScript (strict), TailwindCSS, shadcn/ui, lucide-react, Recharts. Provide both the management UI and the public viewer route that renders without auth via a publicToken. Data is mock-only.
+
+0) Deliverables (full runnable code)
+
+Routes
+
+app/(app)/public-screens/page.tsx — beheerpagina (lijst + “Nieuw” wizard + edit drawer + preview).
+
+app/public/screen/[publicToken]/page.tsx — publieke view (fullscreen, autosync, keyboard controls).
+
+app/public/screen/[publicToken]/opengraph-image.tsx — eenvoudige OG-image (titel + type).
+
+Screens management
+
+components/public-screens/List.tsx — kaartlijst met naam, type, status, tokens/URL-acties.
+
+components/public-screens/NewScreenDialog.tsx — wizard: Type kiezen → Basis (naam) → Type-specifieke config.
+
+components/public-screens/EditScreenDrawer.tsx — aanpasbare instellingen per type (met live preview rechts).
+
+components/public-screens/ScreenCard.tsx — compacte kaart met menu (Kopieer URL, Activeren/Deactiveren, Verwijderen).
+
+components/public-screens/PreviewFrame.tsx — iframe-achtige live preview (zelfde code als public viewer, maar in sandbox container).
+
+Type componenten
+
+Betaalstatus Matrix
+
+components/public-screens/types/PaymentMatrix/MatrixConfigForm.tsx
+
+components/public-screens/types/PaymentMatrix/MatrixPreview.tsx
+
+Grid (leden × maanden), cellen ✔ / ✖ / • of kleurcodes; KPI’s & donut rechtsboven.
+
+Mededelingen Carousel
+
+components/public-screens/types/Announcements/AnnouncementsConfigForm.tsx
+
+components/public-screens/types/Announcements/AnnouncementsPreview.tsx
+
+Slides met titel, rich text, media (image/video), geldigheid & autoplay.
+
+Public viewer runtime
+
+components/public-view/PaymentMatrixView.tsx — fullscreen renderer + autosync.
+
+components/public-view/AnnouncementsView.tsx — fullscreen carousel + toetsen.
+
+components/public-view/Controls.tsx — minimale overlay: Play/Pause, Next/Prev, Fullscreen.
+
+components/public-view/SyncClient.tsx — poll elke 10s (mock) of via BroadcastChannel; respect prefers-reduced-motion.
+
+Data & utils
+
+lib/mock/public-screens.ts — mock store (CRUD, configs, generate token).
+
+lib/mock/fees-snapshot.ts — sample dataset (leden, maanden, betaald/open/overdue).
+
+lib/mock/announcements.ts — sample slides met geldigheid.
+
+lib/format.ts — formatDateBE, monthShortNl, percent.
+
+lib/token.ts — makePublicToken() (cuid/slug-style).
+
+lib/cn.ts — className helper.
+
+UI commons
+
+components/ui/SectionCard.tsx, components/ui/StatusBadge.tsx, components/ui/EmptyState.tsx, components/ui/ConfirmDialog.tsx, components/ui/CopyField.tsx (readonly URL met Copy).
+
+components/ui/Toolbar.tsx — zoek/filter boven lijst.
+
+Theme/config
+
+app/globals.css (Poppins import + CSS vars).
+
+styles/shadcn-override.css (map --primary → blauw).
+
+tailwind.config.ts, postcss.config.js, tsconfig.json.
+
+README.md — run (pnpm i && pnpm dev), theming, hoe tokens/URL werken.
+
+1) UI/UX specificaties (blauwe Poppins-stijl)
+
+Beheerpagina header
+
+H1 “Publieke Schermen”; subtitel: “Genereer & beheer schermen voor betaalstatus en mededelingen”.
+
+Rechts: + Nieuw scherm (primary blauw).
+
+Lijstweergave
+
+Kaart per scherm: Naam, Type (chip: Betaalstatus / Mededelingen), Status (Actief/Inactief), Laatst gewijzigd (dd-mm-jjjj), knoppen:
+
+Open preview, Kopieer URL, Activeren/Deactiveren, Bewerken, Verwijderen.
+
+Filter/zoek: op naam, type, status.
+
+Nieuw scherm wizard (dialog)
+
+Kies type: Betaalstatus Matrix of Mededelingen Carousel.
+
+Basis: Naam (verplicht), toggle Actief, knop Genereer publicToken (readonly).
+
+Type-config (zie hieronder) + Opslaan → toont success toast en keert terug naar lijst.
+
+Edit drawer
+
+Links config, rechts live preview (met actuele config).
+
+Acties: Opslaan, Deactiveren/Activeren, Kopieer URL, Open publieke view.
+
+2) Type-config & gedrag
+A) Betaalstatus Matrix
+
+Doel: Publiek scherm dat betaalstatus per lid en maand toont, met samenvattende grafiek.
+
+Config velden
+
+Jaar (select, default huidig jaar).
+
+Filters: Categorie (multi), Alleen actieve leden (checkbox).
+
+Weergave: Toon grafiek (donut) (checkbox), compacte labels (voornaam initiaal, achternaam vol), toon percentage betaald.
+
+Kleuren: betaalde cel (blauw #2563EB), openstaand (lichtblauw #DBEAFE), overdue (rood #FCA5A5), onbekend/geen data (grijs).
+
+Layout: max hoogte per rij, kolombreedte voor maanden (vb. 40–56px).
+
+Preview/Publieke view gedrag
+
+Grid: rijen = leden, kolommen = maanden (Jan–Dec).
+
+Cel states: ✔ (betaald), ✖ (open), ! (overdue), of kleurblokjes.
+
+Header: titel, jaar, filters toegepast, % betaald (bv. “78%”).
+
+Rechtsboven: donut (Recharts) Paid/Open/Overdue + legenda.
+
+Autosync: elke 10s herladen van snapshot (mock).
+
+Keyboard in publieke view:
+
+F = fullscreen, P = pauze/Resume autosync, R = refresh.
+
+A11y: rol table, headers scope="col|row", aria-labels voor cell status.
+
+B) Mededelingen Carousel
+
+Doel: Fullscreen carousel met mededelingen (titel, rich text, media), gefilterd op geldigheid en activatie.
+
+Config velden
+
+Slides (repeatable list):
+
+Titel (verplicht), Rich text (markdown toegestaan), Media URL (image/video), Media type,
+
+Geldigheid: van/tot (optioneel), Actief toggle, Duur (sec).
+
+Autoplay: aan/uit, interval (sec), volgorde (op datum/handmatig/shuffle).
+
+Stijl: tekst-contrast (licht/donker), achtergrond (wit/zwart/transparant), max breedte tekst.
+
+Hotkeys (publieke view): Space pauzeert, ←/→ vorige/volgende, F fullscreen.
+
+Preview/Publieke view gedrag
+
+Fullscreen slide die het canvas vult; media letterboxed/contain met zwarte of witte achtergrond.
+
+Onderaan: progress-indicator en slide teller (1/5).
+
+Validiteit filtert: alleen active === true en binnen geldigheidsvenster.
+
+Autosync: elke 30s (mock) herlaadt slides.
+
+A11y
+
+Elke slide krijgt role="group" en aria-label="Slide i van n: Titel", knoppen hebben aria-labels.
+
+3) Mock data & stores
+
+lib/mock/public-screens.ts
+
+export type ScreenType = 'PAYMENT_MATRIX' | 'ANNOUNCEMENTS';
+
+export type PublicScreen = {
+  id: string;
+  name: string;
+  type: ScreenType;
+  active: boolean;
+  publicToken: string;
+  updatedAt: string; // ISO
+  config: any;       // type-specific
+};
+
+export const store = {
+  list(): PublicScreen[] { /* in-memory/localStorage */ },
+  create(input: Omit<PublicScreen,'id'|'publicToken'|'updatedAt'>): PublicScreen { /* ... */ },
+  update(id: string, patch: Partial<PublicScreen>): PublicScreen { /* ... */ },
+  remove(id: string): void { /* ... */ },
+  byToken(token: string): PublicScreen | undefined { /* ... */ },
+  generateToken(): string { /* cuid/slug */ },
+};
+
+
+lib/mock/fees-snapshot.ts (voor Matrix)
+
+export type Cell = 'PAID'|'OPEN'|'OVERDUE'|'NA';
+export type MemberRow = { memberId:string; name:string; category:'Senior'|'Volwassene'|'Student'; months: Record<number, Cell> }; // 1..12
+
+export function getPaymentSnapshot(year:number, filters?:{categories?:string[]; activeOnly?:boolean}) {
+  // return { rows: MemberRow[], totals:{paid:number, open:number, overdue:number, na:number}, count:number }
+}
+
+
+lib/mock/announcements.ts
+
+export type Slide = { id:string; title:string; body?:string; mediaUrl?:string; mediaType?:'image'|'video'; validFrom?:string; validTo?:string; active:boolean; durationSec?:number };
+
+export function getActiveSlides(nowISO:string) { /* filter op active + geldigheid */ }
+
+4) Public viewer route /public/screen/[publicToken]
+
+Gedrag
+
+Fetch screen via token uit mock store; indien niet actief → toon nette melding “Scherm is niet actief”.
+
+Render type-specifieke component:
+
+PaymentMatrixView of AnnouncementsView.
+
+Fullscreen & Controls (overlay rechtsboven, auto-hide):
+
+Play/Pause (carousel of autosync),
+
+Volgende/Vorige (carousel),
+
+Fullscreen toggle,
+
+Refresh (snelle herlaad).
+
+Autosync:
+
+Matrix: poll elke 10s → ververs snapshot.
+
+Carousel: poll elke 30s → ververs slides.
+
+Keyboard:
+
+F fullscreen, Space pauze, ←/→ nav (carousel), R refresh.
+
+A11y:
+
+Focus trap in controls, aria-live="polite" bij status.
+
+Styling
+
+Full-bleed, donkere achtergrond voor carousel; matrix gebruikt wit canvas.
+
+Typografie Poppins; blauw palet (#2563EB primair).
+
+5) Acceptatiecriteria
+
+Beheerpagina: lijst toont alle schermen met naam, type, status, last updated; acties werken (mock).
+
+Nieuw wizard kan beide types aanmaken met type-specifieke config; publicToken wordt gegenereerd.
+
+Edit drawer past config live aan; PreviewFrame toont realtime preview.
+
+Publieke route /public/screen/[publicToken] rendert zonder login en toont correcte view per type.
+
+Betaalstatus Matrix: grid (leden × maanden), legenda, donut met Paid/Open/Overdue; autosync werkt.
+
+Mededelingen Carousel: slides met geldigheid, autoplay, toetsen Space/←/→, fullscreen; autosync werkt.
+
+Toegankelijkheid: labels/roles/focus zichtbaar; AA contrast.
+
+TypeScript-strict; geen any; nette mappenstructuur.
+
+Stijl consistent: Poppins, radius 16, zachte schaduwen, blauwe accenten.
+
+Output now the full code for all files above, runnable with pnpm i && pnpm dev.
+Use Dutch (Belgium) labels and dd-mm-jjjj dates. When ambiguous, choose sensible defaults that keep the interface calm, professional, and accessible.

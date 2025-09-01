@@ -34,13 +34,6 @@ export default function IncomeByCategoryCard() {
         />
       </div>
 
-      {/* Section Label */}
-      <div className="mb-4">
-        <h4 className="text-sm font-semibold text-gray-900 font-['Poppins']">Inkomsten Overzicht</h4>
-        <p className="text-xs text-gray-400 font-['Poppins']">
-          Per lidcategorie ({period === 'yearly' ? 'Jaarlijks' : 'Maandelijks'}) (€)
-        </p>
-      </div>
 
       {/* Horizontal Bars */}
       <div className="space-y-6">

@@ -5,8 +5,6 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, ArrowUpDown } from "lucide-react";
 import { Fee } from "@shared/fees-schema";
 import { formatCurrencyBE, formatPeriodBE, formatDateBE } from "@/lib/format";
-import { StatusChip } from "./status-chip";
-import { MethodChip } from "./method-chip";
 import { RowActions } from "./row-actions";
 
 interface FeesTableProps {
@@ -152,11 +150,14 @@ export function FeesTable({
                   <TableCell className="font-medium">
                     {formatCurrencyBE(fee.amount)}
                   </TableCell>
-                  <TableCell>
-                    <MethodChip method={fee.method} />
+                  <TableCell className="text-sm">
+                    {fee.method === 'SEPA' ? 'SEPA' : 
+                     fee.method === 'BANK_TRANSFER' ? 'Overschrijving' :
+                     fee.method === 'BANCONTACT' ? 'Bancontact' : 'Contant'}
                   </TableCell>
-                  <TableCell>
-                    <StatusChip status={fee.status} />
+                  <TableCell className="text-sm">
+                    {fee.status === 'OPEN' ? 'Openstaand' : 
+                     fee.status === 'PAID' ? 'Betaald' : 'Achterstallig'}
                   </TableCell>
                   <TableCell className="text-sm text-gray-600">
                     {fee.paidAt ? formatDateBE(fee.paidAt) : "-"}

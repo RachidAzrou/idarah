@@ -66,7 +66,7 @@ export default function IncomeByCategoryCard() {
               {/* Bar Container */}
               <div className="flex-1 mx-4">
                 <div 
-                  className="h-8 bg-gray-100 rounded-full relative overflow-hidden"
+                  className="h-5 bg-gray-100 rounded-full relative overflow-hidden"
                   role="progressbar"
                   aria-label={`${item.category}: ${formatCurrencyShortEUR(item.amount)}`}
                   aria-valuenow={item.amount}

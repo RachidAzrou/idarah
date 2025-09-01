@@ -133,10 +133,10 @@ export function Toolbar({
 
               <Select value={votingRightsFilter} onValueChange={onVotingRightsFilterChange}>
                 <SelectTrigger className="w-[180px] h-9 border-gray-200" data-testid="voting-rights-filter">
-                  <SelectValue placeholder="Alle stemgerechtigden" />
+                  <SelectValue placeholder="Alle" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Alle stemgerechtigden</SelectItem>
+                  <SelectItem value="all">Alle</SelectItem>
                   <SelectItem value="yes">Stemgerechtigd</SelectItem>
                   <SelectItem value="no">Niet stemgerechtigd</SelectItem>
                 </SelectContent>

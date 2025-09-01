@@ -644,7 +644,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
                     <div className="bg-gray-50 p-4 rounded-lg space-y-2">
                       <div className="flex justify-between">
                         <span className="text-sm text-gray-600">Lidnummer:</span>
-                        <span className="font-mono text-sm">LID-{new Date().getFullYear()}-{String(Date.now()).slice(-4)}</span>
+                        <span className="font-mono text-sm">LID-{new Date().getFullYear()}-0001</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-sm text-gray-600">Lidgeld:</span>

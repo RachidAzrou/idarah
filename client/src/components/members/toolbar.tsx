@@ -128,7 +128,7 @@ export function Toolbar({
               </Select>
 
               <Select value={genderFilter} onValueChange={onGenderFilterChange}>
-                <SelectTrigger className="w-[140px] h-9 border-gray-200" data-testid="gender-filter">
+                <SelectTrigger className="w-[160px] h-9 border-gray-200" data-testid="gender-filter">
                   <SelectValue placeholder="Alle geslachten" />
                 </SelectTrigger>
                 <SelectContent>
@@ -139,7 +139,7 @@ export function Toolbar({
               </Select>
 
               <Select value={paymentStatusFilter} onValueChange={onPaymentStatusFilterChange}>
-                <SelectTrigger className="w-[160px] h-9 border-gray-200" data-testid="payment-status-filter">
+                <SelectTrigger className="w-[180px] h-9 border-gray-200" data-testid="payment-status-filter">
                   <SelectValue placeholder="Alle betaalstatussen" />
                 </SelectTrigger>
                 <SelectContent>

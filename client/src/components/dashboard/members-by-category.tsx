@@ -25,66 +25,60 @@ export default function MembersByCategoryCard() {
       </div>
 
       {/* Content Layout */}
-      <div className="flex flex-col md:flex-row items-start gap-8">
-        {/* Left side - Chart */}
+      <div className="flex flex-col items-center space-y-4">
+        {/* Chart centered and smaller */}
         <div className="flex-shrink-0">
-          <ConcentricRings categories={categories} size={280} />
+          <ConcentricRings categories={categories} size={200} />
         </div>
 
-        {/* Right side - Total + Legend */}
-        <div className="flex-1 min-w-0 space-y-6">
-          {/* Large Total */}
-          <div className="text-center md:text-left">
-            <div 
-              className="text-5xl font-bold font-['Poppins']" 
-              style={{ color: '#0F172A' }}
-            >
-              {new Intl.NumberFormat('nl-BE').format(total)}
-            </div>
-            <div 
-              className="text-sm font-['Poppins'] mt-1" 
-              style={{ color: '#64748B' }}
-            >
-              Totaal leden
-            </div>
+        {/* Total below chart */}
+        <div className="text-center">
+          <div 
+            className="text-3xl font-bold font-['Poppins']" 
+            style={{ color: '#0F172A' }}
+          >
+            {new Intl.NumberFormat('nl-BE').format(total)}
           </div>
+          <div 
+            className="text-sm font-['Poppins']" 
+            style={{ color: '#64748B' }}
+          >
+            Totaal leden
+          </div>
+        </div>
 
-          {/* Divider */}
-          <div style={{ borderTop: '1px solid #E2E8F0' }}></div>
-
-          {/* Legend */}
-          <div className="space-y-4">
-            {categories.map((category, index) => (
-              <div key={category.key} className="flex items-center justify-between" style={{ minHeight: '48px' }}>
-                <div className="flex items-center space-x-3">
-                  <div 
-                    className="w-3 h-3 rounded-full flex-shrink-0"
-                    style={{ backgroundColor: category.color }}
-                  ></div>
-                  <span 
-                    className="text-base font-['Poppins']" 
-                    style={{ color: '#475569' }}
-                  >
-                    {category.label}
-                  </span>
+        {/* Legend */}
+        <div className="w-full space-y-2">
+          {categories.map((category, index) => (
+            <div key={category.key} className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <div 
+                  className="w-3 h-3 rounded-full flex-shrink-0"
+                  style={{ backgroundColor: category.color }}
+                ></div>
+                <span 
+                  className="text-sm font-['Poppins']" 
+                  style={{ color: '#475569' }}
+                >
+                  {category.label}
+                </span>
+              </div>
+              <div className="text-right">
+                <div 
+                  className="text-sm font-semibold font-['Poppins']" 
+                  style={{ color: '#0F172A' }}
+                >
+                  {new Intl.NumberFormat('nl-BE').format(category.count)}
                 </div>
-                <div className="text-right">
-                  <div 
-                    className="text-lg font-semibold font-['Poppins']" 
-                    style={{ color: '#0F172A' }}
-                  >
-                    {new Intl.NumberFormat('nl-BE').format(category.count)}
-                  </div>
-                  <div 
-                    className="text-xs font-['Poppins']" 
-                    style={{ color: '#94A3B8' }}
-                  >
-                    {category.percent}%
-                  </div>
+                <div 
+                  className="text-xs font-['Poppins']" 
+                  style={{ color: '#94A3B8' }}
+                >
+                  {category.percent}%
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

@@ -1,0 +1,168 @@
+Build a single reusable dashboard card called “Inkomsten per Categorie” (Income by Category) in a blue theme (no orange/green), matching the detailed spec below. Stack: Next.js 14 (App Router), TypeScript (strict), TailwindCSS, shadcn/ui, Recharts, Poppins.
+
+0) Deliver exactly
+
+File tree and full code for:
+
+app/(app)/dashboard/page.tsx (renders the card)
+
+components/dashboard/IncomeByCategoryCard.tsx (card component)
+
+components/ui/segmented-control.tsx (simple segmented control)
+
+lib/mock/income.ts (mock data)
+
+app/globals.css (Poppins + CSS variables)
+
+tailwind.config.ts (maps tokens)
+
+styles/shadcn-override.css (map primary to blue)
+
+brief README.md (how to run)
+
+Use nl-BE labels exactly as below.
+
+No lorem ipsum; use realistic copy.
+
+1) Visual spec (match this precisely)
+
+Card container
+
+Background: #FFFFFF
+
+Border: #E5E7EB (1px)
+
+Radius: 16px
+
+Shadow: 0 6px 16px rgba(2,6,23,.08)
+
+Padding: 24px (inside), outer margin via parent grid
+
+Header (left)
+
+Title: “Inkomsten per Categorie” — Poppins 18px, semibold, color #0F172A
+
+Subtitle: “Lidgelden opgesplitst per lidcategorie” — Poppins 14px, regular, #64748B
+
+Header (right)
+
+Segmented control (pill) with two options:
+
+“Maandelijks” (inactive)
+
+“Jaarlijks” (active by default)
+
+Active: background blue #2563EB, text white; Inactive: background #F1F5F9, text #0F172A
+
+Section label (left, above bars)
+
+Title: “Inkomsten Overzicht” — 14px semibold, #0F172A
+
+Subtitle: “Per lidcategorie (Jaarlijks) (€)” — 12px, #94A3B8
+
+Horizontal bars (three rows)
+
+Categories (left labels): Senior, Standaard, Student — 14px, medium, #0F172A
+
+Bar fill: rounded ends, blue gradient left→right
+
+Start #2563EB → End #93C5FD
+
+Subtle inner shadow at the start cap is OK
+
+Track: light grey #F3F4F6, same height, full rounded caps
+
+Right labels (per row):
+
+Amount (bold, blue #2563EB), e.g. “€50k”
+
+Subtext under it (grey #64748B), e.g. “420 leden”
+
+Grid & spacing
+
+Bars evenly spaced (24px vertical gap between rows)
+
+Vertical dotted grid guide lines are optional; if added, use ultra-light rgba(99,102,241,.12).
+
+2) Behavior
+
+Clicking “Maandelijks/Jaarlijks” switches dataset with a 200ms ease crossfade (no big motion; respect prefers-reduced-motion).
+
+Values are formatted nl-BE: €50.000 or short form €50k for labels at the right.
+
+Component is responsive:
+
+≥1280px: plenty of whitespace; labels left, values right
+
+<768px: stack right values below each bar, keep readability
+
+Accessibility
+
+Buttons have aria-pressed
+
+Bars have aria-label with category + value
+
+Contrast AA; focus ring 2px blue at 40% opacity; no layout shift on focus
+
+3) Colors & tokens (blue theme)
+
+Text: #0F172A (primary), #64748B (secondary)
+
+Blue scale: primary #2563EB, mid #3B82F6, light #93C5FD
+
+Border: #E5E7EB; Surfaces: #FFFFFF, muted #F7F8FB
+
+Radius: 16px; Shadow md: 0 6px 16px rgba(2,6,23,.08)
+
+4) Data (mock)
+
+Provide two datasets in lib/mock/income.ts:
+
+export const yearly = [
+  { category: 'Senior', amount: 50000, members: 420 },
+  { category: 'Standaard', amount: 43000, members: 600 },
+  { category: 'Student', amount: 14000, members: 227 },
+];
+export const monthly = [
+  { category: 'Senior', amount: 4200, members: 420 },
+  { category: 'Standaard', amount: 3600, members: 600 },
+  { category: 'Student', amount: 1200, members: 227 },
+];
+
+
+Assume a max track computed from the largest amount in the current dataset.
+
+5) Implementation notes (make it polished)
+
+Use pure Tailwind for the bars (div tracks) so we control the gradient, radius and shadow precisely (no heavy chart lib here).
+
+Create a utility formatCurrencyShortEUR(n: number, locale='nl-BE') returning €50k, €1,2k, etc.
+
+Animate the bar width with transition-[width] duration-200 ease-out.
+
+The right value column should vertically align with bar center.
+
+The segmented control is keyboard navigable (Left/Right arrows, Enter/Space toggles).
+
+6) Page layout (example)
+
+app/(app)/dashboard/page.tsx renders the card inside a container with max-w-7xl mx-auto p-6 grid gap-6.
+
+7) Tailwind + global CSS
+
+Import Poppins in app/globals.css.
+
+Expose CSS vars for brand blues if helpful, but keep Tailwind tokens in tailwind.config.ts (brand.blue).
+
+8) Acceptance criteria
+
+Visual match: white card, blue gradient bars, rounded ends, right-aligned blue amounts with grey member counts.
+
+Toggle switches datasets smoothly; aria is correct.
+
+Works from 320px width upward without overflow.
+
+TypeScript strict, no any.
+
+Output now the full code for all the files listed, ready to run with pnpm i && pnpm dev.
+If something is ambiguous, choose sensible defaults that keep the style calm, professional, and consistent with the spec.

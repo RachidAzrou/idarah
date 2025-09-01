@@ -56,6 +56,12 @@ export default function RevenueByCategoryChart() {
             layout="horizontal"
             margin={{ top: 20, right: 30, left: 80, bottom: 5 }}
           >
+            <defs>
+              <linearGradient id="colorGradient" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor="#2563EB" />
+                <stop offset="100%" stopColor="#93C5FD" />
+              </linearGradient>
+            </defs>
             <XAxis 
               type="number"
               axisLine={false}
@@ -75,12 +81,6 @@ export default function RevenueByCategoryChart() {
               fill="url(#colorGradient)"
               radius={[0, 8, 8, 0]}
             />
-            <defs>
-              <linearGradient id="colorGradient" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor="#2563EB" />
-                <stop offset="100%" stopColor="#93C5FD" />
-              </linearGradient>
-            </defs>
           </BarChart>
         </ResponsiveContainer>
       </div>

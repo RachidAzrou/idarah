@@ -18,6 +18,8 @@ interface ToolbarProps {
   onImport: () => void;
   onGenerateSepa: () => void;
   onBulkMarkPaid: () => void;
+  filtersDrawer?: React.ReactNode;
+  newButton?: React.ReactNode;
 }
 
 export function Toolbar({
@@ -35,6 +37,8 @@ export function Toolbar({
   onImport,
   onGenerateSepa,
   onBulkMarkPaid,
+  filtersDrawer,
+  newButton,
 }: ToolbarProps) {
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 5 }, (_, i) => currentYear - i);
@@ -54,7 +58,7 @@ export function Toolbar({
           />
         </div>
 
-        {/* Quick Filters */}
+        {/* Quick Filters and Actions */}
         <div className="flex gap-3">
           <Select value={statusFilter} onValueChange={onStatusFilterChange}>
             <SelectTrigger className="w-40">
@@ -94,6 +98,9 @@ export function Toolbar({
               <SelectItem value="CASH">Contant</SelectItem>
             </SelectContent>
           </Select>
+
+          {filtersDrawer && filtersDrawer}
+          {newButton && newButton}
         </div>
       </div>
 

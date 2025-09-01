@@ -169,39 +169,41 @@ export default function Lidgelden() {
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="mb-6 flex justify-end gap-3">
-          <FiltersDrawer
-            filters={advancedFilters}
-            onFiltersChange={setAdvancedFilters as any}
-            onReset={resetAdvancedFilters}
-          />
-          <Button className="flex items-center gap-2">
-            <Plus className="h-4 w-4" />
-            Nieuw lidgeld
-          </Button>
-        </div>
-
         {/* KPI Cards */}
         <KpiCards fees={allFees} />
 
         {/* Toolbar */}
-        <Toolbar
-          searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
-          statusFilter={statusFilter}
-          onStatusFilterChange={setStatusFilter}
-          yearFilter={yearFilter}
-          onYearFilterChange={setYearFilter}
-          methodFilter={methodFilter}
-          onMethodFilterChange={setMethodFilter}
-          selectedCount={selectedIds.length}
-          sepaSelectedCount={sepaSelectedFees.length}
-          onExport={handleExport}
-          onImport={() => setShowImportDialog(true)}
-          onGenerateSepa={handleGenerateSepa}
-          onBulkMarkPaid={handleBulkMarkPaid}
-        />
+        <div className="mb-6">
+          <Toolbar
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            statusFilter={statusFilter}
+            onStatusFilterChange={setStatusFilter}
+            yearFilter={yearFilter}
+            onYearFilterChange={setYearFilter}
+            methodFilter={methodFilter}
+            onMethodFilterChange={setMethodFilter}
+            selectedCount={selectedIds.length}
+            sepaSelectedCount={sepaSelectedFees.length}
+            onExport={handleExport}
+            onImport={() => setShowImportDialog(true)}
+            onGenerateSepa={handleGenerateSepa}
+            onBulkMarkPaid={handleBulkMarkPaid}
+            filtersDrawer={
+              <FiltersDrawer
+                filters={advancedFilters}
+                onFiltersChange={setAdvancedFilters as any}
+                onReset={resetAdvancedFilters}
+              />
+            }
+            newButton={
+              <Button className="flex items-center gap-2">
+                <Plus className="h-4 w-4" />
+                Nieuw lidgeld
+              </Button>
+            }
+          />
+        </div>
 
         {/* Table */}
         <FeesTable

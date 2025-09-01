@@ -32,6 +32,10 @@ export default function Leden() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
+  const [genderFilter, setGenderFilter] = useState("all");
+  const [joinDateFrom, setJoinDateFrom] = useState("");
+  const [joinDateTo, setJoinDateTo] = useState("");
+  const [paymentStatusFilter, setPaymentStatusFilter] = useState("all");
   const [showNewMemberDialog, setShowNewMemberDialog] = useState(false);
   const [showFiltersDrawer, setShowFiltersDrawer] = useState(false);
   const [advancedFilters, setAdvancedFilters] = useState<FilterValues>(initialFilters);
@@ -77,32 +81,51 @@ export default function Leden() {
       // Category filter  
       const categoryMatch = categoryFilter === "all" || member.category === categoryFilter;
       
-      // Advanced filters
+      // Gender filter
+      const genderMatch = genderFilter === "all" || member.gender === genderFilter;
+      
+      // Date range filter
+      let dateMatch = true;
+      if (joinDateFrom || joinDateTo) {
+        const memberDate = new Date(member.createdAt);
+        if (joinDateFrom) {
+          dateMatch = dateMatch && memberDate >= new Date(joinDateFrom);
+        }
+        if (joinDateTo) {
+          dateMatch = dateMatch && memberDate <= new Date(joinDateTo);
+        }
+      }
+      
+      // Payment status filter (mock for now)
+      const paymentMatch = paymentStatusFilter === "all";
+      
+      // Advanced filters (keep existing logic as backup)
       const categoryAdvancedMatch = advancedFilters.categories.length === 0 || 
         advancedFilters.categories.includes(member.category);
       
       const statusAdvancedMatch = advancedFilters.statuses.length === 0 || 
         advancedFilters.statuses.includes(member.active ? 'ACTIEF' : 'INACTIEF');
       
-      const genderMatch = advancedFilters.genders.length === 0 || 
+      const genderAdvancedMatch = advancedFilters.genders.length === 0 || 
         advancedFilters.genders.includes(member.gender);
       
-      // Date range filter
-      let dateMatch = true;
+      // Advanced date range filter
+      let dateAdvancedMatch = true;
       if (advancedFilters.joinDateFrom || advancedFilters.joinDateTo) {
         const memberDate = new Date(member.createdAt);
         if (advancedFilters.joinDateFrom) {
-          dateMatch = dateMatch && memberDate >= new Date(advancedFilters.joinDateFrom);
+          dateAdvancedMatch = dateAdvancedMatch && memberDate >= new Date(advancedFilters.joinDateFrom);
         }
         if (advancedFilters.joinDateTo) {
-          dateMatch = dateMatch && memberDate <= new Date(advancedFilters.joinDateTo);
+          dateAdvancedMatch = dateAdvancedMatch && memberDate <= new Date(advancedFilters.joinDateTo);
         }
       }
       
-      return searchMatch && statusMatch && categoryMatch && 
-             categoryAdvancedMatch && statusAdvancedMatch && genderMatch && dateMatch;
+      return searchMatch && statusMatch && categoryMatch && genderMatch && 
+             dateMatch && paymentMatch && categoryAdvancedMatch && 
+             statusAdvancedMatch && genderAdvancedMatch && dateAdvancedMatch;
     });
-  }, [members, searchTerm, statusFilter, categoryFilter, advancedFilters]);
+  }, [members, searchTerm, statusFilter, categoryFilter, genderFilter, joinDateFrom, joinDateTo, paymentStatusFilter, advancedFilters]);
   
   // Pagination
   const totalMembers = filteredMembers.length;
@@ -155,6 +178,19 @@ export default function Leden() {
     toast({ title: "Import", description: "Import functie geopend" });
   };
 
+  const handleResetFilters = () => {
+    setSearchTerm("");
+    setStatusFilter("all");
+    setCategoryFilter("all");
+    setGenderFilter("all");
+    setJoinDateFrom("");
+    setJoinDateTo("");
+    setPaymentStatusFilter("all");
+    setAdvancedFilters(initialFilters);
+    setPage(1);
+    toast({ title: "Filters gereset", description: "Alle filters zijn gewist" });
+  };
+
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
   };
@@ -184,10 +220,18 @@ export default function Leden() {
           onStatusFilterChange={setStatusFilter}
           categoryFilter={categoryFilter}
           onCategoryFilterChange={setCategoryFilter}
+          genderFilter={genderFilter}
+          onGenderFilterChange={setGenderFilter}
+          joinDateFrom={joinDateFrom}
+          onJoinDateFromChange={setJoinDateFrom}
+          joinDateTo={joinDateTo}
+          onJoinDateToChange={setJoinDateTo}
+          paymentStatusFilter={paymentStatusFilter}
+          onPaymentStatusFilterChange={setPaymentStatusFilter}
           onExport={handleExport}
           onImport={handleImport}
           onNewMember={() => setShowNewMemberDialog(true)}
-          onMoreFilters={() => setShowFiltersDrawer(true)}
+          onMoreFilters={handleResetFilters}
         />
 
         {/* Members Table */}

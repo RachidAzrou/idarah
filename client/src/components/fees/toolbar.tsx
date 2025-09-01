@@ -261,7 +261,7 @@ export function Toolbar({
                     value={fromDateInput || (paidFrom ? format(paidFrom, "dd/MM/yyyy", { locale: nl }) : "")}
                     onChange={(e) => handleFromDateInput(e.target.value)}
                     placeholder="DD/MM/YYYY"
-                    className="w-[140px] h-9 border-gray-200 pr-10"
+                    className="w-[160px] h-9 border-gray-200 pr-10"
                     data-testid="paid-date-from"
                     maxLength={10}
                   />
@@ -350,7 +350,7 @@ export function Toolbar({
                     value={toDateInput || (paidTo ? format(paidTo, "dd/MM/yyyy", { locale: nl }) : "")}
                     onChange={(e) => handleToDateInput(e.target.value)}
                     placeholder="DD/MM/YYYY"
-                    className="w-[140px] h-9 border-gray-200 pr-10"
+                    className="w-[160px] h-9 border-gray-200 pr-10"
                     data-testid="paid-date-to"
                     maxLength={10}
                   />

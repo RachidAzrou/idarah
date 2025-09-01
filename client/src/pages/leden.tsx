@@ -7,6 +7,7 @@ import { MembersTable } from "@/components/members/members-table";
 import { FiltersDrawer } from "@/components/members/filters-drawer";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { FiUserPlus } from "react-icons/fi";
 
 interface FilterValues {
   categories: string[];
@@ -253,7 +254,10 @@ export default function Leden() {
         <Dialog open={showNewMemberDialog} onOpenChange={setShowNewMemberDialog}>
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Nieuw Lid Toevoegen</DialogTitle>
+              <DialogTitle className="flex items-center gap-2">
+                <FiUserPlus className="h-5 w-5" />
+                Nieuw Lid Toevoegen
+              </DialogTitle>
               <DialogDescription>
                 Voeg een nieuw lid toe aan de ledenadministratie
               </DialogDescription>

@@ -13,7 +13,7 @@ import { Link } from "wouter";
 export default function Dashboard() {
   return (
         <main className="flex-1 py-4">
-          <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+          <div className="px-4 sm:px-6 lg:px-8 w-full">
             {/* Page Header */}
             <div className="sm:flex sm:items-center sm:justify-between mb-6">
               <div>

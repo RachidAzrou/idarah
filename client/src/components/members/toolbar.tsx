@@ -1,0 +1,130 @@
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
+import { Search, Download, Upload, Plus, SlidersHorizontal, Command } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+interface ToolbarProps {
+  searchTerm: string;
+  onSearchChange: (value: string) => void;
+  statusFilter: string;
+  onStatusFilterChange: (value: string) => void;
+  categoryFilter: string;
+  onCategoryFilterChange: (value: string) => void;
+  onExport: () => void;
+  onImport: () => void;
+  onNewMember: () => void;
+  onMoreFilters: () => void;
+  className?: string;
+}
+
+export function Toolbar({
+  searchTerm,
+  onSearchChange,
+  statusFilter,
+  onStatusFilterChange,
+  categoryFilter,
+  onCategoryFilterChange,
+  onExport,
+  onImport,
+  onNewMember,
+  onMoreFilters,
+  className
+}: ToolbarProps) {
+  return (
+    <Card className={cn("mb-6", className)}>
+      <CardContent className="p-6">
+        <div className="space-y-4">
+          {/* Search and Action Buttons */}
+          <div className="flex flex-col lg:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Zoek op naam, e-mail of lidnummer..."
+                value={searchTerm}
+                onChange={(e) => onSearchChange(e.target.value)}
+                className="pl-10 pr-16 h-10 border-gray-200 focus:border-blue-500 focus:ring-blue-500/20"
+                data-testid="search-members"
+              />
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center gap-1 text-xs text-gray-400">
+                <Command className="h-3 w-3" />
+                <span>K</span>
+              </div>
+            </div>
+            
+            <div className="flex gap-2 lg:flex-shrink-0">
+              <Button 
+                variant="outline" 
+                onClick={onExport}
+                className="h-10 px-4 border-gray-200 hover:border-gray-300"
+                data-testid="export-button"
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Export
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={onImport}
+                className="h-10 px-4 border-gray-200 hover:border-gray-300"
+                data-testid="import-button"
+              >
+                <Upload className="h-4 w-4 mr-2" />
+                Import
+              </Button>
+              <Button 
+                onClick={onNewMember}
+                className="h-10 px-4 bg-blue-600 hover:bg-blue-700 text-white"
+                data-testid="new-member-button"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Nieuw lid
+              </Button>
+            </div>
+          </div>
+
+          {/* Quick Filters */}
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div className="flex flex-wrap gap-3">
+              <Select value={statusFilter} onValueChange={onStatusFilterChange}>
+                <SelectTrigger className="w-[160px] h-9 border-gray-200" data-testid="status-filter">
+                  <SelectValue placeholder="Alle statussen" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alle statussen</SelectItem>
+                  <SelectItem value="ACTIEF">Actief</SelectItem>
+                  <SelectItem value="INACTIEF">Inactief</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select value={categoryFilter} onValueChange={onCategoryFilterChange}>
+                <SelectTrigger className="w-[160px] h-9 border-gray-200" data-testid="category-filter">
+                  <SelectValue placeholder="Alle categorieën" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alle categorieën</SelectItem>
+                  <SelectItem value="SENIOR">Senior</SelectItem>
+                  <SelectItem value="VOLWASSEN">Volwassene</SelectItem>
+                  <SelectItem value="STUDENT">Student</SelectItem>
+                  <SelectItem value="JEUGD">Jeugd</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={onMoreFilters}
+              className="self-start lg:self-auto h-9 px-3 border-gray-200 hover:border-gray-300"
+              data-testid="more-filters-button"
+            >
+              <SlidersHorizontal className="h-4 w-4 mr-2" />
+              Meer filters
+            </Button>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}

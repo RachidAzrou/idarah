@@ -1,7 +1,42 @@
-import { Card, CardContent } from "@/components/ui/card";
 import { Fee } from "@shared/fees-schema";
 import { formatCurrencyBE, formatPercentage } from "@/lib/format";
-import { Euro, TrendingUp, AlertTriangle, FileText, TrendingDown } from "lucide-react";
+import { Euro, TrendingUp, TrendingDown, AlertTriangle, FileText } from "lucide-react";
+
+interface KpiCardProps {
+  title: string;
+  value: string;
+  delta: {
+    value: string;
+    positive: boolean;
+  };
+  icon: React.ReactNode;
+}
+
+function KpiCard({ title, value, delta, icon }: KpiCardProps) {
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow">
+      <div className="flex items-center justify-between">
+        <div className="flex-1">
+          <p className="text-xs font-medium text-gray-500 mb-1">{title}</p>
+          <p className="text-lg font-bold text-gray-900 mb-1">{value}</p>
+          <div className="flex items-center space-x-1">
+            {delta.positive ? (
+              <TrendingUp className="h-3 w-3 text-blue-600" />
+            ) : (
+              <TrendingDown className="h-3 w-3 text-red-500" />
+            )}
+            <span className={`text-xs font-medium ${delta.positive ? 'text-blue-600' : 'text-red-500'}`}>
+              {delta.value}
+            </span>
+          </div>
+        </div>
+        <div className="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center">
+          {icon}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 interface KpiCardsProps {
   fees: Fee[];
@@ -21,92 +56,45 @@ export function KpiCards({ fees }: KpiCardsProps) {
   const paidPercentage = totalAmount > 0 ? (paidAmount / totalAmount) * 100 : 0;
   const totalCount = fees.length;
 
-  // Mock trend data (in real app, this would come from historical data comparison)
-  const getTrendData = (type: string) => {
-    switch (type) {
-      case "open":
-        return { value: 5.2, isPositive: false }; // Decrease in open amounts is good
-      case "paid":
-        return { value: 12.3, isPositive: true }; // Increase in paid percentage is good
-      case "overdue":
-        return { value: 2.1, isPositive: false }; // Increase in overdue is bad
-      case "total":
-        return { value: 8.7, isPositive: true }; // More total invoices can be positive (growth)
-      default:
-        return { value: 0, isPositive: true };
-    }
-  };
-
-  const kpis = [
+  // Calculate month-over-month changes (mock data for demo)
+  const kpiData = [
     {
       title: "Openstaand",
       value: formatCurrencyBE(openAmount),
-      icon: Euro,
-      description: `${openFees.length} facturen`,
-      trend: getTrendData("open"),
+      delta: { value: `${openFees.length} facturen`, positive: openFees.length < 60 },
+      icon: <Euro className="h-4 w-4 text-blue-600" />
     },
     {
       title: "Betaald",
       value: formatPercentage(paidPercentage),
-      icon: TrendingUp,
-      description: `${formatCurrencyBE(paidAmount)} ontvangen`,
-      trend: getTrendData("paid"),
+      delta: { value: `${formatCurrencyBE(paidAmount)} ontvangen`, positive: paidPercentage > 65 },
+      icon: <TrendingUp className="h-4 w-4 text-blue-600" />
     },
     {
-      title: "Achterstallig",
+      title: "Achterstallig", 
       value: formatCurrencyBE(overdueAmount),
-      icon: AlertTriangle,
-      description: `${overdueFees.length} facturen`,
-      trend: getTrendData("overdue"),
+      delta: { value: `${overdueFees.length} facturen`, positive: overdueFees.length < 60 },
+      icon: <AlertTriangle className="h-4 w-4 text-blue-600" />
     },
     {
-      title: "Totaal facturen",
+      title: "Totaal Facturen",
       value: totalCount.toString(),
-      icon: FileText,
-      description: formatCurrencyBE(totalAmount),
-      trend: getTrendData("total"),
-    },
+      delta: { value: formatCurrencyBE(totalAmount), positive: true },
+      icon: <FileText className="h-4 w-4 text-blue-600" />
+    }
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      {kpis.map((kpi) => {
-        const Icon = kpi.icon;
-        const TrendIcon = kpi.trend.isPositive ? TrendingUp : TrendingDown;
-        
-        return (
-          <Card key={kpi.title} className="relative overflow-hidden border-0 shadow-sm bg-white">
-            <CardContent className="p-4">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="p-2 rounded-lg bg-blue-500">
-                      <Icon className="h-4 w-4 text-white" />
-                    </div>
-                    <span className="text-sm font-medium text-gray-600">{kpi.title}</span>
-                  </div>
-                  
-                  <div className="space-y-1">
-                    <div className="text-2xl font-bold text-gray-900">{kpi.value}</div>
-                    <div className="text-xs text-gray-500">{kpi.description}</div>
-                  </div>
-                </div>
-                
-                <div className="flex flex-col items-end">
-                  <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-                    kpi.trend.isPositive 
-                      ? 'text-green-700 bg-green-100' 
-                      : 'text-red-700 bg-red-100'
-                  }`}>
-                    <TrendIcon className="h-3 w-3" />
-                    {kpi.trend.value}%
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        );
-      })}
+    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      {kpiData.map((kpi, index) => (
+        <KpiCard
+          key={index}
+          title={kpi.title}
+          value={kpi.value}
+          delta={kpi.delta}
+          icon={kpi.icon}
+        />
+      ))}
     </div>
   );
 }

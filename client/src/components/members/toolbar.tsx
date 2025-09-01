@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { Search, Download, Upload, Plus, SlidersHorizontal, Command, CalendarIcon } from "lucide-react";
+import { RiResetLeftFill } from "react-icons/ri";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 import { cn } from "@/lib/utils";
@@ -396,7 +397,7 @@ export function Toolbar({
                 className="h-9 px-3 border-gray-200 hover:border-gray-300"
                 data-testid="more-filters-button"
               >
-                <SlidersHorizontal className="h-4 w-4 mr-2" />
+                <RiResetLeftFill className="h-4 w-4 mr-2" />
                 Reset filters
               </Button>
             </div>

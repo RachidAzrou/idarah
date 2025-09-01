@@ -159,16 +159,18 @@ export default function Lidgelden() {
   };
 
   return (
-    <div className="container mx-auto px-6 py-8 space-y-8">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Lidgelden</h1>
-          <p className="text-gray-600 mt-1">
-            Beheer lidgelden, automatiseer incasso's en volg betalingen op
-          </p>
+    <main className="flex-1 py-4">
+      <div className="px-4 sm:px-6 lg:px-8 w-full">
+        {/* Page Header */}
+        <div className="mb-6">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900" data-testid="page-title">Lidgelden</h1>
+            <p className="mt-1 text-sm text-gray-700">Beheer lidgelden, automatiseer incasso's en volg betalingen op</p>
+          </div>
         </div>
-        <div className="flex gap-3">
+
+        {/* Action Buttons */}
+        <div className="mb-6 flex justify-end gap-3">
           <FiltersDrawer
             filters={advancedFilters}
             onFiltersChange={setAdvancedFilters as any}
@@ -179,76 +181,76 @@ export default function Lidgelden() {
             Nieuw lidgeld
           </Button>
         </div>
+
+        {/* KPI Cards */}
+        <KpiCards fees={allFees} />
+
+        {/* Toolbar */}
+        <Toolbar
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          statusFilter={statusFilter}
+          onStatusFilterChange={setStatusFilter}
+          yearFilter={yearFilter}
+          onYearFilterChange={setYearFilter}
+          methodFilter={methodFilter}
+          onMethodFilterChange={setMethodFilter}
+          selectedCount={selectedIds.length}
+          sepaSelectedCount={sepaSelectedFees.length}
+          onExport={handleExport}
+          onImport={() => setShowImportDialog(true)}
+          onGenerateSepa={handleGenerateSepa}
+          onBulkMarkPaid={handleBulkMarkPaid}
+        />
+
+        {/* Table */}
+        <FeesTable
+          fees={paginatedResult.data}
+          total={filteredFees.length}
+          page={page}
+          perPage={perPage}
+          onPageChange={setPage}
+          onPerPageChange={(newPerPage) => {
+            setPerPage(newPerPage);
+            setPage(1);
+          }}
+          selectedIds={selectedIds}
+          onSelectionChange={setSelectedIds}
+          onRowAction={handleRowAction}
+          sortBy={sortBy}
+          sortOrder={sortOrder}
+          onSort={handleSort}
+        />
+
+        {/* Dialogs */}
+        <FeeDetailSlideout
+          fee={selectedFee}
+          open={showDetailSlideout}
+          onClose={() => {
+            setShowDetailSlideout(false);
+            setSelectedFee(null);
+          }}
+          onMarkPaid={(fee) => {
+            handleMarkPaid([fee]);
+            setShowDetailSlideout(false);
+            setSelectedFee(null);
+          }}
+        />
+
+        <ImportDialog
+          open={showImportDialog}
+          onClose={() => setShowImportDialog(false)}
+          fees={allFees.filter(fee => fee.status === "OPEN")}
+          onImport={handleImport}
+        />
+
+        <SepaDialog
+          open={showSepaDialog}
+          onClose={() => setShowSepaDialog(false)}
+          fees={selectedFees}
+          onGenerate={handleSepaGenerate}
+        />
       </div>
-
-      {/* KPI Cards */}
-      <KpiCards fees={allFees} />
-
-      {/* Toolbar */}
-      <Toolbar
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        statusFilter={statusFilter}
-        onStatusFilterChange={setStatusFilter}
-        yearFilter={yearFilter}
-        onYearFilterChange={setYearFilter}
-        methodFilter={methodFilter}
-        onMethodFilterChange={setMethodFilter}
-        selectedCount={selectedIds.length}
-        sepaSelectedCount={sepaSelectedFees.length}
-        onExport={handleExport}
-        onImport={() => setShowImportDialog(true)}
-        onGenerateSepa={handleGenerateSepa}
-        onBulkMarkPaid={handleBulkMarkPaid}
-      />
-
-      {/* Table */}
-      <FeesTable
-        fees={paginatedResult.data}
-        total={filteredFees.length}
-        page={page}
-        perPage={perPage}
-        onPageChange={setPage}
-        onPerPageChange={(newPerPage) => {
-          setPerPage(newPerPage);
-          setPage(1);
-        }}
-        selectedIds={selectedIds}
-        onSelectionChange={setSelectedIds}
-        onRowAction={handleRowAction}
-        sortBy={sortBy}
-        sortOrder={sortOrder}
-        onSort={handleSort}
-      />
-
-      {/* Dialogs */}
-      <FeeDetailSlideout
-        fee={selectedFee}
-        open={showDetailSlideout}
-        onClose={() => {
-          setShowDetailSlideout(false);
-          setSelectedFee(null);
-        }}
-        onMarkPaid={(fee) => {
-          handleMarkPaid([fee]);
-          setShowDetailSlideout(false);
-          setSelectedFee(null);
-        }}
-      />
-
-      <ImportDialog
-        open={showImportDialog}
-        onClose={() => setShowImportDialog(false)}
-        fees={allFees.filter(fee => fee.status === "OPEN")}
-        onImport={handleImport}
-      />
-
-      <SepaDialog
-        open={showSepaDialog}
-        onClose={() => setShowSepaDialog(false)}
-        fees={selectedFees}
-        onGenerate={handleSepaGenerate}
-      />
-    </div>
+    </main>
   );
 }

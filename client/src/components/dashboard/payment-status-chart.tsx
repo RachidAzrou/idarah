@@ -22,9 +22,9 @@ export default function PaymentStatusChart() {
             <Pie
               data={data}
               cx="50%"
-              cy="50%"
-              startAngle={90}
-              endAngle={-180}
+              cy="75%"
+              startAngle={180}
+              endAngle={0}
               innerRadius={60}
               outerRadius={90}
               paddingAngle={2}
@@ -36,7 +36,7 @@ export default function PaymentStatusChart() {
             </Pie>
           </PieChart>
         </ResponsiveContainer>
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ top: '30%' }}>
           <div className="text-2xl font-bold text-gray-900">{total.toLocaleString('nl-BE')}</div>
           <div className="text-sm text-gray-500">Totaal Facturen</div>
         </div>

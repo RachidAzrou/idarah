@@ -78,9 +78,8 @@ export function ConcentricRings({ categories, size = 280 }: ConcentricRingsProps
               strokeLinecap="round"
               className="animate-drawArc"
               style={{
-                animationDelay: `${index * 0.2}s`,
-                strokeDasharray: '1000',
-                strokeDashoffset: '1000'
+                animationDelay: `${index * 0.3}s`,
+                animationDuration: '1.2s'
               }}
             >
               <title>{`${category.label}: ${category.percent}%`}</title>

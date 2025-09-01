@@ -39,14 +39,14 @@ export function ConcentricRings({ categories, size = 280 }: ConcentricRingsProps
   const startAngle = -90; // Start at 12 o'clock
 
   return (
-    <div className="flex items-center justify-center w-full">
+    <div className="flex items-center justify-center">
       <svg 
         width={size} 
         height={size} 
         viewBox={`0 0 ${size} ${size}`}
         role="img"
         aria-label="Leden per categorie"
-        className="drop-shadow-sm max-w-full h-auto"
+        className="drop-shadow-sm"
       >
         {/* Background tracks */}
         {radii.map((radius, index) => (

@@ -18,21 +18,21 @@ export default function AgeGenderCard() {
     >
       {/* Header with Total */}
       <div className="mb-4 pb-3" style={{ borderBottom: '1px solid #E2E8F0' }}>
-        <div className="flex flex-col sm:flex-row items-start sm:items-start justify-between gap-3 sm:gap-0">
+        <div className="flex items-start justify-between">
           <div>
-            <h3 className="text-base md:text-lg font-semibold font-['Poppins']" style={{ color: '#0F172A' }}>
+            <h3 className="text-lg font-semibold font-['Poppins']" style={{ color: '#0F172A' }}>
               Leeftijd en Geslacht
             </h3>
             <p className="text-sm font-['Poppins']" style={{ color: '#64748B' }}>
               Statistieken
             </p>
           </div>
-          <div className="text-left sm:text-right">
+          <div className="text-right">
             <div className="text-sm font-['Poppins']" style={{ color: '#64748B' }}>
               Totaal
             </div>
             <div 
-              className="text-2xl md:text-3xl font-bold font-['Poppins']" 
+              className="text-3xl font-bold font-['Poppins']" 
               style={{ color: '#0F172A' }}
             >
               {new Intl.NumberFormat('nl-BE').format(total)}
@@ -42,7 +42,7 @@ export default function AgeGenderCard() {
       </div>
 
       {/* Legend */}
-      <div className="flex items-center flex-wrap gap-4 md:gap-6 mb-4">
+      <div className="flex items-center space-x-6 mb-4">
         <div className="flex items-center space-x-2">
           <div 
             className="w-3 h-3 rounded-full" 

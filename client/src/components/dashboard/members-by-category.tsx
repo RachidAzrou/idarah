@@ -24,19 +24,19 @@ export default function MembersByCategoryCard() {
         </p>
       </div>
 
-      {/* Content Layout - Responsive */}
-      <div className="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-6 lg:gap-8">
+      {/* Content Layout - Horizontal for wider space */}
+      <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8">
         {/* Left side - Chart */}
         <div className="flex-shrink-0">
-          <ConcentricRings categories={categories} size={200} />
+          <ConcentricRings categories={categories} size={240} />
         </div>
 
         {/* Right side - Total + Legend */}
-        <div className="flex-1 space-y-4 md:space-y-6 w-full">
+        <div className="flex-1 space-y-6">
           {/* Large Total - Centered */}
           <div className="text-center">
             <div 
-              className="text-2xl md:text-3xl lg:text-4xl font-bold font-['Poppins']" 
+              className="text-4xl font-bold font-['Poppins']" 
               style={{ color: '#0F172A' }}
             >
               {new Intl.NumberFormat('nl-BE').format(total)}
@@ -53,16 +53,16 @@ export default function MembersByCategoryCard() {
           <div style={{ borderTop: '1px solid #E2E8F0' }}></div>
 
           {/* Legend */}
-          <div className="space-y-2 md:space-y-3">
+          <div className="space-y-3">
             {categories.map((category, index) => (
               <div key={category.key} className="flex items-center justify-between">
-                <div className="flex items-center space-x-2 md:space-x-3">
+                <div className="flex items-center space-x-3">
                   <div 
                     className="w-3 h-3 rounded-full flex-shrink-0"
                     style={{ backgroundColor: category.color }}
                   ></div>
                   <span 
-                    className="text-sm md:text-base font-['Poppins']" 
+                    className="text-base font-['Poppins']" 
                     style={{ color: '#475569' }}
                   >
                     {category.label}
@@ -70,7 +70,7 @@ export default function MembersByCategoryCard() {
                 </div>
                 <div className="text-right">
                   <div 
-                    className="text-base md:text-lg font-semibold font-['Poppins']" 
+                    className="text-lg font-semibold font-['Poppins']" 
                     style={{ color: '#0F172A' }}
                   >
                     {new Intl.NumberFormat('nl-BE').format(category.count)}

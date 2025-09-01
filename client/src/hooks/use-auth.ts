@@ -12,13 +12,24 @@ interface AuthState {
 
 export function useAuth(): AuthState {
   const [token, setToken] = useState<string | null>(localStorage.getItem("authToken"));
+  const [hasAuthError, setHasAuthError] = useState(false);
   const queryClient = useQueryClient();
 
-  const { data: user, isLoading } = useQuery({
+  const { data: user, isLoading, error } = useQuery({
     queryKey: ["/api/auth/me"],
-    enabled: !!token,
+    enabled: !!token && !hasAuthError,
     retry: false,
   });
+
+  // Handle authentication errors by clearing invalid tokens
+  useEffect(() => {
+    if (error && token && !hasAuthError) {
+      setHasAuthError(true);
+      localStorage.removeItem("authToken");
+      setToken(null);
+      queryClient.clear();
+    }
+  }, [error, token, hasAuthError, queryClient]);
 
   const loginMutation = useMutation({
     mutationFn: async ({ email, password }: { email: string; password: string }) => {
@@ -78,7 +89,16 @@ export function useAuth(): AuthState {
   };
 
   const logout = () => {
+    // Immediate cleanup regardless of API response
+    localStorage.removeItem("authToken");
+    setToken(null);
+    queryClient.clear();
+    
+    // Also try the API logout but don't wait for it
     logoutMutation.mutate();
+    
+    // Force redirect to login
+    window.location.href = "/login";
   };
 
   return {

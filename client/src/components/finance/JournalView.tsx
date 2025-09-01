@@ -8,6 +8,7 @@ import { formatDateBE, formatCurrencyBE } from "@/lib/format";
 import { Transaction } from "@/lib/mock/transactions";
 import { MethodChip } from "@/components/ui/MethodChip";
 import { CiInboxOut, CiInboxIn } from "react-icons/ci";
+import { CgMathEqual } from "react-icons/cg";
 
 interface JournalViewProps {
   transactions: Transaction[];
@@ -66,7 +67,7 @@ export function JournalView({ transactions }: JournalViewProps) {
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Debet (Uitgaven)</p>
+              <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Debet</p>
               <p className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1">{formatCurrencyBE(totals.debit)}</p>
               <div className="flex items-center space-x-1">
                 <span className="text-xs font-medium text-red-600 dark:text-red-400">
@@ -75,7 +76,7 @@ export function JournalView({ transactions }: JournalViewProps) {
               </div>
             </div>
             <div className="w-8 h-8 bg-red-50 dark:bg-red-900/20 rounded-full flex items-center justify-center">
-              <div className="h-4 w-4 text-red-600 dark:text-red-400 font-bold">-</div>
+              <CiInboxOut className="h-4 w-4 text-red-600 dark:text-red-400" />
             </div>
           </div>
         </div>
@@ -83,7 +84,7 @@ export function JournalView({ transactions }: JournalViewProps) {
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Credit (Inkomsten)</p>
+              <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Credit</p>
               <p className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1">{formatCurrencyBE(totals.credit)}</p>
               <div className="flex items-center space-x-1">
                 <span className="text-xs font-medium text-green-600 dark:text-green-400">
@@ -92,7 +93,7 @@ export function JournalView({ transactions }: JournalViewProps) {
               </div>
             </div>
             <div className="w-8 h-8 bg-green-50 dark:bg-green-900/20 rounded-full flex items-center justify-center">
-              <div className="h-4 w-4 text-green-600 dark:text-green-400 font-bold">+</div>
+              <CiInboxIn className="h-4 w-4 text-green-600 dark:text-green-400" />
             </div>
           </div>
         </div>
@@ -113,17 +114,19 @@ export function JournalView({ transactions }: JournalViewProps) {
               </div>
             </div>
             <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-              totals.balance >= 0 
+              totals.balance > 0 
                 ? 'bg-green-50 dark:bg-green-900/20' 
-                : 'bg-red-50 dark:bg-red-900/20'
+                : totals.balance < 0
+                ? 'bg-red-50 dark:bg-red-900/20'
+                : 'bg-gray-50 dark:bg-gray-900/20'
             }`}>
-              <div className={`h-4 w-4 font-bold ${
-                totals.balance >= 0 
+              <CgMathEqual className={`h-4 w-4 ${
+                totals.balance > 0 
                   ? 'text-green-600 dark:text-green-400' 
-                  : 'text-red-600 dark:text-red-400'
-              }`}>
-                {totals.balance >= 0 ? '=' : '!'}
-              </div>
+                  : totals.balance < 0
+                  ? 'text-red-600 dark:text-red-400'
+                  : 'text-gray-600 dark:text-gray-400'
+              }`} />
             </div>
           </div>
         </div>

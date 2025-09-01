@@ -47,6 +47,20 @@ export default function IncomeByCategoryCard() {
         {data.map((item, index) => {
           const widthPercentage = (item.amount / maxAmount) * 100;
           
+          // Different blue shades for each category
+          const getBarColor = (category: string) => {
+            switch (category) {
+              case 'Senior':
+                return '#1E40AF'; // Dark blue
+              case 'Standaard':
+                return '#2563EB'; // Medium blue
+              case 'Student':
+                return '#60A5FA'; // Light blue
+              default:
+                return '#3B82F6'; // Default blue
+            }
+          };
+          
           return (
             <div key={index} className="flex items-center">
               {/* Category Label */}
@@ -69,7 +83,7 @@ export default function IncomeByCategoryCard() {
                     className="h-full rounded-full transition-[width] duration-200 ease-out"
                     style={{
                       width: `${widthPercentage}%`,
-                      background: 'linear-gradient(to right, #2563EB, #93C5FD)',
+                      backgroundColor: getBarColor(item.category),
                     }}
                   />
                 </div>

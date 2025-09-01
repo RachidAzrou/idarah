@@ -268,9 +268,9 @@ export function TransactionsTable({
             >
               Vorige
             </Button>
-            <span className="flex items-center px-3 text-sm">
+            <div className="flex items-center px-3 text-sm">
               Pagina {currentPage} van {totalPages}
-            </span>
+            </div>
             <Button
               variant="outline"
               size="sm"

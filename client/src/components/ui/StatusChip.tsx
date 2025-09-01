@@ -7,7 +7,7 @@ interface StatusChipProps {
 
 export function StatusChip({ type, className }: StatusChipProps) {
   return (
-    <span
+    <div
       className={cn(
         "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium",
         type === 'INCOME'
@@ -17,6 +17,6 @@ export function StatusChip({ type, className }: StatusChipProps) {
       )}
     >
       {type === 'INCOME' ? 'Inkomsten' : 'Uitgaven'}
-    </span>
+    </div>
   );
 }

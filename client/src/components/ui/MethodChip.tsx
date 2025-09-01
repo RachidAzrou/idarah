@@ -28,7 +28,7 @@ export function MethodChip({ method, className }: MethodChipProps) {
   const config = methodConfig[method];
   
   return (
-    <span
+    <div
       className={cn(
         "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium",
         config.className,
@@ -36,6 +36,6 @@ export function MethodChip({ method, className }: MethodChipProps) {
       )}
     >
       {config.label}
-    </span>
+    </div>
   );
 }

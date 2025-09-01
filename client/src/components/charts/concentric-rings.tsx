@@ -36,7 +36,7 @@ export function ConcentricRings({ categories, size = 280 }: ConcentricRingsProps
   const center = size / 2;
   const radii = [110, 86, 62]; // outer, middle, inner  
   const strokeWidth = 14;
-  const startAngle = -60;
+  const startAngle = -90; // Start at 12 o'clock
 
   return (
     <div className="flex items-center justify-center">

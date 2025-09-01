@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { MemberForm } from "@/components/forms/member-form";
 import { Toolbar } from "@/components/members/toolbar";
 import { MembersTable } from "@/components/members/members-table";
@@ -206,6 +206,12 @@ export default function Leden() {
         {/* New Member Dialog */}
         <Dialog open={showNewMemberDialog} onOpenChange={setShowNewMemberDialog}>
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Nieuw Lid Toevoegen</DialogTitle>
+              <DialogDescription>
+                Voeg een nieuw lid toe aan de ledenadministratie
+              </DialogDescription>
+            </DialogHeader>
             <MemberForm
               onSuccess={() => setShowNewMemberDialog(false)}
               onCancel={() => setShowNewMemberDialog(false)}

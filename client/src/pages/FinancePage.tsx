@@ -226,24 +226,13 @@ export default function FinancePage() {
       <div className="px-4 sm:px-6 lg:px-8 w-full">
         {/* Page Header */}
         <div className="mb-6">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900" data-testid="page-title">
-                Financiën
-              </h1>
-              <p className="mt-1 text-sm text-gray-700">
-                Overzicht van inkomsten en uitgaven
-              </p>
-            </div>
-            <Button 
-              onClick={() => setShowNewTransactionDialog(true)}
-              className="gap-2"
-              size="lg"
-              data-testid="button-new-transaction-header"
-            >
-              <Plus className="h-5 w-5" />
-              Nieuwe transactie
-            </Button>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900" data-testid="page-title">
+              Financiën
+            </h1>
+            <p className="mt-1 text-sm text-gray-700">
+              Overzicht van inkomsten en uitgaven
+            </p>
           </div>
         </div>
 

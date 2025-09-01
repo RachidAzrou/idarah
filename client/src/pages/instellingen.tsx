@@ -254,10 +254,10 @@ export default function Instellingen() {
         <main className="flex-1 py-8">
           <div className="px-4 sm:px-6 lg:px-8">
             {/* Page Header */}
-            <div className="sm:flex sm:items-center sm:justify-between mb-8">
+            <div className="mb-6">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900" data-testid="page-title">Instellingen</h1>
-                <p className="mt-2 text-sm text-gray-700">Beheer organisatie-instellingen en configuratie</p>
+                <h1 className="text-2xl font-bold text-gray-900" data-testid="page-title">Instellingen</h1>
+                <p className="mt-1 text-sm text-gray-700">Beheer organisatie-instellingen en configuratie</p>
               </div>
             </div>
 

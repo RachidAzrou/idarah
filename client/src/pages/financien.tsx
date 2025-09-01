@@ -57,22 +57,10 @@ export default function Financien() {
         <main className="flex-1 py-8">
           <div className="px-4 sm:px-6 lg:px-8">
             {/* Page Header */}
-            <div className="sm:flex sm:items-center sm:justify-between mb-8">
+            <div className="mb-6">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900" data-testid="page-title">Financiën</h1>
-                <p className="mt-2 text-sm text-gray-700">Financieel overzicht en transactiebeheer</p>
-              </div>
-              <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-                <div className="flex gap-2">
-                  <Button variant="outline" className="inline-flex items-center gap-x-2 rounded-2xl px-6 py-3" data-testid="button-export">
-                    <Download className="h-4 w-4" />
-                    Export
-                  </Button>
-                  <Button className="inline-flex items-center gap-x-2 rounded-2xl px-6 py-3" data-testid="button-new-transaction">
-                    <Plus className="h-4 w-4" />
-                    Nieuwe Transactie
-                  </Button>
-                </div>
+                <h1 className="text-2xl font-bold text-gray-900" data-testid="page-title">Financiën</h1>
+                <p className="mt-1 text-sm text-gray-700">Financieel overzicht en transactiebeheer</p>
               </div>
             </div>
 

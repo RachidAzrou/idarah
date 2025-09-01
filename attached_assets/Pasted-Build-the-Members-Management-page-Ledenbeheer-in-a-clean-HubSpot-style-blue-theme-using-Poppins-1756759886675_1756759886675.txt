@@ -1,0 +1,223 @@
+Build the Members Management page (“Ledenbeheer”) in a clean, HubSpot-style blue theme using Poppins. The page must include search & filters, Import/Export, New Member CTA, a responsive data table with selection checkboxes, row actions, bulk actions, pagination, and solid empty/loading/error states.
+Stack: Next.js 14 (App Router), React 18, TypeScript (strict), TailwindCSS, shadcn/ui, lucide-react. (Data: mock only.)
+
+0) Deliver exactly
+
+Create these files with complete runnable code:
+
+app/(app)/members/page.tsx – renders the full page.
+
+components/members/MembersTable.tsx – typed, reusable table (sorting, selection, pagination).
+
+components/members/Toolbar.tsx – top toolbar (search, filters, Import/Export, New Member).
+
+components/members/FiltersDrawer.tsx – “Meer filters” slide-over.
+
+components/members/RowActions.tsx – 3-dots menu (Bekijk, Bewerken, Deactiveren).
+
+components/ui/StatusBadge.tsx – badge (Actief/Inactief).
+
+components/ui/EmptyState.tsx, components/ui/ErrorState.tsx, components/ui/SkeletonTable.tsx.
+
+lib/mock/members.ts – mock dataset + helpers (filter, paginate).
+
+app/globals.css, styles/shadcn-override.css, tailwind.config.ts – Poppins + blue tokens.
+
+README.md – run instructions (pnpm i && pnpm dev) + theming notes.
+
+1) Visual & theme (match this)
+
+Typography: Poppins (400/500/600).
+
+Colors:
+
+Text #0F172A, secondary #64748B.
+
+Primary blue #2563EB, base blue #3B82F6, light blue #EEF2FF.
+
+Border #E5E7EB, surfaces white.
+
+Cards/table containers: radius 16px, shadow 0 6px 16px rgba(2,6,23,.08).
+
+Inputs/buttons: soft, rounded; focus ring rgba(37,99,235,.4).
+
+Badges: Actief = soft green (#86EFAC text #166534), Inactief = soft gray.
+
+2) Page layout & content
+
+Header
+
+Title: “Ledenbeheer” (h1, 28–32px, semibold).
+
+Subtitle: “Beheer je verenigingsleden en hun gegevens”.
+
+Toolbar (card)
+
+Search input (full width on desktop until buttons; placeholder: Zoek op naam, e-mail of lidnummer…) with ⌘K hint.
+
+Right actions:
+
+Export (ghost button, icon Download), Import (ghost, icon Upload), Nieuw lid (primary blue).
+
+Quick filters (compact, right-aligned under search on desktop):
+
+Status: “Alle statussen | Actief | Inactief”.
+
+Categorie: “Alle categorieën | Senior | Volwassene | Student | Jeugd”.
+
+Meer filters (pill with SlidersHorizontal) opens FiltersDrawer.
+
+FiltersDrawer (slide-over)
+
+Velden: Categorie (multi), Status (multi), Geslacht (M/V), Inschrijvingsdatum (van/tot), Betaalstatus (Betaald/Open/Overdue), Alleen actieve mandaten (checkbox).
+
+CTA’s: Toepassen, Reset.
+
+Members table (card)
+
+Columns:
+
+checkbox (select all/row)
+
+Lidnummer (monospace, bv. 0001)
+
+Naam (achternaam)
+
+Voornaam
+
+Status (StatusBadge)
+
+Categorie
+
+Inschrijvingsdatum (dd-mm-jjjj)
+
+Acties (3-dots menu)
+
+Sorting: by Lidnummer, Naam, Inschrijvingsdatum.
+
+Row actions: Bekijk (➡ detail), Bewerken, Deactiveren (met confirm).
+
+Bulk selection bar (appears when ≥1 selected): X geselecteerd · acties: Export selectie, Markeer inactief, Verwijder (confirm).
+
+Footer: “Totaal N leden” centered, or pagination bar.
+
+Pagination (top-right of table): “Per pagina: 10 | 20 | 50” (select) + numbered pager bottom-right.
+
+States:
+
+Loading: SkeletonTable (rows shimmer).
+
+Empty: EmptyState met icon + “Geen leden gevonden” + CTA Nieuw lid.
+
+Error: ErrorState met retry.
+
+Keyboard & accessibility
+
+Table rows focusable (arrow keys navigate via tabindex order), Enter = open Bekijk.
+
+All icon-only buttons have aria-label.
+
+Announce bulk selection changes via aria-live="polite".
+
+3) Behavior & utilities
+
+Search filters on: lidnummer, voornaam, achternaam, e-mail (string contains, case-insensitive).
+
+Quick filters + Drawer filters combine (AND) with search.
+
+Sorting toggles asc/desc; show chevron indicator in header.
+
+Pagination client-side (mock): default 20 per page; preserve filters when paging.
+
+Date & number formatting: Intl.DateTimeFormat('nl-BE').
+
+Confirmations: shadcn AlertDialog voor gevaarlijke acties (deactivate/delete).
+
+Toasts: success/error feedback (rechtsboven).
+
+Responsive:
+
+≥1280px: full table.
+
+<1024px: hide Voornaam kolom;
+
+<640px: switch naar stacked row (naam + badges + meta), acties in inline menu.
+
+4) Mock data — lib/mock/members.ts
+
+Provide an array of ~30 items:
+
+export type Member = {
+  id: string;
+  memberNumber: string; // "0001"
+  lastName: string;
+  firstName: string;
+  status: 'ACTIEF' | 'INACTIEF';
+  category: 'Senior' | 'Volwassene' | 'Student' | 'Jeugd';
+  email: string;
+  joinedAt: string; // ISO
+};
+
+export const members: Member[] = [
+  { id:'m1', memberNumber:'0001', lastName:'van der Berg', firstName:'Emma', status:'ACTIEF', category:'Senior', email:'emma@...', joinedAt:'2023-01-15' },
+  { id:'m2', memberNumber:'0002', lastName:'Jansen', firstName:'Lars', status:'ACTIEF', category:'Jeugd', joinedAt:'2023-03-20', email:'lars@...' },
+  // …(meer records, mix status/categorie/dates)
+];
+
+
+Add helpers:
+
+export function filterMembers(list, query, quick, advanced){/* implement */}
+export function paginate(list, page, perPage){/* returns {items,total,pages} */}
+
+5) Components – details
+
+MembersTable.tsx
+
+Props: rows: Member[]; total: number; page: number; perPage: number; onPageChange; onPerPageChange; onRowAction; onBulkAction; onSort; sort: {key:string; dir:'asc'|'desc'}; loading?: boolean;
+
+Table head with clickable sortable headers (show ▲▼).
+
+Body rows with checkbox + cells; hover highlight; 3-dots menu (RowActions) aligned right.
+
+RowActions.tsx
+
+shadcn DropdownMenu with actions Bekijk, Bewerken, Deactiveren.
+
+Emits callbacks with member id.
+
+Toolbar.tsx
+
+Search input with Search icon; onChange debounced (250ms).
+
+Quick filter Selects (Status, Categorie).
+
+Buttons: Export (CSV of JSON mock), Import (open file picker, just toast), Nieuw lid (route /members/new placeholder).
+
+“Meer filters” opens FiltersDrawer.
+
+FiltersDrawer.tsx
+
+Controlled component with fields (zie boven).
+
+On Apply → close + call onChange(filters); On Reset → clear.
+
+StatusBadge.tsx
+
+Variants: ACTIEF (green), INACTIEF (gray). Size small, pill radius.
+
+EmptyState / ErrorState / SkeletonTable
+
+Minimal, clean; icons via lucide-react (Users, AlertTriangle).
+
+6) Acceptance criteria
+
+Matches screenshot vibe: search strip, quick filters + Export/Import/Nieuw lid knoppen, clean table, status badges, right aligned actions, pagination.
+
+Search + filters + sorting + pagination werken (client-side over mock data).
+
+Good responsive behavior; keyboard navigation & A11y in place.
+
+Tailwind tokens + Poppins + blue theme consistent; TypeScript-strict, no any.
+
+Now output the full code for all listed files, runnable with pnpm i && pnpm dev. Use realistic Dutch (Belgium) labels and dd-mm-jjjj dates. If anything is ambiguous, choose sensible defaults that keep the interface calm, professional, and accessible.

@@ -57,26 +57,10 @@ export default function PubliekeSchermen() {
         <main className="flex-1 py-8">
           <div className="px-4 sm:px-6 lg:px-8">
             {/* Page Header */}
-            <div className="sm:flex sm:items-center sm:justify-between mb-8">
+            <div className="mb-6">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900" data-testid="page-title">Publieke Schermen</h1>
-                <p className="mt-2 text-sm text-gray-700">Beheer informatiedisplays en digitale mededelingenborden</p>
-              </div>
-              <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-                <Dialog open={showNewScreenDialog} onOpenChange={setShowNewScreenDialog}>
-                  <DialogTrigger asChild>
-                    <Button className="inline-flex items-center gap-x-2 rounded-2xl px-6 py-3" data-testid="button-new-screen">
-                      <Plus className="h-4 w-4" />
-                      Nieuw Scherm
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-2xl">
-                    <div className="p-6">
-                      <h3 className="text-lg font-semibold mb-4">Nieuw Publiek Scherm</h3>
-                      <p className="text-gray-500">Formulier voor het aanmaken van een nieuw publiek scherm komt hier...</p>
-                    </div>
-                  </DialogContent>
-                </Dialog>
+                <h1 className="text-2xl font-bold text-gray-900" data-testid="page-title">Publieke Schermen</h1>
+                <p className="mt-1 text-sm text-gray-700">Beheer informatiedisplays en digitale mededelingenborden</p>
               </div>
             </div>
 

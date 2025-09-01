@@ -119,26 +119,10 @@ export default function Lidgelden() {
         <main className="flex-1 py-8">
           <div className="px-4 sm:px-6 lg:px-8">
             {/* Page Header */}
-            <div className="sm:flex sm:items-center sm:justify-between mb-8">
+            <div className="mb-6">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900" data-testid="page-title">Lidgelden</h1>
-                <p className="mt-2 text-sm text-gray-700">Beheer en volg alle lidmaatschapsbijdragen</p>
-              </div>
-              <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-                <Dialog open={showNewFeeDialog} onOpenChange={setShowNewFeeDialog}>
-                  <DialogTrigger asChild>
-                    <Button className="inline-flex items-center gap-x-2 rounded-2xl px-6 py-3" data-testid="button-new-fee">
-                      <Plus className="h-4 w-4" />
-                      Nieuw Lidgeld
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-2xl">
-                    <FeeForm
-                      onSuccess={() => setShowNewFeeDialog(false)}
-                      onCancel={() => setShowNewFeeDialog(false)}
-                    />
-                  </DialogContent>
-                </Dialog>
+                <h1 className="text-2xl font-bold text-gray-900" data-testid="page-title">Lidgelden</h1>
+                <p className="mt-1 text-sm text-gray-700">Beheer en volg alle lidmaatschapsbijdragen</p>
               </div>
             </div>
 

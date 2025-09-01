@@ -137,7 +137,7 @@ export function JournalView({ transactions }: JournalViewProps) {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <CiInboxOut className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Debet (Uitgaven)</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Debet</h3>
               </div>
               <span className="text-sm text-gray-500 dark:text-gray-400">{debitTransactions.length} transacties</span>
             </div>
@@ -179,7 +179,7 @@ export function JournalView({ transactions }: JournalViewProps) {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <CiInboxIn className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Credit (Inkomsten)</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Credit</h3>
               </div>
               <span className="text-sm text-gray-500 dark:text-gray-400">{creditTransactions.length} transacties</span>
             </div>

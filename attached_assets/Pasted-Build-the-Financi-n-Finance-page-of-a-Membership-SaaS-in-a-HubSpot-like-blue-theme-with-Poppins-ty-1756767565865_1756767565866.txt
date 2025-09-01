@@ -1,0 +1,228 @@
+Build the Financiën (Finance) page of a Membership SaaS in a HubSpot-like blue theme with Poppins typography. Use Next.js 14 (App Router), React 18, TypeScript strict, TailwindCSS, shadcn/ui, lucide-react, Recharts, date-fns (nl-BE), Zod, react-hook-form. Provide a full runnable scaffold with mock data, imports/exports, and polished UX.
+
+0) Deliverables (full runnable code)
+
+Route
+
+app/(app)/finance/page.tsx — main page layout.
+
+Dashboard widgets
+
+components/finance/KpiCards.tsx — 4 KPIs (Ontvangen €, Uitgegeven €, Saldo, Achterstallig/te betalen).
+
+components/finance/Charts.tsx — Line/Area chart: inkomsten vs. uitgaven; Donut: top categorieën.
+
+Toolbar & filters
+
+components/finance/Toolbar.tsx — zoekveld, snelle filters (Type: Inkomsten/Uitgaven; Periode: jaar/maand), knoppen Import, Export, Nieuw.
+
+components/finance/FiltersDrawer.tsx — geavanceerde filters (categorie, bedrag min/max, datumrange, methode, lid).
+
+Transactions table
+
+components/finance/TransactionsTable.tsx — sortable, filterable, paginated.
+
+components/finance/RowActions.tsx — 3-dots (Bewerken, Verwijderen, Details).
+
+components/finance/DetailSlideOver.tsx — transaction detail (with edit).
+
+components/finance/NewTransactionDialog.tsx — form for nieuwe transactie (Zod validated).
+
+Imports/Exports
+
+components/finance/ImportDialog.tsx — upload CSV/MT940/CODA (mock parser, mapping preview).
+
+components/finance/ExportDialog.tsx — choose format CSV/Excel/PDF.
+
+Journal
+
+components/finance/JournalView.tsx — optional debet/credit weergave (two columns).
+
+UI commons
+
+components/ui/StatusChip.tsx (Income/Expense), components/ui/MethodChip.tsx, components/ui/EmptyState.tsx, components/ui/ErrorState.tsx, components/ui/ConfirmDialog.tsx, components/ui/ToastProvider.tsx.
+
+Data & utils
+
+lib/mock/transactions.ts — mock dataset (100+ transacties, mix van inkomsten/uitgaven).
+
+lib/format.ts — formatDateBE, formatCurrencyBE.
+
+lib/csv.ts — mock CSV parser.
+
+lib/zod-transaction.ts — Zod schema for create/edit transaction.
+
+lib/cn.ts.
+
+Theme/config
+
+app/globals.css (Poppins import).
+
+styles/shadcn-override.css.
+
+tailwind.config.ts.
+
+README.md — run (pnpm i && pnpm dev), import/export notes.
+
+1) UI & layout
+
+Header
+
+H1: “Financiën”; subtitel: “Overzicht van inkomsten en uitgaven”.
+
+Rechts: knop + Nieuwe transactie (primary blauw).
+
+Section 1: KPIs
+
+4 cards:
+
+Ontvangen (€ totaal inkomsten).
+
+Uitgegeven (€ totaal uitgaven).
+
+Saldo (Inkomsten − Uitgaven).
+
+Achterstallig (mock of future feature).
+
+Section 2: Charts
+
+Line chart: inkomsten vs. uitgaven per maand (blauwe curve voor inkomsten, rode voor uitgaven).
+
+Donut: verdeling uitgaven per categorie (huur, nutsvoorzieningen, evenementen, enz.).
+
+Section 3: Toolbar
+
+Zoekbalk: “Zoek op categorie, omschrijving of lidnummer…”
+
+Quick filters: Type (Inkomsten/Uitgaven), Periode (huidig jaar, vorig jaar, deze maand).
+
+Buttons: Import, Export, Nieuw.
+
+Section 4: Transactions table
+
+Kolommen:
+
+Datum (dd-mm-jjjj)
+
+Type (Income/Expense chip)
+
+Categorie (string)
+
+Lid (optioneel gelinkt)
+
+Bedrag (€ formatted, rood = uitgave, blauw/groen = inkomen)
+
+Methode (MethodChip: SEPA/OVERS/Bancontact/Cash)
+
+Omschrijving
+
+Acties (RowActions)
+
+DetailSlideOver
+
+Titel: bedrag + type.
+
+Body: key-value overzicht (categorie, methode, lid, datum, omschrijving).
+
+Knoppen: Bewerken, Verwijderen.
+
+NewTransactionDialog
+
+Form velden:
+
+Type: Inkomsten / Uitgaven.
+
+Datum (verplicht).
+
+Categorie (select).
+
+Bedrag (EUR, required > 0).
+
+Methode (SEPA/Overschrijving/Bancontact/Cash).
+
+Lid (optioneel).
+
+Omschrijving (text).
+
+Zod validatie: bedrag > 0, datum geldig, type verplicht.
+
+2) Mock data (lib/mock/transactions.ts)
+export type Transaction = {
+  id: string;
+  date: string; // ISO
+  type: 'INCOME' | 'EXPENSE';
+  category: string;
+  memberId?: string;
+  memberName?: string;
+  amount: number; // €
+  method: 'SEPA' | 'OVERSCHRIJVING' | 'BANCONTACT' | 'CASH';
+  description?: string;
+};
+
+export const transactions: Transaction[] = [
+  { id:'t1', date:'2025-01-12', type:'INCOME', category:'Lidgeld', memberId:'m1', memberName:'Emma v.d. Berg', amount:120, method:'SEPA', description:'Lidgeld 2025' },
+  { id:'t2', date:'2025-01-15', type:'EXPENSE', category:'Huur', amount:800, method:'OVERSCHRIJVING', description:'Zaalhuur januari' },
+  { id:'t3', date:'2025-01-20', type:'INCOME', category:'Donatie', amount:250, method:'CASH', description:'Vrijwillige gift' },
+  { id:'t4', date:'2025-01-25', type:'EXPENSE', category:'Nutsvoorzieningen', amount:120, method:'OVERSCHRIJVING', description:'Elektriciteit januari' },
+  // … genereer ±100 records mix inkomens/uitgaven
+];
+
+3) Import/Export
+
+ImportDialog
+
+Upload CSV/MT940/CODA → parse naar array van {date, amount, description}.
+
+Matching heuristiek: positief = Inkomsten, negatief = Uitgaven; categorie = “Onbekend” als niet gemapt.
+
+Preview tabel, actie Boek transacties → voeg toe aan store.
+
+ExportDialog
+
+Kies formaat (CSV, Excel, PDF).
+
+Mock: gewoon exporteer huidige gefilterde lijst naar CSV.
+
+4) Journal view
+
+Optional toggle: “Toon journaalweergave” →
+
+Debet links (uitgaven), Credit rechts (inkomsten).
+
+Totaal debet/credit onderaan.
+
+Gebalanceerd overzicht voor penningmeester.
+
+5) Validation (Zod)
+import { z } from 'zod';
+
+export const TransactionSchema = z.object({
+  type: z.enum(['INCOME','EXPENSE']),
+  date: z.date({ required_error: 'Datum verplicht' }),
+  category: z.string().min(2),
+  amount: z.number().positive('Bedrag moet groter zijn dan 0'),
+  method: z.enum(['SEPA','OVERSCHRIJVING','BANCONTACT','CASH']),
+  memberId: z.string().optional(),
+  description: z.string().max(500).optional()
+});
+
+6) Acceptance criteria
+
+Financiën-pagina toont KPI’s, grafieken, zoek/filter/toolbar, transactietabel.
+
+Gebruiker kan transacties toevoegen, bekijken, bewerken, verwijderen (mock store).
+
+Import dialoog parseert CSV/MT940 (mock), voegt transacties toe.
+
+Export dialoog genereert CSV/Excel/PDF (mock).
+
+Journaalweergave toont debet/credit overzicht.
+
+Styling consistent: Poppins, blauw palet, radius 16, schaduwen.
+
+A11y & keyboard: labels, aria, focus-visible.
+
+TypeScript-strict, geen any.
+
+Output full code now for all the files above, runnable with pnpm i && pnpm dev.
+Use Dutch (Belgium) labels and dd-mm-jjjj date format. Choose safe defaults that maintain professional, calm design.

@@ -10,7 +10,7 @@ import Dashboard from "@/pages/dashboard";
 import Login from "@/pages/login";
 import Leden from "@/pages/leden";
 import Lidgelden from "@/pages/lidgelden";
-import Financien from "@/pages/financien";
+import FinancePage from "@/pages/FinancePage";
 import PubliekeSchermen from "@/pages/publieke-schermen";
 import Instellingen from "@/pages/instellingen";
 
@@ -51,7 +51,7 @@ function Router() {
       <Route path="/dashboard" component={() => <ProtectedRoute component={Dashboard} />} />
       <Route path="/leden" component={() => <ProtectedRoute component={Leden} />} />
       <Route path="/lidgelden" component={() => <ProtectedRoute component={Lidgelden} />} />
-      <Route path="/financien" component={() => <ProtectedRoute component={Financien} />} />
+      <Route path="/financien" component={() => <ProtectedRoute component={FinancePage} />} />
       <Route path="/publieke-schermen" component={() => <ProtectedRoute component={PubliekeSchermen} />} />
       <Route path="/instellingen" component={() => <ProtectedRoute component={Instellingen} />} />
       <Route component={NotFound} />

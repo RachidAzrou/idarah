@@ -53,12 +53,8 @@ export default function Dashboard() {
             </div>
 
             {/* Bottom Row */}
-            <div className="mb-6">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
               <DueDates />
-            </div>
-
-            {/* Recent Activities - Full width at bottom */}
-            <div className="mb-6">
               <RecentActivities />
             </div>
           </div>

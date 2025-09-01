@@ -222,81 +222,14 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Geboortedatum *</FormLabel>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <FormControl>
-                              <Button
-                                variant="outline"
-                                className={cn(
-                                  "w-full justify-start text-left font-normal",
-                                  !field.value && "text-muted-foreground"
-                                )}
-                                data-testid="input-birthdate"
-                              >
-                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                {field.value ? format(field.value, "dd/MM/yyyy", { locale: nl }) : "Selecteer geboortedatum"}
-                              </Button>
-                            </FormControl>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <div className="p-3 border-b">
-                              <div className="flex items-center justify-between space-x-2">
-                                <Select
-                                  value={field.value ? field.value.getMonth().toString() : ""}
-                                  onValueChange={(month) => {
-                                    const currentDate = field.value || new Date();
-                                    const newDate = new Date(currentDate.getFullYear(), parseInt(month), currentDate.getDate());
-                                    field.onChange(newDate);
-                                  }}
-                                >
-                                  <SelectTrigger className="w-[120px] h-8">
-                                    <SelectValue placeholder="Maand" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {Array.from({ length: 12 }, (_, i) => (
-                                      <SelectItem key={i} value={i.toString()}>
-                                        {format(new Date(2000, i, 1), "MMMM", { locale: nl })}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                                <Select
-                                  value={field.value ? field.value.getFullYear().toString() : ""}
-                                  onValueChange={(year) => {
-                                    const currentDate = field.value || new Date();
-                                    const newDate = new Date(parseInt(year), currentDate.getMonth(), currentDate.getDate());
-                                    field.onChange(newDate);
-                                  }}
-                                >
-                                  <SelectTrigger className="w-[80px] h-8">
-                                    <SelectValue placeholder="Jaar" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {Array.from({ length: 100 }, (_, i) => {
-                                      const year = new Date().getFullYear() - i;
-                                      return (
-                                        <SelectItem key={year} value={year.toString()}>
-                                          {year}
-                                        </SelectItem>
-                                      );
-                                    })}
-                                  </SelectContent>
-                                </Select>
-                              </div>
-                            </div>
-                            <Calendar
-                              mode="single"
-                              selected={field.value}
-                              onSelect={field.onChange}
-                              locale={nl}
-                              month={field.value || new Date()}
-                              onMonthChange={(month) => field.onChange(month)}
-                              showOutsideDays={false}
-                              className="p-3"
-                              defaultMonth={new Date()}
-                            />
-                          </PopoverContent>
-                        </Popover>
+                        <FormControl>
+                          <Input
+                            type="date"
+                            value={field.value ? new Date(field.value).toISOString().split('T')[0] : ""}
+                            onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : null)}
+                            data-testid="input-birthdate"
+                          />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -362,7 +295,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
                     name="street"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Straat</FormLabel>
+                        <FormLabel>Straat *</FormLabel>
                         <FormControl>
                           <Input placeholder="Wetstraat" {...field} data-testid="input-street" />
                         </FormControl>
@@ -376,7 +309,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
                     name="number"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Nummer</FormLabel>
+                        <FormLabel>Nummer *</FormLabel>
                         <FormControl>
                           <Input placeholder="16" {...field} data-testid="input-number" />
                         </FormControl>
@@ -390,7 +323,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
                     name="postalCode"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Postcode</FormLabel>
+                        <FormLabel>Postcode *</FormLabel>
                         <FormControl>
                           <Input placeholder="1000" {...field} data-testid="input-postalcode" />
                         </FormControl>
@@ -404,7 +337,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
                     name="city"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Stad</FormLabel>
+                        <FormLabel>Stad *</FormLabel>
                         <FormControl>
                           <Input placeholder="Brussel" {...field} data-testid="input-city" />
                         </FormControl>
@@ -418,7 +351,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
                     name="country"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Land</FormLabel>
+                        <FormLabel>Land *</FormLabel>
                         <FormControl>
                           <Input {...field} data-testid="input-country" />
                         </FormControl>

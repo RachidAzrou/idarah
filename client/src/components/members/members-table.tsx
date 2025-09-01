@@ -381,13 +381,9 @@ function EmptyState() {
     <div className="p-12 text-center">
       <Users className="h-12 w-12 text-gray-300 mx-auto mb-4" />
       <h3 className="text-lg font-medium text-gray-900 mb-2">Geen leden gevonden</h3>
-      <p className="text-gray-500 mb-6">
+      <p className="text-gray-500">
         Voeg je eerste lid toe om te beginnen met het beheren van je ledenbestand.
       </p>
-      <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-        <Users className="h-4 w-4 mr-2" />
-        Nieuw lid toevoegen
-      </Button>
     </div>
   );
 }

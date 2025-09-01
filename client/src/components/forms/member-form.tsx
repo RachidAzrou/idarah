@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,7 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { X } from "lucide-react";
+
 
 const memberSchema = z.object({
   firstName: z.string().min(1, "Voornaam is verplicht"),
@@ -104,14 +104,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
 
   return (
     <Card className="w-full max-w-4xl mx-auto">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Nieuw Lid Toevoegen</CardTitle>
-        {onCancel && (
-          <Button variant="ghost" size="sm" onClick={onCancel} data-testid="button-cancel">
-            <X className="h-4 w-4" />
-          </Button>
-        )}
-      </CardHeader>
+      
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">

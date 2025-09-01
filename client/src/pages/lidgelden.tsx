@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import { Link } from "wouter";
 import { KpiCards } from "@/components/fees/kpi-cards";
 import { Toolbar } from "@/components/fees/toolbar";
 import { FeesTable } from "@/components/fees/fees-table";
@@ -206,10 +207,12 @@ export default function Lidgelden() {
             onOnlyOverdueChange={setOnlyOverdue}
             onResetFilters={resetAllFilters}
             newButton={
-              <Button className="flex items-center gap-2">
-                <Plus className="h-4 w-4" />
-                Nieuw lidgeld
-              </Button>
+              <Link href="/lidgelden/nieuw">
+                <Button className="flex items-center gap-2">
+                  <Plus className="h-4 w-4" />
+                  Nieuw lidgeld
+                </Button>
+              </Link>
             }
           />
         </div>

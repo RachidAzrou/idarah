@@ -1,0 +1,245 @@
+mplement a polished, accessible “Nieuw lidgeld” (New Membership Fee) flow for a Membership SaaS in a clean blue theme (Poppins). Use Next.js 14 (App Router), TypeScript (strict), Tailwind, shadcn/ui, react-hook-form, Zod, date-fns with nl-BE locale. Provide a complete, runnable scaffold with mock data and side-effects.
+
+0) Deliverables (full runnable code)
+
+Route
+
+app/(app)/fees/new/page.tsx — mounts the multistep flow (or single form with preview panel).
+
+Flow components
+
+components/fees/new/NewFeeForm.tsx — main container (state + form + preview).
+
+components/fees/new/MemberSelect.tsx — searchable combobox (mock dataset).
+
+components/fees/new/PeriodPicker.tsx — helper to pick Jaarlijks (start/einde) of Maandelijks (auto einde van maand).
+
+components/fees/new/MethodTerm.tsx — select Methode (SEPA/Overschrijving/Bancontact/Cash) + Termijn (Maandelijks/Jaarlijks).
+
+components/fees/new/AmountInput.tsx — bedrag (EUR) met formattering.
+
+components/fees/new/PreviewCard.tsx — samenvatting (lid, periode, bedrag, methode, SEPA-geschiktheid).
+
+components/fees/new/ConfirmDialog.tsx — bevestigen + optioneel “Markeer betaald” (met betaaldatum).
+
+components/ui/SectionCard.tsx, components/ui/StatusChip.tsx, components/ui/ToastProvider.tsx.
+
+Data & utils
+
+lib/mock/members-lite.ts — lijst met {id, memberNumber, firstName, lastName, category, hasMandate}.
+
+lib/mock/fees-store.ts — in-memory store (or localStorage) met createFee, markPaid, listFees.
+
+lib/format.ts — formatDateBE, formatCurrencyBE, euroInputMask.
+
+lib/period.ts — helpers: endOfMonthlyPeriod(date), endOfYearlyPeriod(date), toISO, fromISO.
+
+lib/zod-fee.ts — Zod schema voor validatie.
+
+lib/cn.ts — className helper.
+
+Theme/config
+
+app/globals.css (Poppins import + CSS vars)
+
+styles/shadcn-override.css (map --primary → blauw)
+
+tailwind.config.ts, postcss.config.js, tsconfig.json
+
+README.md — how to run (pnpm i && pnpm dev), theming notes.
+
+1) UX & layout (match this)
+
+Paginaheader
+
+H1 “Nieuw lidgeld” + subtitel “Maak een nieuw lidgeld aan voor een lid en periode”.
+
+Formulier (links) + Preview (rechts)
+
+Grid: lg:grid-cols-[1fr,420px] met gap 24–32px.
+
+Form-sections (in SectionCard’s):
+
+Lid
+
+MemberSelect (zoek op naam/e-mail/lidnummer), toont badge mandaat (JA/NEE).
+
+Termijn & Periode
+
+Termijn: radio Maandelijks / Jaarlijks.
+
+Startdatum (date).
+
+Einddatum (readonly auto) via helpers:
+
+Maandelijks → laatste dag van startmaand.
+
+Jaarlijks → (start + 1 jaar − 1 dag).
+
+Methode & Bedrag
+
+Methode: select (SEPA, Overschrijving, Bancontact, Cash).
+
+IBAN (vereist & masked bij SEPA).
+
+Bedrag (EUR) met live formattering (nl-BE) en minimale validatie.
+
+Opties
+
+Checkbox “Maak automatisch volgende perioden aan” (disabled in mock; toon uitleg).
+
+Notitie (optioneel).
+
+PreviewCard (rechts)
+
+Toon: Lid (naam + lidnummer + categorie), Periode (dd-mm-jjjj — dd-mm-jjjj), Termijn, Methode, Bedrag.
+
+SEPA-geschikt badge:
+
+JA als methode=SEPA én hasMandate=true én IBAN ingevuld.
+
+Anders NEE met reden (bv. “Geen mandaat” of “IBAN ontbreekt”).
+
+Kostensamenvatting (indien Maandelijks: toon ook jaartotaal = bedrag × #maanden resterend vanaf start tot eind jaar).
+
+Bevestig knop opent ConfirmDialog.
+
+2) Validatie (Zod – exact)
+import { z } from 'zod';
+
+export const NewFeeSchema = z.object({
+  memberId: z.string().min(1, 'Selecteer een lid'),
+  term: z.enum(['MONTHLY','YEARLY']),
+  method: z.enum(['SEPA','OVERSCHRIJVING','BANCONTACT','CASH']),
+  startDate: z.date({ required_error: 'Kies een startdatum' }),
+  endDate: z.date(),
+  amount: z.number().min(0.01, 'Bedrag moet groter zijn dan € 0,00'),
+  iban: z.string().optional(),
+  note: z.string().max(500).optional(),
+}).refine(
+  (v) => v.term === 'YEARLY' || v.term === 'MONTHLY',
+  { message: 'Ongeldige termijn' }
+).refine(
+  (v) => v.endDate >= v.startDate,
+  { message: 'Einddatum moet na startdatum liggen', path: ['endDate'] }
+).refine(
+  (v) => (v.method !== 'SEPA') || (v.iban && /^([A-Z]{2}\d{2}\s?\d{4}\s?\d{4}\s?\d{4}\s?\d{0,2})$/.test(v.iban)),
+  { message: 'IBAN vereist en ongeldig voor SEPA', path: ['iban'] }
+);
+
+
+Business-checks (client-side):
+
+SEPA-check: method=SEPA & lid heeft mandaat & IBAN → label SEPA-geschikt (JA), anders NEE met reden.
+
+Overlapcontrole (mock): toon waarschuwing als er al een fee bestaat die (gedeeltelijk) overlapt met gekozen periode voor dit lid.
+
+3) Gedrag & side-effects
+
+Termijn switch berekent automatisch endDate.
+
+Startdatum change herberekent endDate volgens termijn.
+
+Bevestigen (in ConfirmDialog):
+
+Valideer schema; bij success:
+
+Maak fee record via fees-store.createFee(payload).
+
+Optioneel: “Markeer betaald” → open datum-picker (default vandaag) → fees-store.markPaid(id, date).
+
+Toon toast succes “Lidgeld aangemaakt” (en “gemarkeerd als betaald” indien gekozen).
+
+Navigeer naar /fees of /members/[id]?tab=financieel (kies één en vermeld in README).
+
+Toasts voor: validatiefouten (bovenaan), succes, acties.
+
+4) Data (mock)
+
+lib/mock/members-lite.ts
+
+export type MemberLite = {
+  id: string;
+  memberNumber: string;   // "0007"
+  firstName: string;
+  lastName: string;
+  category: 'Senior' | 'Volwassene' | 'Student' | 'Jeugd';
+  hasMandate: boolean;
+  iban?: string;
+};
+
+export const membersLite: MemberLite[] = [
+  { id:'m1', memberNumber:'0001', firstName:'Emma', lastName:'van der Berg', category:'Senior', hasMandate:true,  iban:'BE71 0961 2345 6769' },
+  { id:'m2', memberNumber:'0002', firstName:'Lars', lastName:'Jansen',       category:'Jeugd',  hasMandate:false },
+  { id:'m3', memberNumber:'0003', firstName:'Fatima', lastName:'El Amrani',  category:'Volwassene', hasMandate:true },
+  // … voeg extra leden toe
+];
+
+
+lib/mock/fees-store.ts
+
+export type FeeStatus = 'OPEN' | 'PAID' | 'OVERDUE';
+export type PaymentMethod = 'SEPA' | 'OVERSCHRIJVING' | 'BANCONTACT' | 'CASH';
+
+export type Fee = {
+  id: string;
+  memberId: string;
+  memberNumber: string;
+  memberName: string;
+  periodStart: string; // ISO
+  periodEnd: string;   // ISO
+  amount: number;      // in € voor mock
+  method: PaymentMethod;
+  status: FeeStatus;
+  paidAt?: string;
+  sepaEligible?: boolean;
+  note?: string;
+};
+
+export function createFee(/* payload */): Fee { /* in-memory of localStorage */ }
+export function markPaid(id: string, paidAt: string): void { /* update */ }
+export function listFees(): Fee[] { /* ... */ }
+export function overlaps(memberId: string, startISO: string, endISO: string): boolean { /* ... */ }
+
+5) Styling (blue + Poppins)
+
+Typography: Poppins 400/500/600.
+
+Colors: Text #0F172A, secondary #64748B, primary blauw #2563EB, base #3B82F6, light #EEF2FF, border #E5E7EB.
+
+Cards: radius 16px, shadow 0 6px 16px rgba(2,6,23,.08).
+
+Focus: ring rgba(37,99,235,.4).
+
+Buttons: primary blauw; ghost/secondary voor annuleren.
+
+6) Accessibility & UX
+
+Labels + help-teksten in Nederlands (België).
+
+Keyboard: Tab-volgorde logisch; Enter = primaire actie; Esc sluit dialog.
+
+All icon-only buttons have aria-label.
+
+Error summary boven formulier als er submit-fouten zijn; scroll-to-first-error.
+
+Date pickers met dd-mm-jjjj; alle datums format via Intl.DateTimeFormat('nl-BE').
+
+Respect prefers-reduced-motion.
+
+7) Acceptance criteria
+
+Form toont lidselectie, termijn & periode, methode & bedrag en preview.
+
+Einddatum wordt correct afgeleid uit termijn + startdatum.
+
+SEPA-geschiktheid wordt correct berekend (methode=SEPA + mandaat + IBAN).
+
+Bevestigen maakt fee; optioneel markeren als betaald wijzigt status en betaaldatum.
+
+Overlapwaarschuwing verschijnt indien er al een fee in (gedeeltelijke) periode bestaat.
+
+UI is Poppins + blauw, AA-contrast, responsief, TypeScript-strict, geen any.
+
+Output now the full code for all the files above, runnable with pnpm i && pnpm dev.
+Use Dutch (Belgium) labels and dd-mm-jjjj dates. Choose sensible defaults whenever unclear, preserving a calm, professional style.

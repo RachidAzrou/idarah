@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -204,10 +203,8 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
   };
 
   return (
-    <Card className="w-full max-w-4xl mx-auto">
-      
-      <CardContent>
-        <Form {...form}>
+    <div className="w-full">
+      <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div className="pt-4">
               <div className="mb-6 flex justify-end border-b pb-4">
@@ -734,7 +731,6 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
             </div>
           </form>
         </Form>
-      </CardContent>
-    </Card>
+    </div>
   );
 }

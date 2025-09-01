@@ -55,7 +55,7 @@ export function StackedBars({
                     className="absolute top-0 left-0 h-full rounded-full transition-all duration-200 ease-out"
                     style={{
                       width: `${maleWidth}%`,
-                      background: `linear-gradient(to right, #1E40AF, ${colors.male})`,
+                      backgroundColor: colors.male,
                     }}
                   />
                 )}
@@ -67,7 +67,7 @@ export function StackedBars({
                     style={{
                       left: `${maleWidth}%`,
                       width: `${femaleWidth}%`,
-                      background: `linear-gradient(to right, ${colors.female}, #C084FC)`,
+                      backgroundColor: colors.female,
                     }}
                   />
                 )}

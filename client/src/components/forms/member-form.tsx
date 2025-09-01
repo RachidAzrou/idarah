@@ -9,6 +9,14 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { nl } from "date-fns/locale";
+import { cn } from "@/lib/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -17,21 +25,39 @@ import { useToast } from "@/hooks/use-toast";
 const memberSchema = z.object({
   firstName: z.string().min(1, "Voornaam is verplicht"),
   lastName: z.string().min(1, "Achternaam is verplicht"),
-  gender: z.enum(['M', 'V']),
-  birthDate: z.string().optional(),
-  category: z.enum(['STUDENT', 'VOLWASSEN', 'SENIOR']),
+  gender: z.enum(['M', 'V'], { required_error: "Geslacht is verplicht" }),
+  birthDate: z.date({ required_error: "Geboortedatum is verplicht" }),
+  category: z.enum(['STUDENT', 'VOLWASSEN', 'SENIOR'], { required_error: "Categorie is verplicht" }),
   email: z.string().email("Ongeldig e-mailadres").optional().or(z.literal("")),
   phone: z.string().optional(),
-  street: z.string().optional(),
-  number: z.string().optional(),
-  postalCode: z.string().optional(),
-  city: z.string().optional(),
-  country: z.string().default("België"),
+  street: z.string().min(1, "Straat is verplicht"),
+  number: z.string().min(1, "Nummer is verplicht"),
+  postalCode: z.string().min(1, "Postcode is verplicht"),
+  city: z.string().min(1, "Stad is verplicht"),
+  country: z.string().min(1, "Land is verplicht").default("België"),
   financialSettings: z.object({
     paymentMethod: z.enum(['SEPA', 'OVERSCHRIJVING', 'BANCONTACT', 'CASH']),
     iban: z.string().optional(),
     paymentTerm: z.enum(['MONTHLY', 'YEARLY']),
   }),
+  organization: z.object({
+    interestedInActiveRole: z.boolean().default(false),
+    roleDescription: z.string().optional(),
+  }),
+  permissions: z.object({
+    privacyAgreement: z.boolean().refine(val => val === true, "Akkoord met privacyverklaring is verplicht"),
+    photoVideoConsent: z.boolean().default(false),
+    newsletterSubscription: z.boolean().default(false),
+    whatsappList: z.boolean().default(false),
+  }),
+}).refine((data) => {
+  if (data.financialSettings.paymentMethod !== 'CASH' && !data.financialSettings.iban) {
+    return false;
+  }
+  return true;
+}, {
+  message: "IBAN is verplicht voor alle betaalmethoden behalve contant",
+  path: ["financialSettings", "iban"],
 });
 
 type MemberFormData = z.infer<typeof memberSchema>;
@@ -49,12 +75,31 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
   const form = useForm<MemberFormData>({
     resolver: zodResolver(memberSchema),
     defaultValues: {
+      firstName: '',
+      lastName: '',
       gender: 'M',
       category: 'VOLWASSEN',
+      email: '',
+      phone: '',
+      street: '',
+      number: '',
+      postalCode: '',
+      city: '',
       country: 'België',
       financialSettings: {
         paymentMethod: 'SEPA',
+        iban: '',
         paymentTerm: 'YEARLY',
+      },
+      organization: {
+        interestedInActiveRole: false,
+        roleDescription: '',
+      },
+      permissions: {
+        privacyAgreement: false,
+        photoVideoConsent: false,
+        newsletterSubscription: false,
+        whatsappList: false,
       },
     },
   });
@@ -87,7 +132,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
   };
 
   const nextTab = () => {
-    const tabs = ["personal", "address", "financial", "organization"];
+    const tabs = ["personal", "address", "financial", "organization", "permissions"];
     const currentIndex = tabs.indexOf(activeTab);
     if (currentIndex < tabs.length - 1) {
       setActiveTab(tabs[currentIndex + 1]);
@@ -95,7 +140,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
   };
 
   const prevTab = () => {
-    const tabs = ["personal", "address", "financial", "organization"];
+    const tabs = ["personal", "address", "financial", "organization", "permissions"];
     const currentIndex = tabs.indexOf(activeTab);
     if (currentIndex > 0) {
       setActiveTab(tabs[currentIndex - 1]);
@@ -109,11 +154,12 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
+              <TabsList className="grid w-full grid-cols-5">
                 <TabsTrigger value="personal" data-testid="tab-personal">Persoonlijk</TabsTrigger>
                 <TabsTrigger value="address" data-testid="tab-address">Adres</TabsTrigger>
                 <TabsTrigger value="financial" data-testid="tab-financial">Financieel</TabsTrigger>
                 <TabsTrigger value="organization" data-testid="tab-organization">Organisatie</TabsTrigger>
+                <TabsTrigger value="permissions" data-testid="tab-permissions">Toestemmingen</TabsTrigger>
               </TabsList>
 
               <div className="min-h-[420px] py-6">
@@ -174,10 +220,82 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
                     name="birthDate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Geboortedatum (optioneel)</FormLabel>
-                        <FormControl>
-                          <Input type="date" {...field} data-testid="input-birthdate" />
-                        </FormControl>
+                        <FormLabel>Geboortedatum</FormLabel>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant="outline"
+                                className={cn(
+                                  "w-full justify-start text-left font-normal",
+                                  !field.value && "text-muted-foreground"
+                                )}
+                                data-testid="input-birthdate"
+                              >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {field.value ? format(field.value, "dd/MM/yyyy", { locale: nl }) : "Selecteer geboortedatum"}
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <div className="p-3 border-b">
+                              <div className="flex items-center justify-between space-x-2">
+                                <Select
+                                  value={field.value ? field.value.getMonth().toString() : ""}
+                                  onValueChange={(month) => {
+                                    const currentDate = field.value || new Date();
+                                    const newDate = new Date(currentDate.getFullYear(), parseInt(month), currentDate.getDate());
+                                    field.onChange(newDate);
+                                  }}
+                                >
+                                  <SelectTrigger className="w-[120px] h-8">
+                                    <SelectValue placeholder="Maand" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {Array.from({ length: 12 }, (_, i) => (
+                                      <SelectItem key={i} value={i.toString()}>
+                                        {format(new Date(2000, i, 1), "MMMM", { locale: nl })}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                                <Select
+                                  value={field.value ? field.value.getFullYear().toString() : ""}
+                                  onValueChange={(year) => {
+                                    const currentDate = field.value || new Date();
+                                    const newDate = new Date(parseInt(year), currentDate.getMonth(), currentDate.getDate());
+                                    field.onChange(newDate);
+                                  }}
+                                >
+                                  <SelectTrigger className="w-[80px] h-8">
+                                    <SelectValue placeholder="Jaar" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {Array.from({ length: 100 }, (_, i) => {
+                                      const year = new Date().getFullYear() - i;
+                                      return (
+                                        <SelectItem key={year} value={year.toString()}>
+                                          {year}
+                                        </SelectItem>
+                                      );
+                                    })}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            </div>
+                            <Calendar
+                              mode="single"
+                              selected={field.value}
+                              onSelect={field.onChange}
+                              locale={nl}
+                              month={field.value || new Date()}
+                              onMonthChange={(month) => field.onChange(month)}
+                              showOutsideDays={false}
+                              className="p-3"
+                              defaultMonth={new Date()}
+                            />
+                          </PopoverContent>
+                        </Popover>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -243,7 +361,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
                     name="street"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Straat (optioneel)</FormLabel>
+                        <FormLabel>Straat</FormLabel>
                         <FormControl>
                           <Input placeholder="Wetstraat" {...field} data-testid="input-street" />
                         </FormControl>
@@ -257,7 +375,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
                     name="number"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Nummer (optioneel)</FormLabel>
+                        <FormLabel>Nummer</FormLabel>
                         <FormControl>
                           <Input placeholder="16" {...field} data-testid="input-number" />
                         </FormControl>
@@ -271,7 +389,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
                     name="postalCode"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Postcode (optioneel)</FormLabel>
+                        <FormLabel>Postcode</FormLabel>
                         <FormControl>
                           <Input placeholder="1000" {...field} data-testid="input-postalcode" />
                         </FormControl>
@@ -285,7 +403,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
                     name="city"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Stad (optioneel)</FormLabel>
+                        <FormLabel>Stad</FormLabel>
                         <FormControl>
                           <Input placeholder="Brussel" {...field} data-testid="input-city" />
                         </FormControl>
@@ -341,7 +459,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
                     name="financialSettings.iban"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>IBAN (optioneel)</FormLabel>
+                        <FormLabel>IBAN {form.watch("financialSettings.paymentMethod") !== "CASH" && "*"}</FormLabel>
                         <FormControl>
                           <Input placeholder="BE68 5390 0754 7034" {...field} data-testid="input-iban" />
                         </FormControl>
@@ -375,8 +493,174 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
               </TabsContent>
 
               <TabsContent value="organization" className="space-y-4 mt-0">
-                <div className="text-center py-8">
-                  <p className="text-gray-500">Organisatie instellingen worden automatisch toegepast na het aanmaken van het lid.</p>
+                <div className="space-y-6">
+                  <FormField
+                    control={form.control}
+                    name="organization.interestedInActiveRole"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Interesse in actieve rol?</FormLabel>
+                        <FormControl>
+                          <RadioGroup
+                            onValueChange={(value) => field.onChange(value === "true")}
+                            value={field.value ? "true" : "false"}
+                            className="flex gap-6"
+                            data-testid="radio-active-role"
+                          >
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="true" id="role-yes" />
+                              <Label htmlFor="role-yes">Ja</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="false" id="role-no" />
+                              <Label htmlFor="role-no">Nee</Label>
+                            </div>
+                          </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {form.watch("organization.interestedInActiveRole") && (
+                    <FormField
+                      control={form.control}
+                      name="organization.roleDescription"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>In welke rol zie jij jezelf de moskee helpen?</FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="Beschrijf je gewenste rol..." 
+                              {...field} 
+                              data-testid="input-role-description" 
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
+
+                  <div className="text-center py-4 text-gray-500">
+                    <p>Organisatie instellingen worden automatisch toegepast na het aanmaken van het lid.</p>
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="permissions" className="space-y-4 mt-0">
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-lg font-medium mb-4">Toestemmingen</h3>
+                    <div className="space-y-4">
+                      <FormField
+                        control={form.control}
+                        name="permissions.privacyAgreement"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                                data-testid="checkbox-privacy"
+                              />
+                            </FormControl>
+                            <div className="space-y-1 leading-none">
+                              <FormLabel className="text-sm font-normal">
+                                Ik ga akkoord met de privacyverklaring *
+                              </FormLabel>
+                            </div>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="permissions.photoVideoConsent"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                                data-testid="checkbox-photo-video"
+                              />
+                            </FormControl>
+                            <div className="space-y-1 leading-none">
+                              <FormLabel className="text-sm font-normal">
+                                Toestemming voor foto/video gebruik bij evenementen
+                              </FormLabel>
+                            </div>
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="permissions.newsletterSubscription"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                                data-testid="checkbox-newsletter"
+                              />
+                            </FormControl>
+                            <div className="space-y-1 leading-none">
+                              <FormLabel className="text-sm font-normal">
+                                Aanmelden voor nieuwsbrief
+                              </FormLabel>
+                            </div>
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="permissions.whatsappList"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                                data-testid="checkbox-whatsapp"
+                              />
+                            </FormControl>
+                            <div className="space-y-1 leading-none">
+                              <FormLabel className="text-sm font-normal">
+                                WhatsApp verzendlijst toevoegen
+                              </FormLabel>
+                            </div>
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="border-t pt-6">
+                    <h3 className="text-lg font-medium mb-4">Lidmaatschap overzicht</h3>
+                    <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-sm text-gray-600">Lidnummer:</span>
+                        <span className="font-mono text-sm">LID-{new Date().getFullYear()}-{String(Date.now()).slice(-4)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-gray-600">Lidgeld:</span>
+                        <span className="font-medium">
+                          {form.watch("financialSettings.paymentTerm") === "MONTHLY" ? "€15,00 per maand" : "€150,00 per jaar"}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-gray-600">Frequentie:</span>
+                        <span className="text-sm">
+                          {form.watch("financialSettings.paymentTerm") === "MONTHLY" ? "Maandelijks" : "Jaarlijks"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </TabsContent>
               </div>
@@ -394,7 +678,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
               </Button>
 
               <div className="flex gap-2">
-                {activeTab !== "organization" ? (
+                {activeTab !== "permissions" ? (
                   <Button
                     type="button"
                     onClick={nextTab}

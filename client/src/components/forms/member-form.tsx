@@ -207,24 +207,24 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
     <Card className="w-full max-w-4xl mx-auto">
       
       <CardContent>
-        <div className="mb-3 flex justify-end">
-          <Button
-            type="button"
-            onClick={handleEIDScan}
-            disabled={isScanning}
-            variant="outline"
-            size="sm"
-            className="flex items-center gap-2"
-            data-testid="button-eid-scan"
-          >
-            <IdCard className="h-4 w-4" />
-            {isScanning ? "Scannen..." : "Scan EID"}
-          </Button>
-        </div>
-        
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div className="pt-4">
+              <div className="mb-6 flex justify-end border-b pb-4">
+                <Button
+                  type="button"
+                  onClick={handleEIDScan}
+                  disabled={isScanning}
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2"
+                  data-testid="button-eid-scan"
+                >
+                  <IdCard className="h-4 w-4" />
+                  {isScanning ? "Scannen..." : "Scan EID"}
+                </Button>
+              </div>
+
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList className="grid w-full grid-cols-5">
                 <TabsTrigger value="personal" data-testid="tab-personal" className="flex items-center gap-2">

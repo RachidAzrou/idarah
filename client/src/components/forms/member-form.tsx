@@ -17,6 +17,11 @@ import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 import { cn } from "@/lib/utils";
+import { MdOutlinePermIdentity } from "react-icons/md";
+import { GoHome } from "react-icons/go";
+import { CiBank } from "react-icons/ci";
+import { BsBuildings } from "react-icons/bs";
+import { RiCheckboxMultipleLine } from "react-icons/ri";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -156,11 +161,26 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
             <div className="pt-4">
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList className="grid w-full grid-cols-5">
-                <TabsTrigger value="personal" data-testid="tab-personal">Persoonlijk</TabsTrigger>
-                <TabsTrigger value="address" data-testid="tab-address">Adres</TabsTrigger>
-                <TabsTrigger value="financial" data-testid="tab-financial">Financieel</TabsTrigger>
-                <TabsTrigger value="organization" data-testid="tab-organization">Organisatie</TabsTrigger>
-                <TabsTrigger value="permissions" data-testid="tab-permissions">Toestemmingen</TabsTrigger>
+                <TabsTrigger value="personal" data-testid="tab-personal" className="flex items-center gap-2">
+                  <MdOutlinePermIdentity className="h-4 w-4" />
+                  Persoonlijk
+                </TabsTrigger>
+                <TabsTrigger value="address" data-testid="tab-address" className="flex items-center gap-2">
+                  <GoHome className="h-4 w-4" />
+                  Adres
+                </TabsTrigger>
+                <TabsTrigger value="financial" data-testid="tab-financial" className="flex items-center gap-2">
+                  <CiBank className="h-4 w-4" />
+                  Financieel
+                </TabsTrigger>
+                <TabsTrigger value="organization" data-testid="tab-organization" className="flex items-center gap-2">
+                  <BsBuildings className="h-4 w-4" />
+                  Organisatie
+                </TabsTrigger>
+                <TabsTrigger value="permissions" data-testid="tab-permissions" className="flex items-center gap-2">
+                  <RiCheckboxMultipleLine className="h-4 w-4" />
+                  Toestemmingen
+                </TabsTrigger>
               </TabsList>
 
               <div className="min-h-[420px] py-6">

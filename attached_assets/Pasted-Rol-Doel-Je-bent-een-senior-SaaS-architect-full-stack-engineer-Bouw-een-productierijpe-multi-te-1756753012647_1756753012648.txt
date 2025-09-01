@@ -1,0 +1,533 @@
+Rol & Doel
+Je bent een senior SaaS architect & full-stack engineer. Bouw een productierijpe multi-tenant webapp “Ledenbeheer” voor moskeeën in TypeScript met Next.js (app router), Prisma + PostgreSQL, tRPC/REST, Tailwind + shadcn/ui, Zod, NextAuth (Credentials), Recharts, PWA.
+Taal: Nederlands (België), tijdzone Europe/Brussels.
+Gebruik mijn Figma assets (indien aanwezig) om UI-stijl, iconen en typografie te bepalen; anders gebruik je een zakelijke CRM-stijl.
+
+0) Project setup
+
+Stack:
+
+Next.js 14+ (app/), React 18, TypeScript strict.
+
+Prisma ORM + PostgreSQL.
+
+NextAuth (Credentials) voor login, password hashing (argon2).
+
+RBAC middleware (rollen: SUPERADMIN, BEHEERDER, MEDEWERKER).
+
+TailwindCSS + shadcn/ui (buttons, dialog, drawer, table, tabs, toast).
+
+i18n: nl-BE default; date-fns + tz Europe/Brussels.
+
+Charts: Recharts.
+
+QR: qrcode of qrcode.react.
+
+PWA: manifest + service worker (Workbox of handgeschreven SW).
+
+File storage: lokale /public/uploads (abstracteer in service; makkelijk te vervangen door S3).
+
+Scripts:
+
+dev, build, start
+
+prisma migrate, prisma generate, prisma db seed
+
+lint, test (Vitest/Jest)
+
+Env (.env voorbeeld):
+
+DATABASE_URL=postgresql://user:pass@localhost:5432/ledenbeheer
+NEXTAUTH_SECRET=...
+NEXTAUTH_URL=http://localhost:3000
+SMTP_HOST=...
+SMTP_USER=...
+SMTP_PASS=...
+APP_TIMEZONE=Europe/Brussels
+
+
+Codekwaliteit:
+
+ESLint + Prettier + type-safe tRPC/REST handlers.
+
+Zod validatie op alle forms & APIs.
+
+1) Domein & Data — Prisma schema
+
+Maak prisma/schema.prisma met onderstaande modellen (multi-tenant via tenantId):
+
+datasource db { provider = "postgresql"; url = env("DATABASE_URL") }
+generator client { provider = "prisma-client-js" }
+
+enum Role { SUPERADMIN BEHEERDER MEDEWERKER }
+enum Gender { M V }
+enum MemberCategory { STUDENT VOLWASSEN SENIOR }
+enum PaymentTerm { MONTHLY YEARLY }
+enum PaymentMethod { SEPA OVERSCHRIJVING BANCONTACT CASH }
+enum FeeStatus { OPEN PAID OVERDUE }
+enum ScreenType { BETAALSTATUS MEDEDELINGEN }
+enum CardStatus { ACTUEEL MOMENTOPNAME VERLOPEN }
+enum RuleScope { STEMRECHT VERKIESBAAR FUNCTIE }
+
+model Tenant {
+  id        String  @id @default(cuid())
+  name      String
+  slug      String  @unique
+  logoUrl   String?
+  primaryColor String? // optioneel, branding
+  createdAt DateTime @default(now())
+  users     User[]
+  members   Member[]
+  rules     Rule[]
+  screens   PublicScreen[]
+  announcements Announcement[]
+  fees      MembershipFee[]
+  mandates  Mandate[]
+  transactions Transaction[]
+  notifications Notification[]
+  sepaBatches SEPAExport[]
+}
+
+model User {
+  id        String   @id @default(cuid())
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  name      String
+  email     String   @unique
+  passwordHash String
+  role      Role
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model Member {
+  id           String  @id @default(cuid())
+  tenantId     String
+  tenant       Tenant  @relation(fields: [tenantId], references: [id])
+  memberNumber String  @unique
+  firstName    String
+  lastName     String
+  gender       Gender
+  birthDate    DateTime?
+  category     MemberCategory
+  email        String?
+  phone        String?
+  street       String?
+  number       String?
+  postalCode   String?
+  city         String?
+  country      String?
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  finSettings  MemberFinancialSettings?
+  card         CardMeta?
+  fees         MembershipFee[]
+}
+
+model MemberFinancialSettings {
+  id            String        @id @default(cuid())
+  memberId      String        @unique
+  member        Member        @relation(fields: [memberId], references: [id])
+  paymentMethod PaymentMethod
+  iban          String?
+  paymentTerm   PaymentTerm
+}
+
+model Mandate {
+  id         String   @id @default(cuid())
+  tenantId   String
+  tenant     Tenant   @relation(fields: [tenantId], references: [id])
+  memberId   String
+  member     Member   @relation(fields: [memberId], references: [id])
+  mandateRef String   @unique
+  signedAt   DateTime
+  status     String   // ACTIVE, REVOKED, PENDING
+}
+
+model MembershipFee {
+  id         String       @id @default(cuid())
+  tenantId   String
+  tenant     Tenant       @relation(fields: [tenantId], references: [id])
+  memberId   String
+  member     Member       @relation(fields: [memberId], references: [id])
+  periodStart DateTime
+  periodEnd   DateTime
+  amount     Decimal      @db.Numeric(10,2)
+  status     FeeStatus    @default(OPEN)
+  method     PaymentMethod?
+  paidAt     DateTime?
+  sepaBatchId String?
+  sepaBatch   SEPAExport? @relation(fields: [sepaBatchId], references: [id])
+  createdAt  DateTime     @default(now())
+}
+
+model Transaction {
+  id         String    @id @default(cuid())
+  tenantId   String
+  tenant     Tenant    @relation(fields: [tenantId], references: [id])
+  memberId   String?
+  member     Member?   @relation(fields: [memberId], references: [id])
+  type       String    // INCOME / EXPENSE
+  category   String
+  amount     Decimal   @db.Numeric(10,2)
+  date       DateTime
+  method     PaymentMethod?
+  description String?
+  relatedFeeId String?
+}
+
+model Rule {
+  id         String    @id @default(cuid())
+  tenantId   String
+  tenant     Tenant    @relation(fields: [tenantId], references: [id])
+  name       String
+  description String?
+  scope      RuleScope
+  parameters Json      // bv. {minYears:5, payments:5, consecutive:true, categories:["VOLWASSEN","SENIOR"]}
+  active     Boolean   @default(true)
+  createdAt  DateTime  @default(now())
+}
+
+model RuleOutcome {
+  id        String   @id @default(cuid())
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  ruleId    String
+  rule      Rule     @relation(fields: [ruleId], references: [id])
+  memberId  String
+  member    Member   @relation(fields: [memberId], references: [id])
+  eligible  Boolean
+  evaluatedAt DateTime @default(now())
+}
+
+model PublicScreen {
+  id         String     @id @default(cuid())
+  tenantId   String
+  tenant     Tenant     @relation(fields: [tenantId], references: [id])
+  name       String
+  type       ScreenType
+  active     Boolean    @default(true)
+  config     Json       // bv. {year:2025, showCharts:true}
+  publicToken String    @unique
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
+
+model Announcement {
+  id         String     @id @default(cuid())
+  tenantId   String
+  tenant     Tenant     @relation(fields: [tenantId], references: [id])
+  title      String
+  richText   String?
+  mediaUrl   String?
+  mediaType  String?    // image/video
+  validFrom  DateTime?
+  validTo    DateTime?
+  active     Boolean    @default(true)
+  screenId   String?
+  screen     PublicScreen? @relation(fields: [screenId], references: [id])
+  createdAt  DateTime   @default(now())
+}
+
+model CardMeta {
+  id            String    @id @default(cuid())
+  tenantId      String
+  tenant        Tenant    @relation(fields: [tenantId], references: [id])
+  memberId      String    @unique
+  member        Member    @relation(fields: [memberId], references: [id])
+  version       Int       @default(1)
+  etag          String
+  secureToken   String    @unique
+  qrToken       String    @unique
+  status        CardStatus @default(ACTUEEL)
+  validUntil    DateTime?
+  lastRenderedAt DateTime @default(now())
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  type      String   // finance/system/member
+  title     String
+  body      String?
+  isRead    Boolean  @default(false)
+  userId    String?
+  createdAt DateTime @default(now())
+}
+
+model SEPAExport {
+  id         String   @id @default(cuid())
+  tenantId   String
+  tenant     Tenant   @relation(fields: [tenantId], references: [id])
+  batchRef   String   @unique
+  xml        String
+  totalAmount Decimal @db.Numeric(12,2)
+  numTx      Int
+  status     String   // GENERATED / SUBMITTED
+  createdAt  DateTime @default(now())
+}
+
+
+Voeg prisma/seed.ts toe met een Tenant, Beheerder, enkele Leden + Lidgelden.
+
+2) Auth, RBAC, multi-tenant
+
+NextAuth (Credentials): login met e-mail + wachtwoord (argon2).
+
+Middleware:
+
+Tenant scoping via subdomein of org-selector in session (tenantId).
+
+RBAC guard:
+
+SUPERADMIN: alle tenants.
+
+BEHEERDER: CRUD op leden, lidgelden, financiën, instellingen, regels.
+
+MEDEWERKER: lezen + betaalstatus updaten, publieke schermen bedienen.
+
+Beveiliging: rate limiting op auth endpoints; helmet headers; CSRF via NextAuth.
+
+3) Routes & Pagina’s
+
+App routes (app/):
+
+/login, /reset-password
+
+/dashboard
+
+/leden (lijst, filters), /leden/[id] (detail)
+
+/lidgelden
+
+/financien
+
+/publieke-schermen
+
+/instellingen (tabs: organisatie, branding, lidgelden, beveiliging, organisatieregels)
+
+/profiel
+
+Publiek/extern:
+
+/card/[memberId] → Live Card (PWA), landscape, glossy, status-LED, klikbare QR → modal met grote QR.
+
+/api/card/verify/[qrToken] → JSON (actief/betaald/stemrecht).
+
+/public/screen/[publicToken] → publieke schermen (Betaalstatus matrix of Mededelingen carousel).
+
+API/tRPC Handlers (samenvatting):
+
+Leden: list/create/update/deactivate, import/export.
+
+Lidgelden: list/byMember/create/markPaid/generateRecurring.
+
+Financiën: transactions list/create/import/export, reports.
+
+SEPA: generate PAIN.008 XML per batchRef (config in instellingen).
+
+Rules: CRUD, evaluate all, outcomes per lid.
+
+Screens: CRUD, issue publicToken, render views.
+
+Card: issue/rotate tokens, invalidate on changes, render PNG/PDF (server-side), Live JSON.
+
+4) UI & Interactie (shadcn/ui + Tailwind)
+
+Nav/Sidebar: Dashboard, Leden, Lidgelden, Financiën, Publieke Schermen, Instellingen.
+
+Topbar: zoek, notificaties, profiel.
+
+Tabellen: sticky header, hover highlight, row actions (3-dots).
+
+Modals/Wizards: Nieuw lid (stappen: Persoonlijk, Adres, Financieel, Organisatie, Toestemmingen).
+
+Formvalidatie: Zod schemas; foutweergave onder inputs.
+
+Toasts: compacte bevestigingen.
+
+Als Figma assets aanwezig: extraheers kleur/typografie/iconographie en map naar Tailwind tokens. Anders: zakelijke CRM-stijl (Inter, neutrale grijzen, 1 accentkleur).
+
+5) Businesslogica — Lidgelden & SEPA
+
+Bij nieuw lid: maak direct openstaande fee aan o.b.v. paymentTerm (maandelijks/jaarlijks), bereken periodStart/End.
+
+Automatische inningen: cron/job (Next.js route handler on demand) om volgende perioden aan te maken.
+
+SEPA export:
+
+Genereer PAIN.008 XML voor geselecteerde openstaande fees met paymentMethod=SEPA + geldig Mandate.
+
+Bewaar batch in SEPAExport + link fees → batchRef.
+
+Na bankverwerking: markeer fees PAID (manueel of via import).
+
+Matching betalingen: endpoint voor CSV/MT940/CODA import (basis), UI om te matchen op lidnummer/bedrag/periode.
+
+6) Organisatieregels (Stemrecht, …)
+
+Tab Instellingen → Organisatieregels:
+
+Wizard om regel aan te maken met parameters (minYears, payments, consecutive, categories).
+
+Templates: Stemrecht, Verkiesbaarheid, Actieve rol, Functiebeperkingen.
+
+Voor opslaan: toon natuurlijke taal preview.
+
+Evaluatie job die RuleOutcome per lid bijwerkt; badge in ledenlijst/detail.
+
+7) Digitale Lidkaart — Live Card + PWA
+
+Live Card /card/[memberId]:
+
+Landscape kaart ( ~90–95% van mobiel in landscape ), glossy overlay, status-LED (groen/oranje/rood), naam, lidnummer, categorie, chips “Betaald 20XX”, “Geldig tot dd/mm/jjjj”, optioneel “Stemgerechtigd”.
+
+QR-zone met witte isolatie; klik → modal met grote QR (≥320px).
+
+Ververs-knop: icon spin + diagonale shine sweep animatie (≤800ms, respect prefers-reduced-motion).
+
+Versiebeheer:
+
+CardMeta.etag = hash(member + outcomes + branding.version).
+
+Bij elke relevante wijziging → version++, secureToken & qrToken roteren, caches invalidaten.
+
+PWA:
+
+manifest.webmanifest (name “Digitale Lidkaart”), icons (maskable), start_url=/card/[memberId]?standalone=1, display=standalone.
+
+service-worker: NetworkFirst voor Live Card; QR verify NetworkOnly; offline snapshot met banner “Momentopname”.
+
+Install banner & iOS instructies.
+
+8) Publieke schermen
+
+Beheer /publieke-schermen: lijst, +Nieuw, kopieer URL, (de)activeren.
+
+Type Betaalstatus:
+
+Matrix: rijen = leden, kolommen = maanden jan-dec, ✔/✖, aggregate % betaald, donut chart.
+
+Config: jaar, filters (categorie, actief), opties (toon grafiek ja/nee, verkorte namen).
+
+Type Mededelingen:
+
+Full-screen één mededeling per “slide”, carousel/autoplay.
+
+Rich text + afbeelding/video; geldigheid; activatie.
+
+Publieke view /public/screen/[publicToken]: fullscreen, autosync, toetsen voor pauze/volgende.
+
+9) Financiën
+
+Overzicht: KPI’s (ontvangen/openstaand/achterstallig/saldo), inkomsten vs uitgaven grafiek, top openstaande.
+
+Transacties: tabel (datum, type, categorie, omschrijving, bedrag, methode, lid, status), filters, import/export.
+
+Journaal: debet/credit weergave.
+
+Rapportage: per periode/categorie; export Excel/PDF.
+
+10) Notificaties & Profiel
+
+Notificaties: eigen pagina met filter (finance/system/member), markeer gelezen. Badge in topbar.
+
+Profiel: naam, e-mail, telefoon, adres, lidnummer (indien van toepassing), rol read-only, wachtwoord wijzigen.
+
+11) Forms & Flows — “Nieuw lid”
+
+Velden:
+Persoonlijk: voornaam, achternaam, geslacht (M/V), geboortedatum, e-mail, telefoon.
+Adres: straat, nummer, postcode, stad, land.
+Financieel: betaalmethode (Overschrijving/SEPA/Bancontact/Cash), IBAN, betalingstermijn (maand/jaar).
+Organisatie: rol/functie, interesse actieve rol (ja/nee), wat kan je betekenen (tekst).
+Toestemmingen: privacyverklaring, foto/video, nieuwsbrief, WhatsApp (checkboxen).
+Extra: lidnummer automatisch; mandaatID intern (niet tonen in tabellen).
+
+Flow: opslaan → openstaande fee genereren → Live Card initialiseren → regels evalueren → notificatie “Nieuw lid aangemaakt”.
+
+Optioneel: eID-import stap (indien later: abstraheer als service, mock UI).
+
+12) Figma integratie (indien assets geüpload)
+
+Lees aangeleverde SVG’s/typografie/kleur; zet om naar Tailwind tokens.
+
+Hanteer dezelfde visuele hiërarchie (kopgroottes, card-layout, tabel-style).
+
+Als er specifieke frames zijn (screenshots/JSON), spiegel die grids en spacings.
+
+Als niets aanwezig is: enterprise CRM-stijl (Inter, neutraal, 1 accentkleur), geen speelse elementen.
+
+13) Toegankelijkheid, performance, tests
+
+WCAG AA contrast; focus-visible; ARIA labels voor icon-buttons.
+
+LCP < 2.5s; code-splitting; beeldoptimalisatie.
+
+Unit tests: services (SEPA generator, rules evaluator, fees scheduler).
+
+E2E smoke (Playwright of Cypress) voor login → ledenlijst → nieuw lid → fee aangemaakt.
+
+14) Deliverables
+
+Volledige Next.js codebase met bovenstaande modules.
+
+README.md met setup (env, migraties, seed, run).
+
+Seed data (1 tenant, 1 beheerder, enkele leden/fees/screen).
+
+Export functies (Excel/PDF), SEPA XML generator met voorbeeldbestand.
+
+PWA Live Card + publieke schermen werkend.
+
+RBAC afdwinging en multi-tenant scoping.
+
+15) Acceptatiecriteria (must pass)
+
+Inloggen werkt; RBAC & tenant scoping actief.
+
+Ledenlijst + “Nieuw lid” wizard met alle velden; bij opslaan ontstaat openstaande fee.
+
+Lidgelden: overzicht/filters; markeer betaald; SEPA batch XML genereren.
+
+Financiën: transacties/rapportage/exports.
+
+Organisatieregels: template Stemrecht; evaluatie zichtbaar bij leden (badge).
+
+Digitale Live Card: status-LED, klikbare QR → modal, ververs-animatie, PWA installable, versiebeheer.
+
+Publieke schermen: BETAALSTATUS matrix + MEDEDELINGEN carousel; publieke URL’s werken.
+
+Notificaties & Profiel pagina’s compleet.
+
+A11y & tests: basis unit tests groen; README instructies kloppen.
+
+16) Bouw nu stap voor stap
+
+Initialiseer project + Tailwind + shadcn/ui.
+
+Prisma schema → migratie → seed.
+
+Auth + RBAC middleware.
+
+Sidebar routes en lege pagina’s.
+
+Ledenbeheer + wizard.
+
+Lidgelden + SEPA generator.
+
+Regels + evaluatie.
+
+Live Card + PWA + QR verify.
+
+Publieke schermen.
+
+Financiën + exports.
+
+Notificaties + profiel.
+
+Polishing + tests + README.
+
+Belangrijk: alles in Nederlands (België); datumformaten dd-mm-jjjj; tijdzone Europe/Brussels.
+Gebruik env-veilige config, geen harde secrets.

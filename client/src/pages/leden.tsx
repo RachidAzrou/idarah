@@ -32,7 +32,7 @@ export default function Leden() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
-  const [votingRightsFilter, setVotingRightsFilter] = useState("all");
+  const [votingRightsFilter, setVotingRightsFilter] = useState("");
   const [joinDateFrom, setJoinDateFrom] = useState<Date | undefined>();
   const [joinDateTo, setJoinDateTo] = useState<Date | undefined>();
   const [paymentStatusFilter, setPaymentStatusFilter] = useState("all");
@@ -82,7 +82,7 @@ export default function Leden() {
       const categoryMatch = categoryFilter === "all" || member.category === categoryFilter;
       
       // Voting rights filter (based on age and category)
-      const votingRightsMatch = votingRightsFilter === "all" || 
+      const votingRightsMatch = votingRightsFilter === "" || 
         (votingRightsFilter === "yes" && (member.category === "VOLWASSEN" || member.category === "SENIOR")) ||
         (votingRightsFilter === "no" && (member.category === "STUDENT" || member.category === "JEUGD"));
       
@@ -184,7 +184,7 @@ export default function Leden() {
     setSearchTerm("");
     setStatusFilter("all");
     setCategoryFilter("all");
-    setVotingRightsFilter("all");
+    setVotingRightsFilter("");
     setJoinDateFrom(undefined);
     setJoinDateTo(undefined);
     setPaymentStatusFilter("all");

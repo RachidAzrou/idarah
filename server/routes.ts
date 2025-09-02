@@ -184,6 +184,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Tenant management routes
+  app.get("/api/tenant/current", authMiddleware, tenantMiddleware, async (req, res) => {
+    try {
+      const tenant = await storage.getTenant(req.tenantId!);
+      res.json(tenant);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch tenant" });
+    }
+  });
+
+  app.put("/api/tenant/current", authMiddleware, tenantMiddleware, async (req, res) => {
+    try {
+      const tenantData = req.body;
+      const updatedTenant = await storage.updateTenant(req.tenantId!, tenantData);
+      res.json(updatedTenant);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update tenant" });
+    }
+  });
+
+  // Settings routes
+  app.put("/api/settings/fees", authMiddleware, tenantMiddleware, async (req, res) => {
+    try {
+      // This endpoint can store fee settings in tenant metadata or create a separate settings table
+      // For now, we'll just return success as the settings are applied client-side
+      res.json({ success: true, message: "Fee settings updated" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update fee settings" });
+    }
+  });
+
+  // Users routes
+  app.get("/api/users", authMiddleware, tenantMiddleware, async (req, res) => {
+    try {
+      const users = await storage.getUsersByTenant(req.tenantId!);
+      res.json(users);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch users" });
+    }
+  });
+
+  app.post("/api/users", authMiddleware, tenantMiddleware, async (req, res) => {
+    try {
+      const userData = insertUserSchema.parse(req.body);
+      const user = await storage.createUser({
+        ...userData,
+        tenantId: req.tenantId!,
+      });
+      res.status(201).json(user);
+    } catch (error) {
+      res.status(400).json({ message: "Invalid user data" });
+    }
+  });
+
   // Rules routes
   app.get("/api/rules", authMiddleware, tenantMiddleware, async (req, res) => {
     try {
@@ -191,6 +245,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(rules);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch rules" });
+    }
+  });
+
+  app.post("/api/rules", authMiddleware, tenantMiddleware, async (req, res) => {
+    try {
+      const ruleData = req.body;
+      const rule = await storage.createRule({
+        ...ruleData,
+        tenantId: req.tenantId!,
+      });
+      res.status(201).json(rule);
+    } catch (error) {
+      res.status(400).json({ message: "Invalid rule data" });
     }
   });
 

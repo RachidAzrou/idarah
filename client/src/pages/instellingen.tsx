@@ -110,22 +110,44 @@ export default function Instellingen() {
   const organizationForm = useForm<OrganizationFormData>({
     resolver: zodResolver(organizationSchema),
     defaultValues: {
-      name: tenant?.name || "",
-      slug: tenant?.slug || "",
-      street: tenant?.street || "",
-      number: tenant?.number || "",
-      postalCode: tenant?.postalCode || "",
-      city: tenant?.city || "",
-      country: tenant?.country || "België",
-      email: tenant?.email || "",
-      phone: tenant?.phone || "",
-      website: tenant?.website || "",
-      companyNumber: tenant?.companyNumber || "",
-      companyType: tenant?.companyType || undefined,
-      logoUrl: tenant?.logoUrl || "",
-      primaryColor: tenant?.primaryColor || "#6366f1",
+      name: "",
+      slug: "",
+      street: "",
+      number: "",
+      postalCode: "",
+      city: "",
+      country: "België",
+      email: "",
+      phone: "",
+      website: "",
+      companyNumber: "",
+      companyType: undefined,
+      logoUrl: "",
+      primaryColor: "#6366f1",
     },
   });
+
+  // Reset form when tenant data loads
+  useEffect(() => {
+    if (tenant) {
+      organizationForm.reset({
+        name: tenant.name || "",
+        slug: tenant.slug || "",
+        street: tenant.street || "",
+        number: tenant.number || "",
+        postalCode: tenant.postalCode || "",
+        city: tenant.city || "",
+        country: tenant.country || "België",
+        email: tenant.email || "",
+        phone: tenant.phone || "",
+        website: tenant.website || "",
+        companyNumber: tenant.companyNumber || "",
+        companyType: tenant.companyType || undefined,
+        logoUrl: tenant.logoUrl || "",
+        primaryColor: tenant.primaryColor || "#6366f1",
+      });
+    }
+  }, [tenant, organizationForm]);
 
   const feeForm = useForm<MembershipFeeFormData>({
     resolver: zodResolver(membershipFeeSchema),

@@ -1,0 +1,372 @@
+/* Chart 18 */
+
+position: relative;
+width: 622.86px;
+height: 473.28px;
+
+
+
+/* Container */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+/* Neutral Colors/White */
+background: #FFFFFF;
+/* General Shadows/Shadow 01 */
+box-shadow: 0px 2px 6px rgba(13, 10, 44, 0.08);
+border-radius: 20px;
+
+
+/* Identifiers */
+
+position: absolute;
+left: 60.32%;
+right: 10.27%;
+top: 52.11%;
+bottom: 19.15%;
+
+
+
+/* Label 3 */
+
+position: absolute;
+left: 60.32%;
+right: 10.27%;
+top: 76.62%;
+bottom: 19.15%;
+
+
+
+/* Development team */
+
+position: absolute;
+left: 63.89%;
+right: 10.27%;
+top: 76.62%;
+bottom: 19.15%;
+
+/* Text single/400/Regular */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 18px;
+line-height: 20px;
+/* identical to box height, or 111% */
+
+/* Neutral Colors/Text Gray */
+color: #615E83;
+
+
+
+/* Identifier */
+
+position: absolute;
+left: 60.32%;
+right: 37.4%;
+top: 77.23%;
+bottom: 19.76%;
+
+/* Primary Colors/Purple */
+background: #4A3AFF;
+
+
+/* Label 2 */
+
+position: absolute;
+left: 60.32%;
+right: 14.76%;
+top: 64.37%;
+bottom: 31.41%;
+
+
+
+/* Marketing team */
+
+position: absolute;
+left: 63.89%;
+right: 14.76%;
+top: 64.37%;
+bottom: 31.41%;
+
+/* Text single/400/Regular */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 18px;
+line-height: 20px;
+/* identical to box height, or 111% */
+
+/* Neutral Colors/Text Gray */
+color: #615E83;
+
+
+
+/* Identifier */
+
+position: absolute;
+left: 60.32%;
+right: 37.4%;
+top: 64.98%;
+bottom: 32.02%;
+
+/* System Colors/Blue 200 */
+background: #C6D2FD;
+
+
+/* Label 1 */
+
+position: absolute;
+left: 60.32%;
+right: 17.65%;
+top: 52.11%;
+bottom: 43.66%;
+
+
+
+/* Product team */
+
+position: absolute;
+left: 63.89%;
+right: 17.65%;
+top: 52.11%;
+bottom: 43.66%;
+
+/* Text single/400/Regular */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 18px;
+line-height: 20px;
+/* identical to box height, or 111% */
+
+/* Neutral Colors/Text Gray */
+color: #615E83;
+
+
+
+/* Identifier */
+
+position: absolute;
+left: 60.32%;
+right: 37.4%;
+top: 52.72%;
+bottom: 44.27%;
+
+/* System Colors/Magenta 400 */
+background: #962DFF;
+
+
+/* Amount */
+
+position: absolute;
+left: 59.87%;
+right: 11.39%;
+top: 34.15%;
+bottom: 54.86%;
+
+/* Special Headings/Display 3 */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 700;
+font-size: 44px;
+line-height: 52px;
+/* identical to box height, or 118% */
+
+/* Neutral Colors/Black */
+color: #1E1B39;
+
+
+
+/* Pie Chart */
+
+position: absolute;
+left: 8.29%;
+right: 48.16%;
+top: 30%;
+bottom: 12.68%;
+
+
+
+/* Out */
+
+position: absolute;
+left: 8.29%;
+right: 48.16%;
+top: 30%;
+bottom: 12.68%;
+
+
+
+/* Out Circle */
+
+box-sizing: border-box;
+
+position: absolute;
+left: 8.58%;
+right: 48.44%;
+top: 30.53%;
+bottom: 12.91%;
+
+/* Neutral Colors/500 */
+border: 8.51899px solid #E5E5EF;
+
+
+/* Out Fill */
+
+box-sizing: border-box;
+
+position: absolute;
+left: 8.29%;
+right: 48.16%;
+top: 30%;
+bottom: 12.68%;
+
+/* System Colors/Magenta 400 */
+border: 8.51899px solid #962DFF;
+border-radius: 14.1983px;
+
+
+/* Medium */
+
+position: absolute;
+left: 13.43%;
+right: 53.29%;
+top: 37.28%;
+bottom: 19.73%;
+
+
+
+/* Medium Crcle */
+
+box-sizing: border-box;
+
+position: absolute;
+left: 13.8%;
+right: 53.67%;
+top: 37.4%;
+bottom: 19.79%;
+
+/* Neutral Colors/500 */
+border: 8.51899px solid #E5E5EF;
+
+
+/* Medium Fill */
+
+box-sizing: border-box;
+
+position: absolute;
+left: 13.43%;
+right: 53.29%;
+top: 37.28%;
+bottom: 19.73%;
+
+/* System Colors/Blue 200 */
+border: 14.1983px solid #C6D2FD;
+border-radius: 14.1983px;
+
+
+/* Inner */
+
+position: absolute;
+left: 19.02%;
+right: 58.88%;
+top: 44.36%;
+bottom: 26.82%;
+
+
+
+/* Inner Circle */
+
+box-sizing: border-box;
+
+position: absolute;
+left: 19.15%;
+right: 59.01%;
+top: 44.43%;
+bottom: 26.82%;
+
+/* Neutral Colors/500 */
+border: 8.51899px solid #E5E5EF;
+
+
+/* Inner Fill */
+
+box-sizing: border-box;
+
+position: absolute;
+left: 19.02%;
+right: 58.88%;
+top: 44.36%;
+bottom: 27.08%;
+
+/* Primary Colors/Purple */
+border: 14.1983px solid #4A3AFF;
+border-radius: 14.1983px;
+
+
+/* Divider */
+
+position: absolute;
+left: 5.14%;
+right: 5.14%;
+top: 22.4%;
+bottom: 77.6%;
+
+/* Neutral Colors/500 */
+border: 1px solid #E5E5EF;
+
+
+/* Card Info. */
+
+position: absolute;
+left: 5.14%;
+right: 73.67%;
+top: 6.76%;
+bottom: 82.25%;
+
+
+
+/* Card Title */
+
+position: absolute;
+left: 5.14%;
+right: 73.67%;
+top: 11.83%;
+bottom: 82.25%;
+
+/* Headings/H4 */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 700;
+font-size: 22px;
+line-height: 28px;
+/* identical to box height, or 127% */
+
+/* Neutral Colors/Black */
+color: #1E1B39;
+
+
+
+/* Type Card */
+
+position: absolute;
+left: 5.14%;
+right: 82.18%;
+top: 6.76%;
+bottom: 89.01%;
+
+/* Text single/400/Regular */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 18px;
+line-height: 20px;
+/* identical to box height, or 111% */
+
+/* Neutral Colors/400 */
+color: #9291A5;
+

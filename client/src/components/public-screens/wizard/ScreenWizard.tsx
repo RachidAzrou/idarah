@@ -9,6 +9,7 @@ import { TypeSelectionStep } from "./steps/TypeSelectionStep";
 import { DescriptionStep } from "./steps/DescriptionStep";
 import { StylingStep } from "./steps/StylingStep";
 import { LedenlijstConfigStep } from "./steps/LedenlijstConfigStep";
+import { MededelingenConfigStep } from "./steps/MededelingenConfigStep";
 
 interface ScreenWizardProps {
   open: boolean;
@@ -34,6 +35,27 @@ interface WizardData {
     rowsPerPage: number;
     year: number;
     categories: string[];
+  };
+  mededelingenSettings?: {
+    slides: Array<{
+      id: string;
+      title: string;
+      body?: string;
+      mediaUrl?: string;
+      mediaType?: 'image' | 'video';
+      active: boolean;
+      durationSec: number;
+    }>;
+    autoplay: {
+      enabled: boolean;
+      interval: number;
+      order: 'date' | 'manual' | 'shuffle';
+    };
+    style: {
+      textColor: string;
+      backgroundColor: string;
+      maxTextWidth: number;
+    };
   };
 }
 
@@ -70,6 +92,8 @@ export function ScreenWizard({ open, onOpenChange, onComplete }: ScreenWizardPro
     
     if (wizardData.type === 'LEDENLIJST') {
       baseSteps.push({ title: "Configuratie", component: LedenlijstConfigStep });
+    } else if (wizardData.type === 'MEDEDELINGEN') {
+      baseSteps.push({ title: "Berichten", component: MededelingenConfigStep });
     }
     
     return baseSteps;
@@ -83,7 +107,10 @@ export function ScreenWizard({ open, onOpenChange, onComplete }: ScreenWizardPro
       case 0: return !!wizardData.type;
       case 1: return wizardData.name.length > 0;
       case 2: return wizardData.title.text.length > 0;
-      case 3: return wizardData.type !== 'LEDENLIJST' || !!wizardData.ledenlijstSettings;
+      case 3: 
+        if (wizardData.type === 'LEDENLIJST') return !!wizardData.ledenlijstSettings;
+        if (wizardData.type === 'MEDEDELINGEN') return !!wizardData.mededelingenSettings && wizardData.mededelingenSettings.slides.length > 0;
+        return true;
       default: return true;
     }
   };
@@ -121,16 +148,16 @@ export function ScreenWizard({ open, onOpenChange, onComplete }: ScreenWizardPro
         description: wizardData.description,
         title: wizardData.title,
         subtitle: wizardData.subtitle,
-        slides: [],
-        autoplay: {
+        slides: wizardData.mededelingenSettings?.slides || [],
+        autoplay: wizardData.mededelingenSettings?.autoplay || {
           enabled: true,
           interval: 8,
           order: 'date'
         },
         style: {
-          textContrast: 'light',
-          background: 'black',
-          maxTextWidth: 800
+          textContrast: wizardData.mededelingenSettings?.style.textColor === '#ffffff' ? 'light' : 'dark',
+          background: wizardData.mededelingenSettings?.style.backgroundColor === '#ffffff' ? 'white' : 'black',
+          maxTextWidth: wizardData.mededelingenSettings?.style.maxTextWidth || 800
         }
       } as MededelingenConfig;
     } else {

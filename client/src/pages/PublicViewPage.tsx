@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "wouter";
 import { LedenlijstView } from "@/components/public-view/LedenlijstView";
+import { MededelingenView } from "@/components/public-view/MededelingenView";
 import { publicScreensStore } from "@/lib/mock/public-screens";
 
 export function PublicViewPage() {
@@ -95,50 +96,7 @@ export function PublicViewPage() {
       
       case 'MEDEDELINGEN':
         return (
-          <div 
-            className="min-h-screen bg-background p-8 relative"
-            style={{
-              backgroundImage: `url(/background.jpg)`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              backgroundRepeat: 'no-repeat'
-            }}
-          >
-            {/* Overlay to make background subtle */}
-            <div className="absolute inset-0 bg-white/95 backdrop-blur-md"></div>
-            <div className="max-w-4xl mx-auto text-center relative z-10">
-              <div className="bg-card rounded-2xl p-8 shadow-sm border border-border hover:shadow-md transition-shadow duration-200">
-                <h1 
-                  style={{
-                    fontSize: `${screen.config?.title?.fontSize || 36}px`,
-                    fontFamily: screen.config?.title?.fontFamily || 'Poppins',
-                    color: screen.config?.title?.color || '#1f2937',
-                    fontWeight: screen.config?.title?.fontWeight || 'bold'
-                  }}
-                  className="mb-4 text-card-foreground"
-                >
-                  {screen.config?.title?.text || screen.name}
-                </h1>
-                {screen.config?.subtitle?.text && (
-                  <h2
-                    style={{
-                      fontSize: `${screen.config?.subtitle?.fontSize || 24}px`,
-                      fontFamily: screen.config?.subtitle?.fontFamily || 'Poppins',
-                      color: screen.config?.subtitle?.color || '#6b7280',
-                      fontWeight: screen.config?.subtitle?.fontWeight || 'normal'
-                    }}
-                    className="mb-6 text-muted-foreground"
-                  >
-                    {screen.config?.subtitle?.text}
-                  </h2>
-                )}
-                <div className="text-muted-foreground">
-                  <p className="text-lg mb-2">📢 Mededelingen Scherm</p>
-                  <p className="text-sm">Automatische verversing elke 5 minuten</p>
-                </div>
-              </div>
-            </div>
-          </div>
+          <MededelingenView config={screen.config} />
         );
       
       case 'MULTIMEDIA':

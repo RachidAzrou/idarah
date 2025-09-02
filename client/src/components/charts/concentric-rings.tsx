@@ -39,9 +39,6 @@ export function ConcentricRings({ categories, size = 280 }: ConcentricRingsProps
   const strokeWidth = 14;
   const startAngle = -90; // Start at 12 o'clock
 
-  // Filter categories with data
-  const validCategories = categories.filter(cat => cat.count > 0 && cat.percent > 0);
-
   return (
     <div className="flex items-center justify-center">
       <svg 
@@ -52,8 +49,8 @@ export function ConcentricRings({ categories, size = 280 }: ConcentricRingsProps
         aria-label="Leden per categorie"
         className="drop-shadow-sm"
       >
-        {/* Background tracks - only show for categories with data */}
-        {validCategories.map((category, index) => {
+        {/* Background tracks - show all rings */}
+        {categories.map((category, index) => {
           const radius = radii[index];
           return (
             <circle
@@ -68,9 +65,15 @@ export function ConcentricRings({ categories, size = 280 }: ConcentricRingsProps
           );
         })}
         
-        {/* Progress arcs */}
-        {validCategories.map((category, index) => {
+        {/* Progress arcs - show arcs for categories with data */}
+        {categories.map((category, index) => {
           const radius = radii[index];
+          
+          // Skip categories with no data
+          if (category.percent === 0 || category.count === 0) {
+            return null;
+          }
+          
           const sweep = Math.min((category.percent / 100) * 360, 360);
           const endAngle = startAngle + sweep;
           const pathData = describeArc(center, center, radius, startAngle, endAngle);

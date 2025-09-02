@@ -59,7 +59,8 @@ export default function PubliekeSchermen() {
         });
         
         // Invalidate and refetch the screens data
-        queryClient.invalidateQueries({ queryKey: ["/api/public-screens"] });
+        await queryClient.invalidateQueries({ queryKey: ["/api/public-screens"] });
+        await queryClient.refetchQueries({ queryKey: ["/api/public-screens"] });
         setShowNewScreenDialog(false);
       } else {
         const errorData = await response.json();
@@ -79,8 +80,9 @@ export default function PubliekeSchermen() {
       const response = await apiRequest("PUT", `/api/public-screens/${id}`, { active });
       return response.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/public-screens"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["/api/public-screens"] });
+      await queryClient.refetchQueries({ queryKey: ["/api/public-screens"] });
       toast({
         title: "Status gewijzigd",
         description: "De schermstatus is bijgewerkt.",
@@ -93,8 +95,9 @@ export default function PubliekeSchermen() {
       const response = await apiRequest("DELETE", `/api/public-screens/${id}`);
       return response.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/public-screens"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["/api/public-screens"] });
+      await queryClient.refetchQueries({ queryKey: ["/api/public-screens"] });
       toast({
         title: "Scherm verwijderd",
         description: "Het scherm is succesvol verwijderd.",

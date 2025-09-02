@@ -56,8 +56,9 @@ export default function Leden() {
       const response = await apiRequest("PUT", `/api/members/${id}`, data);
       return response.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/members"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["/api/members"] });
+      await queryClient.refetchQueries({ queryKey: ["/api/members"] });
       toast({
         title: "Lid bijgewerkt",
         description: "De wijzigingen zijn opgeslagen.",
@@ -70,9 +71,11 @@ export default function Leden() {
       const response = await apiRequest("DELETE", `/api/members/${memberId}`);
       return response;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/members"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["/api/members"] });
+      await queryClient.refetchQueries({ queryKey: ["/api/members"] });
+      await queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
+      await queryClient.refetchQueries({ queryKey: ["/api/dashboard/stats"] });
       toast({
         title: "Lid verwijderd",
         description: "Het lid is permanent verwijderd uit het systeem.",
@@ -104,8 +107,11 @@ export default function Leden() {
       
       return importedMembers;
     },
-    onSuccess: (importedMembers) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/members"] });
+    onSuccess: async (importedMembers) => {
+      await queryClient.invalidateQueries({ queryKey: ["/api/members"] });
+      await queryClient.refetchQueries({ queryKey: ["/api/members"] });
+      await queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
+      await queryClient.refetchQueries({ queryKey: ["/api/dashboard/stats"] });
       toast({
         title: "Import voltooid",
         description: `${importedMembers.length} leden succesvol geïmporteerd.`,

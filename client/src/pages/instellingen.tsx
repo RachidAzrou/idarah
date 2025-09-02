@@ -216,8 +216,9 @@ export default function Instellingen() {
       const response = await apiRequest("PUT", "/api/tenant/current", data);
       return response.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/tenant/current"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["/api/tenant/current"] });
+      await queryClient.refetchQueries({ queryKey: ["/api/tenant/current"] });
       setOrganizationSaved(true);
       toast({
         title: "Organisatie bijgewerkt",
@@ -249,8 +250,9 @@ export default function Instellingen() {
       const response = await apiRequest("POST", "/api/users", data);
       return response.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+      await queryClient.refetchQueries({ queryKey: ["/api/users"] });
       setShowNewUserDialog(false);
       userForm.reset();
       toast({
@@ -274,8 +276,9 @@ export default function Instellingen() {
       const response = await apiRequest("POST", "/api/rules", ruleData);
       return response.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/rules"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["/api/rules"] });
+      await queryClient.refetchQueries({ queryKey: ["/api/rules"] });
       setShowNewRuleDialog(false);
       ruleForm.reset();
       toast({

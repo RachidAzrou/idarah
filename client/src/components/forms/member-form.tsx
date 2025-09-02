@@ -118,9 +118,11 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
       const response = await apiRequest("POST", "/api/members", data);
       return response.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/members"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["/api/members"] });
+      await queryClient.refetchQueries({ queryKey: ["/api/members"] });
+      await queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
+      await queryClient.refetchQueries({ queryKey: ["/api/dashboard/stats"] });
       toast({
         title: "Lid aangemaakt",
         description: "Het nieuwe lid is succesvol toegevoegd.",

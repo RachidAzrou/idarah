@@ -136,8 +136,11 @@ export default function Lidgelden() {
       const response = await apiRequest("PUT", `/api/fees/${feeId}/mark-paid`, {});
       return response.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/fees"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["/api/fees"] });
+      await queryClient.refetchQueries({ queryKey: ["/api/fees"] });
+      await queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
+      await queryClient.refetchQueries({ queryKey: ["/api/dashboard/stats"] });
       toast({
         title: "Lidgeld gemarkeerd als betaald",
         description: "De betaalstatus is bijgewerkt.",

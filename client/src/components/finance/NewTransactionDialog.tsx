@@ -61,9 +61,11 @@ export function NewTransactionDialog({
       const response = await apiRequest("POST", "/api/transactions", data);
       return response.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/transactions"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["/api/transactions"] });
+      await queryClient.refetchQueries({ queryKey: ["/api/transactions"] });
+      await queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
+      await queryClient.refetchQueries({ queryKey: ["/api/dashboard/stats"] });
       toast({
         title: "Transactie toegevoegd",
         description: "De transactie is succesvol toegevoegd.",
@@ -86,9 +88,11 @@ export function NewTransactionDialog({
       const response = await apiRequest("PUT", `/api/transactions/${editTransaction.id}`, data);
       return response.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/transactions"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["/api/transactions"] });
+      await queryClient.refetchQueries({ queryKey: ["/api/transactions"] });
+      await queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
+      await queryClient.refetchQueries({ queryKey: ["/api/dashboard/stats"] });
       toast({
         title: "Transactie bijgewerkt",
         description: "De transactie is succesvol bijgewerkt.",

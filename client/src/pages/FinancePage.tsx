@@ -170,8 +170,11 @@ export default function FinancePage() {
       const response = await apiRequest("DELETE", `/api/transactions/${transactionId}`, {});
       return response.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/transactions"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["/api/transactions"] });
+      await queryClient.refetchQueries({ queryKey: ["/api/transactions"] });
+      await queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
+      await queryClient.refetchQueries({ queryKey: ["/api/dashboard/stats"] });
       toast({
         title: "Transactie verwijderd",
         description: "De transactie is succesvol verwijderd.",

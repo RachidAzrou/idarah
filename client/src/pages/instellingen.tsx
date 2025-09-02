@@ -366,29 +366,31 @@ export default function Instellingen() {
                       </div>
                     </div>
 
-                    <div>
-                      <FormField
-                        control={organizationForm.control}
-                        name="primaryColor"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Primaire Kleur</FormLabel>
-                            <div className="flex items-center space-x-4">
-                              <FormControl>
-                                <Input type="color" {...field} className="w-20 h-10" data-testid="input-primary-color" />
-                              </FormControl>
-                              <FormControl>
-                                <Input {...field} placeholder="#6366f1" className="font-mono" data-testid="input-color-hex" />
-                              </FormControl>
-                            </div>
-                            <FormDescription>
-                              Deze kleur wordt gebruikt voor knoppen, accenten en branding elementen
-                            </FormDescription>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
+                    <Form {...organizationForm}>
+                      <form onSubmit={organizationForm.handleSubmit(onOrganizationSubmit)}>
+                        <FormField
+                          control={organizationForm.control}
+                          name="primaryColor"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Primaire Kleur</FormLabel>
+                              <div className="flex items-center space-x-4">
+                                <FormControl>
+                                  <Input type="color" {...field} className="w-20 h-10" data-testid="input-primary-color" />
+                                </FormControl>
+                                <FormControl>
+                                  <Input {...field} placeholder="#6366f1" className="font-mono" data-testid="input-color-hex" />
+                                </FormControl>
+                              </div>
+                              <FormDescription>
+                                Deze kleur wordt gebruikt voor knoppen, accenten en branding elementen
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </form>
+                    </Form>
 
                     <div className="pt-4 border-t">
                       <h4 className="font-medium mb-4">Kleur Voorvertoning</h4>

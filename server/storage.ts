@@ -241,20 +241,6 @@ export class DatabaseStorage implements IStorage {
     return updatedRule;
   }
 
-  // Dashboard Stats
-  async getDashboardStats(tenantId: string) {
-    const totalMembers = await db.select({ count: sql<number>`count(*)` }).from(members).where(eq(members.tenantId, tenantId));
-    const activeMembers = await db.select({ count: sql<number>`count(*)` }).from(members).where(and(eq(members.tenantId, tenantId), eq(members.status, 'ACTIVE')));
-    const openFees = await db.select({ total: sql<number>`coalesce(sum(amount), 0)` }).from(membershipFees).where(and(eq(membershipFees.tenantId, tenantId), eq(membershipFees.status, 'OPEN')));
-    const thisMonthIncome = await db.select({ total: sql<number>`coalesce(sum(amount), 0)` }).from(transactions).where(and(eq(transactions.tenantId, tenantId), eq(transactions.type, 'INCOME'), sql`date >= date_trunc('month', current_date)`));
-    
-    return {
-      totalMembers: totalMembers[0]?.count || 0,
-      activeMembers: activeMembers[0]?.count || 0,
-      openPayments: openFees[0]?.total || 0,
-      monthlyIncome: thisMonthIncome[0]?.total || 0
-    };
-  }
 
   // Rule Outcomes
   async getRuleOutcomesByMember(memberId: string): Promise<RuleOutcome[]> {
@@ -359,7 +345,7 @@ export class DatabaseStorage implements IStorage {
 
     const [activeMembersResult] = await db.select({ count: sql<number>`count(*)` })
       .from(members)
-      .where(and(eq(members.tenantId, tenantId), eq(members.isActive, true)));
+      .where(and(eq(members.tenantId, tenantId), eq(members.active, true)));
 
     const [totalRevenueResult] = await db.select({ sum: sql<number>`coalesce(sum(amount), 0)` })
       .from(membershipFees)

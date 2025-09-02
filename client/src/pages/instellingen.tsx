@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -86,6 +86,8 @@ export default function Instellingen() {
   const [activeTab, setActiveTab] = useState("organization");
   const [showNewUserDialog, setShowNewUserDialog] = useState(false);
   const [showNewRuleDialog, setShowNewRuleDialog] = useState(false);
+  const [organizationSaved, setOrganizationSaved] = useState(false);
+  const [feesSaved, setFeesSaved] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -125,6 +127,22 @@ export default function Instellingen() {
     },
   });
 
+  // Watch for form changes to enable/disable save buttons
+  const organizationFormValues = organizationForm.watch();
+  const feeFormValues = feeForm.watch();
+
+  useEffect(() => {
+    if (organizationSaved) {
+      setOrganizationSaved(false);
+    }
+  }, [organizationFormValues]);
+
+  useEffect(() => {
+    if (feesSaved) {
+      setFeesSaved(false);
+    }
+  }, [feeFormValues]);
+
   const feeForm = useForm<MembershipFeeFormData>({
     resolver: zodResolver(membershipFeeSchema),
     defaultValues: {
@@ -160,6 +178,7 @@ export default function Instellingen() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/tenant/current"] });
+      setOrganizationSaved(true);
       toast({
         title: "Organisatie bijgewerkt",
         description: "De organisatie-instellingen zijn succesvol bijgewerkt.",
@@ -173,6 +192,7 @@ export default function Instellingen() {
       return response.json();
     },
     onSuccess: () => {
+      setFeesSaved(true);
       toast({
         title: "Lidgeld instellingen bijgewerkt",
         description: "De standaard lidgeld instellingen zijn opgeslagen.",
@@ -529,7 +549,7 @@ export default function Instellingen() {
                         <div className="flex justify-end">
                           <Button
                             type="submit"
-                            disabled={updateOrganizationMutation.isPending}
+                            disabled={updateOrganizationMutation.isPending || organizationSaved}
                             data-testid="button-save-organization"
                           >
                             <Save className="h-4 w-4 mr-2" />
@@ -659,7 +679,7 @@ export default function Instellingen() {
                         <div className="flex justify-end">
                           <Button
                             type="submit"
-                            disabled={updateFeeSettingsMutation.isPending}
+                            disabled={updateFeeSettingsMutation.isPending || feesSaved}
                             data-testid="button-save-fees"
                           >
                             <Save className="h-4 w-4 mr-2" />

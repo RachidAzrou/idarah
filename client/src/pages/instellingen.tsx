@@ -129,22 +129,22 @@ export default function Instellingen() {
 
   // Reset form when tenant data loads
   useEffect(() => {
-    if (tenant) {
+    if (tenant && typeof tenant === 'object') {
       organizationForm.reset({
-        name: tenant.name || "",
-        slug: tenant.slug || "",
-        street: tenant.street || "",
-        number: tenant.number || "",
-        postalCode: tenant.postalCode || "",
-        city: tenant.city || "",
-        country: tenant.country || "België",
-        email: tenant.email || "",
-        phone: tenant.phone || "",
-        website: tenant.website || "",
-        companyNumber: tenant.companyNumber || "",
-        companyType: tenant.companyType || undefined,
-        logoUrl: tenant.logoUrl || "",
-        primaryColor: tenant.primaryColor || "#6366f1",
+        name: (tenant as any).name || "",
+        slug: (tenant as any).slug || "",
+        street: (tenant as any).street || "",
+        number: (tenant as any).number || "",
+        postalCode: (tenant as any).postalCode || "",
+        city: (tenant as any).city || "",
+        country: (tenant as any).country || "België",
+        email: (tenant as any).email || "",
+        phone: (tenant as any).phone || "",
+        website: (tenant as any).website || "",
+        companyNumber: (tenant as any).companyNumber || "",
+        companyType: (tenant as any).companyType || undefined,
+        logoUrl: (tenant as any).logoUrl || "",
+        primaryColor: (tenant as any).primaryColor || "#6366f1",
       });
     }
   }, [tenant, organizationForm]);

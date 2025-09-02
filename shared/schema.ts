@@ -79,15 +79,9 @@ export const members = pgTable("members", {
 export const memberFinancialSettings = pgTable("member_financial_settings", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   memberId: varchar("member_id").notNull().unique(),
-  preferredMethod: paymentMethodEnum("preferred_method").notNull(),
-  preferredTerm: paymentTermEnum("preferred_term").notNull(),
-  monthlyAmount: decimal("monthly_amount", { precision: 10, scale: 2 }).notNull().default('0'),
-  yearlyAmount: decimal("yearly_amount", { precision: 10, scale: 2 }).notNull().default('0'),
+  paymentMethod: paymentMethodEnum("payment_method").notNull(),
+  paymentTerm: paymentTermEnum("payment_term").notNull(),
   iban: text("iban"),
-  sepaMandate: text("sepa_mandate"),
-  billingAnchorAt: timestamp("billing_anchor_at"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export const mandates = pgTable("mandates", {

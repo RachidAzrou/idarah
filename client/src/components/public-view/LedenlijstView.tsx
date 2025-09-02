@@ -161,18 +161,18 @@ export function LedenlijstView({ config }: LedenlijstViewProps) {
                         className="px-4 py-5 text-center"
                       >
                         <div
-                          className={`w-8 h-8 rounded-xl mx-auto flex items-center justify-center transition-all duration-300 shadow-sm hover:shadow-md ${
-                            status === 'betaald' ? 'bg-gradient-to-br from-emerald-400 to-emerald-500 border border-emerald-300' :
-                            status === 'achterstallig' ? 'bg-gradient-to-br from-red-400 to-red-500 border border-red-300' :
-                            'bg-gradient-to-br from-slate-200 to-slate-300 border border-slate-200'
+                          className={`w-7 h-7 rounded-lg mx-auto flex items-center justify-center transition-all duration-200 shadow-sm ${
+                            status === 'betaald' ? 'bg-emerald-50 border-2 border-emerald-300' :
+                            status === 'achterstallig' ? 'bg-red-50 border-2 border-red-300' :
+                            'bg-slate-50 border-2 border-slate-300'
                           }`}
                           title={`${month}: ${status}`}
                         >
                           {status === 'betaald' && (
-                            <Check className="w-4 h-4 text-white drop-shadow-sm" strokeWidth={2.5} />
+                            <Check className="w-4 h-4 text-emerald-600" strokeWidth={2.5} />
                           )}
                           {status === 'achterstallig' && (
-                            <X className="w-4 h-4 text-white drop-shadow-sm" strokeWidth={2.5} />
+                            <X className="w-4 h-4 text-red-600" strokeWidth={2.5} />
                           )}
                         </div>
                       </td>

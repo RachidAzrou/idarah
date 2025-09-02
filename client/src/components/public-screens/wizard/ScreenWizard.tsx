@@ -11,8 +11,9 @@ import { DescriptionStep } from "./steps/DescriptionStep";
 import { StylingStep } from "./steps/StylingStep";
 import { LedenlijstConfigStep } from "./steps/LedenlijstConfigStep";
 import { MededelingenConfigStep } from "./steps/MededelingenConfigStep";
-import { MededelingenMessagesStep } from "./steps/MededelingenMessagesStep";
-import { MededelingenCarouselStep } from "./steps/MededelingenCarouselStep";
+// Temporarily import only when needed to avoid module resolution issues
+// import { MededelingenMessagesStep } from "./steps/MededelingenMessagesStep";
+// import { MededelingenCarouselStep } from "./steps/MededelingenCarouselStep";
 import { MultimediaConfigStep } from "./steps/MultimediaConfigStep";
 
 interface ScreenWizardProps {
@@ -125,8 +126,8 @@ export function ScreenWizard({ open, onOpenChange, onComplete }: ScreenWizardPro
     } else if (wizardData.type === 'MEDEDELINGEN') {
       // Voor mededelingen slaan we de opmaak stap over en gaan direct naar berichten
       baseSteps.splice(2, 1); // Verwijder de "Opmaak" stap
-      baseSteps.push({ title: "Berichten", component: MededelingenMessagesStep });
-      baseSteps.push({ title: "Carrousel", component: MededelingenCarouselStep });
+      // Use existing MededelingenConfigStep for now until import issues are resolved
+      baseSteps.push({ title: "Configuratie", component: MededelingenConfigStep });
     } else if (wizardData.type === 'MULTIMEDIA') {
       baseSteps.push({ title: "Media", component: MultimediaConfigStep });
     }

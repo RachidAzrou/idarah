@@ -111,21 +111,21 @@ export function LedenlijstView({ config }: LedenlijstViewProps) {
           <table className="w-full">
             <thead>
               <tr className="bg-slate-50/80 border-b border-slate-200">
-                <th className="px-8 py-5 text-left font-semibold text-slate-800 text-sm uppercase tracking-wider">
+                <th className="px-6 py-3 text-left font-semibold text-slate-800 text-xs uppercase tracking-wider">
                   Lidnr.
                 </th>
-                <th className="px-8 py-5 text-left font-semibold text-slate-800 text-sm uppercase tracking-wider">
+                <th className="px-6 py-3 text-left font-semibold text-slate-800 text-xs uppercase tracking-wider">
                   Naam
                 </th>
                 {config.display.showVotingRights && (
-                  <th className="px-6 py-5 text-center font-semibold text-slate-800 text-sm uppercase tracking-wider">
+                  <th className="px-4 py-3 text-center font-semibold text-slate-800 text-xs uppercase tracking-wider">
                     Stemrecht
                   </th>
                 )}
                 {monthNames.map((month, index) => (
                   <th
                     key={month}
-                    className="px-4 py-5 text-center font-semibold text-slate-800 text-xs uppercase tracking-wider min-w-[60px]"
+                    className="px-3 py-3 text-center font-semibold text-slate-800 text-xs uppercase tracking-wider min-w-[50px]"
                   >
                     {month}
                   </th>
@@ -135,17 +135,17 @@ export function LedenlijstView({ config }: LedenlijstViewProps) {
             <tbody>
               {currentMembers.map((member, memberIndex) => (
                 <tr key={member.id} className="hover:bg-slate-50/50 border-b border-slate-100 last:border-0 transition-all duration-200">
-                  <td className="px-8 py-5 font-mono text-sm text-slate-500">
+                  <td className="px-6 py-3 font-mono text-xs text-slate-500">
                     {member.lidnummer}
                   </td>
-                  <td className="px-8 py-5 text-slate-700 font-medium">
+                  <td className="px-6 py-3 text-slate-700 font-medium text-sm">
                     {getMemberDisplayName(member, {
                       useFullNames: config.display.useFullNames,
                       useInitials: config.display.useInitials
                     })}
                   </td>
                   {config.display.showVotingRights && (
-                    <td className="px-6 py-5 text-center">
+                    <td className="px-4 py-3 text-center">
                       {member.stemrecht && (
                         <Vote className="w-5 h-5 text-primary mx-auto" />
                       )}
@@ -158,10 +158,10 @@ export function LedenlijstView({ config }: LedenlijstViewProps) {
                     return (
                       <td
                         key={month}
-                        className="px-4 py-5 text-center"
+                        className="px-3 py-3 text-center"
                       >
                         <div
-                          className={`w-7 h-7 rounded-lg mx-auto transition-all duration-200 shadow-sm ${
+                          className={`w-6 h-6 rounded-md mx-auto transition-all duration-200 shadow-sm ${
                             status === 'betaald' ? 'bg-emerald-400 border-2 border-emerald-500' :
                             status === 'achterstallig' ? 'bg-red-400 border-2 border-red-500' :
                             'bg-slate-300 border-2 border-slate-400'

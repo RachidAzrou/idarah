@@ -23,7 +23,7 @@ export function ScreenCard({ screen, onEdit, onToggleStatus, onDelete }: ScreenC
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showUrlDialog, setShowUrlDialog] = useState(false);
 
-  const publicUrl = `${window.location.origin}/screen/${screen.id}`;
+  const publicUrl = `${window.location.origin}/screen/${screen.publicToken || screen.id}`;
 
   const getTypeLabel = (type: string) => {
     switch (type) {
@@ -113,13 +113,13 @@ export function ScreenCard({ screen, onEdit, onToggleStatus, onDelete }: ScreenC
             <div className="flex items-center gap-1 text-gray-600">
               <span>Publieke URL:</span>
               <a 
-                href={`/screen/${screen.id}`}
+                href={`/screen/${screen.publicToken || screen.id}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-600 hover:text-blue-800 underline truncate"
                 data-testid={`link-public-${screen.id}`}
               >
-                /screen/{screen.id}
+                /screen/{screen.publicToken || screen.id}
               </a>
             </div>
           </div>

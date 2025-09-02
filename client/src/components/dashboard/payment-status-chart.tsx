@@ -1,8 +1,8 @@
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 
 const data = [
-  { name: 'Betaald', value: 1058, color: '#2563EB' },
-  { name: 'Openstaand', value: 150, color: '#60A5FA' },
+  { name: 'Betaald', value: 1058, color: '#16A34A' },
+  { name: 'Openstaand', value: 150, color: '#F59E0B' },
   { name: 'Achterstallig', value: 39, color: '#EF4444' },
 ];
 

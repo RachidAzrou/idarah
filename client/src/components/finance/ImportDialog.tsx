@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { ImportMappingSchema, ImportMappingData } from "@/lib/zod/transaction";
 import { parseCSV, parseMT940, parseCODA, CSVRow } from "@/lib/csv";
 import { generateTransactionId, Transaction } from "@/lib/mock/transactions";
-import { FileText, AlertTriangle, CheckCircle } from "lucide-react";
+import { FileText, AlertTriangle, CheckCircle, Upload } from "lucide-react";
 import { CiImport } from "react-icons/ci";
 
 interface ImportDialogProps {

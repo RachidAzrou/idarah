@@ -64,8 +64,9 @@ export function PublicScreensList({ onEdit, onDelete }: PublicScreensListProps) 
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="ALL">Alle types</SelectItem>
-            <SelectItem value="PAYMENT_MATRIX">Betaalstatus</SelectItem>
-            <SelectItem value="ANNOUNCEMENTS">Mededelingen</SelectItem>
+            <SelectItem value="LEDENLIJST">Ledenlijst</SelectItem>
+            <SelectItem value="MEDEDELINGEN">Mededelingen</SelectItem>
+            <SelectItem value="MULTIMEDIA">Multimedia</SelectItem>
           </SelectContent>
         </Select>
         <Select value={statusFilter} onValueChange={setStatusFilter}>

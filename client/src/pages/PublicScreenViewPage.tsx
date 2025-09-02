@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRoute } from "wouter";
-import { publicScreensStore, PublicScreen, PaymentMatrixConfig, AnnouncementsConfig } from "@/lib/mock/public-screens";
-import { PaymentMatrixView } from "@/components/public-view/PaymentMatrixView";
+import { publicScreensStore, PublicScreen, LedenlijstConfig, MededelingenConfig, MultimediaConfig } from "@/lib/mock/public-screens";
+import { LedenlijstView } from "@/components/public-view/LedenlijstView";
 import { AnnouncementsView } from "@/components/public-view/AnnouncementsView";
 import { Controls } from "@/components/public-view/Controls";
 
@@ -122,12 +122,18 @@ export default function PublicScreenViewPage() {
   return (
     <div className="min-h-screen relative">
       {/* Main Content */}
-      {screen.type === 'PAYMENT_MATRIX' && (
-        <PaymentMatrixView config={screen.config as PaymentMatrixConfig} />
+      {screen.type === 'LEDENLIJST' && (
+        <LedenlijstView config={screen.config as LedenlijstConfig} />
       )}
       
-      {screen.type === 'ANNOUNCEMENTS' && (
-        <AnnouncementsView config={screen.config as AnnouncementsConfig} />
+      {screen.type === 'MEDEDELINGEN' && (
+        <AnnouncementsView config={screen.config as MededelingenConfig} />
+      )}
+      
+      {screen.type === 'MULTIMEDIA' && (
+        <div className="min-h-screen flex items-center justify-center bg-gray-100">
+          <p className="text-gray-600">Multimedia viewer komt binnenkort...</p>
+        </div>
       )}
 
       {/* Controls Overlay */}

@@ -14,12 +14,23 @@ export default function PublicScreensPage() {
   const [editScreen, setEditScreen] = useState<PublicScreen | null>(null);
   const { toast } = useToast();
 
-  const handleCreateScreen = (screen: PublicScreen) => {
+  const handleCreateScreen = (screenData: {
+    name: string;
+    type: any;
+    config: any;
+  }) => {
+    // Create screen via store
+    const screen = require("@/lib/mock/public-screens").publicScreensStore.create({
+      name: screenData.name,
+      type: screenData.type,
+      active: true,
+      config: screenData.config
+    });
+    
     toast({
       title: "Scherm aangemaakt",
       description: `${screen.name} is succesvol aangemaakt.`,
     });
-    setShowNewDialog(false);
   };
 
   const handleUpdateScreen = (screen: PublicScreen) => {
@@ -51,15 +62,7 @@ export default function PublicScreensPage() {
                 Genereer & beheer schermen voor betaalstatus en mededelingen
               </p>
             </div>
-            <Button 
-              onClick={() => setShowNewDialog(true)}
-              className="gap-2"
-              size="lg"
-              data-testid="button-new-screen"
-            >
-              <Plus className="h-5 w-5" />
-              Nieuw scherm
-            </Button>
+            <NewScreenDialog onCreateScreen={handleCreateScreen} />
           </div>
         </div>
 
@@ -71,9 +74,7 @@ export default function PublicScreensPage() {
 
         {/* Dialogs */}
         <NewScreenDialog
-          open={showNewDialog}
-          onClose={() => setShowNewDialog(false)}
-          onSave={handleCreateScreen}
+          onCreateScreen={handleCreateScreen}
         />
 
         <EditScreenDrawer

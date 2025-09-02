@@ -38,6 +38,17 @@ export interface MededelingenSlide {
   validTo?: string;
   active: boolean;
   durationSec: number;
+  styling?: {
+    titleFontSize: number;
+    titleFontWeight: 'normal' | 'bold' | 'lighter';
+    titleFontFamily: string;
+    titleColor: string;
+    bodyFontSize: number;
+    bodyFontWeight: 'normal' | 'bold' | 'lighter';
+    bodyFontFamily: string;
+    bodyColor: string;
+    backgroundColor: string;
+  };
 }
 
 export interface MededelingenConfig {

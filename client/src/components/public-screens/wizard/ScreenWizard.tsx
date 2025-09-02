@@ -11,6 +11,8 @@ import { DescriptionStep } from "./steps/DescriptionStep";
 import { StylingStep } from "./steps/StylingStep";
 import { LedenlijstConfigStep } from "./steps/LedenlijstConfigStep";
 import { MededelingenConfigStep } from "./steps/MededelingenConfigStep";
+import { MededelingenMessagesStep } from "./steps/MededelingenMessagesStep";
+import { MededelingenCarouselStep } from "./steps/MededelingenCarouselStep";
 import { MultimediaConfigStep } from "./steps/MultimediaConfigStep";
 
 interface ScreenWizardProps {
@@ -121,7 +123,8 @@ export function ScreenWizard({ open, onOpenChange, onComplete }: ScreenWizardPro
     if (wizardData.type === 'LEDENLIJST') {
       baseSteps.push({ title: "Configuratie", component: LedenlijstConfigStep });
     } else if (wizardData.type === 'MEDEDELINGEN') {
-      baseSteps.push({ title: "Berichten", component: MededelingenConfigStep });
+      baseSteps.push({ title: "Berichten", component: MededelingenMessagesStep });
+      baseSteps.push({ title: "Carrousel", component: MededelingenCarouselStep });
     } else if (wizardData.type === 'MULTIMEDIA') {
       baseSteps.push({ title: "Media", component: MultimediaConfigStep });
     }
@@ -141,6 +144,9 @@ export function ScreenWizard({ open, onOpenChange, onComplete }: ScreenWizardPro
         if (wizardData.type === 'LEDENLIJST') return !!wizardData.ledenlijstSettings;
         if (wizardData.type === 'MEDEDELINGEN') return !!wizardData.mededelingenSettings && wizardData.mededelingenSettings.slides.length > 0;
         if (wizardData.type === 'MULTIMEDIA') return !!wizardData.multimediaSettings && wizardData.multimediaSettings.mediaItems.length > 0;
+        return true;
+      case 4:
+        if (wizardData.type === 'MEDEDELINGEN') return !!wizardData.mededelingenSettings?.autoplay;
         return true;
       default: return true;
     }
@@ -228,7 +234,9 @@ export function ScreenWizard({ open, onOpenChange, onComplete }: ScreenWizardPro
             {currentStep === 0 && "Kies het type scherm dat je wilt aanmaken"}
             {currentStep === 1 && "Geef je scherm een duidelijke naam"}
             {currentStep === 2 && "Pas de titel en ondertitel aan"}
-            {currentStep === 3 && "Configureer de specifieke instellingen"}
+            {currentStep === 3 && wizardData.type === 'MEDEDELINGEN' && "Maak en beheer je berichten"}
+            {currentStep === 3 && wizardData.type !== 'MEDEDELINGEN' && "Configureer de specifieke instellingen"}
+            {currentStep === 4 && wizardData.type === 'MEDEDELINGEN' && "Stel de carrousel instellingen in"}
           </DialogDescription>
           
           {/* Progress indicator */}

@@ -71,6 +71,9 @@ export interface IStorage {
   // Transactions
   getTransactionsByTenant(tenantId: string): Promise<Transaction[]>;
   createTransaction(transaction: InsertTransaction): Promise<Transaction>;
+  
+  // Dashboard
+  getDashboardStats(tenantId: string): Promise<any>;
 
   // Rules
   getRulesByTenant(tenantId: string): Promise<Rule[]>;
@@ -236,6 +239,21 @@ export class DatabaseStorage implements IStorage {
   async updateRule(id: string, rule: Partial<InsertRule>): Promise<Rule> {
     const [updatedRule] = await db.update(rules).set(rule).where(eq(rules.id, id)).returning();
     return updatedRule;
+  }
+
+  // Dashboard Stats
+  async getDashboardStats(tenantId: string) {
+    const totalMembers = await db.select({ count: sql<number>`count(*)` }).from(members).where(eq(members.tenantId, tenantId));
+    const activeMembers = await db.select({ count: sql<number>`count(*)` }).from(members).where(and(eq(members.tenantId, tenantId), eq(members.status, 'ACTIVE')));
+    const openFees = await db.select({ total: sql<number>`coalesce(sum(amount), 0)` }).from(membershipFees).where(and(eq(membershipFees.tenantId, tenantId), eq(membershipFees.status, 'OPEN')));
+    const thisMonthIncome = await db.select({ total: sql<number>`coalesce(sum(amount), 0)` }).from(transactions).where(and(eq(transactions.tenantId, tenantId), eq(transactions.type, 'INCOME'), sql`date >= date_trunc('month', current_date)`));
+    
+    return {
+      totalMembers: totalMembers[0]?.count || 0,
+      activeMembers: activeMembers[0]?.count || 0,
+      openPayments: openFees[0]?.total || 0,
+      monthlyIncome: thisMonthIncome[0]?.total || 0
+    };
   }
 
   // Rule Outcomes

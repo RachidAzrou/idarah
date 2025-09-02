@@ -43,7 +43,7 @@ export default function ModernKpiCards() {
     queryKey: ["/api/dashboard/stats"],
   });
 
-  if (isLoading) {
+  if (isLoading || !stats) {
     return (
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-6">
         {[...Array(5)].map((_, i) => (
@@ -53,39 +53,39 @@ export default function ModernKpiCards() {
     );
   }
 
-  // KPI data voor de gewenste categorieën
-  const kpiData = [
+  // KPI data gebaseerd op echte database stats
+  const kpiData = stats ? [
     {
       title: "Totaal Leden",
-      value: "1.247",
-      delta: { value: "+12 deze maand", positive: true },
+      value: (stats as any).totalMembers?.toString() || "0",
+      delta: { value: "Totaal aantal leden", positive: true },
       icon: <Users className="h-4 w-4 text-blue-600" />
     },
     {
       title: "Actieve Leden",
-      value: "1.089",
-      delta: { value: "+2,1% vs vorige maand", positive: true },
+      value: (stats as any).activeMembers?.toString() || "0",
+      delta: { value: "Actieve leden", positive: true },
       icon: <UserCheck className="h-4 w-4 text-blue-600" />
     },
     {
       title: "Stemgerechtigden",
-      value: "896",
-      delta: { value: "82,3% van totaal", positive: true },
+      value: (stats as any).activeMembers?.toString() || "0",
+      delta: { value: "Van actieve leden", positive: true },
       icon: <Vote className="h-4 w-4 text-blue-600" />
     },
     {
       title: "Openstaande Betalingen",
-      value: "€1.570",
-      delta: { value: "-8% vs vorige maand", positive: true },
+      value: `€${((stats as any).openPayments || 0).toFixed(2)}`,
+      delta: { value: "Te betalen bedragen", positive: false },
       icon: <Clock className="h-4 w-4 text-blue-600" />
     },
     {
       title: "Inkomsten Deze Maand",
-      value: "€8.420",
-      delta: { value: "+15,3% vs vorige maand", positive: true },
+      value: `€${((stats as any).monthlyIncome || 0).toFixed(2)}`,
+      delta: { value: "Deze maand", positive: true },
       icon: <Euro className="h-4 w-4 text-blue-600" />
     }
-  ];
+  ] : [];
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-6">

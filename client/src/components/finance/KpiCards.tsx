@@ -1,9 +1,9 @@
 "use client";
 
 import { formatCurrencyBE } from "@/lib/format";
-import { transactions, getTotalByType } from "@/lib/mock/transactions";
 import { TrendingUp, TrendingDown, DollarSign, AlertTriangle } from "lucide-react";
 import { useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 interface KpiCardProps {
   title: string;
@@ -42,13 +42,19 @@ function KpiCard({ title, value, delta, icon }: KpiCardProps) {
 }
 
 export function KpiCards() {
+  const { data: transactions } = useQuery({
+    queryKey: ["/api/transactions"],
+  });
+  
+  const { data: fees } = useQuery({
+    queryKey: ["/api/fees"],
+  });
+
   const kpiData = useMemo(() => {
-    const totalIncome = getTotalByType('INCOME');
-    const totalExpense = getTotalByType('EXPENSE');
+    const totalIncome = Array.isArray(transactions) ? transactions.filter((t: any) => t.type === 'INCOME').reduce((sum: number, t: any) => sum + Math.abs(parseFloat(t.amount)), 0) : 0;
+    const totalExpense = Array.isArray(transactions) ? transactions.filter((t: any) => t.type === 'EXPENSE').reduce((sum: number, t: any) => sum + Math.abs(parseFloat(t.amount)), 0) : 0;
     const balance = totalIncome - totalExpense;
-    
-    // Mock achterstallig bedrag (in real app, this would come from overdue fees)
-    const overdue = 1450;
+    const overdue = Array.isArray(fees) ? fees.filter((f: any) => f.status === 'OPEN').reduce((sum: number, f: any) => sum + parseFloat(f.amount), 0) : 0;
     
     return {
       income: totalIncome,
@@ -56,19 +62,19 @@ export function KpiCards() {
       balance,
       overdue
     };
-  }, []);
+  }, [transactions, fees]);
 
   const kpis = [
     {
       title: "Totale Inkomsten",
       value: formatCurrencyBE(kpiData.income),
-      delta: { value: "+12,5% vs vorige maand", positive: true },
+      delta: { value: "Totaal inkomsten", positive: true },
       icon: <TrendingUp className="h-4 w-4 text-blue-600" />
     },
     {
       title: "Totale Uitgaven",
       value: formatCurrencyBE(kpiData.expense),
-      delta: { value: "+2,3% vs vorige maand", positive: false },
+      delta: { value: "Totaal uitgaven", positive: false },
       icon: <TrendingDown className="h-4 w-4 text-blue-600" />
     },
     {
@@ -83,7 +89,7 @@ export function KpiCards() {
     {
       title: "Achterstallig Lidgeld",
       value: formatCurrencyBE(kpiData.overdue),
-      delta: { value: "-8% vs vorige maand", positive: true },
+      delta: { value: "Openstaande bedragen", positive: false },
       icon: <AlertTriangle className="h-4 w-4 text-blue-600" />
     }
   ];

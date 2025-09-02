@@ -24,10 +24,10 @@ export default function Financien() {
   });
 
   const calculateFinancialStats = () => {
-    const income = transactions?.filter((t: any) => t.type === 'INCOME').reduce((sum: number, t: any) => sum + parseFloat(t.amount), 0) || 0;
-    const expenses = transactions?.filter((t: any) => t.type === 'EXPENSE').reduce((sum: number, t: any) => sum + parseFloat(t.amount), 0) || 0;
+    const income = Array.isArray(transactions) ? transactions.filter((t: any) => t.type === 'INCOME').reduce((sum: number, t: any) => sum + Math.abs(parseFloat(t.amount)), 0) : 0;
+    const expenses = Array.isArray(transactions) ? transactions.filter((t: any) => t.type === 'EXPENSE').reduce((sum: number, t: any) => sum + Math.abs(parseFloat(t.amount)), 0) : 0;
     const balance = income - expenses;
-    const openFees = fees?.filter((f: any) => f.status === 'OPEN').reduce((sum: number, f: any) => sum + parseFloat(f.amount), 0) || 0;
+    const openFees = Array.isArray(fees) ? fees.filter((f: any) => f.status === 'OPEN').reduce((sum: number, f: any) => sum + parseFloat(f.amount), 0) : 0;
 
     return { income, expenses, balance, openFees };
   };

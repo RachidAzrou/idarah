@@ -58,15 +58,6 @@ export function MededelingenCarouselStep({ data, onUpdate }: MededelingenCarouse
 
   const updateSettings = (newSettings: Partial<MededelingenSettings>) => {
     onUpdate({
-      mededelingenSettings: {
-        ...settings,
-        ...newSettings
-      }
-    });
-  };
-
-  const updateSettings = (newSettings: Partial<MededelingenSettings>) => {
-    onUpdate({
       ...data,
       mededelingenSettings: {
         ...settings,

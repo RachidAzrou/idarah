@@ -114,7 +114,7 @@ export function ScreenWizard({ open, onOpenChange, onComplete }: ScreenWizardPro
   }, [open]);
 
   const getSteps = () => {
-    const baseSteps = [
+    const baseSteps: Array<{ title: string; component: any }> = [
       { title: "Type selecteren", component: TypeSelectionStep },
       { title: "Beschrijving", component: DescriptionStep },
       { title: "Opmaak", component: StylingStep }

@@ -125,11 +125,30 @@ export function MededelingenMessagesStep({ data, onUpdate }: MededelingenMessage
   };
 
   const updateSlideStyle = (slideId: string, styleKey: string, value: any) => {
-    const updatedSlides = settings.slides.map(slide =>
-      slide.id === slideId 
-        ? { ...slide, styling: { ...slide.styling, [styleKey]: value } }
-        : slide
-    );
+    const updatedSlides = settings.slides.map(slide => {
+      if (slide.id === slideId) {
+        const defaultStyling = {
+          titleFontSize: 32,
+          titleFontWeight: 'bold' as const,
+          titleFontFamily: 'Poppins',
+          titleColor: '#1f2937',
+          bodyFontSize: 18,
+          bodyFontWeight: 'normal' as const,
+          bodyFontFamily: 'Poppins',
+          bodyColor: '#374151',
+          backgroundColor: '#ffffff'
+        };
+        return { 
+          ...slide, 
+          styling: { 
+            ...defaultStyling,
+            ...slide.styling, 
+            [styleKey]: value 
+          } 
+        };
+      }
+      return slide;
+    });
     
     updateSettings({ slides: updatedSlides });
   };

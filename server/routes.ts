@@ -18,11 +18,25 @@ const loginSchema = z.object({
   password: z.string().min(1),
 });
 
-const createMemberSchema = insertMemberSchema.extend({
+const createMemberSchema = insertMemberSchema.omit({
+  tenantId: true,
+  memberNumber: true,
+}).extend({
+  birthDate: z.union([z.date(), z.string().transform((str) => new Date(str))]),
   financialSettings: z.object({
     paymentMethod: z.enum(['SEPA', 'OVERSCHRIJVING', 'BANCONTACT', 'CASH']),
     iban: z.string().optional(),
     paymentTerm: z.enum(['MONTHLY', 'YEARLY']),
+  }),
+  organization: z.object({
+    interestedInActiveRole: z.boolean(),
+    roleDescription: z.string().optional(),
+  }),
+  permissions: z.object({
+    privacyAgreement: z.boolean(),
+    photoVideoConsent: z.boolean(),
+    newsletterSubscription: z.boolean(),
+    whatsappList: z.boolean(),
   }),
 });
 

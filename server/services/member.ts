@@ -2,11 +2,21 @@ import { storage } from "../storage";
 import { type InsertMember, type Member } from "@shared/schema";
 import { randomUUID } from "crypto";
 
-interface CreateMemberData extends InsertMember {
+interface CreateMemberData extends Omit<InsertMember, 'tenantId' | 'memberNumber'> {
   financialSettings: {
     paymentMethod: 'SEPA' | 'OVERSCHRIJVING' | 'BANCONTACT' | 'CASH';
     iban?: string;
     paymentTerm: 'MONTHLY' | 'YEARLY';
+  };
+  organization: {
+    interestedInActiveRole: boolean;
+    roleDescription?: string;
+  };
+  permissions: {
+    privacyAgreement: boolean;
+    photoVideoConsent: boolean;
+    newsletterSubscription: boolean;
+    whatsappList: boolean;
   };
 }
 
@@ -22,9 +32,10 @@ class MemberService {
       // Generate unique member number
       const memberNumber = await this.generateMemberNumber(tenantId);
       
-      // Create member
+      // Create member (exclude extra frontend fields)
+      const { financialSettings, organization, permissions, ...memberFields } = memberData;
       const member = await storage.createMember({
-        ...memberData,
+        ...memberFields,
         tenantId,
         memberNumber,
       });
@@ -72,6 +83,8 @@ class MemberService {
     await storage.createMembershipFee({
       tenantId: member.tenantId,
       memberId: member.id,
+      memberNumber: member.memberNumber,
+      memberName: `${member.firstName} ${member.lastName}`,
       periodStart,
       periodEnd,
       amount: amount.toString(),

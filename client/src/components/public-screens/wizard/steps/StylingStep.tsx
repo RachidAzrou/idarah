@@ -17,8 +17,23 @@ const fontFamilies = [
   { value: "Poppins", label: "Poppins" },
   { value: "Inter", label: "Inter" },
   { value: "Roboto", label: "Roboto" },
+  { value: "Open Sans", label: "Open Sans" },
+  { value: "Lato", label: "Lato" },
+  { value: "Montserrat", label: "Montserrat" },
+  { value: "Source Sans Pro", label: "Source Sans Pro" },
+  { value: "Nunito", label: "Nunito" },
+  { value: "PT Sans", label: "PT Sans" },
+  { value: "Ubuntu", label: "Ubuntu" },
+  { value: "Raleway", label: "Raleway" },
+  { value: "Merriweather", label: "Merriweather" },
+  { value: "Oswald", label: "Oswald" },
+  { value: "Playfair Display", label: "Playfair Display" },
   { value: "Arial", label: "Arial" },
-  { value: "Georgia", label: "Georgia" }
+  { value: "Helvetica", label: "Helvetica" },
+  { value: "Times New Roman", label: "Times New Roman" },
+  { value: "Georgia", label: "Georgia" },
+  { value: "Verdana", label: "Verdana" },
+  { value: "Trebuchet MS", label: "Trebuchet MS" }
 ];
 
 const fontWeights = [
@@ -27,12 +42,33 @@ const fontWeights = [
 ];
 
 const colors = [
-  { value: "#1f2937", label: "Donkergrijs" },
   { value: "#000000", label: "Zwart" },
+  { value: "#1f2937", label: "Donkergrijs" },
+  { value: "#374151", label: "Grijs" },
+  { value: "#6b7280", label: "Lichtgrijs" },
+  { value: "#9ca3af", label: "Zilvergijs" },
+  { value: "#ffffff", label: "Wit" },
   { value: "#2563eb", label: "Blauw" },
-  { value: "#dc2626", label: "Rood" },
+  { value: "#1d4ed8", label: "Donkerblauw" },
+  { value: "#3b82f6", label: "Lichtblauw" },
+  { value: "#06b6d4", label: "Cyaan" },
+  { value: "#0891b2", label: "Teal" },
   { value: "#059669", label: "Groen" },
-  { value: "#6b7280", label: "Lichtgrijs" }
+  { value: "#16a34a", label: "Lichtgroen" },
+  { value: "#65a30d", label: "Lime" },
+  { value: "#eab308", label: "Geel" },
+  { value: "#f59e0b", label: "Amber" },
+  { value: "#ea580c", label: "Oranje" },
+  { value: "#dc2626", label: "Rood" },
+  { value: "#e11d48", label: "Rose" },
+  { value: "#c2410c", label: "Donkeroranje" },
+  { value: "#7c3aed", label: "Paars" },
+  { value: "#a855f7", label: "Violet" },
+  { value: "#d946ef", label: "Fuchsia" },
+  { value: "#ec4899", label: "Roze" },
+  { value: "#be185d", label: "Donkerroze" },
+  { value: "#92400e", label: "Bruin" },
+  { value: "#451a03", label: "Donkerbruin" }
 ];
 
 export function StylingStep({ data, onUpdate }: StylingStepProps) {

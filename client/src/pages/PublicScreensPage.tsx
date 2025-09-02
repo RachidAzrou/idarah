@@ -14,13 +14,14 @@ export default function PublicScreensPage() {
   const [editScreen, setEditScreen] = useState<PublicScreen | null>(null);
   const { toast } = useToast();
 
-  const handleCreateScreen = (screenData: {
+  const handleCreateScreen = async (screenData: {
     name: string;
     type: any;
     config: any;
   }) => {
     // Create screen via store
-    const screen = require("@/lib/mock/public-screens").publicScreensStore.create({
+    const { publicScreensStore } = await import("@/lib/mock/public-screens");
+    const screen = publicScreensStore.create({
       name: screenData.name,
       type: screenData.type,
       active: true,

@@ -69,7 +69,7 @@ export function ConcentricRings({ categories, size = 280 }: ConcentricRingsProps
           const radius = radii[index];
           
           // Skip categories with no data
-          if (category.percent === 0 || category.count === 0) {
+          if (category.count === 0) {
             return null;
           }
           
@@ -77,8 +77,9 @@ export function ConcentricRings({ categories, size = 280 }: ConcentricRingsProps
           const startAngle = -90; // Start at top
           const endAngle = startAngle + (category.percent / 100) * 360;
           
-          // For small percentages, ensure minimum visible arc
-          const actualEndAngle = endAngle - startAngle < 10 ? startAngle + 10 : endAngle;
+          // For 100% or full circles, make sure we draw the complete circle
+          const actualEndAngle = category.percent >= 100 ? startAngle + 359.9 : 
+                                 endAngle - startAngle < 10 ? startAngle + 10 : endAngle;
           
           const pathData = describeArc(center, center, radius, startAngle, actualEndAngle);
           

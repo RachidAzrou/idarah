@@ -1,0 +1,188 @@
+Migrate this Next.js 14 (App Router, TypeScript strict) project from mock data to a real PostgreSQL (Neon) database using Prisma. Replace all mock stores with DB repositories, add migrations + seed, and expose type-safe API routes. Locale nl-BE, timezone Europe/Brussels. Do not hardcode secrets; read from .env.
+
+0) Environment & scripts
+
+Create/modify:
+
+.env.example
+
+DATABASE_URL=postgresql://<user>:<pass>@<host>/<db>?sslmode=require&channel_binding=require
+NEXTAUTH_SECRET=changeme
+NEXTAUTH_URL=http://localhost:3000
+APP_TIMEZONE=Europe/Brussels
+
+
+Do NOT commit .env.
+
+package.json scripts:
+
+{
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "prisma:migrate": "prisma migrate deploy",
+    "prisma:dev": "prisma migrate dev",
+    "prisma:generate": "prisma generate",
+    "prisma:seed": "ts-node prisma/seed.ts",
+    "lint": "next lint",
+    "test": "vitest"
+  }
+}
+
+1) Prisma setup
+
+Add:
+
+prisma/schema.prisma using PostgreSQL + models (multi-tenant via tenantId) as specified earlier (Tenant, User, Member, MemberFinancialSettings, Mandate, MembershipFee, Transaction, Rule, RuleOutcome, PublicScreen, Announcement, CardMeta, Notification, SEPAExport + enums).
+
+Add unique on fees:
+
+@@unique([tenantId, memberId, periodStart, periodEnd], name: "uniq_fee_member_period")
+
+
+For Card/SEPA batches, keep existing uniques (publicToken, mandateRef, batchRef, etc.).
+
+prisma/seed.ts:
+
+Create 1 tenant ("Demo Moskee"), 1 beheerder (argon2 hashed password), enkele leden (mix categorieën, paymentTerm MONTHLY/YEARLY), MemberFinancialSettings (SEPA/OVERS), Mandate (ACTIVE for some), MembershipFee records (2024–2025, OPEN/PAID), 1 PublicScreen per type (PAYMENT_MATRIX + ANNOUNCEMENTS), a few Announcements.
+
+Use Europe/Brussels for dates; format amounts as decimals with 2 precision.
+
+2) DB client & repositories (replace mocks)
+
+Create one Prisma client and repository layer:
+
+lib/db/prisma.ts
+
+Singleton PrismaClient with log in dev, APP_TIMEZONE read (for potential date utils).
+
+lib/db/tenants.ts, users.ts, members.ts, fees.ts, transactions.ts, publicScreens.ts, announcements.ts, rules.ts
+
+Pure async functions (no Next APIs) with strict types:
+
+members.list({ tenantId, q?, status?, category?, take, skip, sort })
+
+members.getById(tenantId,id)
+
+fees.list({ tenantId, year?, status?, method?, memberId?, take, skip })
+
+fees.markPaid({ tenantId, feeId, paidAt })
+
+fees.generateSepaBatch({ tenantId, feeIds, batchRef }) (returns batch + updates fees)
+
+publicScreens.create/update/list/remove
+
+publicScreens.byToken(publicToken)
+
+publicMatrix.snapshot({ tenantId, year, filters }) → compute 12-maanden matrix uit MembershipFee:
+
+For each active Member, map each month 1..12 to PAID/OPEN/OVERDUE/NA using MembershipFee.periodStart/periodEnd, status, and the year filter.
+
+All functions scope by tenantId except byToken (public).
+
+3) API routes (Next.js App Router)
+
+Add API handlers that call repositories and return Zod-validated payloads:
+
+app/api/members/route.ts
+
+GET list with query params (q, status, category, page, pageSize).
+
+app/api/members/[id]/route.ts
+
+GET detail; PATCH update basic fields; DELETE deactivate.
+
+app/api/fees/route.ts
+
+GET list; PATCH markPaid; accept { feeId, paidAt }.
+
+app/api/fees/sepa/route.ts
+
+POST { feeIds: string[], batchRef: string } → returns { batchId, numTx, totalAmount }.
+
+app/api/public-screens/route.ts
+
+GET list (auth), POST create.
+
+app/api/public-screens/[id]/route.ts
+
+PATCH update config/active/name; DELETE.
+
+Public (no auth): app/api/public/screen/[publicToken]/matrix/route.ts
+
+GET returns matrix snapshot { year, rows: [{memberId,name,category,months:{1..12}}] }.
+
+Query param year optional (default current year).
+
+Add minimal CORS headers; no sensitive data.
+
+All route bodies/queries must be validated with Zod; return 4xx on validation errors. Add a tiny rate-limit (in-memory) to the public endpoint.
+
+4) Replace UI data sources (no mocks)
+
+Update Public Payment Matrix viewer to call /api/public/screen/[publicToken]/matrix?year=YYYY and render the matrix (no charts per your request).
+
+Update Ledenlijst, Lidgelden, Financiën pages to consume the new API routes (client fetch or server actions); remove mock imports.
+
+Keep labels nl-BE, date format dd-mm-jjjj (Intl.DateTimeFormat('nl-BE')).
+
+5) Auth & RBAC (minimal for now)
+
+Plug NextAuth (Credentials) with argon2 hashing in app/api/auth/[...nextauth]/route.ts (read from DB).
+
+Session contains { userId, role, tenantId }.
+
+Add a simple middleware (middleware.ts) that:
+
+Resolves tenantId from subdomain or session.
+
+Guards API routes: BEHEERDER/MEDEWERKER for private endpoints; publicToken routes remain open.
+
+6) SQL safety & indexing
+
+Ensure these indexes in migration:
+
+@@index([tenantId, status], name: "idx_fee_tenant_status")
+@@index([tenantId, memberId], name: "idx_fee_member")
+@@index([tenantId, createdAt], name: "idx_member_created")
+@@index([publicToken], name: "idx_screen_token")
+
+
+All decimal fields use @db.Numeric(10,2) (or 12,2 for totals).
+
+All relations specify onDelete: Cascade where appropriate (e.g., Member → Fees).
+
+7) Seed data (realistic)
+
+prisma/seed.ts should:
+
+Create tenant + admin user (role BEHEERDER), password hashed with argon2.
+
+Insert 25–40 members (mix categories, active flags), matching Belgium naming.
+
+For each member create MembershipFee rows for 2024–2025 with a mix of statuses (OPEN/PAID/OVERDUE), ensuring monthly/yearly examples.
+
+Create one PublicScreen of type PAYMENT_MATRIX with default config (year=current, show compact labels).
+
+A few Transactions (income/outcome) to demo the finance page.
+
+Console log URL for public screen using token.
+
+8) Utility: Europe/Brussels helpers
+
+lib/time/be.ts
+
+Helpers to get current year, month boundaries, and decide if a fee month is OVERDUE: status === OPEN && now > periodEnd.
+
+Use date-fns-tz (Europe/Brussels).
+
+9) Acceptance tests (light)
+
+Add Vitest tests for:
+
+publicMatrix.snapshot() converts DB fees → correct month states.
+
+fees.markPaid() updates status & paidAt, idempotent.
+
+sepa batch function returns correct totals and links fees.

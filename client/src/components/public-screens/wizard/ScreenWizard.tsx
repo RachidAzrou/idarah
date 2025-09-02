@@ -10,6 +10,7 @@ import { DescriptionStep } from "./steps/DescriptionStep";
 import { StylingStep } from "./steps/StylingStep";
 import { LedenlijstConfigStep } from "./steps/LedenlijstConfigStep";
 import { MededelingenConfigStep } from "./steps/MededelingenConfigStep";
+import { MultimediaConfigStep } from "./steps/MultimediaConfigStep";
 
 interface ScreenWizardProps {
   open: boolean;
@@ -57,6 +58,22 @@ interface WizardData {
       maxTextWidth: number;
     };
   };
+  multimediaSettings?: {
+    mediaItems: Array<{
+      id: string;
+      url: string;
+      type: 'image' | 'video';
+      duration: number;
+      active: boolean;
+      loop?: boolean;
+      transition?: 'fade' | 'slide' | 'zoom' | 'none';
+      name?: string;
+    }>;
+    autoplay: {
+      enabled: boolean;
+      interval: number;
+    };
+  };
 }
 
 const defaultTitleStyling: TitleStyling = {
@@ -94,6 +111,8 @@ export function ScreenWizard({ open, onOpenChange, onComplete }: ScreenWizardPro
       baseSteps.push({ title: "Configuratie", component: LedenlijstConfigStep });
     } else if (wizardData.type === 'MEDEDELINGEN') {
       baseSteps.push({ title: "Berichten", component: MededelingenConfigStep });
+    } else if (wizardData.type === 'MULTIMEDIA') {
+      baseSteps.push({ title: "Media", component: MultimediaConfigStep });
     }
     
     return baseSteps;
@@ -110,6 +129,7 @@ export function ScreenWizard({ open, onOpenChange, onComplete }: ScreenWizardPro
       case 3: 
         if (wizardData.type === 'LEDENLIJST') return !!wizardData.ledenlijstSettings;
         if (wizardData.type === 'MEDEDELINGEN') return !!wizardData.mededelingenSettings && wizardData.mededelingenSettings.slides.length > 0;
+        if (wizardData.type === 'MULTIMEDIA') return !!wizardData.multimediaSettings && wizardData.multimediaSettings.mediaItems.length > 0;
         return true;
       default: return true;
     }
@@ -165,8 +185,8 @@ export function ScreenWizard({ open, onOpenChange, onComplete }: ScreenWizardPro
         description: wizardData.description,
         title: wizardData.title,
         subtitle: wizardData.subtitle,
-        mediaItems: [],
-        autoplay: {
+        mediaItems: wizardData.multimediaSettings?.mediaItems || [],
+        autoplay: wizardData.multimediaSettings?.autoplay || {
           enabled: true,
           interval: 5
         }

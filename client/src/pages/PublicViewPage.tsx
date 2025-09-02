@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "wouter";
 import { LedenlijstView } from "@/components/public-view/LedenlijstView";
 import { MededelingenView } from "@/components/public-view/MededelingenView";
+import { MultimediaView } from "@/components/public-view/MultimediaView";
 import { publicScreensStore } from "@/lib/mock/public-screens";
 
 export function PublicViewPage() {
@@ -101,50 +102,7 @@ export function PublicViewPage() {
       
       case 'MULTIMEDIA':
         return (
-          <div 
-            className="min-h-screen bg-sidebar p-8 relative"
-            style={{
-              backgroundImage: `url(/background.jpg)`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              backgroundRepeat: 'no-repeat'
-            }}
-          >
-            {/* Overlay to make background subtle */}
-            <div className="absolute inset-0 bg-white/95 backdrop-blur-md"></div>
-            <div className="max-w-4xl mx-auto text-center relative z-10">
-              <div className="bg-card rounded-2xl p-8 shadow-sm border border-border hover:shadow-md transition-shadow duration-200">
-                <h1 
-                  style={{
-                    fontSize: `${screen.config?.title?.fontSize || 36}px`,
-                    fontFamily: screen.config?.title?.fontFamily || 'Poppins',
-                    color: screen.config?.title?.color || '#ffffff',
-                    fontWeight: screen.config?.title?.fontWeight || 'bold'
-                  }}
-                  className="mb-4 text-sidebar-foreground"
-                >
-                  {screen.config?.title?.text || screen.name}
-                </h1>
-                {screen.config?.subtitle?.text && (
-                  <h2
-                    style={{
-                      fontSize: `${screen.config?.subtitle?.fontSize || 24}px`,
-                      fontFamily: screen.config?.subtitle?.fontFamily || 'Poppins',
-                      color: screen.config?.subtitle?.color || '#9ca3af',
-                      fontWeight: screen.config?.subtitle?.fontWeight || 'normal'
-                    }}
-                    className="mb-6 text-sidebar-accent-foreground"
-                  >
-                    {screen.config?.subtitle?.text}
-                  </h2>
-                )}
-                <div className="text-sidebar-accent-foreground">
-                  <p className="text-lg mb-2">🎬 Multimedia Scherm</p>
-                  <p className="text-sm">Automatische verversing elke 5 minuten</p>
-                </div>
-              </div>
-            </div>
-          </div>
+          <MultimediaView config={screen.config} />
         );
       
       default:

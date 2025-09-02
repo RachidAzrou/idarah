@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ChevronLeft, ChevronRight, Monitor } from "lucide-react";
-import { ScreenType, TitleStyling, LedenlijstConfig, MededelingenConfig, MultimediaConfig } from "@/lib/mock/public-screens";
+import { ScreenType, TitleStyling, LedenlijstConfig, MededelingenConfig } from "@/lib/mock/public-screens";
 import { TypeSelectionStep } from "./steps/TypeSelectionStep";
 import { DescriptionStep } from "./steps/DescriptionStep";
 import { StylingStep } from "./steps/StylingStep";
@@ -13,7 +13,6 @@ import { LedenlijstConfigStep } from "./steps/LedenlijstConfigStep";
 import { MededelingenConfigStep } from "./steps/MededelingenConfigStep";
 import { MededelingenMessagesStep } from "./steps/MededelingenMessagesStep";
 import { MededelingenCarouselStep } from "./steps/MededelingenCarouselStep";
-import { MultimediaConfigStep } from "./steps/MultimediaConfigStep";
 
 interface ScreenWizardProps {
   open: boolean;
@@ -21,7 +20,7 @@ interface ScreenWizardProps {
   onComplete: (screenData: {
     name: string;
     type: ScreenType;
-    config: LedenlijstConfig | MededelingenConfig | MultimediaConfig;
+    config: LedenlijstConfig | MededelingenConfig;
   }) => void;
 }
 
@@ -59,22 +58,6 @@ interface WizardData {
       textColor: string;
       backgroundColor: string;
       maxTextWidth: number;
-    };
-  };
-  multimediaSettings?: {
-    mediaItems: Array<{
-      id: string;
-      url: string;
-      type: 'image' | 'video';
-      duration: number;
-      active: boolean;
-      loop?: boolean;
-      transition?: 'fade' | 'slide' | 'zoom' | 'none';
-      name?: string;
-    }>;
-    autoplay: {
-      enabled: boolean;
-      interval: number;
     };
   };
 }
@@ -127,8 +110,6 @@ export function ScreenWizard({ open, onOpenChange, onComplete }: ScreenWizardPro
       baseSteps.splice(2, 1); // Verwijder de "Opmaak" stap
       baseSteps.push({ title: "Berichten", component: MededelingenMessagesStep });
       baseSteps.push({ title: "Carrousel", component: MededelingenCarouselStep });
-    } else if (wizardData.type === 'MULTIMEDIA') {
-      baseSteps.push({ title: "Media", component: MultimediaConfigStep });
     }
     
     return baseSteps;
@@ -155,7 +136,6 @@ export function ScreenWizard({ open, onOpenChange, onComplete }: ScreenWizardPro
           // Voor mededelingen is stap 3 de carrousel stap
           return !!wizardData.mededelingenSettings?.autoplay;
         }
-        if (wizardData.type === 'MULTIMEDIA') return !!wizardData.multimediaSettings && wizardData.multimediaSettings.mediaItems.length > 0;
         return true;
       default: return true;
     }
@@ -172,7 +152,7 @@ export function ScreenWizard({ open, onOpenChange, onComplete }: ScreenWizardPro
   const handleComplete = () => {
     if (!wizardData.type) return;
 
-    let config: LedenlijstConfig | MededelingenConfig | MultimediaConfig;
+    let config: LedenlijstConfig | MededelingenConfig;
 
     if (wizardData.type === 'LEDENLIJST') {
       config = {
@@ -207,16 +187,21 @@ export function ScreenWizard({ open, onOpenChange, onComplete }: ScreenWizardPro
         }
       } as MededelingenConfig;
     } else {
+      // Fallback voor onbekende types - gebruik ledenlijst config
       config = {
         description: wizardData.description,
         title: wizardData.title,
         subtitle: wizardData.subtitle,
-        mediaItems: wizardData.multimediaSettings?.mediaItems || [],
-        autoplay: wizardData.multimediaSettings?.autoplay || {
-          enabled: true,
-          interval: 5
-        }
-      } as MultimediaConfig;
+        display: {
+          useFullNames: true,
+          useInitials: false,
+          filterByCategories: true,
+          showVotingRights: false,
+          rowsPerPage: 20
+        },
+        year: new Date().getFullYear(),
+        categories: []
+      } as LedenlijstConfig;
     }
 
     onComplete({

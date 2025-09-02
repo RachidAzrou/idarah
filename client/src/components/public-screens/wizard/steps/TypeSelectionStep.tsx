@@ -2,7 +2,7 @@
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScreenType } from "@/lib/mock/public-screens";
-import { Users, MessageSquare, Video } from "lucide-react";
+import { Users, MessageSquare } from "lucide-react";
 
 interface TypeSelectionStepProps {
   data: { type?: ScreenType };
@@ -21,12 +21,6 @@ const screenTypes = [
     label: 'Mededelingen',
     description: 'Carousel met tekstuele aankondigingen',
     icon: MessageSquare
-  },
-  {
-    value: 'MULTIMEDIA' as ScreenType,
-    label: 'Multimedia',
-    description: 'Afbeeldingen en video\'s weergeven',
-    icon: Video
   }
 ];
 

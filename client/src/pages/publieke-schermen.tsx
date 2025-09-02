@@ -86,7 +86,6 @@ export default function PubliekeSchermen() {
       'BETAALSTATUS': 'Betaalstatus Matrix',
       'MEDEDELINGEN': 'Mededelingen Carousel',
       'LEDENLIJST': 'Ledenlijst',
-      'MULTIMEDIA': 'Multimedia Scherm',
     };
     return labels[type] || type;
   };

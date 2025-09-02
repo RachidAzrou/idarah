@@ -54,91 +54,110 @@ export function MededelingenView({ config }: MededelingenViewProps) {
   const textColor = slideStyle.titleColor || config?.style?.textColor || '#1f2937';
 
   return (
-    <div 
-      className="min-h-screen relative overflow-hidden flex flex-col"
-      style={{ 
-        backgroundColor: backgroundColor,
-        color: textColor
-      }}
-    >
-      {/* Main content area with current slide */}
-      <div className="relative z-10 flex-1 flex items-center justify-center p-8">
-        <div 
-          className={`text-center transition-opacity duration-300 ${fadeClass}`}
-          style={{ maxWidth: config?.style?.maxTextWidth || '800px' }}
-        >
-          {/* Slide title */}
-          <h1 
-            className="mb-4"
-            style={{
-              fontSize: slideStyle.titleFontSize ? `${slideStyle.titleFontSize}px` : '48px',
-              fontFamily: slideStyle.titleFontFamily || 'Poppins',
-              fontWeight: slideStyle.titleFontWeight || 'bold',
-              color: slideStyle.titleColor || textColor
+    <div className="min-h-screen bg-gray-50 p-8 relative">
+      {/* Subtle pattern overlay */}
+      <div className="absolute inset-0 opacity-10" style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.1'%3E%3Ccircle cx='7' cy='7' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+      }}></div>
+
+      {/* Main content card */}
+      <div className="relative z-10 flex-1 flex items-center justify-center">
+        <div className="bg-white rounded-2xl border border-gray-200 mx-auto max-w-4xl w-full" style={{ boxShadow: '0 6px 16px rgba(2,6,23,0.08)' }}>
+          <div 
+            className={`p-12 text-center transition-opacity duration-300 ${fadeClass}`}
+            style={{ 
+              backgroundColor: slideStyle.backgroundColor || '#ffffff',
+              borderRadius: '1rem'
             }}
           >
-            {currentSlide.title}
-          </h1>
-          
-          {/* Slide subtitle */}
-          {currentSlide.subtitle && (
-            <h2 
+            {/* Slide title */}
+            <h1 
               className="mb-6"
               style={{
-                fontSize: slideStyle.subtitleFontSize ? `${slideStyle.subtitleFontSize}px` : '24px',
-                fontFamily: slideStyle.subtitleFontFamily || 'Poppins',
-                fontWeight: slideStyle.subtitleFontWeight || 'normal',
-                color: slideStyle.subtitleColor || textColor
+                fontSize: slideStyle.titleFontSize ? `${slideStyle.titleFontSize}px` : '48px',
+                fontFamily: slideStyle.titleFontFamily || 'Poppins',
+                fontWeight: slideStyle.titleFontWeight || 'bold',
+                color: slideStyle.titleColor || '#1f2937',
+                lineHeight: '1.2'
               }}
+              data-testid="mededelingen-title"
             >
-              {currentSlide.subtitle}
-            </h2>
-          )}
-          
-          {/* Slide content/body with line break support */}
-          {currentSlide.body && (
-            <div 
-              className="leading-relaxed whitespace-pre-line"
-              style={{
-                fontSize: slideStyle.bodyFontSize ? `${slideStyle.bodyFontSize}px` : '20px',
-                fontFamily: slideStyle.bodyFontFamily || 'Poppins',
-                fontWeight: slideStyle.bodyFontWeight || 'normal',
-                color: slideStyle.bodyColor || textColor
-              }}
-            >
-              {currentSlide.body}
-            </div>
-          )}
+              {currentSlide.title}
+            </h1>
+            
+            {/* Slide subtitle */}
+            {currentSlide.subtitle && (
+              <h2 
+                className="mb-8"
+                style={{
+                  fontSize: slideStyle.subtitleFontSize ? `${slideStyle.subtitleFontSize}px` : '28px',
+                  fontFamily: slideStyle.subtitleFontFamily || 'Poppins',
+                  fontWeight: slideStyle.subtitleFontWeight || 'normal',
+                  color: slideStyle.subtitleColor || '#6b7280',
+                  lineHeight: '1.3'
+                }}
+                data-testid="mededelingen-subtitle"
+              >
+                {currentSlide.subtitle}
+              </h2>
+            )}
+            
+            {/* Slide content/body with line break support */}
+            {currentSlide.body && (
+              <div 
+                className="leading-relaxed whitespace-pre-line max-w-3xl mx-auto"
+                style={{
+                  fontSize: slideStyle.bodyFontSize ? `${slideStyle.bodyFontSize}px` : '22px',
+                  fontFamily: slideStyle.bodyFontFamily || 'Poppins',
+                  fontWeight: slideStyle.bodyFontWeight || 'normal',
+                  color: slideStyle.bodyColor || '#374151',
+                  lineHeight: '1.6'
+                }}
+                data-testid="mededelingen-body"
+              >
+                {currentSlide.body}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
       {/* Progress indicators */}
       {activeSlides.length > 1 && (
-        <div className="relative z-10 flex justify-center gap-3 p-8">
-          {activeSlides.map((_: any, index: number) => (
-            <div
-              key={index}
-              className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                index === currentSlideIndex 
-                  ? 'opacity-100 scale-110' 
-                  : 'opacity-40'
-              }`}
-              style={{
-                backgroundColor: textColor
-              }}
-            />
-          ))}
+        <div className="relative z-10 flex justify-center mt-8">
+          <div className="bg-white/95 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-slate-200/50">
+            <div className="flex justify-center items-center gap-3 mb-4">
+              {activeSlides.map((_: any, index: number) => (
+                <div
+                  key={index}
+                  className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                    index === currentSlideIndex 
+                      ? 'bg-blue-600 scale-125' 
+                      : 'bg-blue-200'
+                  }`}
+                  data-testid={`slide-indicator-${index}`}
+                />
+              ))}
+            </div>
+            <div className="text-center">
+              <p className="text-slate-700 font-semibold text-lg">
+                Bericht {currentSlideIndex + 1} van {activeSlides.length}
+              </p>
+              <p className="text-slate-500 text-sm mt-1">
+                {activeSlides.length} mededelingen
+              </p>
+            </div>
+          </div>
         </div>
       )}
 
       {/* Auto-play progress bar */}
       {autoAdvance && activeSlides.length > 1 && (
         <div className="absolute bottom-0 left-0 right-0 z-10">
-          <div className="h-1 opacity-20" style={{ backgroundColor: textColor }}>
+          <div className="h-1 bg-blue-200/30">
             <div 
-              className="h-full transition-all linear"
+              className="h-full transition-all linear bg-blue-600"
               style={{
-                backgroundColor: textColor,
                 width: '0%',
                 animation: `progress ${(currentSlide?.displayDuration || intervalTime) / 1000}s linear infinite`
               }}

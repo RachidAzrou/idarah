@@ -1,4 +1,6 @@
-import { UserPlus, UserCheck, CreditCard, AlertCircle } from 'lucide-react';
+import { UserPlus, CreditCard } from 'lucide-react';
+import { LuUserCog } from 'react-icons/lu';
+import { RiSettings4Line } from 'react-icons/ri';
 
 const activities = [
   {
@@ -24,7 +26,7 @@ const activities = [
     user: 'Fatima Bouchouchi',
     action: 'Profiel bijgewerkt',
     time: '5 uur geleden',
-    icon: UserCheck,
+    icon: LuUserCog,
     iconBg: 'bg-blue-50',
     iconColor: 'text-blue-600'
   },
@@ -33,7 +35,7 @@ const activities = [
     user: 'Ahmed El-Hassani',
     action: 'Status gewijzigd naar actief',
     time: '1 dag geleden',
-    icon: UserCheck,
+    icon: LuUserCog,
     iconBg: 'bg-blue-50',
     iconColor: 'text-blue-600'
   },
@@ -42,7 +44,7 @@ const activities = [
     user: 'System',
     action: 'Automatische herinnering verzonden',
     time: '2 dagen geleden',
-    icon: AlertCircle,
+    icon: RiSettings4Line,
     iconBg: 'bg-orange-50',
     iconColor: 'text-orange-600'
   }

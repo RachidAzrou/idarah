@@ -9,36 +9,44 @@ export default function RevenueChart() {
   
   const data = useMemo(() => {
     if (!Array.isArray(transactions)) {
-      return [
-        { month: 'Jan', revenue: 0 },
-        { month: 'Feb', revenue: 0 },
-        { month: 'Mrt', revenue: 0 },
-        { month: 'Apr', revenue: 0 },
-        { month: 'Mei', revenue: 0 },
-        { month: 'Jun', revenue: 0 },
-      ];
+      // Toon laatste 6 maanden zelfs zonder data
+      const result = [];
+      for (let i = 5; i >= 0; i--) {
+        const date = new Date();
+        date.setMonth(date.getMonth() - i);
+        const monthName = date.toLocaleDateString('nl-BE', { month: 'short' });
+        result.push({ month: monthName, revenue: 0 });
+      }
+      return result;
     }
     
-    // Bereken inkomsten per maand van dit jaar
-    const currentYear = new Date().getFullYear();
-    const monthNames = ['Jan', 'Feb', 'Mrt', 'Apr', 'Mei', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dec'];
-    
-    const monthlyRevenue = monthNames.map(monthName => {
-      const monthIndex = monthNames.indexOf(monthName);
+    // Bereken inkomsten voor de laatste 6 maanden
+    const monthlyRevenue = [];
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date();
+      date.setMonth(date.getMonth() - i);
+      const year = date.getFullYear();
+      const month = date.getMonth();
+      const monthName = date.toLocaleDateString('nl-BE', { month: 'short' });
+      
       const monthRevenue = transactions
         .filter((t: any) => {
           const transactionDate = new Date(t.date);
-          return transactionDate.getFullYear() === currentYear && 
-                 transactionDate.getMonth() === monthIndex &&
+          return transactionDate.getFullYear() === year && 
+                 transactionDate.getMonth() === month &&
                  t.type === 'INCOME';
         })
         .reduce((sum: number, t: any) => sum + Math.abs(parseFloat(t.amount)), 0);
       
-      return { month: monthName, revenue: monthRevenue };
-    });
+      monthlyRevenue.push({ month: monthName, revenue: monthRevenue });
+    }
     
-    return monthlyRevenue.slice(0, 6); // Alleen eerste 6 maanden
+    return monthlyRevenue;
   }, [transactions]);
+  
+  // Bereken dynamische Y-as schaal
+  const maxRevenue = Math.max(...data.map(d => d.revenue), 100); // Minimum 100 voor leesbaarheid
+  const yAxisMax = Math.ceil(maxRevenue * 1.1); // 10% ruimte bovenaan
   
   return (
     <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
@@ -66,7 +74,13 @@ export default function RevenueChart() {
               axisLine={false}
               tickLine={false}
               tick={{ fontSize: 12, fill: '#64748B' }}
-              tickFormatter={(value) => `€${(value / 1000).toFixed(1)}k`}
+              domain={[0, yAxisMax]}
+              tickFormatter={(value) => {
+                if (value >= 1000) {
+                  return `€${(value / 1000).toFixed(1)}k`;
+                }
+                return `€${value}`;
+              }}
             />
             <Tooltip 
               contentStyle={{

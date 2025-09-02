@@ -54,99 +54,90 @@ export function MededelingenView({ config }: MededelingenViewProps) {
   const textColor = slideStyle.titleColor || config?.style?.textColor || '#1f2937';
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8 relative">
-      {/* Subtle pattern overlay */}
-      <div className="absolute inset-0 opacity-10" style={{
-        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.1'%3E%3Ccircle cx='7' cy='7' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
-      }}></div>
-
+    <div 
+      className="min-h-screen relative flex items-center justify-center p-8"
+      style={{
+        backgroundImage: `url("@assets/19449746_1756811468947.jpg")`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
       {/* Main content card */}
-      <div className="relative z-10 flex-1 flex items-center justify-center">
-        <div className="bg-white rounded-2xl border border-gray-200 mx-auto max-w-4xl w-full" style={{ boxShadow: '0 6px 16px rgba(2,6,23,0.08)' }}>
-          <div 
-            className={`p-12 text-center transition-opacity duration-300 ${fadeClass}`}
-            style={{ 
-              backgroundColor: slideStyle.backgroundColor || '#ffffff',
-              borderRadius: '1rem'
+      <div className="relative z-10 max-w-5xl w-full">
+        <div 
+          className={`bg-white/95 backdrop-blur-sm rounded-3xl border border-white/20 p-16 text-center transition-opacity duration-300 ${fadeClass}`}
+          style={{ 
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1)',
+            backgroundColor: slideStyle.backgroundColor ? `${slideStyle.backgroundColor}F5` : 'rgba(255, 255, 255, 0.95)'
+          }}
+        >
+          {/* Slide title */}
+          <h1 
+            className="mb-8"
+            style={{
+              fontSize: slideStyle.titleFontSize ? `${slideStyle.titleFontSize}px` : '56px',
+              fontFamily: slideStyle.titleFontFamily || 'Poppins',
+              fontWeight: slideStyle.titleFontWeight || 'bold',
+              color: slideStyle.titleColor || '#1f2937',
+              lineHeight: '1.1'
             }}
+            data-testid="mededelingen-title"
           >
-            {/* Slide title */}
-            <h1 
-              className="mb-6"
+            {currentSlide.title}
+          </h1>
+          
+          {/* Slide subtitle */}
+          {currentSlide.subtitle && (
+            <h2 
+              className="mb-10"
               style={{
-                fontSize: slideStyle.titleFontSize ? `${slideStyle.titleFontSize}px` : '48px',
-                fontFamily: slideStyle.titleFontFamily || 'Poppins',
-                fontWeight: slideStyle.titleFontWeight || 'bold',
-                color: slideStyle.titleColor || '#1f2937',
-                lineHeight: '1.2'
+                fontSize: slideStyle.subtitleFontSize ? `${slideStyle.subtitleFontSize}px` : '32px',
+                fontFamily: slideStyle.subtitleFontFamily || 'Poppins',
+                fontWeight: slideStyle.subtitleFontWeight || 'normal',
+                color: slideStyle.subtitleColor || '#6b7280',
+                lineHeight: '1.3'
               }}
-              data-testid="mededelingen-title"
+              data-testid="mededelingen-subtitle"
             >
-              {currentSlide.title}
-            </h1>
-            
-            {/* Slide subtitle */}
-            {currentSlide.subtitle && (
-              <h2 
-                className="mb-8"
-                style={{
-                  fontSize: slideStyle.subtitleFontSize ? `${slideStyle.subtitleFontSize}px` : '28px',
-                  fontFamily: slideStyle.subtitleFontFamily || 'Poppins',
-                  fontWeight: slideStyle.subtitleFontWeight || 'normal',
-                  color: slideStyle.subtitleColor || '#6b7280',
-                  lineHeight: '1.3'
-                }}
-                data-testid="mededelingen-subtitle"
-              >
-                {currentSlide.subtitle}
-              </h2>
-            )}
-            
-            {/* Slide content/body with line break support */}
-            {currentSlide.body && (
-              <div 
-                className="leading-relaxed whitespace-pre-line max-w-3xl mx-auto"
-                style={{
-                  fontSize: slideStyle.bodyFontSize ? `${slideStyle.bodyFontSize}px` : '22px',
-                  fontFamily: slideStyle.bodyFontFamily || 'Poppins',
-                  fontWeight: slideStyle.bodyFontWeight || 'normal',
-                  color: slideStyle.bodyColor || '#374151',
-                  lineHeight: '1.6'
-                }}
-                data-testid="mededelingen-body"
-              >
-                {currentSlide.body}
-              </div>
-            )}
-          </div>
+              {currentSlide.subtitle}
+            </h2>
+          )}
+          
+          {/* Slide content/body with line break support */}
+          {currentSlide.body && (
+            <div 
+              className="leading-relaxed whitespace-pre-line max-w-4xl mx-auto"
+              style={{
+                fontSize: slideStyle.bodyFontSize ? `${slideStyle.bodyFontSize}px` : '26px',
+                fontFamily: slideStyle.bodyFontFamily || 'Poppins',
+                fontWeight: slideStyle.bodyFontWeight || 'normal',
+                color: slideStyle.bodyColor || '#374151',
+                lineHeight: '1.7'
+              }}
+              data-testid="mededelingen-body"
+            >
+              {currentSlide.body}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Progress indicators */}
+      {/* Simple progress indicators only */}
       {activeSlides.length > 1 && (
-        <div className="relative z-10 flex justify-center mt-8">
-          <div className="bg-white/95 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-slate-200/50">
-            <div className="flex justify-center items-center gap-3 mb-4">
-              {activeSlides.map((_: any, index: number) => (
-                <div
-                  key={index}
-                  className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                    index === currentSlideIndex 
-                      ? 'bg-blue-600 scale-125' 
-                      : 'bg-blue-200'
-                  }`}
-                  data-testid={`slide-indicator-${index}`}
-                />
-              ))}
-            </div>
-            <div className="text-center">
-              <p className="text-slate-700 font-semibold text-lg">
-                Bericht {currentSlideIndex + 1} van {activeSlides.length}
-              </p>
-              <p className="text-slate-500 text-sm mt-1">
-                {activeSlides.length} mededelingen
-              </p>
-            </div>
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10">
+          <div className="flex justify-center items-center gap-3">
+            {activeSlides.map((_: any, index: number) => (
+              <div
+                key={index}
+                className={`w-4 h-4 rounded-full transition-all duration-300 ${
+                  index === currentSlideIndex 
+                    ? 'bg-white scale-125 shadow-lg' 
+                    : 'bg-white/40'
+                }`}
+                data-testid={`slide-indicator-${index}`}
+              />
+            ))}
           </div>
         </div>
       )}
@@ -154,9 +145,9 @@ export function MededelingenView({ config }: MededelingenViewProps) {
       {/* Auto-play progress bar */}
       {autoAdvance && activeSlides.length > 1 && (
         <div className="absolute bottom-0 left-0 right-0 z-10">
-          <div className="h-1 bg-blue-200/30">
+          <div className="h-1 bg-white/20">
             <div 
-              className="h-full transition-all linear bg-blue-600"
+              className="h-full transition-all linear bg-white"
               style={{
                 width: '0%',
                 animation: `progress ${(currentSlide?.displayDuration || intervalTime) / 1000}s linear infinite`

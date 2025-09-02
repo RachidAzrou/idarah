@@ -59,7 +59,7 @@ export function MededelingenView({ config }: MededelingenViewProps) {
       className="min-h-screen relative flex items-center justify-center p-8"
       style={{
         backgroundImage: `url("${backgroundImage}")`,
-        backgroundSize: 'cover',
+        backgroundSize: 'contain',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'
       }}

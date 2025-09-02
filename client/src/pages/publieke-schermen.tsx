@@ -3,11 +3,12 @@ import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Monitor, Plus } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Monitor, Plus, Power } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ScreenWizard } from "@/components/public-screens/wizard/ScreenWizard";
 import { ScreenCard } from "@/components/public-screens/ScreenCard";
-import { EditScreenDrawer } from "@/components/public-screens/EditScreenDrawer";
+import { EditScreenModal } from "@/components/public-screens/EditScreenModal";
 import { apiRequest } from "@/lib/queryClient";
 
 export default function PubliekeSchermen() {
@@ -289,7 +290,7 @@ export default function PubliekeSchermen() {
                                   </Badge>
                                   {announcement.validFrom && announcement.validTo && (
                                     <span className="text-xs text-gray-500">
-                                      Geldig: {formatDateTime(announcement.validFrom)} - {formatDateTime(announcement.validTo)}
+                                      Geldig: {new Date(announcement.validFrom).toLocaleString('nl-NL')} - {new Date(announcement.validTo).toLocaleString('nl-NL')}
                                     </span>
                                   )}
                                 </div>
@@ -320,17 +321,35 @@ export default function PubliekeSchermen() {
             onComplete={handleCreateScreen}
           />
 
-          {/* Edit Screen Drawer */}
-          <EditScreenDrawer
+          {/* Edit Screen Modal */}
+          <EditScreenModal
             screen={editingScreen}
+            open={!!editingScreen}
             onClose={() => setEditingScreen(null)}
             onSave={(updatedScreen) => {
-              queryClient.invalidateQueries({ queryKey: ["/api/public-screens"] });
-              setEditingScreen(null);
-              toast({
-                title: "Scherm bijgewerkt",
-                description: "De wijzigingen zijn opgeslagen.",
-              });
+              // Update screen via API
+              const updateScreen = async () => {
+                try {
+                  await apiRequest('PUT', `/api/public-screens/${updatedScreen.id}`, {
+                    name: updatedScreen.name,
+                    active: updatedScreen.active
+                  });
+                  
+                  queryClient.invalidateQueries({ queryKey: ["/api/public-screens"] });
+                  setEditingScreen(null);
+                  toast({
+                    title: "Scherm bijgewerkt",
+                    description: "De wijzigingen zijn opgeslagen.",
+                  });
+                } catch (error) {
+                  toast({
+                    title: "Fout",
+                    description: "Er is een fout opgetreden bij het opslaan.",
+                    variant: "destructive",
+                  });
+                }
+              };
+              updateScreen();
             }}
           />
         </main>

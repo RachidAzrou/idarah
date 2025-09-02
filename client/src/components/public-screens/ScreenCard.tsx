@@ -9,8 +9,9 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { CopyField } from "@/components/ui/CopyField";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Link2, Edit, Trash2, ExternalLink } from "lucide-react";
+import { Edit, Trash2, ExternalLink, Check } from "lucide-react";
 import { GiPowerButton } from "react-icons/gi";
+import { FaRegCopy } from "react-icons/fa";
 
 interface ScreenCardProps {
   screen: PublicScreen;
@@ -22,11 +23,13 @@ interface ScreenCardProps {
 export function ScreenCard({ screen, onEdit, onToggleStatus, onDelete }: ScreenCardProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showUrlDialog, setShowUrlDialog] = useState(false);
+  const [justCopied, setJustCopied] = useState(false);
 
   const handleCopyUrl = async () => {
     try {
       await navigator.clipboard.writeText(publicUrl);
-      // Optional: Show toast notification
+      setJustCopied(true);
+      setTimeout(() => setJustCopied(false), 2000);
     } catch (err) {
       // Fallback for older browsers
       setShowUrlDialog(true);
@@ -81,10 +84,14 @@ export function ScreenCard({ screen, onEdit, onToggleStatus, onDelete }: ScreenC
                 variant="outline"
                 size="sm"
                 onClick={handleCopyUrl}
-                className="h-8 w-8 p-0"
-                title="Kopieer URL"
+                className={`h-8 w-8 p-0 ${justCopied ? 'text-green-600' : ''}`}
+                title={justCopied ? "Gekopieerd!" : "Kopieer URL"}
               >
-                <Link2 className="h-4 w-4" />
+                {justCopied ? (
+                  <Check className="h-4 w-4" />
+                ) : (
+                  <FaRegCopy className="h-4 w-4" />
+                )}
               </Button>
               <Button
                 variant="outline"

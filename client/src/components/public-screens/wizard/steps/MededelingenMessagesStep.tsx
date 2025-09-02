@@ -83,6 +83,7 @@ export function MededelingenMessagesStep({ data, onUpdate }: MededelingenMessage
 
   const updateSettings = (newSettings: Partial<MededelingenSettings>) => {
     onUpdate({
+      ...data,
       mededelingenSettings: {
         ...settings,
         ...newSettings

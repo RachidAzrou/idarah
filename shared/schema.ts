@@ -424,6 +424,25 @@ export const insertCardMetaSchema = createInsertSchema(cardMeta).omit({
   lastRenderedAt: true,
 });
 
+// Live Card schemas for public endpoints
+export const cardVerifyResponseSchema = z.object({
+  ok: z.boolean(),
+  member: z.object({
+    naam: z.string(),
+    nummer: z.string(),
+  }),
+  status: z.object({
+    actief: z.boolean(),
+    betaaldDitJaar: z.boolean(),
+    geldigTot: z.string().nullable(),
+  }),
+  tenant: z.object({
+    naam: z.string(),
+    slug: z.string(),
+  }),
+  ts: z.number(),
+});
+
 export const insertNotificationSchema = createInsertSchema(notifications).omit({
   id: true,
   createdAt: true,
@@ -476,3 +495,5 @@ export type InsertNotification = z.infer<typeof insertNotificationSchema>;
 
 export type SepaExport = typeof sepaExports.$inferSelect;
 export type InsertSepaExport = z.infer<typeof insertSepaExportSchema>;
+
+export type CardVerifyResponse = z.infer<typeof cardVerifyResponseSchema>;

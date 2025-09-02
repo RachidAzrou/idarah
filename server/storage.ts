@@ -103,8 +103,10 @@ export interface IStorage {
 
   // Card Meta
   getCardMetaByMember(memberId: string): Promise<CardMeta | undefined>;
+  getCardMetaByQrToken(qrToken: string): Promise<CardMeta | undefined>;
   createCardMeta(cardMeta: InsertCardMeta): Promise<CardMeta>;
   updateCardMeta(id: string, cardMeta: Partial<InsertCardMeta>): Promise<CardMeta>;
+  getMemberWithCardAndTenant(memberId: string): Promise<{ member: Member; cardMeta: CardMeta; tenant: Tenant } | undefined>;
 
   // Notifications
   getNotificationsByTenant(tenantId: string): Promise<Notification[]>;
@@ -373,6 +375,11 @@ export class DatabaseStorage implements IStorage {
     return card || undefined;
   }
 
+  async getCardMetaByQrToken(qrToken: string): Promise<CardMeta | undefined> {
+    const [card] = await db.select().from(cardMeta).where(eq(cardMeta.qrToken, qrToken));
+    return card || undefined;
+  }
+
   async createCardMeta(cardMetaData: InsertCardMeta): Promise<CardMeta> {
     const [newCard] = await db.insert(cardMeta).values(cardMetaData).returning();
     return newCard;
@@ -381,6 +388,28 @@ export class DatabaseStorage implements IStorage {
   async updateCardMeta(id: string, cardMetaData: Partial<InsertCardMeta>): Promise<CardMeta> {
     const [updatedCard] = await db.update(cardMeta).set(cardMetaData).where(eq(cardMeta.id, id)).returning();
     return updatedCard;
+  }
+
+  async getMemberWithCardAndTenant(memberId: string): Promise<{ member: Member; cardMeta: CardMeta; tenant: Tenant } | undefined> {
+    const result = await db
+      .select({
+        member: members,
+        cardMeta: cardMeta,
+        tenant: tenants,
+      })
+      .from(members)
+      .innerJoin(cardMeta, eq(members.id, cardMeta.memberId))
+      .innerJoin(tenants, eq(members.tenantId, tenants.id))
+      .where(eq(members.id, memberId));
+
+    if (result.length === 0) return undefined;
+
+    const row = result[0];
+    return {
+      member: row.member,
+      cardMeta: row.cardMeta,
+      tenant: row.tenant,
+    };
   }
 
   // Notifications

@@ -3,6 +3,22 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --animation-duration: 800ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --animation-duration: 0ms;
+  }
+  
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 /* Concentric rings animation */
 @keyframes drawArc {
   0% {

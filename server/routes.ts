@@ -7,6 +7,7 @@ import { authService } from "./services/auth";
 import { memberService } from "./services/member";
 import { feeService } from "./services/fee";
 import { financialService } from "./services/financial";
+import { cardService } from "./services/card";
 import { insertUserSchema, insertMemberSchema, insertMembershipFeeSchema } from "@shared/schema";
 import { generateFeesHandler } from "./api/jobs/fees/generate";
 import { createMemberHandler } from "./api/members/create";
@@ -533,6 +534,141 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Public screens routes - some routes need auth, others are public
   app.use("/api/public-screens", publicScreensRouter);
+
+  // Card routes - Public endpoints for Live Card
+  app.get("/card/:memberId", async (req, res) => {
+    try {
+      const { memberId } = req.params;
+      const { standalone, v } = req.query;
+      
+      const cardData = await cardService.getCardData(memberId);
+      if (!cardData) {
+        return res.status(404).send(`
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>Lidkaart niet gevonden</title>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+          </head>
+          <body style="font-family: system-ui; text-align: center; padding: 2rem;">
+            <h1>Lidkaart niet gevonden</h1>
+            <p>De opgevraagde lidkaart bestaat niet of is niet beschikbaar.</p>
+          </body>
+          </html>
+        `);
+      }
+
+      // Return a simple HTML page that loads the React component
+      const html = `
+        <!DOCTYPE html>
+        <html lang="nl">
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <title>Digitale Lidkaart - ${cardData.member.firstName} ${cardData.member.lastName}</title>
+          <meta name="description" content="Digitale lidkaart voor ${cardData.tenant.name}">
+          <style>
+            body { margin: 0; padding: 0; font-family: system-ui; }
+            .loading { 
+              display: flex; 
+              align-items: center; 
+              justify-content: center; 
+              min-height: 100vh; 
+              background: #f3f4f6; 
+            }
+          </style>
+        </head>
+        <body>
+          <div id="card-root">
+            <div class="loading">Lidkaart laden...</div>
+          </div>
+          <script>
+            window.__CARD_DATA__ = ${JSON.stringify({
+              member: cardData.member,
+              cardMeta: cardData.cardMeta,
+              tenant: cardData.tenant,
+              standalone: standalone === '1',
+            })};
+          </script>
+          <script type="module">
+            // This would normally load the React component
+            // For now, show basic card info
+            document.getElementById('card-root').innerHTML = \`
+              <div style="padding: 2rem; max-width: 400px; margin: 2rem auto; background: white; border-radius: 1rem; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+                <h1 style="margin: 0 0 1rem 0; color: #1f2937;">${cardData.member.firstName} ${cardData.member.lastName}</h1>
+                <p style="margin: 0 0 0.5rem 0; font-family: monospace; color: #6b7280;">#${cardData.member.memberNumber}</p>
+                <p style="margin: 0 0 1rem 0; color: #6b7280;">${cardData.member.category}</p>
+                <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 0.5rem;">
+                  <p style="margin: 0; font-size: 0.875rem; color: #6b7280;">QR Code voor verificatie</p>
+                  <p style="margin: 0.5rem 0 0 0; font-size: 0.75rem; color: #9ca3af;">Scan om status te verifiëren</p>
+                </div>
+              </div>
+            \`;
+          </script>
+        </body>
+        </html>
+      `;
+      
+      res.setHeader('Content-Type', 'text/html');
+      res.send(html);
+    } catch (error) {
+      console.error('Error serving Live Card:', error);
+      res.status(500).send('Internal Server Error');
+    }
+  });
+
+  // Card verification endpoint
+  app.get("/api/card/verify/:qrToken", async (req, res) => {
+    try {
+      const { qrToken } = req.params;
+      
+      const verificationData = await cardService.verifyCardByQrToken(qrToken);
+      if (!verificationData) {
+        return res.status(404).json({ 
+          ok: false, 
+          message: "Card not found or invalid token" 
+        });
+      }
+
+      // Set headers to prevent caching for live verification
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+      
+      res.json(verificationData);
+    } catch (error) {
+      console.error('Error verifying card:', error);
+      res.status(500).json({ 
+        ok: false, 
+        message: "Internal server error" 
+      });
+    }
+  });
+
+  // Card invalidation endpoint (authenticated)
+  app.post("/api/card/invalidate", authMiddleware, tenantMiddleware, async (req, res) => {
+    try {
+      const { memberId, tenantBrandingBump } = req.body;
+      
+      if (memberId) {
+        const cardData = await cardService.getCardData(memberId);
+        if (cardData && cardData.member.tenantId === req.tenantId) {
+          await cardService.invalidateCard(cardData.cardMeta.id);
+        }
+      }
+      
+      if (tenantBrandingBump) {
+        // TODO: Implement tenant branding version bump
+        // This would increment tenant.brandingVersion and invalidate all cards
+      }
+      
+      res.json({ success: true, message: "Card invalidated" });
+    } catch (error) {
+      console.error('Error invalidating card:', error);
+      res.status(500).json({ message: "Failed to invalidate card" });
+    }
+  });
 
   const httpServer = createServer(app);
   return httpServer;

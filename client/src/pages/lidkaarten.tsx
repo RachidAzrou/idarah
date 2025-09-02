@@ -13,7 +13,6 @@ import { LiveCard } from "@/components/cards/live-card";
 import { 
   Search, 
   Filter, 
-  Download, 
   Eye, 
   RefreshCw, 
   Trash2,
@@ -23,6 +22,7 @@ import {
   Clock,
   MoreHorizontal
 } from "lucide-react";
+import { CiExport } from "react-icons/ci";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 import type { Member, CardMeta, Tenant } from "@shared/schema";
@@ -289,11 +289,11 @@ export default function LidkaartenPage() {
                   <Button 
                     variant="outline" 
                     onClick={handleExport}
-                    className="h-10 px-4 border-gray-200 hover:border-gray-300 gap-2"
+                    className="h-10 px-4 border-gray-200 hover:border-gray-300"
                     data-testid="export-button"
                   >
-                    <Download className="h-4 w-4" />
-                    Exporteer
+                    <CiExport className="h-4 w-4 mr-2" />
+                    Export
                   </Button>
                 </div>
               </div>

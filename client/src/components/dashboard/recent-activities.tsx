@@ -1,56 +1,42 @@
 import { UserPlus, CreditCard } from 'lucide-react';
 import { LuUserCog } from 'react-icons/lu';
 import { RiSettings4Line } from 'react-icons/ri';
-
-const activities = [
-  {
-    id: 1,
-    user: 'Emma Janssen',
-    action: 'Nieuw lid toegevoegd',
-    time: '2 uur geleden',
-    icon: UserPlus,
-    iconBg: 'bg-blue-50',
-    iconColor: 'text-blue-600'
-  },
-  {
-    id: 2,
-    user: 'Mohamed Al-Rashid',
-    action: 'Lidgeld betaald',
-    time: '3 uur geleden',
-    icon: CreditCard,
-    iconBg: 'bg-green-50',
-    iconColor: 'text-green-600'
-  },
-  {
-    id: 3,
-    user: 'Fatima Bouchouchi',
-    action: 'Profiel bijgewerkt',
-    time: '5 uur geleden',
-    icon: LuUserCog,
-    iconBg: 'bg-blue-50',
-    iconColor: 'text-blue-600'
-  },
-  {
-    id: 4,
-    user: 'Ahmed El-Hassani',
-    action: 'Status gewijzigd naar actief',
-    time: '1 dag geleden',
-    icon: LuUserCog,
-    iconBg: 'bg-blue-50',
-    iconColor: 'text-blue-600'
-  },
-  {
-    id: 5,
-    user: 'System',
-    action: 'Automatische herinnering verzonden',
-    time: '2 dagen geleden',
-    icon: RiSettings4Line,
-    iconBg: 'bg-orange-50',
-    iconColor: 'text-orange-600'
-  }
-];
+import { useQuery } from '@tanstack/react-query';
+import { formatDistanceToNow } from 'date-fns';
+import { nl } from 'date-fns/locale';
+import { useMemo } from 'react';
 
 export default function RecentActivities() {
+  const { data: transactions } = useQuery({
+    queryKey: ["/api/transactions"],
+  });
+  
+  const activities = useMemo(() => {
+    if (!Array.isArray(transactions)) {
+      return [
+        {
+          id: 1,
+          user: 'Systeem',
+          action: 'Geen recente activiteiten',
+          time: 'Nu',
+          icon: RiSettings4Line,
+          iconBg: 'bg-gray-50',
+          iconColor: 'text-gray-600'
+        }
+      ];
+    }
+    
+    return transactions.slice(0, 5).map((t: any, index: number) => ({
+      id: index + 1,
+      user: t.memberName || 'Onbekend lid',
+      action: t.type === 'INCOME' ? 'Betaling ontvangen' : 'Uitgave geregistreerd',
+      time: formatDistanceToNow(new Date(t.date), { addSuffix: true, locale: nl }),
+      icon: t.type === 'INCOME' ? CreditCard : UserPlus,
+      iconBg: t.type === 'INCOME' ? 'bg-green-50' : 'bg-red-50',
+      iconColor: t.type === 'INCOME' ? 'text-green-600' : 'text-red-600'
+    }));
+  }, [transactions]);
+  
   return (
     <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
       <div className="mb-6 pb-4 border-b border-gray-200">

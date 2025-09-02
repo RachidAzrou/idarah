@@ -1,14 +1,40 @@
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+import { useQuery } from '@tanstack/react-query';
+import { useMemo } from 'react';
 
-const data = [
-  { name: 'Betaald', value: 1058, color: '#16A34A' },
-  { name: 'Openstaand', value: 150, color: '#F59E0B' },
-  { name: 'Achterstallig', value: 39, color: '#EF4444' },
-];
-
-const total = data.reduce((sum, item) => sum + item.value, 0);
+interface PaymentStatusData {
+  name: string;
+  value: number;
+  color: string;
+}
 
 export default function PaymentStatusChart() {
+  const { data: fees } = useQuery({
+    queryKey: ["/api/fees"],
+  });
+  
+  const data: PaymentStatusData[] = useMemo(() => {
+    if (!Array.isArray(fees)) {
+      return [
+        { name: 'Betaald', value: 0, color: '#16A34A' },
+        { name: 'Openstaand', value: 0, color: '#F59E0B' },
+        { name: 'Achterstallig', value: 0, color: '#EF4444' },
+      ];
+    }
+    
+    const paid = fees.filter((f: any) => f.status === 'PAID').length;
+    const open = fees.filter((f: any) => f.status === 'OPEN').length;
+    const overdue = fees.filter((f: any) => f.status === 'OVERDUE').length;
+    
+    return [
+      { name: 'Betaald', value: paid, color: '#16A34A' },
+      { name: 'Openstaand', value: open, color: '#F59E0B' },
+      { name: 'Achterstallig', value: overdue, color: '#EF4444' },
+    ];
+  }, [fees]);
+  
+  const total = data.reduce((sum, item) => sum + item.value, 0);
+  
   return (
     <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
       <div className="mb-6 pb-4 border-b border-gray-200">

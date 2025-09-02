@@ -1,15 +1,45 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
-
-const data = [
-  { month: 'Jan', revenue: 4500 },
-  { month: 'Feb', revenue: 5200 },
-  { month: 'Mrt', revenue: 4800 },
-  { month: 'Apr', revenue: 6100 },
-  { month: 'Mei', revenue: 7300 },
-  { month: 'Jun', revenue: 8400 },
-];
+import { useQuery } from '@tanstack/react-query';
+import { useMemo } from 'react';
 
 export default function RevenueChart() {
+  const { data: transactions } = useQuery({
+    queryKey: ["/api/transactions"],
+  });
+  
+  const data = useMemo(() => {
+    if (!Array.isArray(transactions)) {
+      return [
+        { month: 'Jan', revenue: 0 },
+        { month: 'Feb', revenue: 0 },
+        { month: 'Mrt', revenue: 0 },
+        { month: 'Apr', revenue: 0 },
+        { month: 'Mei', revenue: 0 },
+        { month: 'Jun', revenue: 0 },
+      ];
+    }
+    
+    // Bereken inkomsten per maand van dit jaar
+    const currentYear = new Date().getFullYear();
+    const monthNames = ['Jan', 'Feb', 'Mrt', 'Apr', 'Mei', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dec'];
+    
+    const monthlyRevenue = monthNames.map(monthName => {
+      const monthIndex = monthNames.indexOf(monthName);
+      const monthRevenue = transactions
+        .filter((t: any) => {
+          const transactionDate = new Date(t.date);
+          return transactionDate.getFullYear() === currentYear && 
+                 transactionDate.getMonth() === monthIndex &&
+                 t.type === 'INCOME';
+        })
+        .reduce((sum: number, t: any) => sum + Math.abs(parseFloat(t.amount)), 0);
+      
+      return { month: monthName, revenue: monthRevenue };
+    });
+    
+    return monthlyRevenue.slice(0, 6); // Alleen eerste 6 maanden
+  }, [transactions]);
+  
   return (
     <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
       <div className="mb-6 pb-4 border-b border-gray-200">

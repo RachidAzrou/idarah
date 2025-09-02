@@ -188,7 +188,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/tenant/current", authMiddleware, tenantMiddleware, async (req, res) => {
     try {
       const tenant = await storage.getTenant(req.tenantId!);
-      res.json(tenant);
+      if (!tenant) {
+        return res.status(404).json({ message: "Tenant not found" });
+      }
+      
+      // Return tenant data with consistent field names
+      const mappedTenant = {
+        id: tenant.id,
+        name: tenant.name,
+        slug: tenant.slug,
+        street: tenant.street,
+        number: tenant.number,
+        postalCode: tenant.postalCode,
+        city: tenant.city,
+        country: tenant.country,
+        email: tenant.email,
+        phone: tenant.phone,
+        website: tenant.website,
+        companyNumber: tenant.companyNumber,
+        companyType: tenant.companyType,
+        logoUrl: tenant.logoUrl,
+        primaryColor: tenant.primaryColor,
+        createdAt: tenant.createdAt,
+      };
+      
+      res.json(mappedTenant);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch tenant" });
     }
@@ -197,8 +221,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/tenant/current", authMiddleware, tenantMiddleware, async (req, res) => {
     try {
       const tenantData = req.body;
-      const updatedTenant = await storage.updateTenant(req.tenantId!, tenantData);
-      res.json(updatedTenant);
+      
+      // Map frontend field names to database field names
+      const mappedData = {
+        name: tenantData.name,
+        slug: tenantData.slug,
+        street: tenantData.street,
+        number: tenantData.number,
+        postalCode: tenantData.postalCode,
+        city: tenantData.city,
+        country: tenantData.country,
+        email: tenantData.email,
+        phone: tenantData.phone,
+        website: tenantData.website,
+        companyNumber: tenantData.companyNumber,
+        companyType: tenantData.companyType,
+        logoUrl: tenantData.logoUrl,
+        primaryColor: tenantData.primaryColor,
+      };
+      
+      const updatedTenant = await storage.updateTenant(req.tenantId!, mappedData);
+      
+      // Return consistent response format
+      const mappedResponse = {
+        id: updatedTenant.id,
+        name: updatedTenant.name,
+        slug: updatedTenant.slug,
+        street: updatedTenant.street,
+        number: updatedTenant.number,
+        postalCode: updatedTenant.postalCode,
+        city: updatedTenant.city,
+        country: updatedTenant.country,
+        email: updatedTenant.email,
+        phone: updatedTenant.phone,
+        website: updatedTenant.website,
+        companyNumber: updatedTenant.companyNumber,
+        companyType: updatedTenant.companyType,
+        logoUrl: updatedTenant.logoUrl,
+        primaryColor: updatedTenant.primaryColor,
+        createdAt: updatedTenant.createdAt,
+      };
+      
+      res.json(mappedResponse);
     } catch (error) {
       res.status(500).json({ message: "Failed to update tenant" });
     }

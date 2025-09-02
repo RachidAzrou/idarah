@@ -161,23 +161,25 @@ export default function Instellingen() {
   useEffect(() => {
     if (tenant && typeof tenant === 'object' && 'name' in tenant) {
       const tenantData = tenant as any;
+      console.log('Tenant data received:', tenantData); // Debug log
       organizationForm.reset({
         name: tenantData.name || "",
         slug: tenantData.slug || "",
         street: tenantData.street || "",
         number: tenantData.number || "",
-        postalCode: tenantData.postal_code || tenantData.postalCode || "",
+        postalCode: tenantData.postalCode || "",
         city: tenantData.city || "",
         country: tenantData.country || "België",
         email: tenantData.email || "",
         phone: tenantData.phone || "",
         website: tenantData.website || "",
-        companyNumber: tenantData.company_number || tenantData.companyNumber || "",
-        companyType: tenantData.company_type || tenantData.companyType || undefined,
-        logoUrl: tenantData.logo_url || tenantData.logoUrl || "",
-        primaryColor: tenantData.primary_color || tenantData.primaryColor || "#6366f1",
+        companyNumber: tenantData.companyNumber || "",
+        companyType: tenantData.companyType || undefined,
+        logoUrl: tenantData.logoUrl || "",
+        primaryColor: tenantData.primaryColor || "#6366f1",
       });
       setOrganizationSaved(false);
+      console.log('Form reset with data'); // Debug log
     }
   }, [tenant]);
 

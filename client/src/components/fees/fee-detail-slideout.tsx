@@ -1,4 +1,4 @@
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -21,16 +21,16 @@ export function FeeDetailSlideout({ fee, open, onClose, onMarkPaid }: FeeDetailS
   const canMarkPaid = fee.status === "OPEN" || fee.status === "OVERDUE";
 
   return (
-    <Sheet open={open} onOpenChange={onClose}>
-      <SheetContent className="w-96 overflow-y-auto">
-        <SheetHeader>
-          <SheetTitle>Lidgeld Detail</SheetTitle>
-          <SheetDescription>
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Lidgeld Detail</DialogTitle>
+          <DialogDescription>
             Bekijk alle details van dit lidgeld
-          </SheetDescription>
-        </SheetHeader>
+          </DialogDescription>
+        </DialogHeader>
 
-        <div className="space-y-6 mt-6">
+        <div className="space-y-6">
           {/* Header Info */}
           <div className="bg-gray-50 rounded-lg p-4">
             <div className="flex items-center justify-between mb-2">
@@ -51,7 +51,7 @@ export function FeeDetailSlideout({ fee, open, onClose, onMarkPaid }: FeeDetailS
               <CreditCard className="h-4 w-4" />
               Financiële details
             </h4>
-            <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="grid grid-cols-3 gap-6 text-sm">
               <div>
                 <span className="text-gray-500">Bedrag</span>
                 <p className="font-semibold text-lg">{formatCurrencyBE(fee.amount)}</p>
@@ -81,7 +81,7 @@ export function FeeDetailSlideout({ fee, open, onClose, onMarkPaid }: FeeDetailS
               <User className="h-4 w-4" />
               Lid informatie
             </h4>
-            <div className="space-y-3 text-sm">
+            <div className="grid grid-cols-2 gap-6 text-sm">
               <div>
                 <span className="text-gray-500">Naam</span>
                 <p className="font-medium">{fee.memberFirstName} {fee.memberLastName}</p>
@@ -170,7 +170,7 @@ export function FeeDetailSlideout({ fee, open, onClose, onMarkPaid }: FeeDetailS
             </div>
           </div>
         </div>
-      </SheetContent>
-    </Sheet>
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -57,12 +57,13 @@ const memberSchema = z.object({
     whatsappList: z.boolean().default(false),
   }),
 }).refine((data) => {
-  if (data.financialSettings.paymentMethod !== 'CASH' && !data.financialSettings.iban) {
+  // IBAN is alleen verplicht voor SEPA en Overschrijving
+  if ((data.financialSettings.paymentMethod === 'SEPA' || data.financialSettings.paymentMethod === 'OVERSCHRIJVING') && !data.financialSettings.iban) {
     return false;
   }
   return true;
 }, {
-  message: "IBAN is verplicht voor alle betaalmethoden behalve contant",
+  message: "IBAN is verplicht voor SEPA en Overschrijving",
   path: ["financialSettings", "iban"],
 });
 
@@ -512,7 +513,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
                     name="financialSettings.iban"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>IBAN {form.watch("financialSettings.paymentMethod") !== "CASH" && "*"}</FormLabel>
+                        <FormLabel>IBAN {(form.watch("financialSettings.paymentMethod") === "SEPA" || form.watch("financialSettings.paymentMethod") === "OVERSCHRIJVING") && "*"}</FormLabel>
                         <FormControl>
                           <Input placeholder="BE68 5390 0754 7034" {...field} data-testid="input-iban" />
                         </FormControl>

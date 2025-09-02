@@ -1,268 +1,138 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { Slider } from "@/components/ui/slider";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Input } from "@/components/ui/input";
 
-interface ColorWheelProps {
+interface ColorPickerProps {
   value: string;
   onChange: (color: string) => void;
   className?: string;
 }
 
-interface HSB {
-  h: number; // 0-360
-  s: number; // 0-100
-  b: number; // 0-100
-}
+const predefinedColors = [
+  "#000000", "#1a1a1a", "#333333", "#4d4d4d", "#666666", "#808080", "#999999", "#b3b3b3", "#cccccc", "#e6e6e6", "#f5f5f5", "#ffffff",
+  "#ff0000", "#ff4d4d", "#ff9999", "#ffcccc", "#ffe6e6", "#800000", "#cc0000", "#ff6666", "#ffb3b3", "#ffd9d9", "#ffeeee", "#fff2f2",
+  "#ff8000", "#ffaa55", "#ffcc99", "#ffe6cc", "#fff0e6", "#804000", "#cc6600", "#ff9933", "#ffcc66", "#ffe0b3", "#ffedd9", "#fff7f0",
+  "#ffff00", "#ffff4d", "#ffff99", "#ffffcc", "#ffffe6", "#808000", "#cccc00", "#ffff66", "#ffffb3", "#ffffd9", "#ffffee", "#fffff2",
+  "#80ff00", "#aaff55", "#ccff99", "#e6ffcc", "#f0ffe6", "#408000", "#66cc00", "#99ff33", "#ccff66", "#e0ffb3", "#edffdd", "#f7fff0",
+  "#00ff00", "#4dff4d", "#99ff99", "#ccffcc", "#e6ffe6", "#008000", "#00cc00", "#66ff66", "#b3ffb3", "#d9ffd9", "#eeffee", "#f2fff2",
+  "#00ff80", "#55ffaa", "#99ffcc", "#ccffe6", "#e6fff0", "#008040", "#00cc66", "#33ff99", "#66ffcc", "#b3ffe0", "#ddfedd", "#f0fff7",
+  "#00ffff", "#4dffff", "#99ffff", "#ccffff", "#e6ffff", "#008080", "#00cccc", "#66ffff", "#b3ffff", "#d9ffff", "#eeffff", "#f2ffff",
+  "#0080ff", "#55aaff", "#99ccff", "#cce6ff", "#e6f0ff", "#004080", "#0066cc", "#3399ff", "#66ccff", "#b3e0ff", "#ddedff", "#f0f7ff",
+  "#0000ff", "#4d4dff", "#9999ff", "#ccccff", "#e6e6ff", "#000080", "#0000cc", "#6666ff", "#b3b3ff", "#d9d9ff", "#eeeeff", "#f2f2ff",
+  "#8000ff", "#aa55ff", "#cc99ff", "#e6ccff", "#f0e6ff", "#400080", "#6600cc", "#9933ff", "#cc66ff", "#e0b3ff", "#edddff", "#f7f0ff",
+  "#ff00ff", "#ff4dff", "#ff99ff", "#ffccff", "#ffe6ff", "#800080", "#cc00cc", "#ff66ff", "#ffb3ff", "#ffd9ff", "#ffeeff", "#fff2ff",
+  "#ff0080", "#ff55aa", "#ff99cc", "#ffcce6", "#ffe6f0", "#800040", "#cc0066", "#ff3399", "#ff66cc", "#ffb3e0", "#ffddfd", "#fff0f7"
+];
 
-// Convert HSB to RGB
-function hsbToRgb(h: number, s: number, b: number): { r: number; g: number; b: number } {
-  h = h / 360;
-  s = s / 100;
-  b = b / 100;
+export function ColorPicker({ value, onChange, className = "" }: ColorPickerProps) {
+  const [hexInput, setHexInput] = useState(value);
 
-  const c = b * s;
-  const x = c * (1 - Math.abs(((h * 6) % 2) - 1));
-  const m = b - c;
-
-  let r = 0, g = 0, bl = 0;
-
-  if (0 <= h && h < 1/6) {
-    r = c; g = x; bl = 0;
-  } else if (1/6 <= h && h < 2/6) {
-    r = x; g = c; bl = 0;
-  } else if (2/6 <= h && h < 3/6) {
-    r = 0; g = c; bl = x;
-  } else if (3/6 <= h && h < 4/6) {
-    r = 0; g = x; bl = c;
-  } else if (4/6 <= h && h < 5/6) {
-    r = x; g = 0; bl = c;
-  } else if (5/6 <= h && h < 1) {
-    r = c; g = 0; bl = x;
-  }
-
-  return {
-    r: Math.round((r + m) * 255),
-    g: Math.round((g + m) * 255),
-    b: Math.round((bl + m) * 255)
-  };
-}
-
-// Convert RGB to HSB
-function rgbToHsb(r: number, g: number, b: number): HSB {
-  r /= 255;
-  g /= 255;
-  b /= 255;
-
-  const max = Math.max(r, g, b);
-  const min = Math.min(r, g, b);
-  const delta = max - min;
-
-  let h = 0;
-  const s = max === 0 ? 0 : (delta / max) * 100;
-  const br = max * 100;
-
-  if (delta !== 0) {
-    if (max === r) {
-      h = ((g - b) / delta) % 6;
-    } else if (max === g) {
-      h = (b - r) / delta + 2;
-    } else {
-      h = (r - g) / delta + 4;
-    }
-  }
-
-  h = Math.round(h * 60);
-  if (h < 0) h += 360;
-
-  return { h, s: Math.round(s), b: Math.round(br) };
-}
-
-// Convert hex to RGB
-function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  return result ? {
-    r: parseInt(result[1], 16),
-    g: parseInt(result[2], 16),
-    b: parseInt(result[3], 16)
-  } : null;
-}
-
-// Convert RGB to hex
-function rgbToHex(r: number, g: number, b: number): string {
-  return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-}
-
-export function ColorWheel({ value, onChange, className = "" }: ColorWheelProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const wheelRef = useRef<HTMLDivElement>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  
-  // Parse initial color
-  const rgb = hexToRgb(value) || { r: 255, g: 0, b: 0 };
-  const [hsb, setHsb] = useState<HSB>(rgbToHsb(rgb.r, rgb.g, rgb.b));
-
-  const wheelSize = 200;
-  const center = wheelSize / 2;
-  const radius = center - 10;
-
-  // Draw the color wheel
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    ctx.clearRect(0, 0, wheelSize, wheelSize);
-
-    // Draw the color wheel
-    for (let angle = 0; angle < 360; angle++) {
-      const startAngle = (angle - 1) * Math.PI / 180;
-      const endAngle = angle * Math.PI / 180;
-      
-      const rgb = hsbToRgb(angle, 100, 100);
-      
-      ctx.beginPath();
-      ctx.arc(center, center, radius, startAngle, endAngle);
-      ctx.lineWidth = 20;
-      ctx.strokeStyle = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
-      ctx.stroke();
-    }
-  }, []);
-
-  // Update color when HSB changes
-  useEffect(() => {
-    const rgb = hsbToRgb(hsb.h, hsb.s, hsb.b);
-    const hex = rgbToHex(rgb.r, rgb.g, rgb.b);
-    onChange(hex);
-  }, [hsb, onChange]);
-
-  // Handle wheel click/drag
-  const handleWheelInteraction = (e: React.MouseEvent | MouseEvent) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left - center;
-    const y = e.clientY - rect.top - center;
-    
-    const distance = Math.sqrt(x * x + y * y);
-    if (distance <= radius && distance >= radius - 20) {
-      let angle = Math.atan2(y, x) * 180 / Math.PI;
-      if (angle < 0) angle += 360;
-      
-      setHsb(prev => ({ ...prev, h: Math.round(angle) }));
+  const handleHexChange = (hex: string) => {
+    setHexInput(hex);
+    if (/^#[0-9A-Fa-f]{6}$/.test(hex)) {
+      onChange(hex);
     }
   };
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    setIsDragging(true);
-    handleWheelInteraction(e);
-  };
-
-  const handleMouseMove = (e: MouseEvent) => {
-    if (isDragging) {
-      handleWheelInteraction(e);
-    }
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  useEffect(() => {
-    if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-      return () => {
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
-      };
-    }
-  }, [isDragging]);
-
-  // Calculate handle position
-  const handleAngle = (hsb.h * Math.PI) / 180;
-  const handleRadius = radius - 10;
-  const handleX = center + Math.cos(handleAngle) * handleRadius;
-  const handleY = center + Math.sin(handleAngle) * handleRadius;
 
   return (
-    <div className={`space-y-4 ${className}`}>
-      {/* Color Wheel */}
-      <div className="relative" ref={wheelRef}>
-        <canvas
-          ref={canvasRef}
-          width={wheelSize}
-          height={wheelSize}
-          className="cursor-pointer"
-          onMouseDown={handleMouseDown}
-        />
-        {/* Handle */}
-        <div
-          className="absolute w-4 h-4 bg-white border-2 border-gray-800 rounded-full shadow-lg pointer-events-none transform -translate-x-1/2 -translate-y-1/2"
-          style={{
-            left: handleX,
-            top: handleY,
-          }}
-        />
-        {/* Center preview */}
-        <div
-          className="absolute w-16 h-16 rounded-full border-4 border-white shadow-lg transform -translate-x-1/2 -translate-y-1/2"
-          style={{
-            left: center,
-            top: center,
-            backgroundColor: value,
-          }}
-        />
-      </div>
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          className={`h-10 w-full justify-start gap-3 ${className}`}
+        >
+          <div
+            className="w-6 h-6 rounded border border-gray-300 shadow-sm"
+            style={{ backgroundColor: value }}
+          />
+          <span className="text-sm font-mono">{value.toUpperCase()}</span>
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-80 p-4" align="start">
+        <div className="space-y-4">
+          {/* Current Color Preview */}
+          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+            <div
+              className="w-12 h-12 rounded-lg border-2 border-white shadow-lg"
+              style={{ backgroundColor: value }}
+            />
+            <div>
+              <div className="text-sm font-medium">Geselecteerde kleur</div>
+              <div className="text-xs font-mono text-gray-600">{value.toUpperCase()}</div>
+            </div>
+          </div>
 
-      {/* Saturation Slider */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Verzadiging</label>
-        <Slider
-          value={[hsb.s]}
-          onValueChange={([value]) => setHsb(prev => ({ ...prev, s: value }))}
-          max={100}
-          step={1}
-          className="w-full"
-        />
-        <span className="text-xs text-gray-500">{hsb.s}%</span>
-      </div>
+          {/* Hex Input */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Hex kleur</label>
+            <Input
+              value={hexInput}
+              onChange={(e) => handleHexChange(e.target.value)}
+              placeholder="#000000"
+              className="font-mono"
+            />
+          </div>
 
-      {/* Brightness Slider */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Helderheid</label>
-        <Slider
-          value={[hsb.b]}
-          onValueChange={([value]) => setHsb(prev => ({ ...prev, b: value }))}
-          max={100}
-          step={1}
-          className="w-full"
-        />
-        <span className="text-xs text-gray-500">{hsb.b}%</span>
-      </div>
+          {/* Native Color Picker */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Kleurenkiezer</label>
+            <input
+              type="color"
+              value={value}
+              onChange={(e) => {
+                onChange(e.target.value);
+                setHexInput(e.target.value);
+              }}
+              className="w-full h-12 border border-gray-300 rounded-lg cursor-pointer"
+            />
+          </div>
 
-      {/* Hex Input */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Hex kleur</label>
-        <input
-          type="text"
-          value={value}
-          onChange={(e) => {
-            const hex = e.target.value;
-            if (/^#[0-9A-Fa-f]{6}$/.test(hex)) {
-              const rgb = hexToRgb(hex);
-              if (rgb) {
-                setHsb(rgbToHsb(rgb.r, rgb.g, rgb.b));
-              }
-            }
-          }}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-          placeholder="#000000"
-        />
-      </div>
-    </div>
+          {/* Predefined Colors Grid */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Vooraf gedefinieerde kleuren</label>
+            <div className="grid grid-cols-12 gap-1">
+              {predefinedColors.map((color) => (
+                <button
+                  key={color}
+                  onClick={() => {
+                    onChange(color);
+                    setHexInput(color);
+                  }}
+                  className={`w-6 h-6 rounded border-2 transition-all hover:scale-110 ${
+                    value === color ? 'border-gray-800 ring-2 ring-blue-500' : 'border-gray-300 hover:border-gray-500'
+                  }`}
+                  style={{ backgroundColor: color }}
+                  title={color.toUpperCase()}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Common Colors */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Veel gebruikte kleuren</label>
+            <div className="flex gap-2">
+              {["#000000", "#ffffff", "#2563eb", "#dc2626", "#16a34a", "#f59e0b", "#7c3aed", "#e11d48"].map((color) => (
+                <button
+                  key={color}
+                  onClick={() => {
+                    onChange(color);
+                    setHexInput(color);
+                  }}
+                  className={`w-8 h-8 rounded-lg border-2 transition-all hover:scale-110 ${
+                    value === color ? 'border-gray-800 ring-2 ring-blue-500' : 'border-gray-300 hover:border-gray-500'
+                  }`}
+                  style={{ backgroundColor: color }}
+                  title={color.toUpperCase()}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </PopoverContent>
+    </Popover>
   );
 }

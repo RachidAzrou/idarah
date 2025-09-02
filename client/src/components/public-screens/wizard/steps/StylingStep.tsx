@@ -3,7 +3,7 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ColorWheel } from "@/components/ui/color-wheel";
+import { ColorPicker } from "@/components/ui/color-wheel";
 import { TitleStyling } from "@/lib/mock/public-screens";
 
 interface StylingStepProps {
@@ -183,7 +183,7 @@ export function StylingStep({ data, onUpdate }: StylingStepProps) {
                     data-testid="input-title-color-hex"
                   />
                 </div>
-                <ColorWheel
+                <ColorPicker
                   value={data.title.color}
                   onChange={(color) => updateTitle('color', color)}
                 />
@@ -277,7 +277,7 @@ export function StylingStep({ data, onUpdate }: StylingStepProps) {
                     data-testid="input-subtitle-color-hex"
                   />
                 </div>
-                <ColorWheel
+                <ColorPicker
                   value={data.subtitle.color}
                   onChange={(color) => updateSubtitle('color', color)}
                 />

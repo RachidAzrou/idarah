@@ -1,0 +1,486 @@
+import { useState, useMemo } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
+import { LiveCard } from "@/components/cards/live-card";
+import { 
+  Search, 
+  Filter, 
+  Download, 
+  Eye, 
+  RefreshCw, 
+  Trash2,
+  CreditCard,
+  Users,
+  CheckCircle2,
+  Clock,
+  MoreHorizontal
+} from "lucide-react";
+import { format } from "date-fns";
+import { nl } from "date-fns/locale";
+import type { Member, CardMeta, Tenant } from "@shared/schema";
+
+interface CardWithMember {
+  member: Member;
+  cardMeta: CardMeta | null;
+}
+
+interface CardStats {
+  totalActive: number;
+  validPercentage: number;
+  lastUpdated: Date | null;
+}
+
+function getMemberCategoryLabel(category: string): string {
+  switch (category) {
+    case 'STUDENT':
+      return 'Student';
+    case 'STANDAARD':
+      return 'Volwassen';
+    case 'SENIOR':
+      return 'Senior';
+    default:
+      return category;
+  }
+}
+
+function getStatusLabel(status: string): string {
+  switch (status) {
+    case 'ACTUEEL':
+      return 'Actueel';
+    case 'MOMENTOPNAME':
+      return 'Momentopname';
+    case 'VERLOPEN':
+      return 'Verlopen';
+    default:
+      return status;
+  }
+}
+
+function getStatusVariant(status: string): "default" | "secondary" | "destructive" | "outline" {
+  switch (status) {
+    case 'ACTUEEL':
+      return 'default';
+    case 'MOMENTOPNAME':
+      return 'secondary';
+    case 'VERLOPEN':
+      return 'destructive';
+    default:
+      return 'outline';
+  }
+}
+
+export default function LidkaartenPage() {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [previewCard, setPreviewCard] = useState<CardWithMember | null>(null);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Fetch cards data
+  const { data: cards = [], isLoading: cardsLoading } = useQuery<CardWithMember[]>({
+    queryKey: ['/api/cards'],
+    queryFn: async () => {
+      const response = await fetch('/api/cards');
+      if (!response.ok) throw new Error('Failed to fetch cards');
+      return response.json();
+    },
+  });
+
+  // Fetch card statistics
+  const { data: stats } = useQuery<CardStats>({
+    queryKey: ['/api/cards/stats'],
+    queryFn: async () => {
+      const response = await fetch('/api/cards/stats');
+      if (!response.ok) throw new Error('Failed to fetch card stats');
+      return response.json();
+    },
+  });
+
+  // Fetch tenant data for card preview
+  const { data: tenant } = useQuery<Tenant>({
+    queryKey: ['/api/tenant/current'],
+    queryFn: async () => {
+      const response = await fetch('/api/tenant/current');
+      if (!response.ok) throw new Error('Failed to fetch tenant');
+      return response.json();
+    },
+  });
+
+  // Regenerate card mutation
+  const regenerateCardMutation = useMutation({
+    mutationFn: async (memberId: string) => {
+      const response = await fetch(`/api/cards/${memberId}/regenerate`, {
+        method: 'POST',
+      });
+      if (!response.ok) throw new Error('Failed to regenerate card');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/cards'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/cards/stats'] });
+      toast({ title: "Lidkaart geregenereerd", description: "De kaart is succesvol bijgewerkt met nieuwe tokens." });
+    },
+    onError: () => {
+      toast({ 
+        title: "Fout", 
+        description: "Kon de kaart niet regenereren. Probeer opnieuw.", 
+        variant: "destructive" 
+      });
+    },
+  });
+
+  // Deactivate card mutation
+  const deactivateCardMutation = useMutation({
+    mutationFn: async (memberId: string) => {
+      const response = await fetch(`/api/cards/${memberId}/deactivate`, {
+        method: 'POST',
+      });
+      if (!response.ok) throw new Error('Failed to deactivate card');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/cards'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/cards/stats'] });
+      toast({ title: "Lidkaart gedeactiveerd", description: "De kaart is verlopen en niet meer geldig." });
+    },
+    onError: () => {
+      toast({ 
+        title: "Fout", 
+        description: "Kon de kaart niet deactiveren. Probeer opnieuw.", 
+        variant: "destructive" 
+      });
+    },
+  });
+
+  // Filter cards based on search and filters
+  const filteredCards = useMemo(() => {
+    return cards.filter(({ member, cardMeta }) => {
+      // Search filter
+      const searchMatch = searchTerm === '' || 
+        member.memberNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        `${member.firstName} ${member.lastName}`.toLowerCase().includes(searchTerm.toLowerCase());
+
+      // Status filter
+      const statusMatch = statusFilter === 'all' || 
+        (cardMeta?.status === statusFilter) ||
+        (statusFilter === 'geen-kaart' && !cardMeta);
+
+      // Category filter  
+      const categoryMatch = categoryFilter === 'all' || member.category === categoryFilter;
+
+      return searchMatch && statusMatch && categoryMatch;
+    });
+  }, [cards, searchTerm, statusFilter, categoryFilter]);
+
+  const handlePreview = (cardData: CardWithMember) => {
+    setPreviewCard(cardData);
+  };
+
+  const handleRegenerateCard = (memberId: string) => {
+    regenerateCardMutation.mutate(memberId);
+  };
+
+  const handleDeactivateCard = (memberId: string) => {
+    deactivateCardMutation.mutate(memberId);
+  };
+
+  const handleExport = () => {
+    // TODO: Implement export functionality
+    toast({ title: "Export", description: "Export functionaliteit wordt binnenkort toegevoegd." });
+  };
+
+  return (
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Lidkaarten</h1>
+          <p className="text-muted-foreground">
+            Beheer alle digitale lidkaarten van uw leden
+          </p>
+        </div>
+        <Button onClick={handleExport} variant="outline" className="gap-2">
+          <Download className="h-4 w-4" />
+          Exporteer
+        </Button>
+      </div>
+
+      {/* KPI Cards */}
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Actieve Lidkaarten</CardTitle>
+            <CreditCard className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats?.totalActive || 0}</div>
+            <p className="text-xs text-muted-foreground">
+              kaarten met status 'Actueel'
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Geldigheidspercentage</CardTitle>
+            <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats?.validPercentage || 0}%</div>
+            <p className="text-xs text-muted-foreground">
+              leden met geldige kaart
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Laatst Bijgewerkt</CardTitle>
+            <Clock className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {stats?.lastUpdated 
+                ? format(new Date(stats.lastUpdated), 'dd MMM', { locale: nl })
+                : 'N.v.t.'
+              }
+            </div>
+            <p className="text-xs text-muted-foreground">
+              meest recente kaartupdate
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Search and Filters */}
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex-1">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Input
+              placeholder="Zoek op lidnummer of naam..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+              data-testid="input-search"
+            />
+          </div>
+        </div>
+        
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-48" data-testid="select-status">
+            <Filter className="h-4 w-4 mr-2" />
+            <SelectValue placeholder="Filter status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Alle statussen</SelectItem>
+            <SelectItem value="ACTUEEL">Actueel</SelectItem>
+            <SelectItem value="MOMENTOPNAME">Momentopname</SelectItem>
+            <SelectItem value="VERLOPEN">Verlopen</SelectItem>
+            <SelectItem value="geen-kaart">Geen kaart</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+          <SelectTrigger className="w-48" data-testid="select-category">
+            <Users className="h-4 w-4 mr-2" />
+            <SelectValue placeholder="Filter categorie" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Alle categorieën</SelectItem>
+            <SelectItem value="STUDENT">Student</SelectItem>
+            <SelectItem value="STANDAARD">Volwassen</SelectItem>
+            <SelectItem value="SENIOR">Senior</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Cards Table */}
+      <Card>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Lidnummer</TableHead>
+              <TableHead>Naam</TableHead>
+              <TableHead>Categorie</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Geldig tot</TableHead>
+              <TableHead>Versie</TableHead>
+              <TableHead>Laatste update</TableHead>
+              <TableHead className="text-right">Acties</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {cardsLoading ? (
+              <TableRow>
+                <TableCell colSpan={8} className="text-center py-8">
+                  <div className="flex items-center justify-center gap-2">
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                    Lidkaarten laden...
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : filteredCards.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                  Geen lidkaarten gevonden die voldoen aan de filters
+                </TableCell>
+              </TableRow>
+            ) : (
+              filteredCards.map(({ member, cardMeta }) => (
+                <TableRow key={member.id}>
+                  <TableCell className="font-mono">{member.memberNumber}</TableCell>
+                  <TableCell className="font-medium">
+                    {member.firstName} {member.lastName}
+                  </TableCell>
+                  <TableCell>{getMemberCategoryLabel(member.category)}</TableCell>
+                  <TableCell>
+                    {cardMeta ? (
+                      <Badge variant={getStatusVariant(cardMeta.status)}>
+                        {getStatusLabel(cardMeta.status)}
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline">Geen kaart</Badge>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {cardMeta?.validUntil 
+                      ? format(new Date(cardMeta.validUntil), 'dd/MM/yyyy', { locale: nl })
+                      : '-'
+                    }
+                  </TableCell>
+                  <TableCell>{cardMeta?.version || '-'}</TableCell>
+                  <TableCell>
+                    {cardMeta?.lastRenderedAt 
+                      ? format(new Date(cardMeta.lastRenderedAt), 'dd/MM/yyyy HH:mm', { locale: nl })
+                      : '-'
+                    }
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex items-center justify-end gap-2">
+                      {cardMeta && (
+                        <>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handlePreview({ member, cardMeta })}
+                            data-testid={`button-preview-${member.id}`}
+                            aria-label="Bekijk kaart"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleRegenerateCard(member.id)}
+                            disabled={regenerateCardMutation.isPending}
+                            data-testid={`button-regenerate-${member.id}`}
+                            aria-label="Regenereer kaart"
+                          >
+                            <RefreshCw className={`h-4 w-4 ${regenerateCardMutation.isPending ? 'animate-spin' : ''}`} />
+                          </Button>
+
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                data-testid={`button-deactivate-${member.id}`}
+                                aria-label="Deactiveer kaart"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Kaart deactiveren</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Weet je zeker dat je de kaart van {member.firstName} {member.lastName} wilt deactiveren?
+                                  Deze actie kan niet ongedaan worden gemaakt.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Annuleren</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => handleDeactivateCard(member.id)}
+                                  disabled={deactivateCardMutation.isPending}
+                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                >
+                                  Deactiveren
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </>
+                      )}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </Card>
+
+      {/* Preview Modal */}
+      <Dialog open={!!previewCard} onOpenChange={() => setPreviewCard(null)}>
+        <DialogContent className="max-w-3xl max-h-[95vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Lidkaart Preview</DialogTitle>
+          </DialogHeader>
+          
+          {previewCard && tenant && (
+            <div className="space-y-4">
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <LiveCard
+                  member={previewCard.member}
+                  cardMeta={previewCard.cardMeta!}
+                  tenant={tenant}
+                  standalone={false}
+                />
+              </div>
+              
+              <div className="flex items-center gap-2 pt-4 border-t">
+                <Button
+                  onClick={() => handleRegenerateCard(previewCard.member.id)}
+                  disabled={regenerateCardMutation.isPending}
+                  variant="outline"
+                  className="gap-2"
+                >
+                  <RefreshCw className={`h-4 w-4 ${regenerateCardMutation.isPending ? 'animate-spin' : ''}`} />
+                  Regenereren
+                </Button>
+                
+                <Button
+                  onClick={() => toast({ title: "Export", description: "Export functionaliteit wordt binnenkort toegevoegd." })}
+                  variant="outline"
+                  className="gap-2"
+                >
+                  <Download className="h-4 w-4" />
+                  Exporteren
+                </Button>
+                
+                <Button
+                  onClick={() => setPreviewCard(null)}
+                  variant="default"
+                >
+                  Sluiten
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}

@@ -7,7 +7,8 @@ import {
   BarChart3, 
   Monitor, 
   Settings,
-  Building2
+  Building2,
+  IdCard
 } from "lucide-react";
 import { getUserInitials } from "@/lib/auth";
 import { useAuth } from "@/hooks/use-auth";
@@ -15,6 +16,7 @@ import { useAuth } from "@/hooks/use-auth";
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Leden", href: "/leden", icon: Users },
+  { name: "Lidkaarten", href: "/lidkaarten", icon: IdCard },
   { name: "Lidgelden", href: "/lidgelden", icon: CreditCard },
   { name: "Financiën", href: "/financien", icon: BarChart3 },
   { name: "Publieke Schermen", href: "/publieke-schermen", icon: Monitor },

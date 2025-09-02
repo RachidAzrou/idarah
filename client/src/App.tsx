@@ -17,6 +17,7 @@ import PublicScreenViewPage from "@/pages/PublicScreenViewPage";
 import { PublicViewPage } from "@/pages/PublicViewPage";
 import Instellingen from "@/pages/instellingen";
 import { CardPage } from "@/pages/card";
+import Lidkaarten from "@/pages/lidkaarten";
 
 function LoadingSpinner() {
   return (
@@ -54,6 +55,7 @@ function Router() {
       <Route path="/" component={() => <ProtectedRoute component={Dashboard} />} />
       <Route path="/dashboard" component={() => <ProtectedRoute component={Dashboard} />} />
       <Route path="/leden" component={() => <ProtectedRoute component={Leden} />} />
+      <Route path="/lidkaarten" component={() => <ProtectedRoute component={Lidkaarten} />} />
       <Route path="/lidgelden" component={() => <ProtectedRoute component={Lidgelden} />} />
       <Route path="/financien" component={() => <ProtectedRoute component={FinancePage} />} />
       <Route path="/publieke-schermen" component={() => <ProtectedRoute component={PublicScreensPage} />} />

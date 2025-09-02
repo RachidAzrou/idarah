@@ -670,6 +670,85 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get current tenant for card preview
+  app.get("/api/tenant/current", authMiddleware, tenantMiddleware, async (req, res) => {
+    try {
+      const tenant = await storage.getTenant(req.tenantId!);
+      if (!tenant) {
+        return res.status(404).json({ message: "Tenant not found" });
+      }
+      res.json(tenant);
+    } catch (error) {
+      console.error('Error fetching tenant:', error);
+      res.status(500).json({ message: "Failed to fetch tenant" });
+    }
+  });
+
+  // Card management endpoints for admin
+  app.get("/api/cards", authMiddleware, tenantMiddleware, async (req, res) => {
+    try {
+      const cards = await storage.getAllCardsWithMembers(req.tenantId!);
+      res.json(cards);
+    } catch (error) {
+      console.error('Error fetching cards:', error);
+      res.status(500).json({ message: "Failed to fetch cards" });
+    }
+  });
+
+  app.get("/api/cards/stats", authMiddleware, tenantMiddleware, async (req, res) => {
+    try {
+      const stats = await storage.getCardStats(req.tenantId!);
+      res.json(stats);
+    } catch (error) {
+      console.error('Error fetching card stats:', error);
+      res.status(500).json({ message: "Failed to fetch card stats" });
+    }
+  });
+
+  app.post("/api/cards/:memberId/regenerate", authMiddleware, tenantMiddleware, async (req, res) => {
+    try {
+      const { memberId } = req.params;
+      const member = await storage.getMember(memberId);
+      
+      if (!member || member.tenantId !== req.tenantId) {
+        return res.status(404).json({ message: "Member not found" });
+      }
+
+      const cardData = await cardService.getOrCreateCardMeta(memberId);
+      if (cardData) {
+        await cardService.invalidateCard(cardData.cardMeta.id);
+        res.json({ success: true, message: "Card regenerated" });
+      } else {
+        res.status(500).json({ message: "Failed to regenerate card" });
+      }
+    } catch (error) {
+      console.error('Error regenerating card:', error);
+      res.status(500).json({ message: "Failed to regenerate card" });
+    }
+  });
+
+  app.post("/api/cards/:memberId/deactivate", authMiddleware, tenantMiddleware, async (req, res) => {
+    try {
+      const { memberId } = req.params;
+      const member = await storage.getMember(memberId);
+      
+      if (!member || member.tenantId !== req.tenantId) {
+        return res.status(404).json({ message: "Member not found" });
+      }
+
+      const cardMeta = await storage.getCardMetaByMember(memberId);
+      if (cardMeta) {
+        await storage.updateCardMeta(cardMeta.id, { status: 'VERLOPEN' });
+        res.json({ success: true, message: "Card deactivated" });
+      } else {
+        res.status(404).json({ message: "Card not found" });
+      }
+    } catch (error) {
+      console.error('Error deactivating card:', error);
+      res.status(500).json({ message: "Failed to deactivate card" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

@@ -107,6 +107,8 @@ export interface IStorage {
   createCardMeta(cardMeta: InsertCardMeta): Promise<CardMeta>;
   updateCardMeta(id: string, cardMeta: Partial<InsertCardMeta>): Promise<CardMeta>;
   getMemberWithCardAndTenant(memberId: string): Promise<{ member: Member; cardMeta: CardMeta; tenant: Tenant } | undefined>;
+  getAllCardsWithMembers(tenantId: string): Promise<{ member: Member; cardMeta: CardMeta | null }[]>;
+  getCardStats(tenantId: string): Promise<{ totalActive: number; validPercentage: number; lastUpdated: Date | null }>;
 
   // Notifications
   getNotificationsByTenant(tenantId: string): Promise<Notification[]>;
@@ -410,6 +412,58 @@ export class DatabaseStorage implements IStorage {
       cardMeta: row.cardMeta,
       tenant: row.tenant,
     };
+  }
+
+  async getAllCardsWithMembers(tenantId: string): Promise<{ member: Member; cardMeta: CardMeta | null }[]> {
+    const result = await db
+      .select({
+        member: members,
+        cardMeta: cardMeta,
+      })
+      .from(members)
+      .leftJoin(cardMeta, eq(members.id, cardMeta.memberId))
+      .where(eq(members.tenantId, tenantId))
+      .orderBy(desc(members.createdAt));
+
+    return result.map(row => ({
+      member: row.member,
+      cardMeta: row.cardMeta || null,
+    }));
+  }
+
+  async getCardStats(tenantId: string): Promise<{ totalActive: number; validPercentage: number; lastUpdated: Date | null }> {
+    const cacheKey = `card:stats:${tenantId}`;
+    const cached = cache.get<{ totalActive: number; validPercentage: number; lastUpdated: Date | null }>(cacheKey);
+    if (cached) return cached;
+
+    const result = await db.execute(sql`
+      WITH card_stats AS (
+        SELECT 
+          COUNT(CASE WHEN cm.status = 'ACTUEEL' THEN 1 END) as active_cards,
+          COUNT(cm.id) as total_cards,
+          COUNT(m.id) as total_members,
+          MAX(cm.last_rendered_at) as last_updated
+        FROM ${members} m
+        LEFT JOIN ${cardMeta} cm ON m.id = cm.member_id
+        WHERE m.tenant_id = ${tenantId}
+      )
+      SELECT 
+        active_cards::int,
+        total_cards::int,
+        total_members::int,
+        last_updated
+      FROM card_stats
+    `);
+
+    const stats = result.rows[0] as any;
+    const cardStats = {
+      totalActive: parseInt(stats.active_cards) || 0,
+      validPercentage: stats.total_members > 0 ? Math.round((parseInt(stats.total_cards) / parseInt(stats.total_members)) * 100) : 0,
+      lastUpdated: stats.last_updated ? new Date(stats.last_updated) : null,
+    };
+
+    cache.set(cacheKey, cardStats, 10000); // Cache for 10 seconds
+    return cardStats;
   }
 
   // Notifications

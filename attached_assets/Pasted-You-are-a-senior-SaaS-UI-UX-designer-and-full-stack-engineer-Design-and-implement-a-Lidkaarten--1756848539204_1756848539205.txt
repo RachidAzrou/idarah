@@ -1,0 +1,84 @@
+You are a senior SaaS UI/UX designer and full-stack engineer.  
+Design and implement a **Lidkaarten** management page for administrators in the moskeeledenbeheer SaaS.  
+This page centralizes all member cards (Live Cards) so that admins can easily view, manage, and update them.
+
+------------------------------------------------------------
+## GOALS
+- Provide an overview of all digital membership cards.
+- Allow administrators to preview, regenerate, or deactivate cards.
+- Make it possible to search, filter, and manage cards efficiently.
+- Keep consistent enterprise-grade look & feel with the rest of the app.
+
+------------------------------------------------------------
+## LAYOUT
+- Title: “Lidkaarten”
+- Header actions:
+  - 🔍 Search bar (by lidnummer, naam).
+  - Filters: status (Actueel / Momentopname / Verlopen), categorie (Student/Volwassen/Senior).
+  - Export: list of cards (Excel/PDF) with status overview.
+- KPI cards at the top:
+  - Totaal actieve lidkaarten
+  - % leden met geldige kaart
+  - Laatst geüpdatete kaart
+- Main content: **Table view of all cards**.
+
+------------------------------------------------------------
+## TABLE COLUMNS
+- Lidnummer
+- Naam lid
+- Categorie (Student / Volwassen / Senior)
+- Status (Actueel / Momentopname / Verlopen)
+- Geldig tot
+- Versie (CardMeta.version)
+- Laatste update (lastRenderedAt)
+- Acties (buttons):
+  - 👁️ Preview (modal of side panel showing live card)
+  - ♻️ Invalidate/regenerate card (bump version + new tokens)
+  - ⬇️ Snapshot export (PNG/PDF)
+  - 🗑️ Deactivate card (set status = Verlopen)
+
+------------------------------------------------------------
+## CARD PREVIEW (modal)
+- Show the digital card design (same as member-facing Live Card).
+- Preview includes name, lidnummer, category, chips, status LED, QR code.
+- Action buttons inside modal:
+  - Regenerate card (invalidate + bump version).
+  - Export snapshot.
+  - Close.
+
+------------------------------------------------------------
+## FLOWS
+1. **Search/Filter**
+   - Admin searches for “Achternaam” or filters on category/status.
+   - Table updates instantly.
+
+2. **Preview card**
+   - Admin clicks “Preview” → modal opens → shows rendered Live Card.
+   - QR clickable in preview as well.
+
+3. **Regenerate card**
+   - Admin clicks ♻️ → confirmation dialog → system bumps version, rotates tokens, invalidates cache.
+   - Table refreshes with updated version + timestamp.
+
+4. **Export snapshot**
+   - Admin clicks ⬇️ → server generates PNG/PDF snapshot of the card → download link.
+
+5. **Deactivate card**
+   - Admin clicks 🗑️ → confirmation → sets status=Verlopen.
+   - Card becomes invalid for member (LED red).
+
+------------------------------------------------------------
+## STYLE
+- Enterprise CRM look.
+- Table with sticky header, zebra rows.
+- Action buttons as shadcn/ui buttons with icons (lucide-react).
+- Preview modal: centered card, max 95% viewport width, glossy card design.
+
+------------------------------------------------------------
+## ACCEPTANCE CRITERIA
+1) Page lists all lidkaarten with correct metadata (status, versie, geldigheid).  
+2) Search and filter work instantly.  
+3) Preview shows card in same style as member-facing Live Card.  
+4) Admin can regenerate, export, or deactivate any card.  
+5) Exports (Excel/PDF) include card statuses for reporting.  
+6) UI is consistent, professional, and accessible (WCAG AA).  

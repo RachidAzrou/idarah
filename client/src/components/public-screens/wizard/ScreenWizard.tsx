@@ -258,7 +258,7 @@ export function ScreenWizard({ open, onOpenChange, onComplete }: ScreenWizardPro
         </DialogHeader>
 
         {/* Main content area with fixed height */}
-        <div className="flex-1 py-6 overflow-y-auto" style={{ minHeight: '600px', maxHeight: '700px' }}>
+        <div className="flex-1 py-6 overflow-y-auto">
           {StepComponent && (
             <StepComponent
               data={wizardData}

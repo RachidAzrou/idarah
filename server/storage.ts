@@ -55,6 +55,7 @@ export interface IStorage {
   getUsersByTenant(tenantId: string): Promise<User[]>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: string, user: Partial<InsertUser>): Promise<User>;
+  deleteUser(id: string): Promise<void>;
 
   // Members
   getMember(id: string): Promise<Member | undefined>;
@@ -172,6 +173,10 @@ export class DatabaseStorage implements IStorage {
   async updateUser(id: string, user: Partial<InsertUser>): Promise<User> {
     const [updatedUser] = await db.update(users).set(user).where(eq(users.id, id)).returning();
     return updatedUser;
+  }
+
+  async deleteUser(id: string): Promise<void> {
+    await db.delete(users).where(eq(users.id, id));
   }
 
   // Members

@@ -27,7 +27,9 @@ import {
   Upload,
   Save,
   Eye,
-  Trash2
+  Trash2,
+  Edit,
+  KeyRound
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
@@ -85,6 +87,8 @@ type RuleFormData = z.infer<typeof ruleSchema>;
 export default function Instellingen() {
   const [activeTab, setActiveTab] = useState("organization");
   const [showNewUserDialog, setShowNewUserDialog] = useState(false);
+  const [showEditUserDialog, setShowEditUserDialog] = useState(false);
+  const [editingUser, setEditingUser] = useState<any>(null);
   const [showNewRuleDialog, setShowNewRuleDialog] = useState(false);
   const [organizationSaved, setOrganizationSaved] = useState(false);
   const [feesSaved, setFeesSaved] = useState(false);
@@ -201,6 +205,12 @@ export default function Instellingen() {
     },
   });
 
+  const editUserForm = useForm<UserFormData>({
+    resolver: zodResolver(userSchema.extend({
+      password: z.string().optional(), // Password optional for editing
+    })),
+  });
+
   const ruleForm = useForm<RuleFormData>({
     resolver: zodResolver(ruleSchema),
     defaultValues: {
@@ -284,6 +294,51 @@ export default function Instellingen() {
     },
   });
 
+  const editUserMutation = useMutation({
+    mutationFn: async (data: UserFormData) => {
+      const response = await apiRequest("PUT", `/api/users/${editingUser.id}`, data);
+      return response.json();
+    },
+    onSuccess: async (updatedUser) => {
+      // Optimistic update - update user in list immediately
+      queryClient.setQueryData(["/api/users"], (oldData: any) => {
+        if (!Array.isArray(oldData)) return oldData;
+        return oldData.map((user: any) => 
+          user.id === editingUser.id ? { ...user, ...updatedUser } : user
+        );
+      });
+      
+      await queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+      setShowEditUserDialog(false);
+      setEditingUser(null);
+      editUserForm.reset();
+      toast({
+        title: "Gebruiker bijgewerkt",
+        description: "De gebruikersgegevens zijn succesvol bijgewerkt.",
+      });
+    },
+  });
+
+  const deleteUserMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      const response = await apiRequest("DELETE", `/api/users/${userId}`, {});
+      return response.json();
+    },
+    onSuccess: async (result, userId) => {
+      // Optimistic update - remove user from list immediately
+      queryClient.setQueryData(["/api/users"], (oldData: any) => {
+        if (!Array.isArray(oldData)) return oldData;
+        return oldData.filter((user: any) => user.id !== userId);
+      });
+      
+      await queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+      toast({
+        title: "Gebruiker verwijderd",
+        description: "De gebruiker is succesvol verwijderd.",
+      });
+    },
+  });
+
   const createRuleMutation = useMutation({
     mutationFn: async (data: RuleFormData) => {
       const ruleData = {
@@ -327,8 +382,46 @@ export default function Instellingen() {
     createUserMutation.mutate(data);
   };
 
+  const onEditUserSubmit = (data: UserFormData) => {
+    editUserMutation.mutate(data);
+  };
+
   const onRuleSubmit = (data: RuleFormData) => {
     createRuleMutation.mutate(data);
+  };
+
+  // User management handlers
+  const handleEditUser = (user: any) => {
+    setEditingUser(user);
+    editUserForm.reset({
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    });
+    setShowEditUserDialog(true);
+  };
+
+  const handleResetPassword = async (user: any) => {
+    try {
+      const response = await apiRequest("POST", `/api/users/${user.id}/reset-password`, {});
+      const result = await response.json();
+      toast({
+        title: "Wachtwoord gereset",
+        description: `Nieuw tijdelijk wachtwoord: ${result.temporaryPassword}`,
+      });
+    } catch (error) {
+      toast({
+        title: "Fout",
+        description: "Er is een fout opgetreden bij het resetten van het wachtwoord.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeleteUser = (user: any) => {
+    if (confirm(`Weet je zeker dat je ${user.name} wilt verwijderen?`)) {
+      deleteUserMutation.mutate(user.id);
+    }
   };
 
   const getRuleScopeLabel = (scope: string) => {
@@ -911,9 +1004,15 @@ export default function Instellingen() {
                                   </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                  <DropdownMenuItem>Bewerken</DropdownMenuItem>
-                                  <DropdownMenuItem>Wachtwoord resetten</DropdownMenuItem>
-                                  <DropdownMenuItem className="text-red-600">
+                                  <DropdownMenuItem onClick={() => handleEditUser(user)} data-testid={`action-edit-user-${user.id}`}>
+                                    <Edit className="h-4 w-4 mr-2" />
+                                    Bewerken
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => handleResetPassword(user)} data-testid={`action-reset-password-${user.id}`}>
+                                    <KeyRound className="h-4 w-4 mr-2" />
+                                    Wachtwoord resetten
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem className="text-red-600" onClick={() => handleDeleteUser(user)} data-testid={`action-delete-user-${user.id}`}>
                                     <Trash2 className="h-4 w-4 mr-2" />
                                     Verwijderen
                                   </DropdownMenuItem>
@@ -926,6 +1025,77 @@ export default function Instellingen() {
                     )}
                   </CardContent>
                 </Card>
+
+                {/* Edit User Dialog */}
+                <Dialog open={showEditUserDialog} onOpenChange={setShowEditUserDialog}>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Gebruiker Bewerken</DialogTitle>
+                    </DialogHeader>
+                    <Form {...editUserForm}>
+                      <form onSubmit={editUserForm.handleSubmit(onEditUserSubmit)} className="space-y-4">
+                        <FormField
+                          control={editUserForm.control}
+                          name="name"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Naam</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Voornaam Achternaam" {...field} data-testid="input-edit-user-name" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={editUserForm.control}
+                          name="email"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>E-mailadres</FormLabel>
+                              <FormControl>
+                                <Input type="email" placeholder="gebruiker@moskee.be" {...field} data-testid="input-edit-user-email" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={editUserForm.control}
+                          name="role"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Rol</FormLabel>
+                              <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl>
+                                  <SelectTrigger data-testid="select-edit-user-role">
+                                    <SelectValue placeholder="Selecteer rol" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  <SelectItem value="BEHEERDER">Beheerder</SelectItem>
+                                  <SelectItem value="MEDEWERKER">Medewerker</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <div className="flex justify-end gap-2 pt-4">
+                          <Button type="button" variant="outline" onClick={() => setShowEditUserDialog(false)}>
+                            Annuleren
+                          </Button>
+                          <Button type="submit" disabled={editUserMutation.isPending} data-testid="button-update-user">
+                            {editUserMutation.isPending ? "Bijwerken..." : "Gebruiker Bijwerken"}
+                          </Button>
+                        </div>
+                      </form>
+                    </Form>
+                  </DialogContent>
+                </Dialog>
               </TabsContent>
 
               <TabsContent value="rules" className="space-y-6">

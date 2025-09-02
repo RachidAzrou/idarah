@@ -409,6 +409,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.put("/api/users/:id", authMiddleware, tenantMiddleware, async (req, res) => {
+    try {
+      const userData = insertUserSchema.partial().parse(req.body);
+      const user = await storage.updateUser(req.params.id, userData);
+      res.json(user);
+    } catch (error) {
+      res.status(400).json({ message: "Invalid user data" });
+    }
+  });
+
+  app.delete("/api/users/:id", authMiddleware, tenantMiddleware, async (req, res) => {
+    try {
+      await storage.deleteUser(req.params.id);
+      res.json({ message: "User deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete user" });
+    }
+  });
+
+  app.post("/api/users/:id/reset-password", authMiddleware, tenantMiddleware, async (req, res) => {
+    try {
+      // Generate a new temporary password
+      const newPassword = Math.random().toString(36).slice(-8);
+      await storage.updateUser(req.params.id, { password: newPassword });
+      
+      // In a real app, you would send this via email
+      res.json({ 
+        message: "Password reset successfully",
+        temporaryPassword: newPassword 
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to reset password" });
+    }
+  });
+
   // Rules routes
   app.get("/api/rules", authMiddleware, tenantMiddleware, async (req, res) => {
     try {

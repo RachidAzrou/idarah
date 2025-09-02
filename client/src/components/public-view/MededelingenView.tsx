@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import backgroundImage from "@assets/19449746_1756811468947.jpg";
 
 interface MededelingenViewProps {
   config: any;
@@ -57,7 +58,7 @@ export function MededelingenView({ config }: MededelingenViewProps) {
     <div 
       className="min-h-screen relative flex items-center justify-center p-8"
       style={{
-        backgroundImage: `url("@assets/19449746_1756811468947.jpg")`,
+        backgroundImage: `url("${backgroundImage}")`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'

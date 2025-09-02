@@ -1,7 +1,28 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { PaymentMatrixConfig } from "@/lib/mock/public-screens";
+import React, { useState, useEffect } from "react";
+// Removed specific config import for now
+interface PaymentMatrixConfig {
+  year: number;
+  filters: {
+    categories: string[];
+    activeOnly: boolean;
+  };
+  colors: {
+    paid: string;
+    open: string;
+    overdue: string;
+    unknown: string;
+  };
+  layout: {
+    columnWidth: number;
+    maxRowHeight: number;
+  };
+  display: {
+    showLegend: boolean;
+    showStats: boolean;
+  };
+}
 import { getPaymentSnapshot, monthShortNl, Cell } from "@/lib/mock/fees-snapshot";
 import { PieChart, Pie, ResponsiveContainer, Legend } from "recharts";
 import { Check, X, AlertTriangle } from "lucide-react";
@@ -11,7 +32,7 @@ interface PaymentMatrixViewProps {
   config: PaymentMatrixConfig;
 }
 
-export function PaymentMatrixView({ config }: PaymentMatrixViewProps) {
+const PaymentMatrixView = React.memo(function PaymentMatrixView({ config }: PaymentMatrixViewProps) {
   const [snapshot, setSnapshot] = useState(() => 
     getPaymentSnapshot(config.year, {
       categories: config.filters.categories,
@@ -19,7 +40,7 @@ export function PaymentMatrixView({ config }: PaymentMatrixViewProps) {
     })
   );
 
-  // Auto-sync every 10 seconds
+  // Auto-sync every 30 seconds (reduced for better performance)
   useEffect(() => {
     const interval = setInterval(() => {
       const newSnapshot = getPaymentSnapshot(config.year, {
@@ -27,7 +48,7 @@ export function PaymentMatrixView({ config }: PaymentMatrixViewProps) {
         activeOnly: config.filters.activeOnly
       });
       setSnapshot(newSnapshot);
-    }, 10000);
+    }, 30000);
 
     return () => clearInterval(interval);
   }, [config]);
@@ -214,4 +235,6 @@ export function PaymentMatrixView({ config }: PaymentMatrixViewProps) {
       </div>
     </div>
   );
-}
+});
+
+export { PaymentMatrixView };

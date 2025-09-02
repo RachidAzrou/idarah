@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { StatusChip } from "@/components/ui/StatusChip";
@@ -24,7 +24,7 @@ interface TransactionsTableProps {
 type SortField = 'date' | 'amount' | 'category' | 'type';
 type SortDirection = 'asc' | 'desc';
 
-export function TransactionsTable({
+const TransactionsTable = React.memo(function TransactionsTable({
   transactions,
   filters,
   onTransactionSelect,
@@ -37,18 +37,22 @@ export function TransactionsTable({
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
 
-  // Filter and sort transactions
+  // Filter and sort transactions (optimized)
   const filteredAndSortedTransactions = useMemo(() => {
+    // Early return if no transactions
+    if (!transactions || transactions.length === 0) return [];
+    
     let filtered = transactions;
 
-    // Apply filters
+    // Apply filters with optimized string operations
     if (filters.search) {
       const search = filters.search.toLowerCase();
-      filtered = filtered.filter(t => 
-        t.category.toLowerCase().includes(search) ||
-        (t.description?.toLowerCase().includes(search)) ||
-        (t.memberName?.toLowerCase().includes(search))
-      );
+      filtered = filtered.filter(t => {
+        const category = t.category?.toLowerCase() || '';
+        const description = t.description?.toLowerCase() || '';
+        const memberName = t.memberName?.toLowerCase() || '';
+        return category.includes(search) || description.includes(search) || memberName.includes(search);
+      });
     }
 
     if (filters.type && filters.type !== 'ALL') {
@@ -287,4 +291,6 @@ export function TransactionsTable({
       )}
     </div>
   );
-}
+});
+
+export { TransactionsTable };

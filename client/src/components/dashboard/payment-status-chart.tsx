@@ -1,6 +1,6 @@
+import React, { useMemo } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { useQuery } from '@tanstack/react-query';
-import { useMemo } from 'react';
 
 interface PaymentStatusData {
   name: string;
@@ -8,13 +8,13 @@ interface PaymentStatusData {
   color: string;
 }
 
-export default function PaymentStatusChart() {
+const PaymentStatusChart = React.memo(function PaymentStatusChart() {
   const { data: fees } = useQuery({
     queryKey: ["/api/fees"],
   });
   
   const data: PaymentStatusData[] = useMemo(() => {
-    if (!Array.isArray(fees)) {
+    if (!Array.isArray(fees) || fees.length === 0) {
       return [
         { name: 'Betaald', value: 0, color: '#16A34A' },
         { name: 'Openstaand', value: 0, color: '#F59E0B' },
@@ -22,14 +22,18 @@ export default function PaymentStatusChart() {
       ];
     }
     
-    const paid = fees.filter((f: any) => f.status === 'PAID').length;
-    const open = fees.filter((f: any) => f.status === 'OPEN').length;
-    const overdue = fees.filter((f: any) => f.status === 'OVERDUE').length;
+    // Optimized counting with a single pass
+    const counts = fees.reduce((acc: any, f: any) => {
+      if (f.status === 'PAID') acc.paid++;
+      else if (f.status === 'OPEN') acc.open++;
+      else if (f.status === 'OVERDUE') acc.overdue++;
+      return acc;
+    }, { paid: 0, open: 0, overdue: 0 });
     
     return [
-      { name: 'Betaald', value: paid, color: '#16A34A' },
-      { name: 'Openstaand', value: open, color: '#F59E0B' },
-      { name: 'Achterstallig', value: overdue, color: '#EF4444' },
+      { name: 'Betaald', value: counts.paid, color: '#16A34A' },
+      { name: 'Openstaand', value: counts.open, color: '#F59E0B' },
+      { name: 'Achterstallig', value: counts.overdue, color: '#EF4444' },
     ];
   }, [fees]);
   
@@ -86,4 +90,6 @@ export default function PaymentStatusChart() {
       </div>
     </div>
   );
-}
+});
+
+export default PaymentStatusChart;

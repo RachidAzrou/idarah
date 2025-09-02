@@ -8,11 +8,14 @@ import { NewScreenDialog } from "@/components/public-screens/NewScreenDialog";
 import { EditScreenDrawer } from "@/components/public-screens/EditScreenDrawer";
 import { PublicScreen } from "@/lib/mock/public-screens";
 import { useToast } from "@/hooks/use-toast";
+import { useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 
 export default function PublicScreensPage() {
   const [showNewDialog, setShowNewDialog] = useState(false);
   const [editScreen, setEditScreen] = useState<PublicScreen | null>(null);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const handleCreateScreen = async (screenData: {
     name: string;
@@ -20,38 +23,22 @@ export default function PublicScreensPage() {
     config: any;
   }) => {
     try {
-      // Get auth token from localStorage
-      const token = localStorage.getItem("authToken");
-      if (!token) {
-        throw new Error('Not authenticated');
-      }
-
-      const response = await fetch('/api/public-screens', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          name: screenData.name,
-          type: screenData.type,
-          active: true,
-          config: screenData.config
-        }),
+      const response = await apiRequest('POST', '/api/public-screens', {
+        name: screenData.name,
+        type: screenData.type,
+        active: true,
+        config: screenData.config
       });
 
-      if (response.ok) {
-        const screen = await response.json();
-        toast({
-          title: "Scherm aangemaakt",
-          description: `${screen.name} is succesvol aangemaakt.`,
-        });
-        // Refresh the screen list
-        window.location.reload();
-      } else {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create screen');
-      }
+      const screen = await response.json();
+      
+      // Gebruik slimme cache invalidation in plaats van page reload
+      queryClient.invalidateQueries({ queryKey: ["/api/public-screens"] });
+      
+      toast({
+        title: "Scherm aangemaakt",
+        description: `${screen.name} is succesvol aangemaakt.`,
+      });
     } catch (error: any) {
       toast({
         title: "Fout",
@@ -62,6 +49,9 @@ export default function PublicScreensPage() {
   };
 
   const handleUpdateScreen = (screen: PublicScreen) => {
+    // Invalideer cache voor snellere updates
+    queryClient.invalidateQueries({ queryKey: ["/api/public-screens"] });
+    
     toast({
       title: "Scherm bijgewerkt",
       description: `${screen.name} is succesvol bijgewerkt.`,
@@ -70,6 +60,9 @@ export default function PublicScreensPage() {
   };
 
   const handleDeleteScreen = (screenName: string) => {
+    // Invalideer cache na verwijdering
+    queryClient.invalidateQueries({ queryKey: ["/api/public-screens"] });
+    
     toast({
       title: "Scherm verwijderd",
       description: `${screenName} is verwijderd.`,

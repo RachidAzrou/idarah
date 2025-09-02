@@ -1,12 +1,12 @@
+import React, { useMemo } from 'react';
 import { UserPlus, CreditCard } from 'lucide-react';
 import { LuUserCog } from 'react-icons/lu';
 import { RiSettings4Line } from 'react-icons/ri';
 import { useQuery } from '@tanstack/react-query';
 import { formatDistanceToNow } from 'date-fns';
 import { nl } from 'date-fns/locale';
-import { useMemo } from 'react';
 
-export default function RecentActivities() {
+const RecentActivities = React.memo(function RecentActivities() {
   const { data: transactions } = useQuery({
     queryKey: ["/api/transactions"],
   });
@@ -26,6 +26,7 @@ export default function RecentActivities() {
       ];
     }
     
+    // Optimized: take only first 5 and avoid unnecessary operations
     return transactions.slice(0, 5).map((t: any, index: number) => ({
       id: index + 1,
       user: t.memberName || 'Onbekend lid',
@@ -69,4 +70,6 @@ export default function RecentActivities() {
       </div>
     </div>
   );
-}
+});
+
+export default RecentActivities;

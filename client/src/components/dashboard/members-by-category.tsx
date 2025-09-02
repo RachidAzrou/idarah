@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { ConcentricRings } from '@/components/charts/concentric-rings';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { useQuery } from '@tanstack/react-query';
 
 export default function MembersByCategoryCard() {
@@ -80,8 +80,41 @@ export default function MembersByCategoryCard() {
       {/* Content Layout - Horizontal for wider space */}
       <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8">
         {/* Left side - Chart */}
-        <div className="flex-shrink-0">
-          <ConcentricRings categories={categories} size={240} />
+        <div className="flex-shrink-0" style={{ width: '240px', height: '240px' }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={categories.filter(cat => cat.count > 0)}
+                dataKey="count"
+                nameKey="label"
+                cx="50%"
+                cy="50%"
+                outerRadius={90}
+                innerRadius={0}
+                strokeWidth={2}
+                stroke="#ffffff"
+              >
+                {categories.filter(cat => cat.count > 0).map((category, index) => (
+                  <Cell key={`cell-${index}`} fill={category.color} />
+                ))}
+              </Pie>
+              <Tooltip 
+                formatter={(value: number, name: string) => [
+                  `${value} ${value === 1 ? 'lid' : 'leden'}`,
+                  name
+                ]}
+                labelStyle={{ color: '#0F172A', fontWeight: '600' }}
+                contentStyle={{ 
+                  backgroundColor: 'white',
+                  border: '1px solid #E2E8F0',
+                  borderRadius: '12px',
+                  fontSize: '14px',
+                  fontFamily: 'Poppins',
+                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+                }}
+              />
+            </PieChart>
+          </ResponsiveContainer>
         </div>
 
         {/* Right side - Total + Legend */}

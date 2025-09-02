@@ -112,15 +112,7 @@ export function LedenlijstConfigStep({ data, onUpdate }: LedenlijstConfigStepPro
             </div>
           </div>
 
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="show-voting-rights"
-              checked={settings.showVotingRights}
-              onCheckedChange={(checked) => updateSettings('showVotingRights', checked)}
-              data-testid="checkbox-voting-rights"
-            />
-            <Label htmlFor="show-voting-rights">Stemrecht tonen</Label>
-          </div>
+          
         </div>
       </div>
 

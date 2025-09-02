@@ -244,11 +244,6 @@ export default function PubliekeSchermen() {
                         <ScreenCard
                           key={screen.id}
                           screen={screen}
-                          onEdit={() => {
-                            setEditingScreen(screen);
-                            setWizardMode('edit');
-                            setShowNewScreenDialog(true);
-                          }}
                           onToggleStatus={() => toggleScreenMutation.mutate({ id: screen.id, active: !screen.active })}
                           onDelete={() => deleteScreenMutation.mutate(screen.id)}
                         />

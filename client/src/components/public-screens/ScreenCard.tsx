@@ -12,18 +12,19 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Edit, Trash2, ExternalLink, Check } from "lucide-react";
 import { GiPowerButton } from "react-icons/gi";
 import { FaRegCopy } from "react-icons/fa";
+import { EditScreenDialog } from "./EditScreenDialog";
 
 interface ScreenCardProps {
   screen: PublicScreen;
-  onEdit: () => void;
   onToggleStatus: () => void;
   onDelete: () => void;
 }
 
-export function ScreenCard({ screen, onEdit, onToggleStatus, onDelete }: ScreenCardProps) {
+export function ScreenCard({ screen, onToggleStatus, onDelete }: ScreenCardProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showUrlDialog, setShowUrlDialog] = useState(false);
   const [justCopied, setJustCopied] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
 
   const handleCopyUrl = async () => {
     try {
@@ -108,7 +109,7 @@ export function ScreenCard({ screen, onEdit, onToggleStatus, onDelete }: ScreenC
               <Button
                 variant="outline"
                 size="sm"
-                onClick={onEdit}
+                onClick={() => setShowEditDialog(true)}
                 className="h-8 w-8 p-0"
                 title="Bewerken"
               >
@@ -184,6 +185,13 @@ export function ScreenCard({ screen, onEdit, onToggleStatus, onDelete }: ScreenC
         description={`Weet je zeker dat je "${screen.name}" wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.`}
         confirmText="Verwijderen"
         variant="destructive"
+      />
+      
+      {/* Edit Screen Dialog */}
+      <EditScreenDialog
+        screen={screen}
+        open={showEditDialog}
+        onOpenChange={setShowEditDialog}
       />
     </>
   );

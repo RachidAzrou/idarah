@@ -123,6 +123,8 @@ export function ScreenWizard({ open, onOpenChange, onComplete }: ScreenWizardPro
     if (wizardData.type === 'LEDENLIJST') {
       baseSteps.push({ title: "Configuratie", component: LedenlijstConfigStep });
     } else if (wizardData.type === 'MEDEDELINGEN') {
+      // Voor mededelingen slaan we de opmaak stap over en gaan direct naar berichten
+      baseSteps.splice(2, 1); // Verwijder de "Opmaak" stap
       baseSteps.push({ title: "Berichten", component: MededelingenMessagesStep });
       baseSteps.push({ title: "Carrousel", component: MededelingenCarouselStep });
     } else if (wizardData.type === 'MULTIMEDIA') {
@@ -139,14 +141,20 @@ export function ScreenWizard({ open, onOpenChange, onComplete }: ScreenWizardPro
     switch (currentStep) {
       case 0: return !!wizardData.type;
       case 1: return wizardData.name.length > 0;
-      case 2: return wizardData.title.text.length > 0;
+      case 2: 
+        if (wizardData.type === 'MEDEDELINGEN') {
+          // Voor mededelingen is stap 2 de berichten stap
+          return !!wizardData.mededelingenSettings && wizardData.mededelingenSettings.slides.length > 0;
+        } else {
+          // Voor andere types is stap 2 de opmaak stap
+          return wizardData.title.text.length > 0;
+        }
       case 3: 
         if (wizardData.type === 'LEDENLIJST') return !!wizardData.ledenlijstSettings;
-        if (wizardData.type === 'MEDEDELINGEN') return !!wizardData.mededelingenSettings && wizardData.mededelingenSettings.slides.length > 0;
+        if (wizardData.type === 'MEDEDELINGEN') return !!wizardData.mededelingenSettings?.autoplay;
         if (wizardData.type === 'MULTIMEDIA') return !!wizardData.multimediaSettings && wizardData.multimediaSettings.mediaItems.length > 0;
         return true;
       case 4:
-        if (wizardData.type === 'MEDEDELINGEN') return !!wizardData.mededelingenSettings?.autoplay;
         return true;
       default: return true;
     }
@@ -233,10 +241,10 @@ export function ScreenWizard({ open, onOpenChange, onComplete }: ScreenWizardPro
           <DialogDescription className="text-base mt-2">
             {currentStep === 0 && "Kies het type scherm dat je wilt aanmaken"}
             {currentStep === 1 && "Geef je scherm een duidelijke naam"}
-            {currentStep === 2 && "Pas de titel en ondertitel aan"}
-            {currentStep === 3 && wizardData.type === 'MEDEDELINGEN' && "Maak en beheer je berichten"}
+            {currentStep === 2 && wizardData.type === 'MEDEDELINGEN' && "Maak en beheer je berichten"}
+            {currentStep === 2 && wizardData.type !== 'MEDEDELINGEN' && "Pas de titel en ondertitel aan"}
+            {currentStep === 3 && wizardData.type === 'MEDEDELINGEN' && "Stel de carrousel instellingen in"}
             {currentStep === 3 && wizardData.type !== 'MEDEDELINGEN' && "Configureer de specifieke instellingen"}
-            {currentStep === 4 && wizardData.type === 'MEDEDELINGEN' && "Stel de carrousel instellingen in"}
           </DialogDescription>
           
           {/* Progress indicator */}

@@ -65,6 +65,16 @@ export function MededelingenCarouselStep({ data, onUpdate }: MededelingenCarouse
     });
   };
 
+  const updateSettings = (newSettings: Partial<MededelingenSettings>) => {
+    onUpdate({
+      ...data,
+      mededelingenSettings: {
+        ...settings,
+        ...newSettings
+      }
+    });
+  };
+
   const updateAutoplay = (key: keyof typeof settings.autoplay, value: any) => {
     updateSettings({
       autoplay: {

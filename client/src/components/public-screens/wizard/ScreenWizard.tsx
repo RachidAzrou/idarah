@@ -144,15 +144,14 @@ export function ScreenWizard({ open, onOpenChange, onComplete }: ScreenWizardPro
       case 1: return wizardData.name.length > 0;
       case 2: 
         if (wizardData.type === 'MEDEDELINGEN') {
-          // Voor mededelingen is stap 2 de berichten stap
+          // Voor mededelingen is stap 2 de configuratie stap (berichten)
           return !!wizardData.mededelingenSettings && wizardData.mededelingenSettings.slides.length > 0;
         } else {
           // Voor andere types is stap 2 de opmaak stap
-          return wizardData.title.text.length > 0;
+          return wizardData.title && wizardData.title.text && wizardData.title.text.length > 0;
         }
       case 3: 
         if (wizardData.type === 'LEDENLIJST') return !!wizardData.ledenlijstSettings;
-        if (wizardData.type === 'MEDEDELINGEN') return !!wizardData.mededelingenSettings?.autoplay;
         if (wizardData.type === 'MULTIMEDIA') return !!wizardData.multimediaSettings && wizardData.multimediaSettings.mediaItems.length > 0;
         return true;
       case 4:

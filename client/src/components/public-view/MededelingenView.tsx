@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import backgroundImage from "@assets/19449746_1756811468947.jpg";
+import backgroundImage from "@assets/ramadan_15_03_2022_1_1756811846212.jpg";
 
 interface MededelingenViewProps {
   config: any;

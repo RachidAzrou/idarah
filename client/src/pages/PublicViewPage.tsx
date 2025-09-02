@@ -5,7 +5,6 @@ import { useParams } from "wouter";
 import { LedenlijstView } from "@/components/public-view/LedenlijstView";
 import { MededelingenView } from "@/components/public-view/MededelingenView";
 import { MultimediaView } from "@/components/public-view/MultimediaView";
-import { publicScreensStore } from "@/lib/mock/public-screens";
 
 export function PublicViewPage() {
   const { screenId } = useParams();
@@ -13,25 +12,32 @@ export function PublicViewPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Load screen data
-    const loadScreen = () => {
+    // Load screen data - treating screenId as publicToken
+    const loadScreen = async () => {
       try {
-        const allScreens = publicScreensStore.list();
-        const foundScreen = allScreens.find(s => s.id === screenId);
-        setScreen(foundScreen);
+        const response = await fetch(`/api/public-screens/token/${screenId}`);
+        if (response.ok) {
+          const foundScreen = await response.json();
+          setScreen(foundScreen);
+        } else {
+          setScreen(null);
+        }
       } catch (error) {
         console.error('Error loading screen:', error);
+        setScreen(null);
       } finally {
         setLoading(false);
       }
     };
 
-    loadScreen();
+    if (screenId) {
+      loadScreen();
 
-    // Auto-refresh every 5 minutes (300,000ms)
-    const refreshInterval = setInterval(loadScreen, 300000);
+      // Auto-refresh every 5 minutes (300,000ms)
+      const refreshInterval = setInterval(loadScreen, 300000);
 
-    return () => clearInterval(refreshInterval);
+      return () => clearInterval(refreshInterval);
+    }
   }, [screenId]);
 
   // Show loading state

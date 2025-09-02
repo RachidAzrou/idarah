@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { publicScreensStore, PublicScreen } from "@/lib/mock/public-screens";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { PublicScreen } from "@/lib/mock/public-screens";
 import { ScreenCard } from "./ScreenCard";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface PublicScreensListProps {
   onEdit: (screen: PublicScreen) => void;
@@ -16,8 +18,44 @@ export function PublicScreensList({ onEdit, onDelete }: PublicScreensListProps) 
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState<string>("ALL");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
   
-  const screens = publicScreensStore.list();
+  const { data: screens = [], isLoading } = useQuery({
+    queryKey: ['/api/public-screens'],
+    queryFn: async () => {
+      const response = await fetch('/api/public-screens');
+      if (!response.ok) throw new Error('Failed to fetch screens');
+      return response.json();
+    }
+  });
+
+  const toggleStatusMutation = useMutation({
+    mutationFn: async ({ id, active }: { id: string; active: boolean }) => {
+      const response = await fetch(`/api/public-screens/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ active })
+      });
+      if (!response.ok) throw new Error('Failed to update screen');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/public-screens'] });
+    }
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const response = await fetch(`/api/public-screens/${id}`, {
+        method: 'DELETE'
+      });
+      if (!response.ok) throw new Error('Failed to delete screen');
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/public-screens'] });
+    }
+  });
 
   const filteredScreens = useMemo(() => {
     return screens.filter(screen => {
@@ -32,17 +70,22 @@ export function PublicScreensList({ onEdit, onDelete }: PublicScreensListProps) 
   }, [screens, searchTerm, typeFilter, statusFilter]);
 
   const handleToggleStatus = (screen: PublicScreen) => {
-    publicScreensStore.update(screen.id, { active: !screen.active });
-    // Force re-render by updating key
-    setSearchTerm(prev => prev);
+    toggleStatusMutation.mutate({ id: screen.id, active: !screen.active });
   };
 
   const handleDelete = (screen: PublicScreen) => {
-    publicScreensStore.remove(screen.id);
+    deleteMutation.mutate(screen.id);
     onDelete(screen.name);
-    // Force re-render
-    setSearchTerm(prev => prev);
   };
+
+  if (isLoading) {
+    return (
+      <div className="text-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <p className="text-gray-600">Schermen laden...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

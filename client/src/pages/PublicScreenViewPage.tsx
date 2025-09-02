@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRoute } from "wouter";
-import { publicScreensStore, PublicScreen, LedenlijstConfig, MededelingenConfig, MultimediaConfig } from "@/lib/mock/public-screens";
+import { PublicScreen, LedenlijstConfig, MededelingenConfig, MultimediaConfig } from "@/lib/mock/public-screens";
 import { LedenlijstView } from "@/components/public-view/LedenlijstView";
 import { AnnouncementsView } from "@/components/public-view/AnnouncementsView";
 import { Controls } from "@/components/public-view/Controls";
@@ -16,11 +16,26 @@ export default function PublicScreenViewPage() {
   const [showControls, setShowControls] = useState(true);
 
   useEffect(() => {
-    if (publicToken) {
-      const foundScreen = publicScreensStore.byToken(publicToken);
-      setScreen(foundScreen || null);
-      setLoading(false);
-    }
+    const loadScreen = async () => {
+      if (publicToken) {
+        try {
+          const response = await fetch(`/api/public-screens/token/${publicToken}`);
+          if (response.ok) {
+            const foundScreen = await response.json();
+            setScreen(foundScreen);
+          } else {
+            setScreen(null);
+          }
+        } catch (error) {
+          console.error('Error loading screen:', error);
+          setScreen(null);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadScreen();
   }, [publicToken]);
 
   useEffect(() => {

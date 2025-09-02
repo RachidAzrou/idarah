@@ -19,19 +19,38 @@ export default function PublicScreensPage() {
     type: any;
     config: any;
   }) => {
-    // Create screen via store
-    const { publicScreensStore } = await import("@/lib/mock/public-screens");
-    const screen = publicScreensStore.create({
-      name: screenData.name,
-      type: screenData.type,
-      active: true,
-      config: screenData.config
-    });
-    
-    toast({
-      title: "Scherm aangemaakt",
-      description: `${screen.name} is succesvol aangemaakt.`,
-    });
+    try {
+      const response = await fetch('/api/public-screens', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: screenData.name,
+          type: screenData.type,
+          active: true,
+          config: screenData.config
+        }),
+      });
+
+      if (response.ok) {
+        const screen = await response.json();
+        toast({
+          title: "Scherm aangemaakt",
+          description: `${screen.name} is succesvol aangemaakt.`,
+        });
+        // Refresh the screen list
+        window.location.reload();
+      } else {
+        throw new Error('Failed to create screen');
+      }
+    } catch (error) {
+      toast({
+        title: "Fout",
+        description: "Er is een fout opgetreden bij het aanmaken van het scherm.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleUpdateScreen = (screen: PublicScreen) => {

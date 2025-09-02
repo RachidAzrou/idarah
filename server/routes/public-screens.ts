@@ -1,11 +1,13 @@
 import { Router } from "express";
 import { z } from "zod";
 import { storage } from "../storage";
+import { authMiddleware } from "../middleware/auth";
+import { tenantMiddleware } from "../middleware/tenant";
 
 const router = Router();
 
-// Get all public screens
-router.get('/', async (req, res) => {
+// Get all public screens (requires auth)
+router.get('/', authMiddleware, tenantMiddleware, async (req, res) => {
   try {
     const tenantId = req.user?.tenantId;
     if (!tenantId) {
@@ -33,8 +35,8 @@ router.get('/token/:token', async (req, res) => {
   }
 });
 
-// Create new public screen
-router.post('/', async (req, res) => {
+// Create new public screen (requires auth)
+router.post('/', authMiddleware, tenantMiddleware, async (req, res) => {
   try {
     const createSchema = z.object({
       name: z.string().min(1),
@@ -67,8 +69,9 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Update public screen
-router.put('/:id', async (req, res) => {
+// Update public screen (requires auth)
+// Also support PATCH for partial updates
+router.patch('/:id', authMiddleware, tenantMiddleware, async (req, res) => {
   try {
     const updateSchema = z.object({
       name: z.string().min(1).optional(),
@@ -88,8 +91,29 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-// Delete public screen
-router.delete('/:id', async (req, res) => {
+// Update public screen
+router.put('/:id', authMiddleware, tenantMiddleware, async (req, res) => {
+  try {
+    const updateSchema = z.object({
+      name: z.string().min(1).optional(),
+      active: z.boolean().optional(),
+      config: z.any().optional()
+    });
+
+    const data = updateSchema.parse(req.body);
+    const screen = await storage.updatePublicScreen(req.params.id, data);
+    res.json(screen);
+  } catch (error) {
+    console.error('Error updating public screen:', error);
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ error: 'Invalid data', details: error.errors });
+    }
+    res.status(500).json({ error: 'Failed to update public screen' });
+  }
+});
+
+// Delete public screen (requires auth)
+router.delete('/:id', authMiddleware, tenantMiddleware, async (req, res) => {
   try {
     await storage.deletePublicScreen(req.params.id);
     res.status(204).send();

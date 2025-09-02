@@ -229,8 +229,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Enhanced member creation with rolling fees
   app.post("/api/members/create", authMiddleware, tenantMiddleware, createMemberHandler);
 
-  // Public screens routes
-  app.use("/api/public-screens", authMiddleware, tenantMiddleware, publicScreensRouter);
+  // Public screens routes - some routes need auth, others are public
+  app.use("/api/public-screens", publicScreensRouter);
 
   const httpServer = createServer(app);
   return httpServer;

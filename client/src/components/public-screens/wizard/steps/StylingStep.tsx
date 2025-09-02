@@ -72,18 +72,38 @@ const colors = [
   { value: "#451a03", label: "Donkerbruin" }
 ];
 
+const defaultTitleStyling: TitleStyling = {
+  text: "",
+  fontSize: 32,
+  fontFamily: "Poppins",
+  color: "#1f2937",
+  fontWeight: "bold"
+};
+
+const defaultSubtitleStyling: TitleStyling = {
+  text: "",
+  fontSize: 18,
+  fontFamily: "Poppins", 
+  color: "#6b7280",
+  fontWeight: "normal"
+};
+
 export function StylingStep({ data, onUpdate }: StylingStepProps) {
+  // Ensure title and subtitle exist with defaults
+  const safeTitle = data.title || defaultTitleStyling;
+  const safeSubtitle = data.subtitle || defaultSubtitleStyling;
+
   const updateTitle = (field: keyof TitleStyling, value: any) => {
     onUpdate({
       ...data,
-      title: { ...data.title, [field]: value }
+      title: { ...safeTitle, [field]: value }
     });
   };
 
   const updateSubtitle = (field: keyof TitleStyling, value: any) => {
     onUpdate({
       ...data,
-      subtitle: { ...data.subtitle, [field]: value }
+      subtitle: { ...safeSubtitle, [field]: value }
     });
   };
 
@@ -106,7 +126,7 @@ export function StylingStep({ data, onUpdate }: StylingStepProps) {
             <Label htmlFor="title-text">Tekst *</Label>
             <Input
               id="title-text"
-              value={data.title.text}
+              value={safeTitle.text}
               onChange={(e) => updateTitle('text', e.target.value)}
               placeholder="Titel van het scherm"
               data-testid="input-title-text"
@@ -119,7 +139,7 @@ export function StylingStep({ data, onUpdate }: StylingStepProps) {
               <Input
                 id="title-fontsize"
                 type="number"
-                value={data.title.fontSize}
+                value={safeTitle.fontSize}
                 onChange={(e) => updateTitle('fontSize', parseInt(e.target.value))}
                 min="12"
                 max="72"
@@ -129,7 +149,7 @@ export function StylingStep({ data, onUpdate }: StylingStepProps) {
             
             <div>
               <Label htmlFor="title-fontweight">Gewicht</Label>
-              <Select value={data.title.fontWeight} onValueChange={(value) => updateTitle('fontWeight', value)}>
+              <Select value={safeTitle.fontWeight} onValueChange={(value) => updateTitle('fontWeight', value)}>
                 <SelectTrigger data-testid="select-title-fontweight">
                   <SelectValue />
                 </SelectTrigger>
@@ -147,7 +167,7 @@ export function StylingStep({ data, onUpdate }: StylingStepProps) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="title-fontfamily">Lettertype</Label>
-              <Select value={data.title.fontFamily} onValueChange={(value) => updateTitle('fontFamily', value)}>
+              <Select value={safeTitle.fontFamily} onValueChange={(value) => updateTitle('fontFamily', value)}>
                 <SelectTrigger data-testid="select-title-fontfamily">
                   <SelectValue />
                 </SelectTrigger>
@@ -164,7 +184,7 @@ export function StylingStep({ data, onUpdate }: StylingStepProps) {
             <div>
               <Label htmlFor="title-color">Kleur</Label>
               <ColorPicker
-                value={data.title.color}
+                value={safeTitle.color}
                 onChange={(color) => updateTitle('color', color)}
               />
             </div>
@@ -179,7 +199,7 @@ export function StylingStep({ data, onUpdate }: StylingStepProps) {
             <Label htmlFor="subtitle-text">Tekst</Label>
             <Input
               id="subtitle-text"
-              value={data.subtitle.text}
+              value={safeSubtitle.text}
               onChange={(e) => updateSubtitle('text', e.target.value)}
               placeholder="Ondertitel (optioneel)"
               data-testid="input-subtitle-text"
@@ -192,7 +212,7 @@ export function StylingStep({ data, onUpdate }: StylingStepProps) {
               <Input
                 id="subtitle-fontsize"
                 type="number"
-                value={data.subtitle.fontSize}
+                value={safeSubtitle.fontSize}
                 onChange={(e) => updateSubtitle('fontSize', parseInt(e.target.value))}
                 min="12"
                 max="48"
@@ -202,7 +222,7 @@ export function StylingStep({ data, onUpdate }: StylingStepProps) {
             
             <div>
               <Label htmlFor="subtitle-fontweight">Gewicht</Label>
-              <Select value={data.subtitle.fontWeight} onValueChange={(value) => updateSubtitle('fontWeight', value)}>
+              <Select value={safeSubtitle.fontWeight} onValueChange={(value) => updateSubtitle('fontWeight', value)}>
                 <SelectTrigger data-testid="select-subtitle-fontweight">
                   <SelectValue />
                 </SelectTrigger>
@@ -220,7 +240,7 @@ export function StylingStep({ data, onUpdate }: StylingStepProps) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="subtitle-fontfamily">Lettertype</Label>
-              <Select value={data.subtitle.fontFamily} onValueChange={(value) => updateSubtitle('fontFamily', value)}>
+              <Select value={safeSubtitle.fontFamily} onValueChange={(value) => updateSubtitle('fontFamily', value)}>
                 <SelectTrigger data-testid="select-subtitle-fontfamily">
                   <SelectValue />
                 </SelectTrigger>
@@ -237,7 +257,7 @@ export function StylingStep({ data, onUpdate }: StylingStepProps) {
             <div>
               <Label htmlFor="subtitle-color">Kleur</Label>
               <ColorPicker
-                value={data.subtitle.color}
+                value={safeSubtitle.color}
                 onChange={(color) => updateSubtitle('color', color)}
               />
             </div>
@@ -255,39 +275,39 @@ export function StylingStep({ data, onUpdate }: StylingStepProps) {
         </div>
 
         <div className="p-6 border rounded-lg bg-white min-h-[300px] flex flex-col justify-center items-center space-y-4">
-          {data.title.text && (
+          {safeTitle.text && (
             <h1
               style={{
-                fontSize: `${data.title.fontSize}px`,
-                fontFamily: data.title.fontFamily,
-                color: data.title.color,
-                fontWeight: data.title.fontWeight,
+                fontSize: `${safeTitle.fontSize}px`,
+                fontFamily: safeTitle.fontFamily,
+                color: safeTitle.color,
+                fontWeight: safeTitle.fontWeight,
                 textAlign: 'center',
                 margin: 0
               }}
               data-testid="preview-title"
             >
-              {data.title.text}
+              {safeTitle.text}
             </h1>
           )}
           
-          {data.subtitle.text && (
+          {safeSubtitle.text && (
             <h2
               style={{
-                fontSize: `${data.subtitle.fontSize}px`,
-                fontFamily: data.subtitle.fontFamily,
-                color: data.subtitle.color,
-                fontWeight: data.subtitle.fontWeight,
+                fontSize: `${safeSubtitle.fontSize}px`,
+                fontFamily: safeSubtitle.fontFamily,
+                color: safeSubtitle.color,
+                fontWeight: safeSubtitle.fontWeight,
                 textAlign: 'center',
                 margin: 0
               }}
               data-testid="preview-subtitle"
             >
-              {data.subtitle.text}
+              {safeSubtitle.text}
             </h2>
           )}
 
-          {!data.title.text && (
+          {!safeTitle.text && (
             <p className="text-gray-400 text-center">
               Voer een titel in om de preview te zien
             </p>

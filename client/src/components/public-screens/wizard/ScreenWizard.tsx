@@ -79,7 +79,7 @@ interface WizardData {
   };
 }
 
-const resetWizardData = () => ({
+const resetWizardData = (): WizardData => ({
   name: "",
   title: { ...defaultTitleStyling },
   subtitle: { ...defaultSubtitleStyling }

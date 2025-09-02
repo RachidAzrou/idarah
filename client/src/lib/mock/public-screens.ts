@@ -1,31 +1,34 @@
 import { generateId } from "./utils";
 
-export type ScreenType = 'PAYMENT_MATRIX' | 'ANNOUNCEMENTS';
+export type ScreenType = 'LEDENLIJST' | 'MEDEDELINGEN' | 'MULTIMEDIA';
 
-export interface PaymentMatrixConfig {
-  year: number;
-  filters: {
-    categories: string[];
-    activeOnly: boolean;
-  };
-  display: {
-    showChart: boolean;
-    compactLabels: boolean;
-    showPercentage: boolean;
-  };
-  colors: {
-    paid: string;
-    open: string;
-    overdue: string;
-    unknown: string;
-  };
-  layout: {
-    maxRowHeight: number;
-    columnWidth: number;
-  };
+// Styling configuratie voor titel en ondertitel
+export interface TitleStyling {
+  text: string;
+  fontSize: number;
+  fontFamily: string;
+  color: string;
+  fontWeight: 'normal' | 'bold';
 }
 
-export interface AnnouncementSlide {
+// Ledenlijst configuratie
+export interface LedenlijstConfig {
+  description?: string;
+  title: TitleStyling;
+  subtitle: TitleStyling;
+  display: {
+    useFullNames: boolean;
+    useInitials: boolean;
+    filterByCategories: boolean;
+    showVotingRights: boolean;
+    rowsPerPage: number;
+  };
+  year: number;
+  categories: string[];
+}
+
+// Mededelingen configuratie
+export interface MededelingenSlide {
   id: string;
   title: string;
   body?: string;
@@ -37,8 +40,11 @@ export interface AnnouncementSlide {
   durationSec: number;
 }
 
-export interface AnnouncementsConfig {
-  slides: AnnouncementSlide[];
+export interface MededelingenConfig {
+  description?: string;
+  title: TitleStyling;
+  subtitle: TitleStyling;
+  slides: MededelingenSlide[];
   autoplay: {
     enabled: boolean;
     interval: number;
@@ -51,6 +57,24 @@ export interface AnnouncementsConfig {
   };
 }
 
+// Multimedia configuratie
+export interface MultimediaConfig {
+  description?: string;
+  title: TitleStyling;
+  subtitle: TitleStyling;
+  mediaItems: {
+    id: string;
+    url: string;
+    type: 'image' | 'video';
+    duration: number;
+    active: boolean;
+  }[];
+  autoplay: {
+    enabled: boolean;
+    interval: number;
+  };
+}
+
 export interface PublicScreen {
   id: string;
   name: string;
@@ -58,49 +82,68 @@ export interface PublicScreen {
   active: boolean;
   publicToken: string;
   updatedAt: string;
-  config: PaymentMatrixConfig | AnnouncementsConfig;
+  config: LedenlijstConfig | MededelingenConfig | MultimediaConfig;
 }
 
 // In-memory store
 let screens: PublicScreen[] = [
   {
     id: "1",
-    name: "Betaalstatus Overzicht 2025",
-    type: "PAYMENT_MATRIX",
+    name: "Ledenlijst 2025",
+    type: "LEDENLIJST",
     active: true,
-    publicToken: "matrix-2025-abc123",
+    publicToken: "ledenlijst-2025-abc123",
     updatedAt: new Date().toISOString(),
     config: {
-      year: 2025,
-      filters: {
-        categories: ["Volwassene", "Student"],
-        activeOnly: true
+      description: "Overzicht van alle leden met betaalstatus",
+      title: {
+        text: "Ledenlijst",
+        fontSize: 32,
+        fontFamily: "Poppins",
+        color: "#1f2937",
+        fontWeight: "bold"
+      },
+      subtitle: {
+        text: "Betaalstatus 2025",
+        fontSize: 18,
+        fontFamily: "Poppins",
+        color: "#6b7280",
+        fontWeight: "normal"
       },
       display: {
-        showChart: true,
-        compactLabels: true,
-        showPercentage: true
+        useFullNames: true,
+        useInitials: false,
+        filterByCategories: true,
+        showVotingRights: false,
+        rowsPerPage: 20
       },
-      colors: {
-        paid: "#2563EB",
-        open: "#DBEAFE", 
-        overdue: "#FCA5A5",
-        unknown: "#9CA3AF"
-      },
-      layout: {
-        maxRowHeight: 48,
-        columnWidth: 48
-      }
-    } as PaymentMatrixConfig
+      year: 2025,
+      categories: ["Volwassene", "Student"]
+    } as LedenlijstConfig
   },
   {
     id: "2", 
     name: "Algemene Mededelingen",
-    type: "ANNOUNCEMENTS",
+    type: "MEDEDELINGEN",
     active: false,
-    publicToken: "announcements-xyz789",
-    updatedAt: new Date(Date.now() - 86400000).toISOString(), // yesterday
+    publicToken: "mededelingen-xyz789",
+    updatedAt: new Date(Date.now() - 86400000).toISOString(),
     config: {
+      description: "Belangrijke mededelingen voor de gemeenschap",
+      title: {
+        text: "Mededelingen",
+        fontSize: 28,
+        fontFamily: "Poppins",
+        color: "#1f2937",
+        fontWeight: "bold"
+      },
+      subtitle: {
+        text: "Laatste updates",
+        fontSize: 16,
+        fontFamily: "Poppins",
+        color: "#6b7280",
+        fontWeight: "normal"
+      },
       slides: [
         {
           id: "slide1",
@@ -120,7 +163,7 @@ let screens: PublicScreen[] = [
         background: "black",
         maxTextWidth: 800
       }
-    } as AnnouncementsConfig
+    } as MededelingenConfig
   }
 ];
 

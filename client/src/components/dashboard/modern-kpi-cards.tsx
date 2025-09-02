@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Users, UserCheck, Euro, Clock, TrendingUp, TrendingDown, Vote } from "lucide-react";
+import { HiInboxArrowDown } from "react-icons/hi2";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface KpiCardProps {
@@ -55,25 +56,25 @@ export default function ModernKpiCards() {
       title: "Actieve Leden", 
       value: isLoading ? "..." : ((stats as any)?.activeMembers?.toString() || "0"),
       delta: { value: "Actieve leden", positive: true },
-      icon: <UserCheck className="h-4 w-4 text-blue-600" />
+      icon: <UserCheck className="h-4 w-4 text-green-600" />
     },
     {
       title: "Stemgerechtigden",
       value: isLoading ? "..." : ((stats as any)?.activeMembers?.toString() || "0"),
       delta: { value: "Van actieve leden", positive: true },
-      icon: <Vote className="h-4 w-4 text-blue-600" />
+      icon: <Vote className="h-4 w-4 text-amber-500" />
     },
     {
       title: "Openstaande Betalingen",
       value: isLoading ? "..." : `€${(((stats as any)?.openPayments || 0)).toFixed(2)}`,
       delta: { value: "Te betalen bedragen", positive: false },
-      icon: <Clock className="h-4 w-4 text-blue-600" />
+      icon: <Clock className="h-4 w-4 text-orange-500" />
     },
     {
       title: "Inkomsten Deze Maand",
       value: isLoading ? "..." : `€${(((stats as any)?.monthlyIncome || 0)).toFixed(2)}`,
       delta: { value: "Deze maand", positive: true },
-      icon: <Euro className="h-4 w-4 text-blue-600" />
+      icon: <HiInboxArrowDown className="h-4 w-4 text-blue-600" />
     }
   ];
 

@@ -39,6 +39,16 @@ import { formatCurrency, formatDate } from "@/lib/format";
 const organizationSchema = z.object({
   name: z.string().min(1, "Organisatienaam is verplicht"),
   slug: z.string().min(1, "URL slug is verplicht"),
+  street: z.string().optional(),
+  number: z.string().optional(),
+  postalCode: z.string().optional(),
+  city: z.string().optional(),
+  country: z.string().optional(),
+  email: z.string().email("Ongeldig e-mailadres").optional().or(z.literal("")),
+  phone: z.string().optional(),
+  website: z.string().url("Ongeldige website URL").optional().or(z.literal("")),
+  companyNumber: z.string().optional(),
+  companyType: z.enum(['VZW', 'BVBA', 'NV', 'VOF', 'EENMANSZAAK', 'CVBA', 'SE', 'ANDERE']).optional(),
   logoUrl: z.string().optional(),
   primaryColor: z.string().optional(),
 });
@@ -101,6 +111,16 @@ export default function Instellingen() {
     defaultValues: {
       name: tenant?.name || "",
       slug: tenant?.slug || "",
+      street: tenant?.street || "",
+      number: tenant?.number || "",
+      postalCode: tenant?.postalCode || "",
+      city: tenant?.city || "",
+      country: tenant?.country || "België",
+      email: tenant?.email || "",
+      phone: tenant?.phone || "",
+      website: tenant?.website || "",
+      companyNumber: tenant?.companyNumber || "",
+      companyType: tenant?.companyType || undefined,
       logoUrl: tenant?.logoUrl || "",
       primaryColor: tenant?.primaryColor || "#6366f1",
     },
@@ -293,37 +313,222 @@ export default function Instellingen() {
                   <CardContent>
                     <Form {...organizationForm}>
                       <form onSubmit={organizationForm.handleSubmit(onOrganizationSubmit)} className="space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          <FormField
-                            control={organizationForm.control}
-                            name="name"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Organisatienaam</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="Moskee Al-Nour Brussel" {...field} data-testid="input-org-name" />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
+                        <div className="space-y-6">
+                          {/* Basis Informatie */}
+                          <div>
+                            <h3 className="text-lg font-medium mb-4">Basis Informatie</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <FormField
+                                control={organizationForm.control}
+                                name="name"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Organisatienaam</FormLabel>
+                                    <FormControl>
+                                      <Input placeholder="Moskee Al-Nour Brussel" {...field} data-testid="input-org-name" />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
 
-                          <FormField
-                            control={organizationForm.control}
-                            name="slug"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>URL Identificatie</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="al-nour-brussel" {...field} data-testid="input-org-slug" />
-                                </FormControl>
-                                <FormDescription>
-                                  Gebruikt voor unieke identificatie in URL's
-                                </FormDescription>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
+                              <FormField
+                                control={organizationForm.control}
+                                name="slug"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>URL Identificatie</FormLabel>
+                                    <FormControl>
+                                      <Input placeholder="al-nour-brussel" {...field} data-testid="input-org-slug" />
+                                    </FormControl>
+                                    <FormDescription>
+                                      Gebruikt voor unieke identificatie in URL's
+                                    </FormDescription>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            </div>
+                          </div>
+
+                          {/* Adres Informatie */}
+                          <div>
+                            <h3 className="text-lg font-medium mb-4">Adres</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                              <div className="md:col-span-2">
+                                <FormField
+                                  control={organizationForm.control}
+                                  name="street"
+                                  render={({ field }) => (
+                                    <FormItem>
+                                      <FormLabel>Straat</FormLabel>
+                                      <FormControl>
+                                        <Input placeholder="Moskeestraat" {...field} data-testid="input-org-street" />
+                                      </FormControl>
+                                      <FormMessage />
+                                    </FormItem>
+                                  )}
+                                />
+                              </div>
+                              
+                              <FormField
+                                control={organizationForm.control}
+                                name="number"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Nummer</FormLabel>
+                                    <FormControl>
+                                      <Input placeholder="123" {...field} data-testid="input-org-number" />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+
+                              <FormField
+                                control={organizationForm.control}
+                                name="postalCode"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Postcode</FormLabel>
+                                    <FormControl>
+                                      <Input placeholder="1000" {...field} data-testid="input-org-postal" />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            </div>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                              <FormField
+                                control={organizationForm.control}
+                                name="city"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Stad</FormLabel>
+                                    <FormControl>
+                                      <Input placeholder="Brussel" {...field} data-testid="input-org-city" />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+
+                              <FormField
+                                control={organizationForm.control}
+                                name="country"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Land</FormLabel>
+                                    <FormControl>
+                                      <Input placeholder="België" {...field} data-testid="input-org-country" />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            </div>
+                          </div>
+
+                          {/* Contact Informatie */}
+                          <div>
+                            <h3 className="text-lg font-medium mb-4">Contact</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <FormField
+                                control={organizationForm.control}
+                                name="email"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>E-mailadres</FormLabel>
+                                    <FormControl>
+                                      <Input type="email" placeholder="info@moskee.be" {...field} data-testid="input-org-email" />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+
+                              <FormField
+                                control={organizationForm.control}
+                                name="phone"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Telefoonnummer</FormLabel>
+                                    <FormControl>
+                                      <Input placeholder="+32 2 123 45 67" {...field} data-testid="input-org-phone" />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+
+                              <FormField
+                                control={organizationForm.control}
+                                name="website"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Website</FormLabel>
+                                    <FormControl>
+                                      <Input placeholder="https://www.moskee.be" {...field} data-testid="input-org-website" />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            </div>
+                          </div>
+
+                          {/* Juridische Informatie */}
+                          <div>
+                            <h3 className="text-lg font-medium mb-4">Juridische Informatie</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <FormField
+                                control={organizationForm.control}
+                                name="companyNumber"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Ondernemingsnummer</FormLabel>
+                                    <FormControl>
+                                      <Input placeholder="0123.456.789" {...field} data-testid="input-org-company-number" />
+                                    </FormControl>
+                                    <FormDescription>
+                                      Belgisch ondernemingsnummer (BE format)
+                                    </FormDescription>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+
+                              <FormField
+                                control={organizationForm.control}
+                                name="companyType"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Vennootschapsvorm</FormLabel>
+                                    <Select onValueChange={field.onChange} value={field.value}>
+                                      <FormControl>
+                                        <SelectTrigger data-testid="select-company-type">
+                                          <SelectValue placeholder="Selecteer vennootschapsvorm" />
+                                        </SelectTrigger>
+                                      </FormControl>
+                                      <SelectContent>
+                                        <SelectItem value="VZW">Vereniging zonder winstoogmerk (VZW)</SelectItem>
+                                        <SelectItem value="BVBA">Besloten vennootschap (BV)</SelectItem>
+                                        <SelectItem value="NV">Naamloze vennootschap (NV)</SelectItem>
+                                        <SelectItem value="VOF">Vennootschap onder firma (VOF)</SelectItem>
+                                        <SelectItem value="EENMANSZAAK">Eenmanszaak</SelectItem>
+                                        <SelectItem value="CVBA">Coöperatieve vennootschap (CV)</SelectItem>
+                                        <SelectItem value="SE">Europese vennootschap (SE)</SelectItem>
+                                        <SelectItem value="ANDERE">Andere</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            </div>
+                          </div>
                         </div>
 
                         <div className="flex justify-end">

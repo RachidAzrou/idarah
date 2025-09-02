@@ -22,13 +22,24 @@ export const paymentMethodEnum = pgEnum('payment_method', ['SEPA', 'OVERSCHRIJVI
 export const feeStatusEnum = pgEnum('fee_status', ['OPEN', 'PAID', 'OVERDUE']);
 export const screenTypeEnum = pgEnum('screen_type', ['LEDENLIJST', 'MEDEDELINGEN', 'MULTIMEDIA']);
 export const cardStatusEnum = pgEnum('card_status', ['ACTUEEL', 'MOMENTOPNAME', 'VERLOPEN']);
-export const ruleScopeEnum = pgEnum('rule_scope', ['STEMRECHT', 'VERKIESBAAR', 'FUNCTIE']);
+export const ruleScopeEnum = pgEnum('rule_scope', ['STEMRECHT', 'VERKIESBAAR']);
+export const companyTypeEnum = pgEnum('company_type', ['VZW', 'BVBA', 'NV', 'VOF', 'EENMANSZAAK', 'CVBA', 'SE', 'ANDERE']);
 
 // Tables
 export const tenants = pgTable("tenants", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   name: text("name").notNull(),
   slug: text("slug").notNull().unique(),
+  street: text("street"),
+  number: text("number"),
+  postalCode: text("postal_code"),
+  city: text("city"),
+  country: text("country").default('België'),
+  email: text("email"),
+  phone: text("phone"),
+  website: text("website"),
+  companyNumber: text("company_number"),
+  companyType: companyTypeEnum("company_type"),
   logoUrl: text("logo_url"),
   primaryColor: text("primary_color"),
   createdAt: timestamp("created_at").defaultNow().notNull(),

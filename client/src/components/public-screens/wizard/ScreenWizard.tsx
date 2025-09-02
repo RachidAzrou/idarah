@@ -22,6 +22,14 @@ interface ScreenWizardProps {
     type: ScreenType;
     config: LedenlijstConfig | MededelingenConfig;
   }) => void;
+  editingScreen?: {
+    id: string;
+    name: string;
+    type: ScreenType;
+    active: boolean;
+    config: LedenlijstConfig | MededelingenConfig;
+  };
+  mode?: 'create' | 'edit';
 }
 
 interface WizardData {
@@ -78,30 +86,73 @@ const defaultSubtitleStyling: TitleStyling = {
   fontWeight: "normal"
 };
 
-const resetWizardData = (): WizardData => ({
-  name: "",
-  title: { ...defaultTitleStyling },
-  subtitle: { ...defaultSubtitleStyling }
-});
+const resetWizardData = (editingScreen?: ScreenWizardProps['editingScreen']): WizardData => {
+  if (editingScreen) {
+    // Pre-populate with existing screen data
+    const config = editingScreen.config;
+    
+    return {
+      type: editingScreen.type,
+      name: editingScreen.name,
+      description: config.description,
+      title: config.title || { ...defaultTitleStyling },
+      subtitle: config.subtitle || { ...defaultSubtitleStyling },
+      ledenlijstSettings: editingScreen.type === 'LEDENLIJST' ? {
+        useFullNames: (config as LedenlijstConfig).display?.useFullNames ?? true,
+        useInitials: (config as LedenlijstConfig).display?.useInitials ?? false,
+        filterByCategories: (config as LedenlijstConfig).display?.filterByCategories ?? true,
+        showVotingRights: (config as LedenlijstConfig).display?.showVotingRights ?? false,
+        rowsPerPage: (config as LedenlijstConfig).display?.rowsPerPage ?? 20,
+        year: (config as LedenlijstConfig).year ?? new Date().getFullYear(),
+        categories: (config as LedenlijstConfig).categories ?? []
+      } : undefined,
+      mededelingenSettings: editingScreen.type === 'MEDEDELINGEN' ? {
+        slides: (config as MededelingenConfig).slides || [],
+        autoplay: (config as MededelingenConfig).autoplay || {
+          enabled: true,
+          interval: 8,
+          order: 'date'
+        },
+        style: {
+          textColor: (config as MededelingenConfig).style?.textContrast === 'light' ? '#ffffff' : '#000000',
+          backgroundColor: (config as MededelingenConfig).style?.background === 'white' ? '#ffffff' : '#000000',
+          maxTextWidth: (config as MededelingenConfig).style?.maxTextWidth || 800
+        }
+      } : undefined
+    };
+  }
+  
+  return {
+    name: "",
+    title: { ...defaultTitleStyling },
+    subtitle: { ...defaultSubtitleStyling }
+  };
+};
 
-export function ScreenWizard({ open, onOpenChange, onComplete }: ScreenWizardProps) {
+export function ScreenWizard({ open, onOpenChange, onComplete, editingScreen, mode = 'create' }: ScreenWizardProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [wizardData, setWizardData] = useState<WizardData>(resetWizardData());
 
   // Reset wizard when dialog opens
   useEffect(() => {
     if (open) {
-      setCurrentStep(0);
-      setWizardData(resetWizardData());
+      setCurrentStep(mode === 'edit' ? 1 : 0); // Skip type selection for edit mode
+      setWizardData(resetWizardData(editingScreen));
     }
-  }, [open]);
+  }, [open, editingScreen, mode]);
 
   const getSteps = () => {
-    const baseSteps: Array<{ title: string; component: any }> = [
-      { title: "Type selecteren", component: TypeSelectionStep },
+    const baseSteps: Array<{ title: string; component: any }> = [];
+    
+    // Only show type selection for create mode
+    if (mode === 'create') {
+      baseSteps.push({ title: "Type selecteren", component: TypeSelectionStep });
+    }
+    
+    baseSteps.push(
       { title: "Beschrijving", component: DescriptionStep },
       { title: "Opmaak", component: StylingStep }
-    ];
+    );
     
     if (wizardData.type === 'LEDENLIJST') {
       baseSteps.push({ title: "Configuratie", component: LedenlijstConfigStep });
@@ -119,7 +170,9 @@ export function ScreenWizard({ open, onOpenChange, onComplete }: ScreenWizardPro
 
   const isLastStep = currentStep === steps.length - 1;
   const canGoNext = () => {
-    switch (currentStep) {
+    const adjustedStep = mode === 'edit' ? currentStep + 1 : currentStep;
+    
+    switch (adjustedStep) {
       case 0: return !!wizardData.type;
       case 1: return wizardData.name.length > 0;
       case 2: 
@@ -222,15 +275,15 @@ export function ScreenWizard({ open, onOpenChange, onComplete }: ScreenWizardPro
         <DialogHeader className="flex-shrink-0 pb-6 border-b border-border">
           <DialogTitle className="flex items-center gap-3 text-xl">
             <Monitor className="h-6 w-6" />
-            {steps[currentStep]?.title}
+            {mode === 'edit' ? 'Scherm bewerken' : 'Nieuw scherm aanmaken'}: {steps[currentStep]?.title}
           </DialogTitle>
           <DialogDescription className="text-base mt-2">
-            {currentStep === 0 && "Kies het type scherm dat je wilt aanmaken"}
-            {currentStep === 1 && "Geef je scherm een duidelijke naam"}
-            {currentStep === 2 && wizardData.type === 'MEDEDELINGEN' && "Maak en beheer je berichten"}
-            {currentStep === 2 && wizardData.type !== 'MEDEDELINGEN' && "Pas de titel en ondertitel aan"}
-            {currentStep === 3 && wizardData.type === 'MEDEDELINGEN' && "Stel de carrousel instellingen in"}
-            {currentStep === 3 && wizardData.type !== 'MEDEDELINGEN' && "Configureer de specifieke instellingen"}
+            {currentStep === 0 && mode === 'create' && "Kies het type scherm dat je wilt aanmaken"}
+            {(currentStep === 0 && mode === 'edit') || (currentStep === 1 && mode === 'create') ? "Geef je scherm een duidelijke naam" : ''}
+            {((currentStep === 1 && mode === 'edit') || (currentStep === 2 && mode === 'create')) && wizardData.type === 'MEDEDELINGEN' && "Maak en beheer je berichten"}
+            {((currentStep === 1 && mode === 'edit') || (currentStep === 2 && mode === 'create')) && wizardData.type !== 'MEDEDELINGEN' && "Pas de titel en ondertitel aan"}
+            {((currentStep === 2 && mode === 'edit') || (currentStep === 3 && mode === 'create')) && wizardData.type === 'MEDEDELINGEN' && "Stel de carrousel instellingen in"}
+            {((currentStep === 2 && mode === 'edit') || (currentStep === 3 && mode === 'create')) && wizardData.type !== 'MEDEDELINGEN' && "Configureer de specifieke instellingen"}
           </DialogDescription>
           
           {/* Progress indicator */}
@@ -274,7 +327,7 @@ export function ScreenWizard({ open, onOpenChange, onComplete }: ScreenWizardPro
           <Button
             variant="outline"
             onClick={() => setCurrentStep(prev => prev - 1)}
-            disabled={currentStep === 0}
+            disabled={mode === 'edit' ? currentStep === 0 : currentStep === 0}
             data-testid="wizard-back"
             size="lg"
           >

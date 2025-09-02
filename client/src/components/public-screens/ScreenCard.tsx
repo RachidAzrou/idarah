@@ -73,7 +73,7 @@ export function ScreenCard({ screen, onEdit, onToggleStatus, onDelete }: ScreenC
                 </Badge>
                 <Badge 
                   variant={screen.active ? "default" : "secondary"}
-                  className={screen.active ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}
+                  className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent hover:bg-secondary/80 bg-[#cc41415c] text-[#c9170e]"
                 >
                   {screen.active ? "Actief" : "Inactief"}
                 </Badge>
@@ -155,7 +155,6 @@ export function ScreenCard({ screen, onEdit, onToggleStatus, onDelete }: ScreenC
           
         </CardContent>
       </Card>
-
       {/* Copy URL Dialog */}
       <Dialog open={showUrlDialog} onOpenChange={setShowUrlDialog}>
         <DialogContent className="sm:max-w-md">
@@ -170,7 +169,6 @@ export function ScreenCard({ screen, onEdit, onToggleStatus, onDelete }: ScreenC
           </div>
         </DialogContent>
       </Dialog>
-
       {/* Delete Confirmation */}
       <ConfirmDialog
         open={showDeleteConfirm}

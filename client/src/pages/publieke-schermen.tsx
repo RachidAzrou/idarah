@@ -8,12 +8,13 @@ import { Monitor, Plus, Power } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ScreenWizard } from "@/components/public-screens/wizard/ScreenWizard";
 import { ScreenCard } from "@/components/public-screens/ScreenCard";
-import { EditScreenModal } from "@/components/public-screens/EditScreenModal";
+// Removed EditScreenModal import - using ScreenWizard for editing
 import { apiRequest } from "@/lib/queryClient";
 
 export default function PubliekeSchermen() {
   const [showNewScreenDialog, setShowNewScreenDialog] = useState(false);
   const [editingScreen, setEditingScreen] = useState<any>(null);
+  const [wizardMode, setWizardMode] = useState<'create' | 'edit'>('create');
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -127,7 +128,11 @@ export default function PubliekeSchermen() {
                   <p className="mt-1 text-sm text-gray-700">Beheer informatiedisplays en digitale mededelingenborden</p>
                 </div>
                 <Button 
-                  onClick={() => setShowNewScreenDialog(true)}
+                  onClick={() => {
+                    setEditingScreen(null);
+                    setWizardMode('create');
+                    setShowNewScreenDialog(true);
+                  }}
                   className="gap-2"
                   data-testid="button-new-screen"
                 >
@@ -239,7 +244,11 @@ export default function PubliekeSchermen() {
                         <ScreenCard
                           key={screen.id}
                           screen={screen}
-                          onEdit={() => setEditingScreen(screen)}
+                          onEdit={() => {
+                            setEditingScreen(screen);
+                            setWizardMode('edit');
+                            setShowNewScreenDialog(true);
+                          }}
                           onToggleStatus={() => toggleScreenMutation.mutate({ id: screen.id, active: !screen.active })}
                           onDelete={() => deleteScreenMutation.mutate(screen.id)}
                         />
@@ -314,11 +323,47 @@ export default function PubliekeSchermen() {
             </Tabs>
           </div>
 
-          {/* Screen Wizard */}
+          {/* Screen Wizard - handles both create and edit */}
           <ScreenWizard
             open={showNewScreenDialog}
-            onOpenChange={setShowNewScreenDialog}
-            onComplete={handleCreateScreen}
+            onOpenChange={(open) => {
+              setShowNewScreenDialog(open);
+              if (!open) {
+                setEditingScreen(null);
+                setWizardMode('create');
+              }
+            }}
+            onComplete={(screenData) => {
+              if (wizardMode === 'edit' && editingScreen) {
+                // Handle edit mode
+                const updateScreen = async () => {
+                  try {
+                    await apiRequest('PUT', `/api/public-screens/${editingScreen.id}`, {
+                      name: screenData.name,
+                      config: screenData.config
+                    });
+                    
+                    queryClient.invalidateQueries({ queryKey: ["/api/public-screens"] });
+                    toast({
+                      title: "Scherm bijgewerkt",
+                      description: `${screenData.name} is succesvol bijgewerkt.`,
+                    });
+                  } catch (error: any) {
+                    toast({
+                      title: "Fout",
+                      description: error.message || "Er is een fout opgetreden bij het bijwerken van het scherm.",
+                      variant: "destructive",
+                    });
+                  }
+                };
+                updateScreen();
+              } else {
+                // Handle create mode
+                handleCreateScreen(screenData);
+              }
+            }}
+            editingScreen={editingScreen}
+            mode={wizardMode}
           />
 
           {/* Edit Screen Modal */}

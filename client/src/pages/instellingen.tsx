@@ -275,8 +275,8 @@ export default function Instellingen() {
                   Lidgelden
                 </TabsTrigger>
                 <TabsTrigger value="security" className="flex items-center gap-2" data-testid="tab-security">
-                  <Shield className="h-4 w-4" />
-                  Beveiliging
+                  <Users className="h-4 w-4" />
+                  Gebruikers
                 </TabsTrigger>
                 <TabsTrigger value="rules" className="flex items-center gap-2" data-testid="tab-rules">
                   <Scale className="h-4 w-4" />

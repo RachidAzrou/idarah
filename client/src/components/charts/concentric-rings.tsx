@@ -72,28 +72,31 @@ export function ConcentricRings({ categories, size = 280 }: ConcentricRingsProps
         {categories.map((category, index) => {
           const radius = radii[index];
           
-          console.log(`Rendering category ${category.label}: count=${category.count}, percent=${category.percent}, radius=${radius}, color=${category.color}`);
-          
           // Skip categories with no data
           if (category.count === 0) {
-            console.log(`Skipping ${category.label} - no data`);
             return null;
           }
           
           // For 100%, render a complete circle instead of an arc
           if (category.percent >= 100) {
-            console.log(`Rendering full circle for ${category.label}`);
             return (
-              <circle
+              <CustomTooltip
                 key={`circle-${category.key}`}
-                cx={center}
-                cy={center}
-                r={radius}
-                fill="none"
-                stroke="#3B82F6"
-                strokeWidth="20"
-                strokeOpacity="1"
-              />
+                title={category.label}
+                count={category.count}
+                percentage={category.percent}
+                color={category.color}
+              >
+                <circle
+                  cx={center}
+                  cy={center}
+                  r={radius}
+                  fill="none"
+                  stroke={category.color}
+                  strokeWidth={strokeWidth}
+                  className="hover:stroke-opacity-80 transition-all duration-200 cursor-pointer"
+                />
+              </CustomTooltip>
             );
           }
           

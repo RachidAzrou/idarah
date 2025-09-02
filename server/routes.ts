@@ -18,11 +18,20 @@ const loginSchema = z.object({
   password: z.string().min(1),
 });
 
-const createMemberSchema = insertMemberSchema.omit({
-  tenantId: true,
-  memberNumber: true,
-}).extend({
+const createMemberSchema = z.object({
+  firstName: z.string(),
+  lastName: z.string(),
+  gender: z.enum(['M', 'V']),
   birthDate: z.union([z.date(), z.string().transform((str) => new Date(str))]),
+  category: z.enum(['STUDENT', 'STANDAARD', 'SENIOR']),
+  email: z.string().optional(),
+  phone: z.string().optional(),
+  street: z.string(),
+  number: z.string(),
+  bus: z.string().optional(),
+  postalCode: z.string(),
+  city: z.string(),
+  country: z.string(),
   financialSettings: z.object({
     paymentMethod: z.enum(['SEPA', 'OVERSCHRIJVING', 'BANCONTACT', 'CASH']),
     iban: z.string().optional(),

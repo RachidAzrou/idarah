@@ -61,11 +61,16 @@ export function NewTransactionDialog({
       const response = await apiRequest("POST", "/api/transactions", data);
       return response.json();
     },
-    onSuccess: async () => {
+    onSuccess: async (newTransaction, variables) => {
+      // Optimistic update - voeg transactie toe aan lijst
+      queryClient.setQueryData(["/api/transactions"], (oldData: any) => {
+        if (!Array.isArray(oldData)) return [newTransaction];
+        return [newTransaction, ...oldData];
+      });
+      
       await queryClient.invalidateQueries({ queryKey: ["/api/transactions"] });
-      await queryClient.refetchQueries({ queryKey: ["/api/transactions"] });
       await queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
-      await queryClient.refetchQueries({ queryKey: ["/api/dashboard/stats"] });
+      await queryClient.invalidateQueries({ queryKey: ["/api/financial/reports"] });
       toast({
         title: "Transactie toegevoegd",
         description: "De transactie is succesvol toegevoegd.",
@@ -88,11 +93,18 @@ export function NewTransactionDialog({
       const response = await apiRequest("PUT", `/api/transactions/${editTransaction.id}`, data);
       return response.json();
     },
-    onSuccess: async () => {
+    onSuccess: async (updatedTransaction, variables) => {
+      // Optimistic update - update transactie in lijst
+      queryClient.setQueryData(["/api/transactions"], (oldData: any) => {
+        if (!Array.isArray(oldData)) return oldData;
+        return oldData.map((transaction: any) => 
+          transaction.id === editTransaction.id ? updatedTransaction : transaction
+        );
+      });
+      
       await queryClient.invalidateQueries({ queryKey: ["/api/transactions"] });
-      await queryClient.refetchQueries({ queryKey: ["/api/transactions"] });
       await queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
-      await queryClient.refetchQueries({ queryKey: ["/api/dashboard/stats"] });
+      await queryClient.invalidateQueries({ queryKey: ["/api/financial/reports"] });
       toast({
         title: "Transactie bijgewerkt",
         description: "De transactie is succesvol bijgewerkt.",

@@ -56,9 +56,16 @@ export default function Leden() {
       const response = await apiRequest("PUT", `/api/members/${id}`, data);
       return response.json();
     },
-    onSuccess: async () => {
+    onSuccess: async (updatedMember, variables) => {
+      // Optimistic update - update member in lijst
+      queryClient.setQueryData(["/api/members"], (oldData: any) => {
+        if (!Array.isArray(oldData)) return oldData;
+        return oldData.map((member: any) => 
+          member.id === variables.id ? { ...member, ...variables.data } : member
+        );
+      });
+      
       await queryClient.invalidateQueries({ queryKey: ["/api/members"] });
-      await queryClient.refetchQueries({ queryKey: ["/api/members"] });
       toast({
         title: "Lid bijgewerkt",
         description: "De wijzigingen zijn opgeslagen.",
@@ -71,11 +78,25 @@ export default function Leden() {
       const response = await apiRequest("DELETE", `/api/members/${memberId}`);
       return response;
     },
-    onSuccess: async () => {
+    onSuccess: async (result, deletedMemberId) => {
+      // Optimistic update - verwijder member uit lijst
+      queryClient.setQueryData(["/api/members"], (oldData: any) => {
+        if (!Array.isArray(oldData)) return oldData;
+        return oldData.filter((member: any) => member.id !== deletedMemberId);
+      });
+      
+      // Update dashboard stats optimistically
+      queryClient.setQueryData(["/api/dashboard/stats"], (oldStats: any) => {
+        if (!oldStats) return oldStats;
+        return {
+          ...oldStats,
+          totalMembers: (parseInt(oldStats.totalMembers) - 1).toString(),
+          activeMembers: (parseInt(oldStats.activeMembers) - 1).toString(),
+        };
+      });
+      
       await queryClient.invalidateQueries({ queryKey: ["/api/members"] });
-      await queryClient.refetchQueries({ queryKey: ["/api/members"] });
       await queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
-      await queryClient.refetchQueries({ queryKey: ["/api/dashboard/stats"] });
       toast({
         title: "Lid verwijderd",
         description: "Het lid is permanent verwijderd uit het systeem.",
@@ -107,11 +128,26 @@ export default function Leden() {
       
       return importedMembers;
     },
-    onSuccess: async (importedMembers) => {
+    onSuccess: async (importedMembers, variables) => {
+      // Optimistic update - voeg geïmporteerde members toe
+      queryClient.setQueryData(["/api/members"], (oldData: any) => {
+        if (!Array.isArray(oldData)) return importedMembers;
+        return [...importedMembers, ...oldData];
+      });
+      
+      // Update dashboard stats optimistically
+      queryClient.setQueryData(["/api/dashboard/stats"], (oldStats: any) => {
+        if (!oldStats) return oldStats;
+        const activeCount = importedMembers.filter((m: any) => m.active).length;
+        return {
+          ...oldStats,
+          totalMembers: (parseInt(oldStats.totalMembers) + importedMembers.length).toString(),
+          activeMembers: (parseInt(oldStats.activeMembers) + activeCount).toString(),
+        };
+      });
+      
       await queryClient.invalidateQueries({ queryKey: ["/api/members"] });
-      await queryClient.refetchQueries({ queryKey: ["/api/members"] });
       await queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
-      await queryClient.refetchQueries({ queryKey: ["/api/dashboard/stats"] });
       toast({
         title: "Import voltooid",
         description: `${importedMembers.length} leden succesvol geïmporteerd.`,

@@ -215,9 +215,14 @@ export default function Instellingen() {
       const response = await apiRequest("PUT", "/api/tenant/current", data);
       return response.json();
     },
-    onSuccess: async () => {
+    onSuccess: async (result, variables) => {
+      // Optimistic update - update cache immediately
+      queryClient.setQueryData(["/api/tenant/current"], (oldData: any) => {
+        if (!oldData) return oldData;
+        return { ...oldData, ...variables };
+      });
+      
       await queryClient.invalidateQueries({ queryKey: ["/api/tenant/current"] });
-      await queryClient.refetchQueries({ queryKey: ["/api/tenant/current"] });
       setOrganizationSaved(true);
       toast({
         title: "Organisatie bijgewerkt",
@@ -231,10 +236,22 @@ export default function Instellingen() {
       const response = await apiRequest("PUT", "/api/settings/fees", data);
       return response.json();
     },
-    onSuccess: async (result) => {
-      // Invalideer de tenant query en force een refetch
+    onSuccess: async (result, variables) => {
+      // Optimistic update - update cache immediately met nieuwe data
+      queryClient.setQueryData(["/api/tenant/current"], (oldData: any) => {
+        if (!oldData) return oldData;
+        return {
+          ...oldData,
+          studentFee: variables.studentFee,
+          adultFee: variables.adultFee,
+          seniorFee: variables.seniorFee,
+          defaultPaymentTerm: variables.defaultPaymentTerm,
+          defaultPaymentMethod: variables.defaultPaymentMethod,
+        };
+      });
+      
+      // Nog steeds invalideren voor zekerheid
       await queryClient.invalidateQueries({ queryKey: ["/api/tenant/current"] });
-      await queryClient.refetchQueries({ queryKey: ["/api/tenant/current"] });
       
       setFeesSaved(true);
       toast({

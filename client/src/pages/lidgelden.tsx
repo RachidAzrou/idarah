@@ -136,11 +136,17 @@ export default function Lidgelden() {
       const response = await apiRequest("PUT", `/api/fees/${feeId}/mark-paid`, {});
       return response.json();
     },
-    onSuccess: async () => {
+    onSuccess: async (result, feeId) => {
+      // Optimistic update - markeer fee als betaald
+      queryClient.setQueryData(["/api/fees"], (oldData: any) => {
+        if (!Array.isArray(oldData)) return oldData;
+        return oldData.map((fee: any) => 
+          fee.id === feeId ? { ...fee, status: 'PAID', paidDate: new Date().toISOString() } : fee
+        );
+      });
+      
       await queryClient.invalidateQueries({ queryKey: ["/api/fees"] });
-      await queryClient.refetchQueries({ queryKey: ["/api/fees"] });
       await queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
-      await queryClient.refetchQueries({ queryKey: ["/api/dashboard/stats"] });
       toast({
         title: "Lidgeld gemarkeerd als betaald",
         description: "De betaalstatus is bijgewerkt.",
@@ -329,8 +335,7 @@ export default function Lidgelden() {
           open={showNewFeeDialog}
           onOpenChange={setShowNewFeeDialog}
           onSuccess={() => {
-            // Refresh data or handle success
-            window.location.reload();
+            // Data wordt automatisch bijgewerkt via optimistic updates
           }}
         />
       </div>

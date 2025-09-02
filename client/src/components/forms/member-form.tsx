@@ -118,11 +118,25 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
       const response = await apiRequest("POST", "/api/members", data);
       return response.json();
     },
-    onSuccess: async () => {
+    onSuccess: async (newMember, variables) => {
+      // Optimistic update - voeg nieuwe member toe aan lijst
+      queryClient.setQueryData(["/api/members"], (oldData: any) => {
+        if (!Array.isArray(oldData)) return [newMember];
+        return [newMember, ...oldData];
+      });
+      
+      // Update dashboard stats optimistically 
+      queryClient.setQueryData(["/api/dashboard/stats"], (oldStats: any) => {
+        if (!oldStats) return oldStats;
+        return {
+          ...oldStats,
+          totalMembers: (parseInt(oldStats.totalMembers) + 1).toString(),
+          activeMembers: (parseInt(oldStats.activeMembers) + (newMember.active ? 1 : 0)).toString(),
+        };
+      });
+      
       await queryClient.invalidateQueries({ queryKey: ["/api/members"] });
-      await queryClient.refetchQueries({ queryKey: ["/api/members"] });
       await queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
-      await queryClient.refetchQueries({ queryKey: ["/api/dashboard/stats"] });
       toast({
         title: "Lid aangemaakt",
         description: "Het nieuwe lid is succesvol toegevoegd.",

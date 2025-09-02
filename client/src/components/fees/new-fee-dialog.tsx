@@ -97,11 +97,15 @@ export function NewFeeDialog({ open, onOpenChange, onSuccess }: NewFeeDialogProp
       const response = await apiRequest("POST", "/api/fees", feeData);
       return response.json();
     },
-    onSuccess: async (fee) => {
+    onSuccess: async (fee, variables) => {
+      // Optimistic update - voeg fee toe aan lijst
+      queryClient.setQueryData(["/api/fees"], (oldData: any) => {
+        if (!Array.isArray(oldData)) return [fee];
+        return [fee, ...oldData];
+      });
+      
       await queryClient.invalidateQueries({ queryKey: ["/api/fees"] });
-      await queryClient.refetchQueries({ queryKey: ["/api/fees"] });
       await queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
-      await queryClient.refetchQueries({ queryKey: ["/api/dashboard/stats"] });
       toast({
         title: "Lidgeld aangemaakt",
         description: "Het lidgeld is succesvol aangemaakt.",

@@ -38,8 +38,8 @@ function describeArc(x: number, y: number, radius: number, startAngle: number, e
 
 export function ConcentricRings({ categories, size = 280 }: ConcentricRingsProps) {
   const center = size / 2;
-  const radii = [100, 76, 52]; // outer, middle, inner - adjusted for visibility
-  const strokeWidth = 16;
+  const radii = [90, 70, 50]; // outer, middle, inner - adjusted for visibility
+  const strokeWidth = 20;
   
 
   return (
@@ -62,7 +62,7 @@ export function ConcentricRings({ categories, size = 280 }: ConcentricRingsProps
               cy={center}
               r={radius}
               fill="none"
-              stroke="#E9EDF5"
+              stroke="#E5E7EB"
               strokeWidth={strokeWidth}
             />
           );
@@ -72,35 +72,28 @@ export function ConcentricRings({ categories, size = 280 }: ConcentricRingsProps
         {categories.map((category, index) => {
           const radius = radii[index];
           
+          console.log(`Rendering category ${category.label}: count=${category.count}, percent=${category.percent}, radius=${radius}, color=${category.color}`);
+          
           // Skip categories with no data
           if (category.count === 0) {
+            console.log(`Skipping ${category.label} - no data`);
             return null;
           }
           
           // For 100%, render a complete circle instead of an arc
           if (category.percent >= 100) {
+            console.log(`Rendering full circle for ${category.label}`);
             return (
-              <CustomTooltip
+              <circle
                 key={`circle-${category.key}`}
-                title={category.label}
-                count={category.count}
-                percentage={category.percent}
-                color={category.color}
-              >
-                <circle
-                  cx={center}
-                  cy={center}
-                  r={radius}
-                  fill="none"
-                  stroke={category.color}
-                  strokeWidth={strokeWidth}
-                  className="hover:stroke-opacity-80 transition-all duration-200 cursor-pointer"
-                  style={{ 
-                    strokeOpacity: 1,
-                    strokeLinecap: 'round'
-                  }}
-                />
-              </CustomTooltip>
+                cx={center}
+                cy={center}
+                r={radius}
+                fill="none"
+                stroke="#3B82F6"
+                strokeWidth="20"
+                strokeOpacity="1"
+              />
             );
           }
           

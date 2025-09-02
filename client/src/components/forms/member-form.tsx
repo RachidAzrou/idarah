@@ -137,6 +137,33 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
   });
 
   const onSubmit = (data: MemberFormData) => {
+    // Controleer op validatiefouten en toon melding
+    if (!form.formState.isValid) {
+      const errors = form.formState.errors;
+      console.log('Form validation errors:', errors);
+      
+      // Bepaal welke tab de eerste fout bevat
+      let targetTab = "personal";
+      if (errors.street || errors.number || errors.postalCode || errors.city || errors.country) {
+        targetTab = "address";
+      } else if (errors.financialSettings) {
+        targetTab = "financial";
+      } else if (errors.organization) {
+        targetTab = "organization";
+      } else if (errors.permissions) {
+        targetTab = "permissions";
+      }
+      
+      setActiveTab(targetTab);
+      
+      toast({
+        title: "Formulier onvolledig",
+        description: "Vul alle verplichte velden in om verder te gaan.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     createMemberMutation.mutate(data);
   };
 
@@ -205,6 +232,26 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
     }
   };
 
+  // Functie om te controleren of een tab fouten heeft
+  const hasTabErrors = (tabName: string) => {
+    const errors = form.formState.errors;
+    
+    switch (tabName) {
+      case "personal":
+        return !!(errors.firstName || errors.lastName || errors.gender || errors.birthDate || errors.category || errors.email || errors.phone);
+      case "address":
+        return !!(errors.street || errors.number || errors.postalCode || errors.city || errors.country);
+      case "financial":
+        return !!(errors.financialSettings);
+      case "organization":
+        return !!(errors.organization);
+      case "permissions":
+        return !!(errors.permissions);
+      default:
+        return false;
+    }
+  };
+
   return (
     <div className="w-full">
       <Form {...form}>
@@ -230,22 +277,27 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
                 <TabsTrigger value="personal" data-testid="tab-personal" className="flex items-center gap-2">
                   <MdOutlinePermIdentity className="h-4 w-4" />
                   Persoonlijk
+                  {hasTabErrors("personal") && <span className="text-red-500 ml-1">!</span>}
                 </TabsTrigger>
                 <TabsTrigger value="address" data-testid="tab-address" className="flex items-center gap-2">
                   <GoHome className="h-4 w-4" />
                   Adres
+                  {hasTabErrors("address") && <span className="text-red-500 ml-1">!</span>}
                 </TabsTrigger>
                 <TabsTrigger value="financial" data-testid="tab-financial" className="flex items-center gap-2">
                   <CiBank className="h-4 w-4" />
                   Financieel
+                  {hasTabErrors("financial") && <span className="text-red-500 ml-1">!</span>}
                 </TabsTrigger>
                 <TabsTrigger value="organization" data-testid="tab-organization" className="flex items-center gap-2">
                   <BsBuildings className="h-4 w-4" />
                   Organisatie
+                  {hasTabErrors("organization") && <span className="text-red-500 ml-1">!</span>}
                 </TabsTrigger>
                 <TabsTrigger value="permissions" data-testid="tab-permissions" className="flex items-center gap-2">
                   <RiCheckboxMultipleLine className="h-4 w-4" />
                   Toestemmingen
+                  {hasTabErrors("permissions") && <span className="text-red-500 ml-1">!</span>}
                 </TabsTrigger>
               </TabsList>
 

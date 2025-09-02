@@ -1073,56 +1073,62 @@ export default function Instellingen() {
                       </div>
                     ) : (
                       <div className="space-y-4">
-                        {Array.isArray(users) && users.map((user: any) => (
-                          <div key={user.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-xl" data-testid={`user-item-${user.id}`}>
+                        {Array.isArray(users) && users.map((currentUser: any) => {
+                          const isCurrentUser = currentUser.id === user?.id;
+                          return (
+                          <div key={currentUser.id} className={`flex items-center justify-between p-4 border border-gray-200 rounded-xl ${isCurrentUser ? 'opacity-50' : ''}`} data-testid={`user-item-${currentUser.id}`}>
                             <div className="flex items-center space-x-4">
                               <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-                                {user.role === 'BEHEERDER' ? (
+                                {currentUser.role === 'BEHEERDER' ? (
                                   <RiAdminLine className="h-5 w-5 text-primary-foreground" />
                                 ) : (
                                   <Users className="h-5 w-5 text-primary-foreground" />
                                 )}
                               </div>
                               <div>
-                                <div className="font-medium text-gray-900" data-testid={`user-name-${user.id}`}>
-                                  {user.name}
+                                <div className="font-medium text-gray-900" data-testid={`user-name-${currentUser.id}`}>
+                                  {currentUser.name}
+                                  {isCurrentUser && <span className="text-xs text-gray-500 ml-2">(jij)</span>}
                                 </div>
-                                <div className="text-sm text-gray-500" data-testid={`user-email-${user.id}`}>
-                                  {user.email}
+                                <div className="text-sm text-gray-500" data-testid={`user-email-${currentUser.id}`}>
+                                  {currentUser.email}
                                 </div>
                               </div>
                             </div>
                             <div className="flex items-center space-x-2">
-                              <Badge variant={user.role === 'BEHEERDER' ? 'default' : 'secondary'} data-testid={`user-role-${user.id}`}>
-                                {user.role === 'BEHEERDER' ? 'Beheerder' : 'Medewerker'}
+                              <Badge variant={currentUser.role === 'BEHEERDER' ? 'default' : 'secondary'} data-testid={`user-role-${currentUser.id}`}>
+                                {currentUser.role === 'BEHEERDER' ? 'Beheerder' : 'Medewerker'}
                               </Badge>
-                              <Badge variant={user.active ? 'default' : 'destructive'} className={user.active ? 'bg-green-100 text-green-800 hover:bg-green-100' : ''}>
-                                {user.active ? 'Actief' : 'Inactief'}
+                              <Badge variant={currentUser.active ? 'default' : 'destructive'} className={currentUser.active ? 'bg-green-100 text-green-800 hover:bg-green-100' : ''}>
+                                {currentUser.active ? 'Actief' : 'Inactief'}
                               </Badge>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="sm" data-testid={`user-actions-${user.id}`}>
-                                    <MoreVertical className="h-4 w-4" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuItem onClick={() => handleEditUser(user)} data-testid={`action-edit-user-${user.id}`}>
-                                    <Edit className="h-4 w-4 mr-2" />
-                                    Bewerken
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem onClick={() => handleResetPassword(user)} data-testid={`action-reset-password-${user.id}`}>
-                                    <KeyRound className="h-4 w-4 mr-2" />
-                                    Wachtwoord resetten
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem className="text-red-600" onClick={() => handleDeleteUser(user)} data-testid={`action-delete-user-${user.id}`}>
-                                    <Trash2 className="h-4 w-4 mr-2" />
-                                    Verwijderen
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
+                              {!isCurrentUser && (
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="sm" data-testid={`user-actions-${currentUser.id}`}>
+                                      <MoreVertical className="h-4 w-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuItem onClick={() => handleEditUser(currentUser)} data-testid={`action-edit-user-${currentUser.id}`}>
+                                      <Edit className="h-4 w-4 mr-2" />
+                                      Bewerken
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => handleResetPassword(currentUser)} data-testid={`action-reset-password-${currentUser.id}`}>
+                                      <KeyRound className="h-4 w-4 mr-2" />
+                                      Wachtwoord resetten
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem className="text-red-600" onClick={() => handleDeleteUser(currentUser)} data-testid={`action-delete-user-${currentUser.id}`}>
+                                      <Trash2 className="h-4 w-4 mr-2" />
+                                      Verwijderen
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              )}
                             </div>
                           </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     )}
                   </CardContent>

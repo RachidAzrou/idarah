@@ -57,18 +57,16 @@ export default function IncomeByCategoryCard() {
         return acc;
       }, {});
     
-    // Combineer data
-    const result = Object.keys(membersByCategory).map(category => ({
+    // Zorg er altijd voor dat alle categorieën getoond worden
+    const allCategories = ['Student', 'Standaard', 'Senior'];
+    
+    const result = allCategories.map(category => ({
       category,
       amount: incomeByCategory[category] || 0,
-      members: membersByCategory[category].count
+      members: membersByCategory[category]?.count || 0
     }));
     
-    return result.length > 0 ? result : [
-      { category: 'Senior', amount: 0, members: 0 },
-      { category: 'Standaard', amount: 0, members: 0 },
-      { category: 'Student', amount: 0, members: 0 },
-    ];
+    return result;
   }, [transactions, members, period]);
   
   const maxAmount = Math.max(...data.map(item => item.amount), 1);

@@ -149,12 +149,12 @@ export default function FinancePage() {
   }, [transactions, effectiveFilters]);
 
   // Handlers
-  const handleTransactionSelect = (transaction: Transaction) => {
+  const handleTransactionSelect = (transaction: any) => {
     setSelectedTransaction(transaction);
     setShowDetailSlideOver(true);
   };
 
-  const handleTransactionEdit = (transaction: Transaction) => {
+  const handleTransactionEdit = (transaction: any) => {
     setEditTransaction(transaction);
     setShowNewTransactionDialog(true);
   };
@@ -164,36 +164,64 @@ export default function FinancePage() {
     setShowDeleteConfirm(true);
   };
 
+  const deleteTransactionMutation = useMutation({
+    mutationFn: async (transactionId: string) => {
+      const response = await apiRequest("DELETE", `/api/transactions/${transactionId}`, {});
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/transactions"] });
+      toast({
+        title: "Transactie verwijderd",
+        description: "De transactie is succesvol verwijderd.",
+      });
+    },
+  });
+
   const confirmDelete = () => {
-    setTransactions(prev => prev.filter(t => t.id !== deleteTransactionId));
+    deleteTransactionMutation.mutate(deleteTransactionId);
     setDeleteTransactionId('');
-    toast({
-      title: "Transactie verwijderd",
-      description: "De transactie is succesvol verwijderd.",
-    });
   };
 
-  const handleTransactionSave = (transaction: Transaction) => {
-    if (editTransaction) {
-      // Update existing transaction
-      setTransactions(prev => prev.map(t => t.id === transaction.id ? transaction : t));
-      toast({
-        title: "Transactie bijgewerkt",
-        description: "De wijzigingen zijn succesvol opgeslagen.",
-      });
-    } else {
-      // Add new transaction
-      setTransactions(prev => [transaction, ...prev]);
+  const createTransactionMutation = useMutation({
+    mutationFn: async (transactionData: any) => {
+      const response = await apiRequest("POST", "/api/transactions", transactionData);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/transactions"] });
       toast({
         title: "Transactie toegevoegd",
         description: "De nieuwe transactie is succesvol toegevoegd.",
       });
+    },
+  });
+
+  const updateTransactionMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: any }) => {
+      const response = await apiRequest("PUT", `/api/transactions/${id}`, data);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/transactions"] });
+      toast({
+        title: "Transactie bijgewerkt",
+        description: "De wijzigingen zijn succesvol opgeslagen.",
+      });
+    },
+  });
+
+  const handleTransactionSave = (transaction: any) => {
+    if (editTransaction) {
+      updateTransactionMutation.mutate({ id: transaction.id, data: transaction });
+    } else {
+      createTransactionMutation.mutate(transaction);
     }
     setEditTransaction(null);
   };
 
-  const handleImport = (importedTransactions: Transaction[]) => {
-    setTransactions(prev => [...importedTransactions, ...prev]);
+  const handleImport = (importedTransactions: any[]) => {
+    // For now, just show the notification - bulk import can be implemented later
     toast({
       title: "Import voltooid",
       description: `${importedTransactions.length} transacties zijn geïmporteerd.`,

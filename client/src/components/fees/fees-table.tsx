@@ -8,7 +8,7 @@ import { formatCurrencyBE, formatPeriodBE, formatDateBE } from "@/lib/format";
 import { RowActions } from "./row-actions";
 
 interface FeesTableProps {
-  fees: Fee[];
+  fees: any[];
   total: number;
   page: number;
   perPage: number;
@@ -16,7 +16,7 @@ interface FeesTableProps {
   onPerPageChange: (perPage: number) => void;
   selectedIds: string[];
   onSelectionChange: (ids: string[]) => void;
-  onRowAction: (action: string, fee: Fee) => void;
+  onRowAction: (action: string, fee: any) => void;
   sortBy?: string;
   sortOrder?: "asc" | "desc";
   onSort?: (field: string) => void;
@@ -42,14 +42,14 @@ export function FeesTable({
   const startIndex = (page - 1) * perPage + 1;
   const endIndex = Math.min(page * perPage, total);
 
-  const isAllSelected = fees.length > 0 && fees.every(fee => selectedIds.includes(fee.id));
-  const isPartiallySelected = fees.some(fee => selectedIds.includes(fee.id)) && !isAllSelected;
+  const isAllSelected = fees?.length > 0 && fees.every(fee => selectedIds.includes(fee.id));
+  const isPartiallySelected = fees?.some(fee => selectedIds.includes(fee.id)) && !isAllSelected;
 
   const handleSelectAll = () => {
     if (isAllSelected) {
-      onSelectionChange(selectedIds.filter(id => !fees.find(fee => fee.id === id)));
+      onSelectionChange(selectedIds.filter(id => !fees?.find(fee => fee.id === id)));
     } else {
-      onSelectionChange([...selectedIds, ...fees.map(fee => fee.id).filter(id => !selectedIds.includes(id))]);
+      onSelectionChange([...selectedIds, ...(fees?.map(fee => fee.id).filter(id => !selectedIds.includes(id)) || [])]);
     }
   };
 
@@ -97,7 +97,7 @@ export function FeesTable({
                 <Checkbox
                   checked={isAllSelected}
                   ref={(el) => {
-                    if (el) el.indeterminate = isPartiallySelected;
+                    if (el) (el as any).indeterminate = isPartiallySelected;
                   }}
                   onCheckedChange={handleSelectAll}
                   aria-label="Selecteer alle rijen"
@@ -114,7 +114,7 @@ export function FeesTable({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {fees.length === 0 ? (
+            {!fees?.length ? (
               <TableRow>
                 <TableCell colSpan={9} className="text-center py-8">
                   <div className="text-gray-500">
@@ -124,7 +124,7 @@ export function FeesTable({
                 </TableCell>
               </TableRow>
             ) : (
-              fees.map((fee) => (
+              fees?.map((fee) => (
                 <TableRow 
                   key={fee.id}
                   className={selectedIds.includes(fee.id) ? "bg-blue-50" : ""}

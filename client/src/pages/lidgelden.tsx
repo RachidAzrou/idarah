@@ -275,7 +275,7 @@ export default function Lidgelden() {
 
         {/* Table */}
         <FeesTable
-          fees={paginatedResult.data}
+          fees={paginatedResult.items}
           total={filteredFees.length}
           page={page}
           perPage={perPage}
@@ -290,6 +290,7 @@ export default function Lidgelden() {
           sortBy={sortBy}
           sortOrder={sortOrder}
           onSort={handleSort}
+          loading={isLoading}
         />
 
         {/* Dialogs */}

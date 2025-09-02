@@ -16,9 +16,10 @@ interface KpiCardProps {
     positive: boolean;
   };
   icon: React.ReactNode;
+  iconBgColor?: string;
 }
 
-function KpiCard({ title, value, delta, icon }: KpiCardProps) {
+function KpiCard({ title, value, delta, icon, iconBgColor = "bg-blue-50" }: KpiCardProps) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow">
       <div className="flex items-center justify-between">
@@ -36,7 +37,7 @@ function KpiCard({ title, value, delta, icon }: KpiCardProps) {
             </span>
           </div>
         </div>
-        <div className="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center">
+        <div className={`w-8 h-8 ${iconBgColor} rounded-full flex items-center justify-center`}>
           {icon}
         </div>
       </div>
@@ -72,13 +73,15 @@ export function KpiCards() {
       title: "Totale Inkomsten",
       value: formatCurrencyBE(kpiData.income),
       delta: { value: "Totaal inkomsten", positive: true },
-      icon: <HiInboxIn className="h-4 w-4 text-green-600" />
+      icon: <HiInboxIn className="h-4 w-4 text-green-600" />,
+      iconBgColor: "bg-green-50"
     },
     {
       title: "Totale Uitgaven",
       value: formatCurrencyBE(kpiData.expense),
       delta: { value: "Totaal uitgaven", positive: false },
-      icon: <MdOutlineOutbox className="h-4 w-4 text-red-600" />
+      icon: <MdOutlineOutbox className="h-4 w-4 text-red-600" />,
+      iconBgColor: "bg-red-50"
     },
     {
       title: "Netto Saldo",
@@ -87,13 +90,15 @@ export function KpiCards() {
         value: kpiData.balance >= 0 ? "Overschot" : "Tekort", 
         positive: kpiData.balance >= 0 
       },
-      icon: <Euro className="h-4 w-4 text-blue-600" />
+      icon: <Euro className="h-4 w-4 text-blue-600" />,
+      iconBgColor: "bg-blue-50"
     },
     {
       title: "Achterstallig Lidgeld",
       value: formatCurrencyBE(kpiData.overdue),
       delta: { value: "Openstaande bedragen", positive: false },
-      icon: <TbClockExclamation className="h-4 w-4 text-red-600" />
+      icon: <TbClockExclamation className="h-4 w-4 text-red-600" />,
+      iconBgColor: "bg-red-50"
     }
   ];
 
@@ -106,6 +111,7 @@ export function KpiCards() {
           value={kpi.value}
           delta={kpi.delta}
           icon={kpi.icon}
+          iconBgColor={kpi.iconBgColor}
         />
       ))}
     </div>

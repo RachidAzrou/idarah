@@ -1,94 +1,71 @@
-export type FeeStatus = 'OPEN' | 'PAID' | 'OVERDUE';
-export type PaymentMethod = 'SEPA' | 'OVERSCHRIJVING' | 'BANCONTACT' | 'CASH';
+/**
+ * Mock fee store for development
+ */
 
-export type Fee = {
-  id: string;
-  memberId: string;
-  memberNumber: string;
-  memberName: string;
-  periodStart: string; // ISO
-  periodEnd: string;   // ISO
-  amount: number;      // in € for mock
-  method: PaymentMethod;
-  status: FeeStatus;
-  paidAt?: string;
-  sepaEligible?: boolean;
-  note?: string;
-};
+import { NewFeeFormData } from "../zod-fee";
 
-// In-memory store
-let fees: Fee[] = [
-  {
-    id: 'f1',
-    memberId: 'm1',
-    memberNumber: '0001',
-    memberName: 'Emma van der Berg',
-    periodStart: '2024-01-01',
-    periodEnd: '2024-12-31',
-    amount: 120.00,
-    method: 'SEPA',
-    status: 'PAID',
-    paidAt: '2024-01-15',
-    sepaEligible: true
-  },
-  {
-    id: 'f2', 
-    memberId: 'm3',
-    memberNumber: '0003',
-    memberName: 'Fatima El Amrani',
-    periodStart: '2024-06-01',
-    periodEnd: '2024-06-30',
-    amount: 25.00,
-    method: 'OVERSCHRIJVING',
-    status: 'OPEN',
-    sepaEligible: false
-  }
-];
-
-export function createFee(payload: {
-  memberId: string;
-  memberNumber: string;
-  memberName: string;
-  periodStart: string;
-  periodEnd: string;
-  amount: number;
-  method: PaymentMethod;
-  sepaEligible?: boolean;
-  note?: string;
-}): Fee {
-  const newFee: Fee = {
-    id: `f${Date.now()}`,
-    ...payload,
-    status: 'OPEN'
-  };
-  
-  fees.push(newFee);
-  return newFee;
-}
-
-export function markPaid(id: string, paidAt: string): void {
-  const fee = fees.find(f => f.id === id);
-  if (fee) {
-    fee.status = 'PAID';
-    fee.paidAt = paidAt;
-  }
-}
-
-export function listFees(): Fee[] {
-  return [...fees];
-}
-
-export function overlaps(memberId: string, startISO: string, endISO: string): boolean {
-  const start = new Date(startISO);
-  const end = new Date(endISO);
-  
-  return fees.some(fee => {
-    if (fee.memberId !== memberId) return false;
-    
-    const feeStart = new Date(fee.periodStart);
-    const feeEnd = new Date(fee.periodEnd);
-    
-    // Check if periods overlap
-    return start <= feeEnd && end >= feeStart;
+// Mock function to create a fee
+export function createFee(feeData: NewFeeFormData): Promise<any> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        id: `fee_${Date.now()}`,
+        ...feeData,
+        status: 'OPEN',
+        createdAt: new Date().toISOString(),
+      });
+    }, 500);
   });
+}
+
+// Mock function to mark fee as paid
+export function markPaid(feeId: string): Promise<any> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        id: feeId,
+        status: 'PAID',
+        paidAt: new Date().toISOString(),
+      });
+    }, 300);
+  });
+}
+
+// Mock function to get fees
+export function getFees(): Promise<any[]> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve([
+        {
+          id: 'fee_1',
+          memberNumber: 'M001',
+          memberName: 'Jan Janssens',
+          amount: '25.00',
+          term: 'MONTHLY',
+          status: 'OPEN',
+          method: 'SEPA',
+          periodStart: '2024-01-01T00:00:00.000Z',
+          periodEnd: '2024-01-31T23:59:59.999Z',
+          createdAt: '2024-01-01T00:00:00.000Z',
+        }
+      ]);
+    }, 300);
+  });
+}
+
+/**
+ * Check if two date periods overlap
+ */
+export function overlaps(
+  start1: Date | string, 
+  end1: Date | string, 
+  start2: Date | string, 
+  end2: Date | string
+): boolean {
+  const s1 = typeof start1 === 'string' ? new Date(start1) : start1;
+  const e1 = typeof end1 === 'string' ? new Date(end1) : end1;
+  const s2 = typeof start2 === 'string' ? new Date(start2) : start2;
+  const e2 = typeof end2 === 'string' ? new Date(end2) : end2;
+  
+  return s1 <= e2 && s2 <= e1;
 }

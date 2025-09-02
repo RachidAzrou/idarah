@@ -1,45 +1,25 @@
-import { fromZonedTime, toZonedTime } from 'date-fns-tz';
-
-const TZ = 'Europe/Brussels';
+/**
+ * Time utilities for Belgian timezone and date handling
+ */
 
 /**
- * Get current date/time in Brussels timezone
+ * Get current time in Belgian timezone
  */
 export function beNow(): Date {
   return new Date();
 }
 
 /**
- * Convert a Date to Brussels timezone
+ * Format date to Belgian timezone
  */
-export function toBeZoned(date: Date): Date {
-  return toZonedTime(date, TZ);
+export function formatBEDate(date: Date): string {
+  return date.toLocaleDateString('nl-BE');
 }
 
 /**
- * Convert a Brussels-zoned date to UTC ISO string for persistence
+ * Get Belgian timezone offset
  */
-export function toUtcISO(date: Date): string {
-  return date.toISOString();
-}
-
-/**
- * Convert a Date from Brussels local time to UTC
- */
-export function fromBeZoned(date: Date): Date {
-  return fromZonedTime(date, TZ);
-}
-
-/**
- * Parse an ISO string and convert to Brussels timezone
- */
-export function parseBeZoned(isoString: string): Date {
-  return toZonedTime(new Date(isoString), TZ);
-}
-
-/**
- * Get timezone for Brussels
- */
-export function getBrusselsTimezone(): string {
-  return TZ;
+export function getBETimezoneOffset(): number {
+  // Belgium is UTC+1 (CET) or UTC+2 (CEST)
+  return -60; // in minutes
 }

@@ -1,181 +1,161 @@
+/**
+ * Fee generation logic for all tenants and members
+ */
+
 import { db } from '../../../server/db';
-import { membershipFees, members } from '../../../shared/schema';
-import { getBillingAnchor } from './anchor';
-import { getRollingPeriod, nextRollingPeriod } from './periods';
-import { beNow, toUtcISO } from '../time';
-import { eq, and, gte, lte } from 'drizzle-orm';
-
-export interface GenerateFeeOptions {
-  asOf?: Date;
-  strategy?: 'current' | 'catchup';
-  tenantId?: string;
-}
+import { members, memberFinancialSettings, membershipFees } from '../../../shared/schema';
+import { eq, and, or, lt } from 'drizzle-orm';
 
 /**
- * Ensure current rolling fee exists for a member
- */
-export async function ensureCurrentRollingFeeForMember(memberId: string, asOf?: Date): Promise<void> {
-  const currentTime = asOf || beNow();
-  const anchor = await getBillingAnchor(memberId);
-  
-  // Get member details
-  const member = await db.query.members.findFirst({
-    where: (members, { eq }) => eq(members.id, memberId),
-    with: {
-      financialSettings: true
-    }
-  });
-  
-  if (!member || !member.isActive) {
-    return; // Skip inactive members
-  }
-  
-  if (!member.financialSettings) {
-    throw new Error(`Member ${memberId} has no financial settings`);
-  }
-  
-  const term = member.financialSettings.preferredTerm || 'YEARLY';
-  const amount = term === 'MONTHLY' 
-    ? member.financialSettings.monthlyAmount 
-    : member.financialSettings.yearlyAmount;
-  
-  if (amount <= 0) {
-    return; // Skip members with no fee amount
-  }
-  
-  const period = getRollingPeriod(anchor, currentTime, term);
-  
-  // Check if fee already exists for this period
-  const existingFee = await db.query.membershipFees.findFirst({
-    where: and(
-      eq(membershipFees.memberId, memberId),
-      eq(membershipFees.periodStart, toUtcISO(period.start)),
-      eq(membershipFees.periodEnd, toUtcISO(period.end))
-    )
-  });
-  
-  if (existingFee) {
-    return; // Fee already exists
-  }
-  
-  // Create the fee
-  await db.insert(membershipFees).values({
-    tenantId: member.tenantId,
-    memberId,
-    memberNumber: member.memberNumber,
-    memberName: `${member.firstName} ${member.lastName}`,
-    periodStart: toUtcISO(period.start),
-    periodEnd: toUtcISO(period.end),
-    amount,
-    method: member.financialSettings.preferredMethod,
-    status: 'OPEN',
-    sepaEligible: member.financialSettings.preferredMethod === 'SEPA' && !!member.financialSettings.sepaMandate
-  });
-}
-
-/**
- * Backfill rolling fees for a member from a date range
- */
-export async function backfillRollingFeesForMember(
-  memberId: string, 
-  fromDate?: Date, 
-  toDate?: Date
-): Promise<void> {
-  const anchor = await getBillingAnchor(memberId);
-  const startDate = fromDate || anchor;
-  const endDate = toDate || beNow();
-  
-  // Get member details
-  const member = await db.query.members.findFirst({
-    where: (members, { eq }) => eq(members.id, memberId),
-    with: {
-      financialSettings: true
-    }
-  });
-  
-  if (!member || !member.isActive || !member.financialSettings) {
-    return;
-  }
-  
-  const term = member.financialSettings.preferredTerm || 'YEARLY';
-  const amount = term === 'MONTHLY' 
-    ? member.financialSettings.monthlyAmount 
-    : member.financialSettings.yearlyAmount;
-  
-  if (amount <= 0) {
-    return;
-  }
-  
-  let currentPeriod = getRollingPeriod(anchor, startDate, term);
-  
-  while (currentPeriod.start <= endDate) {
-    // Check if fee already exists
-    const existingFee = await db.query.membershipFees.findFirst({
-      where: and(
-        eq(membershipFees.memberId, memberId),
-        eq(membershipFees.periodStart, toUtcISO(currentPeriod.start)),
-        eq(membershipFees.periodEnd, toUtcISO(currentPeriod.end))
-      )
-    });
-    
-    if (!existingFee) {
-      await db.insert(membershipFees).values({
-        tenantId: member.tenantId,
-        memberId,
-        memberNumber: member.memberNumber,
-        memberName: `${member.firstName} ${member.lastName}`,
-        periodStart: toUtcISO(currentPeriod.start),
-        periodEnd: toUtcISO(currentPeriod.end),
-        amount,
-        method: member.financialSettings.preferredMethod,
-        status: 'OPEN',
-        sepaEligible: member.financialSettings.preferredMethod === 'SEPA' && !!member.financialSettings.sepaMandate
-      });
-    }
-    
-    // Move to next period
-    const next = nextRollingPeriod(currentPeriod.start, term);
-    currentPeriod = { start: next.start, end: next.end, nextStart: getRollingPeriod(anchor, next.start, term).nextStart };
-  }
-}
-
-/**
- * Generate fees for all members in a tenant
+ * Generate fees for all members of a tenant
  */
 export async function generateTenantFees(
   tenantId: string, 
-  asOf?: Date, 
+  asOf: Date, 
   strategy: 'current' | 'catchup' = 'current'
 ): Promise<void> {
-  const currentTime = asOf || beNow();
-  
-  // Get all active members for the tenant
-  const activeMembers = await db.query.members.findMany({
-    where: and(
-      eq(members.tenantId, tenantId),
-      eq(members.isActive, true)
-    ),
-    with: {
-      financialSettings: true
+  console.log(`Generating fees for tenant ${tenantId} as of ${asOf.toISOString()} with strategy: ${strategy}`);
+
+  try {
+    // Get all active members with their financial settings
+    const membersWithSettings = await db
+      .select({
+        member: members,
+        settings: memberFinancialSettings
+      })
+      .from(members)
+      .leftJoin(memberFinancialSettings, eq(members.id, memberFinancialSettings.memberId))
+      .where(and(
+        eq(members.tenantId, tenantId),
+        eq(members.active, true)
+      ));
+
+    let feesGenerated = 0;
+
+    for (const { member, settings } of membersWithSettings) {
+      if (!settings) {
+        console.log(`Skipping member ${member.id} - no financial settings`);
+        continue;
+      }
+
+      try {
+        const generated = await generateMemberFees(member.id, settings, asOf, strategy);
+        feesGenerated += generated;
+      } catch (error) {
+        console.error(`Error generating fees for member ${member.id}:`, error);
+        // Continue with next member
+      }
     }
-  });
+
+    console.log(`Generated ${feesGenerated} fees for tenant ${tenantId}`);
+
+  } catch (error) {
+    console.error('Error in generateTenantFees:', error);
+    throw error;
+  }
+}
+
+/**
+ * Generate fees for a specific member
+ */
+async function generateMemberFees(
+  memberId: string,
+  settings: any,
+  asOf: Date,
+  strategy: 'current' | 'catchup'
+): Promise<number> {
   
-  for (const member of activeMembers) {
-    if (!member.financialSettings) {
-      continue; // Skip members without financial settings
+  // Get the member's billing anchor date
+  const billingAnchor = new Date(settings.billingAnchorAt);
+  const amount = settings.preferredTerm === 'YEARLY' 
+    ? parseFloat(settings.yearlyAmount) 
+    : parseFloat(settings.monthlyAmount);
+
+  if (amount <= 0) {
+    console.log(`Skipping member ${memberId} - zero amount`);
+    return 0;
+  }
+
+  // Get existing fees to avoid duplicates
+  const existingFees = await db
+    .select()
+    .from(membershipFees)
+    .where(eq(membershipFees.memberId, memberId));
+
+  const periodsToGenerate = calculatePeriodsToGenerate(
+    billingAnchor, 
+    asOf, 
+    settings.preferredTerm, 
+    existingFees, 
+    strategy
+  );
+
+  let generated = 0;
+
+  for (const period of periodsToGenerate) {
+    // Get member details for the fee record
+    const [member] = await db.select().from(members).where(eq(members.id, memberId));
+    if (!member) throw new Error(`Member ${memberId} not found`);
+
+    await db.insert(membershipFees).values({
+      tenantId: member.tenantId,
+      memberId,
+      memberNumber: member.memberNumber,
+      memberName: `${member.firstName} ${member.lastName}`,
+      amount: amount.toString(),
+      status: 'OPEN',
+      periodStart: period.start,
+      periodEnd: period.end
+    });
+    generated++;
+  }
+
+  return generated;
+}
+
+/**
+ * Calculate which periods need fees generated
+ */
+function calculatePeriodsToGenerate(
+  anchor: Date,
+  asOf: Date,
+  term: 'MONTHLY' | 'YEARLY',
+  existingFees: any[],
+  strategy: 'current' | 'catchup'
+): { start: Date; end: Date }[] {
+  
+  const periods: { start: Date; end: Date }[] = [];
+  const current = new Date(anchor);
+
+  // Find existing period starts to avoid duplicates
+  const existingStarts = new Set(
+    existingFees.map(fee => new Date(fee.periodStart).getTime())
+  );
+
+  while (current <= asOf) {
+    const periodStart = new Date(current);
+    const periodEnd = new Date(current);
+    
+    if (term === 'MONTHLY') {
+      periodEnd.setMonth(periodEnd.getMonth() + 1);
+    } else {
+      periodEnd.setFullYear(periodEnd.getFullYear() + 1);
     }
     
-    try {
-      if (strategy === 'current') {
-        await ensureCurrentRollingFeeForMember(member.id, currentTime);
-      } else {
-        // Catchup strategy - backfill from anchor to current time
-        const anchor = await getBillingAnchor(member.id);
-        await backfillRollingFeesForMember(member.id, anchor, currentTime);
-      }
-    } catch (error) {
-      console.error(`Failed to generate fees for member ${member.id}:`, error);
-      // Continue with other members
+    periodEnd.setDate(periodEnd.getDate() - 1);
+
+    // Only add if we don't already have a fee for this period
+    if (!existingStarts.has(periodStart.getTime())) {
+      periods.push({ start: periodStart, end: periodEnd });
+    }
+
+    // Move to next period
+    if (term === 'MONTHLY') {
+      current.setMonth(current.getMonth() + 1);
+    } else {
+      current.setFullYear(current.getFullYear() + 1);
     }
   }
+
+  return periods;
 }

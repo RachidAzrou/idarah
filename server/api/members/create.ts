@@ -44,7 +44,6 @@ export async function createMemberHandler(req: Request, res: Response) {
     const result = await db.transaction(async (tx) => {
       // Create member
       const [member] = await tx.insert(members).values({
-        tenantId,
         memberNumber: body.memberNumber,
         firstName: body.firstName,
         lastName: body.lastName,
@@ -59,7 +58,7 @@ export async function createMemberHandler(req: Request, res: Response) {
         city: body.city,
         country: body.country,
         joinDate: joinDate.toISOString(),
-        isActive: true
+        active: true
       }).returning();
 
       // Create financial settings
@@ -71,7 +70,7 @@ export async function createMemberHandler(req: Request, res: Response) {
         yearlyAmount: body.yearlyAmount.toString(),
         iban: body.iban,
         sepaMandate: body.sepaMandate,
-        billingAnchorAt: joinDate.toISOString()
+        billingAnchorAt: joinDate
       });
 
       return member;

@@ -1,24 +1,27 @@
-import { z } from 'zod';
+import { z } from "zod";
 
+// Fee validation schema
 export const NewFeeSchema = z.object({
-  memberId: z.string().min(1, 'Selecteer een lid'),
-  term: z.enum(['MONTHLY','YEARLY']),
-  method: z.enum(['SEPA','OVERSCHRIJVING','BANCONTACT','CASH']),
-  startDate: z.date({ required_error: 'Kies een startdatum' }),
-  endDate: z.date(),
-  amount: z.number().min(0.01, 'Bedrag moet groter zijn dan € 0,00'),
+  memberId: z.string().optional(),
+  memberNumber: z.string().optional(),
+  term: z.enum(['MONTHLY', 'YEARLY']),
+  method: z.enum(['SEPA', 'OVERSCHRIJVING', 'BANCONTACT', 'CASH']),
+  amount: z.number().min(0, "Amount must be greater than or equal to 0"),
+  periodStart: z.string().optional(),
+  periodEnd: z.string().optional(), 
   iban: z.string().optional(),
-  note: z.string().max(500).optional(),
+  note: z.string().optional(),
   autoCreate: z.boolean().default(false),
-}).refine(
-  (v) => v.term === 'YEARLY' || v.term === 'MONTHLY',
-  { message: 'Ongeldige termijn' }
-).refine(
-  (v) => v.endDate >= v.startDate,
-  { message: 'Einddatum moet na startdatum liggen', path: ['endDate'] }
-).refine(
-  (v) => (v.method !== 'SEPA') || (v.iban && /^([A-Z]{2}\d{2}\s?\d{4}\s?\d{4}\s?\d{4}\s?\d{0,2})$/.test(v.iban)),
-  { message: 'IBAN vereist en ongeldig voor SEPA', path: ['iban'] }
-);
+});
 
 export type NewFeeFormData = z.infer<typeof NewFeeSchema>;
+
+// Fee update schema
+export const UpdateFeeSchema = z.object({
+  amount: z.number().min(0).optional(),
+  method: z.enum(['SEPA', 'OVERSCHRIJVING', 'BANCONTACT', 'CASH']).optional(),
+  status: z.enum(['OPEN', 'PAID', 'OVERDUE']).optional(),
+  note: z.string().optional(),
+});
+
+export type UpdateFeeFormData = z.infer<typeof UpdateFeeSchema>;

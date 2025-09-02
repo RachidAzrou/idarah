@@ -178,13 +178,16 @@ export default function Instellingen() {
       });
       
       // Initialize fee form with tenant data
-      feeForm.reset({
+      const feeFormData = {
         studentFee: tenantData.studentFee || "15.00",
         adultFee: tenantData.adultFee || "25.00",
         seniorFee: tenantData.seniorFee || "20.00",
         defaultPaymentTerm: tenantData.defaultPaymentTerm || "YEARLY",
         defaultPaymentMethod: tenantData.defaultPaymentMethod || "SEPA",
-      });
+      };
+      
+      console.log('Resetting fee form with data:', feeFormData);
+      feeForm.reset(feeFormData);
       
       setOrganizationSaved(false);
       setFeesSaved(false);
@@ -228,8 +231,11 @@ export default function Instellingen() {
       const response = await apiRequest("PUT", "/api/settings/fees", data);
       return response.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/tenant/current"] });
+    onSuccess: async (result) => {
+      // Invalideer de tenant query en force een refetch
+      await queryClient.invalidateQueries({ queryKey: ["/api/tenant/current"] });
+      await queryClient.refetchQueries({ queryKey: ["/api/tenant/current"] });
+      
       setFeesSaved(true);
       toast({
         title: "Lidgeld instellingen bijgewerkt",

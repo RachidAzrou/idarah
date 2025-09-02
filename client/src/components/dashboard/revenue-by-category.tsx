@@ -40,15 +40,15 @@ export default function IncomeByCategoryCard() {
         {data.map((item, index) => {
           const widthPercentage = (item.amount / maxAmount) * 100;
           
-          // Different blue shades for each category
+          // Colors consistent with Leden per categorie
           const getBarColor = (category: string) => {
             switch (category) {
               case 'Senior':
-                return '#1E40AF'; // Dark blue
+                return '#1E3A8A'; // Dark blue - same as members
               case 'Standaard':
-                return '#2563EB'; // Medium blue
+                return '#3B82F6'; // Medium blue - same as members
               case 'Student':
-                return '#60A5FA'; // Light blue
+                return '#06B6D4'; // Light blue/cyan - same as members
               default:
                 return '#3B82F6'; // Default blue
             }

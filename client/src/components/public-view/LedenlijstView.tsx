@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { LedenlijstConfig } from "@/lib/mock/public-screens";
 import { mockMembers, monthNames, getFilteredMembers, getMemberDisplayName, Member } from "@/lib/mock/members-data";
 import { Check, X, Vote } from "lucide-react";
+import backgroundImage from "@assets/ramadan_15_03_2022_1_1756802762060.jpg";
 
 interface LedenlijstViewProps {
   config: LedenlijstConfig;
@@ -68,7 +69,7 @@ export function LedenlijstView({ config }: LedenlijstViewProps) {
     <div 
       className="min-h-screen bg-background p-8 relative"
       style={{
-        backgroundImage: `url('@assets/ramadan_15_03_2022_1_1756802762060.jpg')`,
+        backgroundImage: `url(${backgroundImage})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'

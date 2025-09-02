@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "wouter";
 import { LedenlijstView } from "@/components/public-view/LedenlijstView";
 import { publicScreensStore } from "@/lib/mock/public-screens";
+import backgroundImage from "@assets/ramadan_15_03_2022_1_1756802762060.jpg";
 
 export function PublicViewPage() {
   const { screenId } = useParams();
@@ -98,7 +99,7 @@ export function PublicViewPage() {
           <div 
             className="min-h-screen bg-background p-8 relative"
             style={{
-              backgroundImage: `url('@assets/ramadan_15_03_2022_1_1756802762060.jpg')`,
+              backgroundImage: `url(${backgroundImage})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat'
@@ -146,7 +147,7 @@ export function PublicViewPage() {
           <div 
             className="min-h-screen bg-sidebar p-8 relative"
             style={{
-              backgroundImage: `url('@assets/ramadan_15_03_2022_1_1756802762060.jpg')`,
+              backgroundImage: `url(${backgroundImage})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat'
@@ -194,7 +195,7 @@ export function PublicViewPage() {
           <div 
             className="min-h-screen bg-background flex items-center justify-center p-8 relative"
             style={{
-              backgroundImage: `url('@assets/ramadan_15_03_2022_1_1756802762060.jpg')`,
+              backgroundImage: `url(${backgroundImage})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat'

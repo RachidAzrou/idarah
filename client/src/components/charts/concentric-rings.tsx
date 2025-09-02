@@ -1,4 +1,5 @@
 import React from 'react';
+import { CustomTooltip } from '@/components/ui/CustomTooltip';
 
 interface Category {
   key: string;
@@ -69,21 +70,26 @@ export function ConcentricRings({ categories, size = 280 }: ConcentricRingsProps
           const pathData = describeArc(center, center, radius, startAngle, endAngle);
           
           return (
-            <path
+            <CustomTooltip
               key={category.key}
-              d={pathData}
-              fill="none"
-              stroke={category.color}
-              strokeWidth={strokeWidth}
-              strokeLinecap="round"
-              className="animate-drawArc"
-              style={{
-                animationDelay: `${index * 0.3}s`,
-                animationDuration: '1.2s'
-              }}
+              title={category.label}
+              count={category.count}
+              percentage={category.percent}
+              color={category.color}
             >
-              <title>{`${category.label}: ${category.percent}%`}</title>
-            </path>
+              <path
+                d={pathData}
+                fill="none"
+                stroke={category.color}
+                strokeWidth={strokeWidth}
+                strokeLinecap="round"
+                className="animate-drawArc hover:stroke-opacity-80 transition-all duration-200 cursor-pointer"
+                style={{
+                  animationDelay: `${index * 0.3}s`,
+                  animationDuration: '1.2s'
+                }}
+              />
+            </CustomTooltip>
           );
         })}
       </svg>

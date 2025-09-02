@@ -65,10 +65,10 @@ export function LedenlijstView({ config }: LedenlijstViewProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-background p-8">
       {/* Header */}
       <div className="text-center mb-8">
-        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200 mx-auto max-w-4xl">
+        <div className="bg-card rounded-2xl p-8 shadow-sm border border-border mx-auto max-w-4xl hover:shadow-md transition-shadow duration-200">
           <h1
             style={{
               fontSize: `${config.title.fontSize}px`,
@@ -77,6 +77,7 @@ export function LedenlijstView({ config }: LedenlijstViewProps) {
               fontWeight: config.title.fontWeight,
               margin: 0
             }}
+            className="text-card-foreground"
             data-testid="ledenlijst-title"
           >
             {config.title.text}
@@ -91,6 +92,7 @@ export function LedenlijstView({ config }: LedenlijstViewProps) {
                 fontWeight: config.subtitle.fontWeight,
                 margin: '8px 0 0 0'
               }}
+              className="text-muted-foreground"
               data-testid="ledenlijst-subtitle"
             >
               {config.subtitle.text}
@@ -101,25 +103,25 @@ export function LedenlijstView({ config }: LedenlijstViewProps) {
 
       {/* Tabel */}
       <div className="w-full">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div className="bg-card rounded-2xl shadow-sm border border-border overflow-hidden hover:shadow-md transition-shadow duration-200">
           <table className="w-full">
             <thead>
-              <tr className="bg-gray-50 border-b border-gray-200">
-                <th className="px-6 py-4 text-left font-semibold text-gray-700">
+              <tr className="bg-muted border-b border-border">
+                <th className="px-6 py-4 text-left font-semibold text-card-foreground">
                   Lidnr.
                 </th>
-                <th className="px-6 py-4 text-left font-semibold text-gray-700">
+                <th className="px-6 py-4 text-left font-semibold text-card-foreground">
                   Naam
                 </th>
                 {config.display.showVotingRights && (
-                  <th className="px-4 py-4 text-center font-semibold text-gray-700">
+                  <th className="px-4 py-4 text-center font-semibold text-card-foreground">
                     Stemrecht
                   </th>
                 )}
                 {monthNames.map((month, index) => (
                   <th
                     key={month}
-                    className="px-3 py-4 text-center font-semibold text-gray-700 text-sm min-w-[60px]"
+                    className="px-3 py-4 text-center font-semibold text-card-foreground text-sm min-w-[60px]"
                   >
                     {month}
                   </th>
@@ -128,11 +130,11 @@ export function LedenlijstView({ config }: LedenlijstViewProps) {
             </thead>
             <tbody>
               {currentMembers.map((member, memberIndex) => (
-                <tr key={member.id} className="hover:bg-gray-50 border-b border-gray-100 last:border-0">
-                  <td className="px-6 py-4 font-mono text-sm text-gray-600">
+                <tr key={member.id} className="hover:bg-accent border-b border-border last:border-0 transition-colors duration-200">
+                  <td className="px-6 py-4 font-mono text-sm text-muted-foreground">
                     {member.lidnummer}
                   </td>
-                  <td className="px-6 py-4 text-gray-900 font-medium">
+                  <td className="px-6 py-4 text-card-foreground font-medium">
                     {getMemberDisplayName(member, {
                       useFullNames: config.display.useFullNames,
                       useInitials: config.display.useInitials
@@ -141,7 +143,7 @@ export function LedenlijstView({ config }: LedenlijstViewProps) {
                   {config.display.showVotingRights && (
                     <td className="px-4 py-4 text-center">
                       {member.stemrecht && (
-                        <Vote className="w-5 h-5 text-blue-600 mx-auto" />
+                        <Vote className="w-5 h-5 text-primary mx-auto" />
                       )}
                     </td>
                   )}
@@ -155,18 +157,18 @@ export function LedenlijstView({ config }: LedenlijstViewProps) {
                         className="px-3 py-4 text-center"
                       >
                         <div
-                          className={`w-6 h-6 rounded-full mx-auto flex items-center justify-center ${
-                            status === 'betaald' ? 'bg-green-100' :
-                            status === 'achterstallig' ? 'bg-red-100' :
-                            'bg-gray-100'
+                          className={`w-6 h-6 rounded-full mx-auto flex items-center justify-center transition-all duration-200 ${
+                            status === 'betaald' ? 'bg-success/10' :
+                            status === 'achterstallig' ? 'bg-destructive/10' :
+                            'bg-muted'
                           }`}
                           title={`${month}: ${status}`}
                         >
                           {status === 'betaald' && (
-                            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                            <div className="w-3 h-3 bg-success rounded-full"></div>
                           )}
                           {status === 'achterstallig' && (
-                            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                            <div className="w-3 h-3 bg-destructive rounded-full"></div>
                           )}
                         </div>
                       </td>
@@ -181,24 +183,24 @@ export function LedenlijstView({ config }: LedenlijstViewProps) {
         {/* Paginering info */}
         {totalPages > 1 && (
           <div className="mt-8 flex justify-center">
-            <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
+            <div className="bg-card rounded-2xl p-6 shadow-lg border border-border hover:shadow-xl transition-shadow duration-200">
               <div className="flex justify-center items-center gap-3 mb-4">
                 {Array.from({ length: totalPages }, (_, i) => (
                   <div
                     key={i}
                     className={`w-3 h-3 rounded-full transition-all duration-300 ${
                       i === currentPage 
-                        ? 'bg-blue-600 scale-125 shadow-lg' 
-                        : 'bg-gray-300 hover:bg-gray-400'
+                        ? 'bg-primary scale-125 shadow-lg' 
+                        : 'bg-muted hover:bg-muted-foreground/20'
                     }`}
                   />
                 ))}
               </div>
               <div className="text-center">
-                <p className="text-gray-700 font-medium text-lg">
+                <p className="text-card-foreground font-medium text-lg">
                   Pagina {currentPage + 1} van {totalPages}
                 </p>
-                <p className="text-gray-500 text-sm mt-1">
+                <p className="text-muted-foreground text-sm mt-1">
                   {filteredMembers.length} leden weergegeven
                 </p>
               </div>

@@ -95,9 +95,9 @@ export function PublicViewPage() {
       
       case 'MEDEDELINGEN':
         return (
-          <div className="min-h-screen bg-gray-50 p-8">
+          <div className="min-h-screen bg-background p-8">
             <div className="max-w-4xl mx-auto text-center">
-              <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200">
+              <div className="bg-card rounded-2xl p-8 shadow-sm border border-border hover:shadow-md transition-shadow duration-200">
                 <h1 
                   style={{
                     fontSize: `${screen.config?.title?.fontSize || 36}px`,
@@ -105,7 +105,7 @@ export function PublicViewPage() {
                     color: screen.config?.title?.color || '#1f2937',
                     fontWeight: screen.config?.title?.fontWeight || 'bold'
                   }}
-                  className="mb-4"
+                  className="mb-4 text-card-foreground"
                 >
                   {screen.config?.title?.text || screen.name}
                 </h1>
@@ -117,12 +117,12 @@ export function PublicViewPage() {
                       color: screen.config?.subtitle?.color || '#6b7280',
                       fontWeight: screen.config?.subtitle?.fontWeight || 'normal'
                     }}
-                    className="mb-6"
+                    className="mb-6 text-muted-foreground"
                   >
                     {screen.config?.subtitle?.text}
                   </h2>
                 )}
-                <div className="text-gray-600">
+                <div className="text-muted-foreground">
                   <p className="text-lg mb-2">📢 Mededelingen Scherm</p>
                   <p className="text-sm">Automatische verversing elke 5 minuten</p>
                 </div>
@@ -133,9 +133,9 @@ export function PublicViewPage() {
       
       case 'MULTIMEDIA':
         return (
-          <div className="min-h-screen bg-black p-8">
+          <div className="min-h-screen bg-sidebar p-8">
             <div className="max-w-4xl mx-auto text-center">
-              <div className="bg-gray-900 rounded-lg p-8 shadow-sm border border-gray-700">
+              <div className="bg-sidebar-accent rounded-2xl p-8 shadow-sm border border-sidebar-border hover:shadow-md transition-shadow duration-200">
                 <h1 
                   style={{
                     fontSize: `${screen.config?.title?.fontSize || 36}px`,
@@ -143,7 +143,7 @@ export function PublicViewPage() {
                     color: screen.config?.title?.color || '#ffffff',
                     fontWeight: screen.config?.title?.fontWeight || 'bold'
                   }}
-                  className="mb-4"
+                  className="mb-4 text-sidebar-foreground"
                 >
                   {screen.config?.title?.text || screen.name}
                 </h1>
@@ -155,12 +155,12 @@ export function PublicViewPage() {
                       color: screen.config?.subtitle?.color || '#9ca3af',
                       fontWeight: screen.config?.subtitle?.fontWeight || 'normal'
                     }}
-                    className="mb-6"
+                    className="mb-6 text-sidebar-accent-foreground"
                   >
                     {screen.config?.subtitle?.text}
                   </h2>
                 )}
-                <div className="text-gray-400">
+                <div className="text-sidebar-accent-foreground">
                   <p className="text-lg mb-2">🎬 Multimedia Scherm</p>
                   <p className="text-sm">Automatische verversing elke 5 minuten</p>
                 </div>
@@ -171,12 +171,12 @@ export function PublicViewPage() {
       
       default:
         return (
-          <div className="min-h-screen bg-gray-50 flex items-center justify-center p-8">
-            <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 text-center max-w-md">
-              <h1 className="text-2xl font-bold text-gray-900 mb-4">
+          <div className="min-h-screen bg-background flex items-center justify-center p-8">
+            <div className="bg-card rounded-2xl p-8 shadow-sm border border-border text-center max-w-md hover:shadow-md transition-shadow duration-200">
+              <h1 className="text-2xl font-bold text-card-foreground mb-4">
                 ⚠️ Onbekend Schermtype
               </h1>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 Dit schermtype wordt nog niet ondersteund.
               </p>
             </div>

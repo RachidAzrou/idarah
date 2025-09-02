@@ -73,10 +73,7 @@ export default function PublicScreensPage() {
           onDelete={handleDeleteScreen}
         />
 
-        {/* Dialogs */}
-        <NewScreenDialog
-          onCreateScreen={handleCreateScreen}
-        />
+        {/* Edit Dialog */}
 
         <EditScreenDrawer
           screen={editScreen}

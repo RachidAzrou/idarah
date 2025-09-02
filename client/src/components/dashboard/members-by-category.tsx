@@ -83,6 +83,20 @@ export default function MembersByCategoryCard() {
         <div className="flex-shrink-0" style={{ width: '240px', height: '240px' }}>
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
+              <defs>
+                <linearGradient id="gradient-standaard" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#3B82F6" />
+                  <stop offset="100%" stopColor="#60A5FA" />
+                </linearGradient>
+                <linearGradient id="gradient-senior" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#1E3A8A" />
+                  <stop offset="100%" stopColor="#3B82F6" />
+                </linearGradient>
+                <linearGradient id="gradient-student" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#06B6D4" />
+                  <stop offset="100%" stopColor="#67E8F9" />
+                </linearGradient>
+              </defs>
               <Pie
                 data={categories.filter(cat => cat.count > 0)}
                 dataKey="count"
@@ -94,9 +108,19 @@ export default function MembersByCategoryCard() {
                 strokeWidth={2}
                 stroke="#ffffff"
               >
-                {categories.filter(cat => cat.count > 0).map((category, index) => (
-                  <Cell key={`cell-${index}`} fill={category.color} />
-                ))}
+                {categories.filter(cat => cat.count > 0).map((category, index) => {
+                  const getGradientId = (key: string) => {
+                    switch (key) {
+                      case 'standaard': return 'url(#gradient-standaard)';
+                      case 'senior': return 'url(#gradient-senior)';
+                      case 'student': return 'url(#gradient-student)';
+                      default: return 'url(#gradient-standaard)';
+                    }
+                  };
+                  return (
+                    <Cell key={`cell-${index}`} fill={getGradientId(category.key)} />
+                  );
+                })}
               </Pie>
               <Tooltip 
                 formatter={(value: number, name: string) => [

@@ -135,7 +135,7 @@ export default function IncomeByCategoryCard() {
                     className="h-full rounded-full transition-[width] duration-200 ease-out"
                     style={{
                       width: `${widthPercentage}%`,
-                      backgroundColor: getBarColor(item.category),
+                      background: getBarGradient(item.category),
                     }}
                   />
                 </div>

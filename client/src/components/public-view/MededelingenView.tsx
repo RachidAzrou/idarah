@@ -12,13 +12,17 @@ export function MededelingenView({ config }: MededelingenViewProps) {
 
   // Get slides/messages with safe fallback
   const slides = config?.slides || config?.messages || [];
-  const activeSlides = slides.filter((slide: any) => slide.active !== false); // Include items without active property
+  const activeSlides = slides.filter((slide: any) => slide.active !== false);
   const currentSlide = activeSlides[currentSlideIndex];
 
   // Safe config defaults
   const carouselConfig = config?.carousel || {};
-  const autoAdvance = carouselConfig.autoAdvance ?? true;
-  const intervalTime = carouselConfig.intervalTime || 10000; // milliseconds
+  const autoAdvance = carouselConfig.autoAdvance ?? config?.autoplay?.enabled ?? true;
+  const intervalTime = carouselConfig.intervalTime || (config?.autoplay?.interval * 1000) || 10000;
+
+  // Title and subtitle from config
+  const titleConfig = config?.title || {};
+  const subtitleConfig = config?.subtitle || {};
 
   useEffect(() => {
     if (!autoAdvance || activeSlides.length <= 1) return;
@@ -31,7 +35,7 @@ export function MededelingenView({ config }: MededelingenViewProps) {
       setTimeout(() => {
         setCurrentSlideIndex(prev => (prev + 1) % activeSlides.length);
         setFadeClass("opacity-100");
-      }, 300); // Fade transition duration
+      }, 300);
     }, slideInterval);
 
     return () => clearTimeout(timer);
@@ -48,29 +52,84 @@ export function MededelingenView({ config }: MededelingenViewProps) {
     );
   }
 
+  // Get styling from slide or use defaults
+  const slideStyle = currentSlide.styling || {};
+  const backgroundColor = slideStyle.backgroundColor || config?.style?.background || '#f3f4f6';
+  const textColor = slideStyle.titleColor || config?.style?.textColor || '#1f2937';
+
   return (
     <div 
       className="min-h-screen relative overflow-hidden flex flex-col"
       style={{ 
-        backgroundColor: '#f3f4f6',
-        color: '#1f2937'
+        backgroundColor: backgroundColor,
+        color: textColor
       }}
     >
-      {/* Header with title */}
+      {/* Header with title and subtitle */}
       <div className="relative z-10 p-8 text-center">
-        <h1 className="text-4xl font-bold mb-4 text-blue-900">
-          Mededelingen
-        </h1>
+        {/* Main title */}
+        {titleConfig.text && (
+          <h1 
+            className="mb-4"
+            style={{
+              fontSize: titleConfig.fontSize ? `${titleConfig.fontSize}px` : '48px',
+              fontFamily: titleConfig.fontFamily || 'Poppins',
+              fontWeight: titleConfig.fontWeight || 'bold',
+              color: titleConfig.color || textColor
+            }}
+          >
+            {titleConfig.text}
+          </h1>
+        )}
+        
+        {/* Subtitle */}
+        {subtitleConfig.text && (
+          <h2 
+            className="mb-6"
+            style={{
+              fontSize: subtitleConfig.fontSize ? `${subtitleConfig.fontSize}px` : '24px',
+              fontFamily: subtitleConfig.fontFamily || 'Poppins',
+              fontWeight: subtitleConfig.fontWeight || 'normal',
+              color: subtitleConfig.color || textColor
+            }}
+          >
+            {subtitleConfig.text}
+          </h2>
+        )}
       </div>
 
-      {/* Main content area */}
+      {/* Main content area with current slide */}
       <div className="relative z-10 flex-1 flex items-center justify-center p-8">
         <div 
           className={`text-center transition-opacity duration-300 ${fadeClass}`}
-          style={{ maxWidth: '800px' }}
+          style={{ maxWidth: config?.style?.maxTextWidth || '800px' }}
         >
-          <div className="text-2xl leading-relaxed whitespace-pre-wrap text-gray-800">
-            {currentSlide.content || currentSlide.title || currentSlide.body}
+          {/* Slide title */}
+          {currentSlide.title && (
+            <h3 
+              className="mb-6"
+              style={{
+                fontSize: slideStyle.titleFontSize ? `${slideStyle.titleFontSize}px` : '36px',
+                fontFamily: slideStyle.titleFontFamily || 'Poppins',
+                fontWeight: slideStyle.titleFontWeight || 'bold',
+                color: slideStyle.titleColor || textColor
+              }}
+            >
+              {currentSlide.title}
+            </h3>
+          )}
+          
+          {/* Slide content/body with line break support */}
+          <div 
+            className="leading-relaxed whitespace-pre-line"
+            style={{
+              fontSize: slideStyle.bodyFontSize ? `${slideStyle.bodyFontSize}px` : '24px',
+              fontFamily: slideStyle.bodyFontFamily || 'Poppins',
+              fontWeight: slideStyle.bodyFontWeight || 'normal',
+              color: slideStyle.bodyColor || textColor
+            }}
+          >
+            {currentSlide.content || currentSlide.body || currentSlide.title}
           </div>
         </div>
       </div>
@@ -83,9 +142,12 @@ export function MededelingenView({ config }: MededelingenViewProps) {
               key={index}
               className={`w-3 h-3 rounded-full transition-all duration-300 ${
                 index === currentSlideIndex 
-                  ? 'bg-blue-600 scale-110' 
-                  : 'bg-blue-300 opacity-40'
+                  ? 'opacity-100 scale-110' 
+                  : 'opacity-40'
               }`}
+              style={{
+                backgroundColor: textColor
+              }}
             />
           ))}
         </div>
@@ -94,10 +156,11 @@ export function MededelingenView({ config }: MededelingenViewProps) {
       {/* Auto-play progress bar */}
       {autoAdvance && activeSlides.length > 1 && (
         <div className="absolute bottom-0 left-0 right-0 z-10">
-          <div className="h-1 bg-blue-600 opacity-20">
+          <div className="h-1 opacity-20" style={{ backgroundColor: textColor }}>
             <div 
-              className="h-full bg-blue-600 transition-all linear"
+              className="h-full transition-all linear"
               style={{
+                backgroundColor: textColor,
                 width: '0%',
                 animation: `progress ${(currentSlide?.displayDuration || intervalTime) / 1000}s linear infinite`
               }}

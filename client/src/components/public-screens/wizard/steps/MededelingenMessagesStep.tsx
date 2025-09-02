@@ -259,7 +259,7 @@ export function MededelingenMessagesStep({ data, onUpdate }: MededelingenMessage
                       id={`body-${slide.id}`}
                       value={slide.body || ''}
                       onChange={(e) => updateSlide(slide.id, { body: e.target.value })}
-                      placeholder="Bericht tekst (optioneel)"
+                      placeholder="Bericht tekst (optioneel)&#10;Gebruik Enter voor nieuwe regels"
                       rows={3}
                       data-testid={`textarea-slide-body-${slide.id}`}
                     />
@@ -434,6 +434,7 @@ export function MededelingenMessagesStep({ data, onUpdate }: MededelingenMessage
                     </h3>
                     {slide.body && (
                       <p
+                        className="whitespace-pre-line"
                         style={{
                           fontSize: `${slide.styling?.bodyFontSize || 18}px`,
                           fontFamily: slide.styling?.bodyFontFamily || 'Poppins',

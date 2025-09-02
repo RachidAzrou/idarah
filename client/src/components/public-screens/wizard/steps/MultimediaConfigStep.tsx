@@ -109,10 +109,20 @@ export function MultimediaConfigStep({ data, onUpdate }: MultimediaConfigStepPro
         const formData = new FormData();
         formData.append('file', file);
 
-        const result = await apiRequest('/api/public-screens/upload', {
+        const token = localStorage.getItem('authToken');
+        const response = await fetch('/api/public-screens/upload', {
           method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          },
           body: formData
         });
+
+        if (!response.ok) {
+          throw new Error('Upload failed');
+        }
+
+        const result = await response.json();
         addMediaItem(result.url, result.type, result.filename);
         toast({
           title: "Upload succesvol",

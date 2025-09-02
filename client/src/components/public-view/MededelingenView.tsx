@@ -19,7 +19,7 @@ export function MededelingenView({ config }: MededelingenViewProps) {
   // Safe config defaults
   const carouselConfig = config?.carousel || {};
   const autoAdvance = carouselConfig.autoAdvance ?? config?.autoplay?.enabled ?? true;
-  const intervalTime = carouselConfig.intervalTime || (config?.autoplay?.interval * 1000) || 10000;
+  const intervalTime = carouselConfig.intervalTime || (config?.autoplay?.interval * 1000) || 60000;
 
   useEffect(() => {
     if (!autoAdvance || activeSlides.length <= 1) return;

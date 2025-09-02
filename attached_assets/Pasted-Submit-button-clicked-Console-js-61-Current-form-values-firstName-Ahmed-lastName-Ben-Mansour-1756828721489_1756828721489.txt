@@ -1,0 +1,42 @@
+Submit button clicked
+Console.js:61 Current form values: {firstName: 'Ahmed', lastName: 'Ben Mansour', gender: 'M', category: 'STANDAARD', email: '', …}
+Console.js:61 Form state: {isValid: false, isSubmitting: false, errors: {…}}
+Console.js:61 Form submitted with data: {firstName: 'Ahmed', lastName: 'Ben Mansour', gender: 'M', birthDate: Fri Mar 15 1985 01:00:00 GMT+0100 (Midden-Europese standaardtijd), category: 'STANDAARD', …}
+Console.js:61 Form is valid: false
+Console.js:61 Form errors: {}
+Console.js:61 Sending member data to API: {firstName: 'Ahmed', lastName: 'Ben Mansour', gender: 'M', birthDate: Fri Mar 15 1985 01:00:00 GMT+0100 (Midden-Europese standaardtijd), category: 'STANDAARD', …}
+injected.js:253  POST https://3d4c5ce5-e595-4447-afbd-e830450332bf-00-26rzswrf5l18h.spock.replit.dev/api/members 400 (Bad Request)
+window.fetch @ Network.js:219
+apply @ injected.js:253
+apiRequest @ queryClient.ts:23
+mutationFn @ member-form.tsx:119
+fn @ @tanstack_react-query.js?v=7654fd65:1189
+run @ @tanstack_react-query.js?v=7654fd65:494
+start @ @tanstack_react-query.js?v=7654fd65:536
+execute @ @tanstack_react-query.js?v=7654fd65:1225
+await in execute
+mutate @ @tanstack_react-query.js?v=7654fd65:2630
+(anonymous) @ @tanstack_react-query.js?v=7654fd65:3295
+onSubmit @ member-form.tsx:148
+(anonymous) @ chunk-4BFJKWC4.js?v=7654fd65:1465
+await in (anonymous)
+handleFormSubmit @ member-form.tsx:160
+callCallback2 @ chunk-RPCDYKBN.js?v=7654fd65:3674
+invokeGuardedCallbackDev @ chunk-RPCDYKBN.js?v=7654fd65:3699
+invokeGuardedCallback @ chunk-RPCDYKBN.js?v=7654fd65:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-RPCDYKBN.js?v=7654fd65:3736
+executeDispatch @ chunk-RPCDYKBN.js?v=7654fd65:7014
+processDispatchQueueItemsInOrder @ chunk-RPCDYKBN.js?v=7654fd65:7034
+processDispatchQueue @ chunk-RPCDYKBN.js?v=7654fd65:7043
+dispatchEventsForPlugins @ chunk-RPCDYKBN.js?v=7654fd65:7051
+(anonymous) @ chunk-RPCDYKBN.js?v=7654fd65:7174
+batchedUpdates$1 @ chunk-RPCDYKBN.js?v=7654fd65:18913
+batchedUpdates @ chunk-RPCDYKBN.js?v=7654fd65:3579
+dispatchEventForPluginEventSystem @ chunk-RPCDYKBN.js?v=7654fd65:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-RPCDYKBN.js?v=7654fd65:5478
+dispatchEvent @ chunk-RPCDYKBN.js?v=7654fd65:5472
+dispatchDiscreteEvent @ chunk-RPCDYKBN.js?v=7654fd65:5449Understand this error
+Console.js:61 Member creation error: Error: 400: {"message":"Invalid member data"}
+    at throwIfResNotOk (queryClient.ts:6:11)
+    at async apiRequest (queryClient.ts:30:3)
+    at async Object.mutationFn (member-form.tsx:119:24)

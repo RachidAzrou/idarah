@@ -8,6 +8,7 @@ import { Toolbar } from "@/components/finance/Toolbar";
 import { FiltersDrawer } from "@/components/finance/FiltersDrawer";
 import { TransactionsTable } from "@/components/finance/TransactionsTable";
 import { DetailSlideOver } from "@/components/finance/DetailSlideOver";
+import { TransactionDetailDialog } from "@/components/finance/TransactionDetailDialog";
 import { NewTransactionDialog } from "@/components/finance/NewTransactionDialog";
 import { ImportDialog } from "@/components/finance/ImportDialog";
 import { ExportDialog } from "@/components/finance/ExportDialog";
@@ -30,6 +31,7 @@ export default function FinancePage() {
   
   // UI state
   const [showDetailSlideOver, setShowDetailSlideOver] = useState(false);
+  const [showDetailDialog, setShowDetailDialog] = useState(false);
   const [showNewTransactionDialog, setShowNewTransactionDialog] = useState(false);
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [showExportDialog, setShowExportDialog] = useState(false);
@@ -152,7 +154,7 @@ export default function FinancePage() {
   // Handlers
   const handleTransactionSelect = (transaction: any) => {
     setSelectedTransaction(transaction);
-    setShowDetailSlideOver(true);
+    setShowDetailDialog(true);
   };
 
   const handleTransactionEdit = (transaction: any) => {
@@ -293,6 +295,13 @@ export default function FinancePage() {
           transaction={selectedTransaction}
           onEdit={handleTransactionEdit}
           onDelete={handleTransactionDelete}
+        />
+
+        <TransactionDetailDialog
+          open={showDetailDialog}
+          onClose={() => setShowDetailDialog(false)}
+          transaction={selectedTransaction}
+          onEdit={handleTransactionEdit}
         />
 
         <NewTransactionDialog

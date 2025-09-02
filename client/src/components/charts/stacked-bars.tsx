@@ -44,10 +44,11 @@ export function StackedBars({
             </div>
             
             {/* Stacked Bar */}
-            <div className="flex-1 relative">
+            <div className="flex-1 relative group">
               <div 
-                className="h-4 rounded-full relative overflow-hidden"
+                className="h-4 rounded-full relative overflow-hidden cursor-pointer hover:h-5 transition-all duration-200"
                 style={{ backgroundColor: colors.track }}
+                title={`${bucket.label}: ${bucket.male} mannen, ${bucket.female} vrouwen (totaal: ${rowTotal})`}
               >
                 {/* Male segment */}
                 {bucket.male > 0 && (

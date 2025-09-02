@@ -20,13 +20,7 @@ interface LedenlijstConfigStepProps {
   onUpdate: (data: any) => void;
 }
 
-const availableCategories = [
-  "Volwassene",
-  "Student", 
-  "Kind",
-  "Senior",
-  "Gezin"
-];
+const availableCategories = ['Student', 'Standaard', 'Senior', 'Stemgerechtigd'];
 
 export function LedenlijstConfigStep({ data, onUpdate }: LedenlijstConfigStepProps) {
   const settings = data.ledenlijstSettings || {
@@ -36,7 +30,7 @@ export function LedenlijstConfigStep({ data, onUpdate }: LedenlijstConfigStepPro
     showVotingRights: false,
     rowsPerPage: 20,
     year: new Date().getFullYear(),
-    categories: ["Volwassene", "Student"]
+    categories: ["Student", "Standaard"]
   };
 
   const updateSettings = (field: string, value: any) => {
@@ -113,7 +107,7 @@ export function LedenlijstConfigStep({ data, onUpdate }: LedenlijstConfigStepPro
                   }}
                   data-testid="radio-short-names"
                 />
-                <Label htmlFor="short-names">Korte namen (bijv. Ahmed H.)</Label>
+                <Label htmlFor="short-names">Korte namen - alleen voornaam (bijv. Ahmed)</Label>
               </div>
             </div>
           </div>
@@ -130,24 +124,52 @@ export function LedenlijstConfigStep({ data, onUpdate }: LedenlijstConfigStepPro
         </div>
       </div>
 
-      {/* Categorie filter */}
+      {/* Filter */}
       <div className="space-y-4 p-4 border rounded-lg">
-        <h4 className="font-medium">Categorie filter</h4>
+        <h4 className="font-medium">Filter</h4>
         
         <div>
           <Label>Welke categorieën wil je tonen?</Label>
           <div className="mt-2 space-y-2">
-            {availableCategories.map(category => (
-              <div key={category} className="flex items-center space-x-2">
-                <Checkbox
-                  id={`category-${category}`}
-                  checked={settings.categories.includes(category)}
-                  onCheckedChange={() => toggleCategory(category)}
-                  data-testid={`checkbox-category-${category.toLowerCase()}`}
-                />
-                <Label htmlFor={`category-${category}`}>{category}</Label>
-              </div>
-            ))}
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="category-student"
+                checked={settings.categories.includes('Student')}
+                onCheckedChange={() => toggleCategory('Student')}
+                data-testid="checkbox-category-student"
+              />
+              <Label htmlFor="category-student">Student</Label>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="category-standaard"
+                checked={settings.categories.includes('Standaard')}
+                onCheckedChange={() => toggleCategory('Standaard')}
+                data-testid="checkbox-category-standaard"
+              />
+              <Label htmlFor="category-standaard">Standaard</Label>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="category-senior"
+                checked={settings.categories.includes('Senior')}
+                onCheckedChange={() => toggleCategory('Senior')}
+                data-testid="checkbox-category-senior"
+              />
+              <Label htmlFor="category-senior">Senior</Label>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="category-stemgerechtigd"
+                checked={settings.categories.includes('Stemgerechtigd')}
+                onCheckedChange={() => toggleCategory('Stemgerechtigd')}
+                data-testid="checkbox-category-stemgerechtigd"
+              />
+              <Label htmlFor="category-stemgerechtigd">Stemgerechtigd</Label>
+            </div>
           </div>
           <p className="text-xs text-gray-500 mt-2">
             Selecteer de categorieën die je wilt tonen in de ledenlijst

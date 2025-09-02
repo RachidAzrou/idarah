@@ -162,24 +162,40 @@ export function StylingStep({ data, onUpdate }: StylingStepProps) {
 
             <div>
               <Label htmlFor="title-color">Kleur</Label>
-              <Select value={data.title.color} onValueChange={(value) => updateTitle('color', value)}>
-                <SelectTrigger data-testid="select-title-color">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {colors.map(color => (
-                    <SelectItem key={color.value} value={color.value}>
-                      <div className="flex items-center gap-2">
-                        <div 
-                          className="w-4 h-4 rounded border" 
-                          style={{ backgroundColor: color.value }}
-                        />
-                        {color.label}
-                      </div>
-                    </SelectItem>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <input
+                    type="color"
+                    id="title-color-picker"
+                    value={data.title.color}
+                    onChange={(e) => updateTitle('color', e.target.value)}
+                    className="w-10 h-10 border border-gray-300 rounded cursor-pointer"
+                    data-testid="colorpicker-title-color"
+                  />
+                  <Input
+                    id="title-color-hex"
+                    value={data.title.color}
+                    onChange={(e) => updateTitle('color', e.target.value)}
+                    placeholder="#000000"
+                    pattern="^#[0-9A-Fa-f]{6}$"
+                    className="flex-1"
+                    data-testid="input-title-color-hex"
+                  />
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {colors.slice(0, 12).map(color => (
+                    <button
+                      key={color.value}
+                      type="button"
+                      onClick={() => updateTitle('color', color.value)}
+                      className="w-6 h-6 rounded border border-gray-300 hover:border-gray-500 transition-colors"
+                      style={{ backgroundColor: color.value }}
+                      title={color.label}
+                      data-testid={`colorbutton-title-${color.value}`}
+                    />
                   ))}
-                </SelectContent>
-              </Select>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -249,24 +265,40 @@ export function StylingStep({ data, onUpdate }: StylingStepProps) {
 
             <div>
               <Label htmlFor="subtitle-color">Kleur</Label>
-              <Select value={data.subtitle.color} onValueChange={(value) => updateSubtitle('color', value)}>
-                <SelectTrigger data-testid="select-subtitle-color">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {colors.map(color => (
-                    <SelectItem key={color.value} value={color.value}>
-                      <div className="flex items-center gap-2">
-                        <div 
-                          className="w-4 h-4 rounded border" 
-                          style={{ backgroundColor: color.value }}
-                        />
-                        {color.label}
-                      </div>
-                    </SelectItem>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <input
+                    type="color"
+                    id="subtitle-color-picker"
+                    value={data.subtitle.color}
+                    onChange={(e) => updateSubtitle('color', e.target.value)}
+                    className="w-10 h-10 border border-gray-300 rounded cursor-pointer"
+                    data-testid="colorpicker-subtitle-color"
+                  />
+                  <Input
+                    id="subtitle-color-hex"
+                    value={data.subtitle.color}
+                    onChange={(e) => updateSubtitle('color', e.target.value)}
+                    placeholder="#000000"
+                    pattern="^#[0-9A-Fa-f]{6}$"
+                    className="flex-1"
+                    data-testid="input-subtitle-color-hex"
+                  />
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {colors.slice(0, 12).map(color => (
+                    <button
+                      key={color.value}
+                      type="button"
+                      onClick={() => updateSubtitle('color', color.value)}
+                      className="w-6 h-6 rounded border border-gray-300 hover:border-gray-500 transition-colors"
+                      style={{ backgroundColor: color.value }}
+                      title={color.label}
+                      data-testid={`colorbutton-subtitle-${color.value}`}
+                    />
                   ))}
-                </SelectContent>
-              </Select>
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -23,7 +23,7 @@ export function ScreenCard({ screen, onEdit, onToggleStatus, onDelete }: ScreenC
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showUrlDialog, setShowUrlDialog] = useState(false);
 
-  const publicUrl = `${window.location.origin}/public/screen/${screen.publicToken}`;
+  const publicUrl = `${window.location.origin}/screen/${screen.id}`;
 
   const getTypeLabel = (type: string) => {
     switch (type) {
@@ -107,6 +107,21 @@ export function ScreenCard({ screen, onEdit, onToggleStatus, onDelete }: ScreenC
         <CardContent className="pt-0">
           <div className="text-sm text-gray-500">
             Laatst gewijzigd: {formatDateBE(screen.updatedAt)}
+          </div>
+          
+          <div className="mt-2 p-2 bg-gray-50 rounded text-xs">
+            <div className="flex items-center gap-1 text-gray-600">
+              <span>Publieke URL:</span>
+              <a 
+                href={`/screen/${screen.id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:text-blue-800 underline truncate"
+                data-testid={`link-public-${screen.id}`}
+              >
+                /screen/{screen.id}
+              </a>
+            </div>
           </div>
           
           <div className="flex gap-2 mt-4">

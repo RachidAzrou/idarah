@@ -14,6 +14,7 @@ import FinancePage from "@/pages/FinancePage";
 import PubliekeSchermen from "@/pages/publieke-schermen";
 import PublicScreensPage from "@/pages/PublicScreensPage";
 import PublicScreenViewPage from "@/pages/PublicScreenViewPage";
+import { PublicViewPage } from "@/pages/PublicViewPage";
 import Instellingen from "@/pages/instellingen";
 
 function LoadingSpinner() {
@@ -56,6 +57,7 @@ function Router() {
       <Route path="/financien" component={() => <ProtectedRoute component={FinancePage} />} />
       <Route path="/publieke-schermen" component={() => <ProtectedRoute component={PublicScreensPage} />} />
       <Route path="/public/screen/:publicToken" component={PublicScreenViewPage} />
+      <Route path="/screen/:screenId" component={PublicViewPage} />
       <Route path="/instellingen" component={() => <ProtectedRoute component={Instellingen} />} />
       <Route component={NotFound} />
     </Switch>

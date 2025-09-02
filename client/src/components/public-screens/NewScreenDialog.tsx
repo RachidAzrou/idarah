@@ -19,10 +19,7 @@ export function NewScreenDialog({ onCreateScreen }: NewScreenDialogProps) {
 
   return (
     <>
-      <Button onClick={() => setWizardOpen(true)} data-testid="button-new-screen">
-        <Plus className="w-4 h-4 mr-2" />
-        Nieuw scherm
-      </Button>
+      
 
       <ScreenWizard
         open={wizardOpen}

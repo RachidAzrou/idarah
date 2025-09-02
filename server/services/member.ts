@@ -64,10 +64,23 @@ class MemberService {
   }
 
   private async generateMemberNumber(tenantId: string): Promise<string> {
-    const year = new Date().getFullYear();
     const members = await storage.getMembersByTenant(tenantId);
-    const memberCount = members.length + 1;
-    return `${year}-${memberCount.toString().padStart(3, '0')}`;
+    
+    // Find the highest existing member number for this tenant
+    let maxNumber = 0;
+    for (const member of members) {
+      const match = member.memberNumber.match(/^(\d+)$/);
+      if (match) {
+        const num = parseInt(match[1], 10);
+        if (num > maxNumber) {
+          maxNumber = num;
+        }
+      }
+    }
+    
+    // Generate next sequential number
+    const nextNumber = maxNumber + 1;
+    return nextNumber.toString().padStart(4, '0');
   }
 
   private async generateInitialFee(member: Member): Promise<void> {

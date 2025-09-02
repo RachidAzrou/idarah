@@ -64,8 +64,22 @@ export function LedenlijstView({ config }: LedenlijstViewProps) {
     }
   };
 
+  // Category color mapping - consistent with dashboard
+  const getCategoryColor = (category: string) => {
+    switch (category.toLowerCase()) {
+      case 'senior':
+        return '#1E3A8A'; // Dark blue
+      case 'standaard':
+        return '#3B82F6'; // Medium blue  
+      case 'student':
+        return '#06B6D4'; // Light blue/cyan
+      default:
+        return '#6B7280'; // Gray fallback
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-8 relative">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 p-8 relative">
       {/* Subtle pattern overlay */}
       <div className="absolute inset-0 opacity-10" style={{
         backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.1'%3E%3Ccircle cx='7' cy='7' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
@@ -110,22 +124,22 @@ export function LedenlijstView({ config }: LedenlijstViewProps) {
         <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg border border-slate-200/50 overflow-hidden">
           <table className="w-full">
             <thead>
-              <tr className="bg-slate-50/80 border-b border-slate-200">
-                <th className="px-6 py-3 text-left font-semibold text-slate-800 text-xs uppercase tracking-wider">
+              <tr className="bg-blue-50/80 border-b border-blue-200">
+                <th className="px-6 py-3 text-left font-semibold text-blue-900 text-xs uppercase tracking-wider">
                   Lidnr.
                 </th>
-                <th className="px-6 py-3 text-left font-semibold text-slate-800 text-xs uppercase tracking-wider">
+                <th className="px-6 py-3 text-left font-semibold text-blue-900 text-xs uppercase tracking-wider">
                   Naam
                 </th>
                 {config.display.showVotingRights && (
-                  <th className="px-4 py-3 text-center font-semibold text-slate-800 text-xs uppercase tracking-wider">
+                  <th className="px-4 py-3 text-center font-semibold text-blue-900 text-xs uppercase tracking-wider">
                     Stemrecht
                   </th>
                 )}
                 {monthNames.map((month, index) => (
                   <th
                     key={month}
-                    className="px-3 py-3 text-center font-semibold text-slate-800 text-xs uppercase tracking-wider min-w-[50px]"
+                    className="px-3 py-3 text-center font-semibold text-blue-900 text-xs uppercase tracking-wider min-w-[50px]"
                   >
                     {month}
                   </th>
@@ -134,11 +148,11 @@ export function LedenlijstView({ config }: LedenlijstViewProps) {
             </thead>
             <tbody>
               {currentMembers.map((member, memberIndex) => (
-                <tr key={member.id} className="hover:bg-slate-50/50 border-b border-slate-100 last:border-0 transition-all duration-200">
+                <tr key={member.id} className="hover:bg-blue-50/50 border-b border-blue-100 last:border-0 transition-all duration-200">
                   <td className="px-6 py-3 font-mono text-xs text-slate-500">
                     {member.lidnummer}
                   </td>
-                  <td className="px-6 py-3 text-slate-700 font-medium text-sm">
+                  <td className="px-6 py-3 text-blue-900 font-medium text-sm">
                     {getMemberDisplayName(member, {
                       useFullNames: config.display.useFullNames,
                       useInitials: config.display.useInitials
@@ -187,8 +201,8 @@ export function LedenlijstView({ config }: LedenlijstViewProps) {
                     key={i}
                     className={`w-3 h-3 rounded-full transition-all duration-300 ${
                       i === currentPage 
-                        ? 'bg-slate-700 scale-125' 
-                        : 'bg-slate-300'
+                        ? 'bg-blue-600 scale-125' 
+                        : 'bg-blue-200'
                     }`}
                   />
                 ))}

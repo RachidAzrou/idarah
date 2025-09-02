@@ -62,7 +62,7 @@ export function MultimediaView({ config }: MultimediaViewProps) {
 
   if (!currentItem) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 to-cyan-800 text-white">
         <div className="text-center">
           <h1 className="text-4xl font-bold mb-4">Geen actieve media</h1>
           <p className="text-xl opacity-75">Er zijn momenteel geen media items om weer te geven.</p>
@@ -72,7 +72,7 @@ export function MultimediaView({ config }: MultimediaViewProps) {
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden flex flex-col bg-black">
+    <div className="min-h-screen relative overflow-hidden flex flex-col bg-gradient-to-br from-blue-950 to-cyan-900">
       {/* Header with title and subtitle */}
       <div className="relative z-10 p-8 text-center">
         <h1 
@@ -131,7 +131,7 @@ export function MultimediaView({ config }: MultimediaViewProps) {
       </div>
 
       {/* Media info overlay */}
-      <div className="absolute bottom-4 left-4 bg-black bg-opacity-70 text-white px-4 py-2 rounded-lg">
+      <div className="absolute bottom-4 left-4 bg-blue-900 bg-opacity-90 text-white px-4 py-2 rounded-lg border border-blue-600/30 backdrop-blur-sm">
         <div className="text-sm font-medium">{currentItem.name}</div>
         <div className="text-xs opacity-75">
           {currentItem.type === 'video' ? 
@@ -177,7 +177,7 @@ export function MultimediaView({ config }: MultimediaViewProps) {
       {activeItems.length > 1 && (
         <div className="absolute inset-0 z-10 opacity-0 hover:opacity-100 transition-opacity duration-300">
           <button
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70 transition-all"
+            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-blue-900 bg-opacity-80 text-white p-3 rounded-full hover:bg-opacity-100 transition-all border border-blue-600/30 backdrop-blur-sm"
             onClick={() => setCurrentItemIndex(prev => 
               prev > 0 ? prev - 1 : activeItems.length - 1
             )}
@@ -185,7 +185,7 @@ export function MultimediaView({ config }: MultimediaViewProps) {
             ←
           </button>
           <button
-            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70 transition-all"
+            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-blue-900 bg-opacity-80 text-white p-3 rounded-full hover:bg-opacity-100 transition-all border border-blue-600/30 backdrop-blur-sm"
             onClick={() => setCurrentItemIndex(prev => 
               prev < activeItems.length - 1 ? prev + 1 : 0
             )}

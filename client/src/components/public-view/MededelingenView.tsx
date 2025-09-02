@@ -43,7 +43,7 @@ export function MededelingenView({ config }: MededelingenViewProps) {
 
   if (!currentSlide) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 to-cyan-800 text-white">
         <div className="text-center">
           <h1 className="text-4xl font-bold mb-4">Geen actieve mededelingen</h1>
           <p className="text-xl opacity-75">Er zijn momenteel geen berichten om weer te geven.</p>

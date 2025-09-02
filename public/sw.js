@@ -1,225 +1,273 @@
-const CACHE_NAME = 'lidkaart-v1';
-const STATIC_CACHE = 'lidkaart-static-v1';
+// Service Worker voor Ledenbeheer PWA
+// Versie: 2.0.0
 
-// Assets to cache immediately
+const CACHE_VERSION = '2.0.0';
+const STATIC_CACHE = `ledenbeheer-static-v${CACHE_VERSION}`;
+const DYNAMIC_CACHE = `ledenbeheer-dynamic-v${CACHE_VERSION}`;
+const API_CACHE = `ledenbeheer-api-v${CACHE_VERSION}`;
+
+// Bestanden die altijd gecached moeten worden
 const STATIC_ASSETS = [
-  '/manifest.webmanifest',
-  '/icon-192.png',
-  '/icon-512.png',
+  '/',
+  '/index.html',
+  '/manifest.json'
 ];
 
-// Install event - cache static assets
-self.addEventListener('install', (event) => {
-  console.log('Service Worker installing');
+// API endpoints die gecached mogen worden (niet verify endpoint!)
+const CACHEABLE_APIS = [
+  '/api/members',
+  '/api/dashboard/stats',
+  '/api/cards/stats',
+  '/api/cards',
+  '/api/tenant/current'
+];
+
+// API endpoints die NOOIT gecached mogen worden
+const NO_CACHE_APIS = [
+  '/api/card/verify',
+  '/api/auth'
+];
+
+self.addEventListener('install', event => {
+  console.log('[SW] Installing service worker v' + CACHE_VERSION);
+  
   event.waitUntil(
     caches.open(STATIC_CACHE)
-      .then((cache) => {
-        console.log('Caching static assets');
+      .then(cache => {
+        console.log('[SW] Caching static assets');
         return cache.addAll(STATIC_ASSETS);
       })
       .then(() => {
-        console.log('Static assets cached, skipping waiting');
+        console.log('[SW] Static assets cached successfully');
         return self.skipWaiting();
       })
+      .catch(error => {
+        console.error('[SW] Error caching static assets:', error);
+      })
   );
 });
 
-// Activate event - clean up old caches
-self.addEventListener('activate', (event) => {
-  console.log('Service Worker activating');
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME && cacheName !== STATIC_CACHE) {
-            console.log('Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    }).then(() => {
-      console.log('Service Worker activated, claiming clients');
-      return self.clients.claim();
-    })
-  );
-});
-
-// Fetch event - implement caching strategies
-self.addEventListener('fetch', (event) => {
-  const url = new URL(event.request.url);
+self.addEventListener('activate', event => {
+  console.log('[SW] Activating service worker v' + CACHE_VERSION);
   
-  // Skip non-GET requests
-  if (event.request.method !== 'GET') {
-    return;
-  }
-
-  // Skip chrome-extension requests
-  if (url.protocol === 'chrome-extension:') {
-    return;
-  }
-
-  // NetworkOnly strategy for verify endpoint (always live)
-  if (url.pathname.includes('/api/card/verify/')) {
-    console.log('NetworkOnly for verify endpoint:', url.pathname);
-    event.respondWith(
-      fetch(event.request).catch(() => {
-        return new Response(
-          JSON.stringify({
-            ok: false,
-            message: 'Verificatie niet beschikbaar offline'
-          }),
-          {
-            status: 503,
-            headers: { 'Content-Type': 'application/json' }
-          }
+  event.waitUntil(
+    caches.keys()
+      .then(cacheNames => {
+        return Promise.all(
+          cacheNames.map(cacheName => {
+            if (cacheName !== STATIC_CACHE && 
+                cacheName !== DYNAMIC_CACHE && 
+                cacheName !== API_CACHE) {
+              console.log('[SW] Deleting old cache:', cacheName);
+              return caches.delete(cacheName);
+            }
+          })
         );
       })
-    );
-    return;
-  }
-
-  // NetworkFirst strategy for Live Card pages
-  if (url.pathname.startsWith('/card/') || url.pathname.includes('/api/members/')) {
-    console.log('NetworkFirst for card data:', url.pathname);
-    event.respondWith(
-      caches.open(CACHE_NAME).then((cache) => {
-        return fetch(event.request)
-          .then((response) => {
-            // Clone the response before caching
-            const responseClone = response.clone();
-            
-            // Only cache successful responses
-            if (response.status === 200) {
-              console.log('Caching fresh data for:', url.pathname);
-              cache.put(event.request, responseClone);
-            }
-            
-            return response;
-          })
-          .catch(() => {
-            console.log('Network failed, trying cache for:', url.pathname);
-            return cache.match(event.request).then((cachedResponse) => {
-              if (cachedResponse) {
-                console.log('Serving from cache (offline):', url.pathname);
-                
-                // Add offline indicator for HTML responses
-                if (url.pathname.startsWith('/card/') && 
-                    cachedResponse.headers.get('content-type')?.includes('text/html')) {
-                  return cachedResponse.text().then((html) => {
-                    const offlineHtml = html.replace(
-                      '</body>',
-                      `<div style="position: fixed; top: 1rem; right: 1rem; background: #f59e0b; color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 0.875rem; z-index: 1000;">
-                        📱 Momentopname - ${new Date().toLocaleString('nl-BE')}
-                      </div></body>`
-                    );
-                    return new Response(offlineHtml, {
-                      headers: cachedResponse.headers
-                    });
-                  });
-                }
-                
-                return cachedResponse;
-              }
-              
-              // Return offline fallback
-              return new Response(`
-                <!DOCTYPE html>
-                <html lang="nl">
-                <head>
-                  <meta charset="utf-8">
-                  <meta name="viewport" content="width=device-width, initial-scale=1">
-                  <title>Offline - Digitale Lidkaart</title>
-                  <style>
-                    body { 
-                      font-family: system-ui; 
-                      text-align: center; 
-                      padding: 2rem; 
-                      background: #f3f4f6;
-                      min-height: 100vh;
-                      display: flex;
-                      align-items: center;
-                      justify-content: center;
-                    }
-                    .offline { 
-                      background: white; 
-                      padding: 2rem; 
-                      border-radius: 1rem; 
-                      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-                      max-width: 400px;
-                    }
-                  </style>
-                </head>
-                <body>
-                  <div class="offline">
-                    <h1>🔌 Offline</h1>
-                    <p>Je bent offline en deze lidkaart is niet beschikbaar in de cache.</p>
-                    <p>Controleer je internetverbinding en probeer opnieuw.</p>
-                  </div>
-                </body>
-                </html>
-              `, {
-                status: 503,
-                headers: { 'Content-Type': 'text/html' }
-              });
-            });
-          });
+      .then(() => {
+        console.log('[SW] Service worker activated');
+        return self.clients.claim();
       })
-    );
+  );
+});
+
+self.addEventListener('fetch', event => {
+  const request = event.request;
+  const url = new URL(request.url);
+  
+  // Alleen GET requests verwerken
+  if (request.method !== 'GET') {
     return;
   }
 
-  // CacheFirst strategy for static assets
-  if (STATIC_ASSETS.some(asset => url.pathname.includes(asset))) {
-    console.log('CacheFirst for static asset:', url.pathname);
-    event.respondWith(
-      caches.match(event.request).then((cachedResponse) => {
-        if (cachedResponse) {
-          console.log('Serving from cache:', url.pathname);
-          return cachedResponse;
+  // Skip chrome-extension en andere protocollen
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+    return;
+  }
+
+  // API requests
+  if (url.pathname.startsWith('/api/')) {
+    event.respondWith(handleApiRequest(request));
+    return;
+  }
+
+  // Static assets en pagina's
+  event.respondWith(handleStaticRequest(request));
+});
+
+// Behandel API requests met verschillende strategieën
+async function handleApiRequest(request) {
+  const url = new URL(request.url);
+  
+  // Verificatie endpoint: altijd NetworkOnly
+  if (NO_CACHE_APIS.some(api => url.pathname.startsWith(api))) {
+    console.log('[SW] NetworkOnly for:', url.pathname);
+    try {
+      return await fetch(request);
+    } catch (error) {
+      console.error('[SW] Network error for no-cache API:', error);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Geen internetverbinding',
+          offline: true 
+        }), 
+        { 
+          status: 503,
+          headers: { 'Content-Type': 'application/json' }
         }
-        
-        return fetch(event.request).then((response) => {
-          if (response.status === 200) {
-            const responseClone = response.clone();
-            caches.open(STATIC_CACHE).then((cache) => {
-              cache.put(event.request, responseClone);
-            });
-          }
-          return response;
-        });
-      })
-    );
-    return;
+      );
+    }
   }
 
-  // StaleWhileRevalidate for other assets (icons, CSS, JS)
-  if (url.pathname.includes('.') && !url.pathname.includes('/api/')) {
-    console.log('StaleWhileRevalidate for asset:', url.pathname);
-    event.respondWith(
-      caches.open(CACHE_NAME).then((cache) => {
-        return cache.match(event.request).then((cachedResponse) => {
-          const fetchPromise = fetch(event.request).then((networkResponse) => {
-            if (networkResponse.status === 200) {
-              cache.put(event.request, networkResponse.clone());
-            }
-            return networkResponse;
-          });
-          
-          return cachedResponse || fetchPromise;
-        });
-      })
-    );
-    return;
+  // Cacheable API's: NetworkFirst strategie
+  if (CACHEABLE_APIS.some(api => url.pathname.startsWith(api))) {
+    console.log('[SW] NetworkFirst for:', url.pathname);
+    return networkFirstStrategy(request, API_CACHE);
   }
 
-  // Default: try network first
-  console.log('Default fetch for:', url.pathname);
+  // Andere API's: direct naar netwerk
+  try {
+    return await fetch(request);
+  } catch (error) {
+    console.error('[SW] Network error for API:', error);
+    return new Response(
+      JSON.stringify({ 
+        error: 'API niet bereikbaar',
+        offline: true 
+      }), 
+      { 
+        status: 503,
+        headers: { 'Content-Type': 'application/json' }
+      }
+    );
+  }
+}
+
+// Behandel statische requests
+async function handleStaticRequest(request) {
+  // Voor navigatie requests: NetworkFirst met fallback naar index.html
+  if (request.mode === 'navigate') {
+    console.log('[SW] Navigation request:', request.url);
+    return networkFirstStrategy(request, DYNAMIC_CACHE, '/');
+  }
+
+  // Voor andere static assets: CacheFirst
+  return cacheFirstStrategy(request, STATIC_CACHE);
+}
+
+// NetworkFirst strategie: probeer netwerk eerst, fallback naar cache
+async function networkFirstStrategy(request, cacheName, fallbackUrl = null) {
+  try {
+    const networkResponse = await fetch(request);
+    
+    // Als succesvol, update cache
+    if (networkResponse.ok) {
+      const cache = await caches.open(cacheName);
+      cache.put(request, networkResponse.clone());
+    }
+    
+    return networkResponse;
+  } catch (error) {
+    console.log('[SW] Network failed, trying cache:', request.url);
+    
+    // Probeer uit cache
+    const cachedResponse = await caches.match(request);
+    if (cachedResponse) {
+      console.log('[SW] Serving from cache (offline)');
+      return cachedResponse;
+    }
+    
+    // Fallback voor navigatie
+    if (fallbackUrl) {
+      const fallbackResponse = await caches.match(fallbackUrl);
+      if (fallbackResponse) {
+        return fallbackResponse;
+      }
+    }
+    
+    // Geen cache beschikbaar
+    throw error;
+  }
+}
+
+// CacheFirst strategie: cache eerst, fallback naar netwerk
+async function cacheFirstStrategy(request, cacheName) {
+  const cachedResponse = await caches.match(request);
+  
+  if (cachedResponse) {
+    console.log('[SW] Serving from cache:', request.url);
+    return cachedResponse;
+  }
+  
+  console.log('[SW] Cache miss, fetching:', request.url);
+  try {
+    const networkResponse = await fetch(request);
+    
+    if (networkResponse.ok) {
+      const cache = await caches.open(cacheName);
+      cache.put(request, networkResponse.clone());
+    }
+    
+    return networkResponse;
+  } catch (error) {
+    console.error('[SW] Failed to fetch:', request.url, error);
+    throw error;
+  }
+}
+
+// Background sync voor offline acties
+self.addEventListener('sync', event => {
+  console.log('[SW] Background sync event:', event.tag);
+  
+  if (event.tag === 'background-sync') {
+    event.waitUntil(doBackgroundSync());
+  }
+});
+
+async function doBackgroundSync() {
+  console.log('[SW] Performing background sync...');
+  // Implementeer background sync logica hier
+}
+
+// Push notifications
+self.addEventListener('push', event => {
+  console.log('[SW] Push notification received');
+  
+  if (event.data) {
+    const data = event.data.json();
+    
+    const options = {
+      body: data.body || 'Nieuwe melding van Ledenbeheer',
+      icon: '/icon-192.svg',
+      badge: '/icon-192.svg',
+      vibrate: [200, 100, 200],
+      data: data.data || {},
+      actions: data.actions || []
+    };
+    
+    event.waitUntil(
+      self.registration.showNotification(data.title || 'Ledenbeheer', options)
+    );
+  }
+});
+
+// Notification click handling
+self.addEventListener('notificationclick', event => {
+  console.log('[SW] Notification clicked');
+  
+  event.notification.close();
+  
+  event.waitUntil(
+    clients.openWindow(event.notification.data.url || '/')
+  );
 });
 
 // Listen for messages from the main thread
-self.addEventListener('message', (event) => {
+self.addEventListener('message', event => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
-    console.log('Received SKIP_WAITING message');
+    console.log('[SW] Received SKIP_WAITING message');
     self.skipWaiting();
   }
 });
+
+console.log('[SW] Service worker script loaded v' + CACHE_VERSION);

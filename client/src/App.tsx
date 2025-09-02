@@ -18,6 +18,8 @@ import { PublicViewPage } from "@/pages/PublicViewPage";
 import Instellingen from "@/pages/instellingen";
 import { CardPage } from "@/pages/card";
 import Lidkaarten from "@/pages/lidkaarten";
+import { InstallPrompt } from "@/components/pwa/install-prompt";
+import { OfflineIndicator } from "@/components/pwa/offline-indicator";
 
 function LoadingSpinner() {
   return (
@@ -74,6 +76,8 @@ function App() {
       <TooltipProvider>
         <Toaster />
         <Router />
+        <InstallPrompt />
+        <OfflineIndicator />
       </TooltipProvider>
     </QueryClientProvider>
   );

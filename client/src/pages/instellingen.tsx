@@ -411,19 +411,6 @@ export default function Instellingen() {
     }
   });
 
-  const duplicateRuleMutation = useMutation({
-    mutationFn: async (ruleData: any) => {
-      const response = await apiRequest("POST", "/api/rules", ruleData);
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/rules"] });
-      toast({ title: "Regel gedupliceerd", description: "De regel is succesvol gedupliceerd." });
-    },
-    onError: () => {
-      toast({ title: "Fout", description: "Er is een fout opgetreden.", variant: "destructive" });
-    }
-  });
 
   const onOrganizationSubmit = (data: OrganizationFormData) => {
     updateOrganizationMutation.mutate(data);
@@ -506,15 +493,6 @@ export default function Instellingen() {
     setShowEditRuleDialog(true);
   };
 
-  const handleDuplicateRule = (rule: any) => {
-    const duplicatedRule = {
-      name: `${rule.name} (kopie)`,
-      description: rule.description,
-      scope: rule.scope,
-      parameters: rule.parameters,
-    };
-    duplicateRuleMutation.mutate(duplicatedRule);
-  };
 
   const handleDeleteRule = (rule: any) => {
     if (confirm(`Weet je zeker dat je de regel "${rule.name}" wilt verwijderen?`)) {
@@ -1386,10 +1364,6 @@ export default function Instellingen() {
                                     <DropdownMenuItem onClick={() => handleEditRule(rule)} data-testid={`action-edit-rule-${rule.id}`}>
                                       <Edit className="h-4 w-4 mr-2" />
                                       Bewerken
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => handleDuplicateRule(rule)} data-testid={`action-duplicate-rule-${rule.id}`}>
-                                      <Copy className="h-4 w-4 mr-2" />
-                                      Dupliceren
                                     </DropdownMenuItem>
                                     <DropdownMenuItem className="text-red-600" onClick={() => handleDeleteRule(rule)} data-testid={`action-delete-rule-${rule.id}`}>
                                       <Trash2 className="h-4 w-4 mr-2" />

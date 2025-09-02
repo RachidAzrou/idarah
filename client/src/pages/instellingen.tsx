@@ -127,27 +127,6 @@ export default function Instellingen() {
     },
   });
 
-  // Reset form when tenant data loads
-  useEffect(() => {
-    if (tenant && typeof tenant === 'object') {
-      organizationForm.reset({
-        name: (tenant as any).name || "",
-        slug: (tenant as any).slug || "",
-        street: (tenant as any).street || "",
-        number: (tenant as any).number || "",
-        postalCode: (tenant as any).postalCode || "",
-        city: (tenant as any).city || "",
-        country: (tenant as any).country || "België",
-        email: (tenant as any).email || "",
-        phone: (tenant as any).phone || "",
-        website: (tenant as any).website || "",
-        companyNumber: (tenant as any).companyNumber || "",
-        companyType: (tenant as any).companyType || undefined,
-        logoUrl: (tenant as any).logoUrl || "",
-        primaryColor: (tenant as any).primaryColor || "#6366f1",
-      });
-    }
-  }, [tenant, organizationForm]);
 
   const feeForm = useForm<MembershipFeeFormData>({
     resolver: zodResolver(membershipFeeSchema),
@@ -164,17 +143,43 @@ export default function Instellingen() {
   const organizationFormValues = organizationForm.watch();
   const feeFormValues = feeForm.watch();
 
+  // Reset organization saved state when form changes
   useEffect(() => {
     if (organizationSaved) {
       setOrganizationSaved(false);
     }
   }, [organizationFormValues]);
 
+  // Reset fees saved state when form changes
   useEffect(() => {
     if (feesSaved) {
       setFeesSaved(false);
     }
   }, [feeFormValues]);
+
+  // Initialize form with tenant data when available
+  useEffect(() => {
+    if (tenant && typeof tenant === 'object' && 'name' in tenant) {
+      const tenantData = tenant as any;
+      organizationForm.reset({
+        name: tenantData.name || "",
+        slug: tenantData.slug || "",
+        street: tenantData.street || "",
+        number: tenantData.number || "",
+        postalCode: tenantData.postalCode || "",
+        city: tenantData.city || "",
+        country: tenantData.country || "België",
+        email: tenantData.email || "",
+        phone: tenantData.phone || "",
+        website: tenantData.website || "",
+        companyNumber: tenantData.companyNumber || "",
+        companyType: tenantData.companyType || undefined,
+        logoUrl: tenantData.logoUrl || "",
+        primaryColor: tenantData.primaryColor || "#6366f1",
+      });
+      setOrganizationSaved(false);
+    }
+  }, [tenant]);
 
   const userForm = useForm<UserFormData>({
     resolver: zodResolver(userSchema),

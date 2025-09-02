@@ -45,7 +45,7 @@ const organizationSchema = z.object({
 
 const membershipFeeSchema = z.object({
   studentFee: z.string().min(1, "Studentenbijdrage is verplicht"),
-  adultFee: z.string().min(1, "Volwassenenbijdrage is verplicht"),
+  adultFee: z.string().min(1, "Standaardbijdrage is verplicht"),
   seniorFee: z.string().min(1, "Seniorenbijdrage is verplicht"),
   defaultPaymentTerm: z.enum(['MONTHLY', 'YEARLY']),
   defaultPaymentMethod: z.enum(['SEPA', 'OVERSCHRIJVING', 'BANCONTACT', 'CASH']),
@@ -455,7 +455,7 @@ export default function Instellingen() {
                             name="adultFee"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Volwassen Bijdrage</FormLabel>
+                                <FormLabel>Standaard Bijdrage</FormLabel>
                                 <FormControl>
                                   <div className="relative">
                                     <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">€</span>
@@ -733,7 +733,7 @@ export default function Instellingen() {
                                   <FormItem>
                                     <FormLabel>Regelnaam</FormLabel>
                                     <FormControl>
-                                      <Input placeholder="Stemrecht voor volwassen leden" {...field} data-testid="input-rule-name" />
+                                      <Input placeholder="Stemrecht voor standaard leden" {...field} data-testid="input-rule-name" />
                                     </FormControl>
                                     <FormMessage />
                                   </FormItem>

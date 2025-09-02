@@ -84,7 +84,7 @@ export default function Leden() {
       
       // Voting rights filter (based on age and category)
       const votingRightsMatch = votingRightsFilter === "" || 
-        (votingRightsFilter === "yes" && (member.category === "VOLWASSEN" || member.category === "SENIOR")) ||
+        (votingRightsFilter === "yes" && (member.category === "STANDAARD" || member.category === "SENIOR")) ||
         (votingRightsFilter === "no" && (member.category === "STUDENT" || member.category === "JEUGD"));
       
       // Date range filter

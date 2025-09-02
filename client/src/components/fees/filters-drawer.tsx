@@ -133,7 +133,7 @@ export function FiltersDrawer({ filters, onFiltersChange, onReset }: FiltersDraw
                   />
                   <Label htmlFor={category} className="text-sm">
                     {category === "STUDENT" ? "Student" :
-                     category === "VOLWASSEN" ? "Volwassen" : "Senior"}
+                     category === "STANDAARD" ? "Standaard" : "Senior"}
                   </Label>
                 </div>
               ))}

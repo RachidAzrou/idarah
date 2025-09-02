@@ -48,7 +48,7 @@ export default function IncomeByCategoryCard() {
         let category = 'Standaard';
         if (member?.category === 'STUDENT') category = 'Student';
         else if (member?.category === 'SENIOR') category = 'Senior';
-        else if (member?.category === 'VOLWASSEN') category = 'Standaard';
+        else if (member?.category === 'STANDAARD') category = 'Standaard';
         
         if (!acc[category]) {
           acc[category] = 0;

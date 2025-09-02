@@ -25,7 +25,7 @@ export default function MembersByCategoryCard() {
       let category = 'Standaard';
       if (member.category === 'STUDENT') category = 'Student';
       else if (member.category === 'SENIOR') category = 'Senior';
-      else if (member.category === 'VOLWASSEN') category = 'Standaard';
+      else if (member.category === 'STANDAARD') category = 'Standaard';
       
       acc[category] = (acc[category] || 0) + 1;
       return acc;

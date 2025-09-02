@@ -11,7 +11,8 @@ import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileText, Upload, Download, Check, X, AlertTriangle } from "lucide-react";
-import { CiImport, CiExport } from "react-icons/ci";
+import { CiImport } from "react-icons/ci";
+import { MdDownloading } from "react-icons/md";
 
 interface MemberImportDialogProps {
   open: boolean;
@@ -404,7 +405,7 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
                   Download eerst de CSV template met alle benodigde velden en voorbeelden
                 </p>
                 <Button onClick={downloadTemplate} variant="outline" className="gap-2">
-                  <CiExport className="h-4 w-4" />
+                  <MdDownloading className="h-4 w-4" />
                   Download Template
                 </Button>
               </div>

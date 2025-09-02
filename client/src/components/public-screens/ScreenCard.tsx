@@ -6,11 +6,11 @@ import { formatDateBE } from "@/lib/mock/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { CopyField } from "@/components/ui/CopyField";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { MoreHorizontal, Eye, Link2, Power, Edit, Trash2, ExternalLink } from "lucide-react";
+import { Link2, Edit, Trash2, ExternalLink } from "lucide-react";
+import { GiPowerButton } from "react-icons/gi";
 
 interface ScreenCardProps {
   screen: PublicScreen;
@@ -22,6 +22,16 @@ interface ScreenCardProps {
 export function ScreenCard({ screen, onEdit, onToggleStatus, onDelete }: ScreenCardProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showUrlDialog, setShowUrlDialog] = useState(false);
+
+  const handleCopyUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(publicUrl);
+      // Optional: Show toast notification
+    } catch (err) {
+      // Fallback for older browsers
+      setShowUrlDialog(true);
+    }
+  };
 
   const publicUrl = `${window.location.origin}/screen/${screen.publicToken || screen.id}`;
 
@@ -66,41 +76,53 @@ export function ScreenCard({ screen, onEdit, onToggleStatus, onDelete }: ScreenC
                 </Badge>
               </div>
             </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                  <MoreHorizontal className="h-4 w-4" />
-                  <span className="sr-only">Acties</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem onClick={() => setShowUrlDialog(true)}>
-                  <Link2 className="h-4 w-4 mr-2" />
-                  Kopieer URL
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleOpenPublic}>
-                  <ExternalLink className="h-4 w-4 mr-2" />
-                  Open publieke view
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={onEdit}>
-                  <Edit className="h-4 w-4 mr-2" />
-                  Bewerken
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={onToggleStatus}>
-                  <Power className="h-4 w-4 mr-2" />
-                  {screen.active ? "Deactiveren" : "Activeren"}
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem 
-                  onClick={() => setShowDeleteConfirm(true)}
-                  className="text-red-600 focus:text-red-600"
-                >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Verwijderen
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="flex gap-1">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleCopyUrl}
+                className="h-8 w-8 p-0"
+                title="Kopieer URL"
+              >
+                <Link2 className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleOpenPublic}
+                className="h-8 w-8 p-0"
+                title="Open publieke view"
+              >
+                <ExternalLink className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onEdit}
+                className="h-8 w-8 p-0"
+                title="Bewerken"
+              >
+                <Edit className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onToggleStatus}
+                className={`h-8 w-8 p-0 ${screen.active ? 'text-green-600' : 'text-gray-400'}`}
+                title={screen.active ? "Deactiveren" : "Activeren"}
+              >
+                <GiPowerButton className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowDeleteConfirm(true)}
+                className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+                title="Verwijderen"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </CardHeader>
         
@@ -124,16 +146,6 @@ export function ScreenCard({ screen, onEdit, onToggleStatus, onDelete }: ScreenC
             </div>
           </div>
           
-          <div className="flex gap-2 mt-4">
-            <Button variant="outline" size="sm" onClick={() => setShowUrlDialog(true)}>
-              <Eye className="h-4 w-4 mr-1" />
-              Preview
-            </Button>
-            <Button variant="outline" size="sm" onClick={onEdit}>
-              <Edit className="h-4 w-4 mr-1" />
-              Bewerken
-            </Button>
-          </div>
         </CardContent>
       </Card>
 

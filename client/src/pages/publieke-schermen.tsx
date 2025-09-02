@@ -1,18 +1,18 @@
 import { useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Monitor, Plus, Eye, Copy, Settings, Power, PowerOff, ExternalLink } from "lucide-react";
-import { formatDateTime } from "@/lib/format";
+import { Monitor, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ScreenWizard } from "@/components/public-screens/wizard/ScreenWizard";
+import { ScreenCard } from "@/components/public-screens/ScreenCard";
+import { EditScreenDrawer } from "@/components/public-screens/EditScreenDrawer";
+import { apiRequest } from "@/lib/queryClient";
 
 export default function PubliekeSchermen() {
   const [showNewScreenDialog, setShowNewScreenDialog] = useState(false);
+  const [editingScreen, setEditingScreen] = useState<any>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -72,23 +72,34 @@ export default function PubliekeSchermen() {
     }
   };
 
-  const copyPublicUrl = (token: string) => {
-    const url = `${window.location.origin}/public/screen/${token}`;
-    navigator.clipboard.writeText(url);
-    toast({
-      title: "URL gekopieerd",
-      description: "De publieke URL is naar het klembord gekopieerd.",
-    });
-  };
+  const toggleScreenMutation = useMutation({
+    mutationFn: async ({ id, active }: { id: string; active: boolean }) => {
+      const response = await apiRequest("PUT", `/api/public-screens/${id}`, { active });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/public-screens"] });
+      toast({
+        title: "Status gewijzigd",
+        description: "De schermstatus is bijgewerkt.",
+      });
+    },
+  });
 
-  const getScreenTypeLabel = (type: string) => {
-    const labels: Record<string, string> = {
-      'BETAALSTATUS': 'Betaalstatus Matrix',
-      'MEDEDELINGEN': 'Mededelingen Carousel',
-      'LEDENLIJST': 'Ledenlijst',
-    };
-    return labels[type] || type;
-  };
+  const deleteScreenMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const response = await apiRequest("DELETE", `/api/public-screens/${id}`);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/public-screens"] });
+      toast({
+        title: "Scherm verwijderd",
+        description: "Het scherm is succesvol verwijderd.",
+      });
+    },
+  });
+
 
   if (isLoading) {
     return (
@@ -214,105 +225,27 @@ export default function PubliekeSchermen() {
                 </div>
 
                 {/* Screens List */}
-                <Card>
-                  <CardHeader className="px-6 py-6 border-b border-gray-200">
-                    <CardTitle>Publieke Schermen Overzicht</CardTitle>
-                    <p className="text-sm text-gray-500">{Array.isArray(screens) ? screens.length : 0} schermen geconfigureerd</p>
-                  </CardHeader>
-                  
-                  <CardContent className="p-0">
-                    {!Array.isArray(screens) || screens.length === 0 ? (
-                      <div className="p-6 text-center text-gray-500" data-testid="no-screens">
+                <div className="space-y-6">
+                  {!Array.isArray(screens) || screens.length === 0 ? (
+                    <Card>
+                      <CardContent className="p-6 text-center text-gray-500" data-testid="no-screens">
                         Nog geen publieke schermen geconfigureerd
-                      </div>
-                    ) : (
-                      <div className="divide-y divide-gray-200">
-                        {(screens as any[]).map((screen: any) => (
-                          <div key={screen.id} className="p-6 hover:bg-gray-50" data-testid={`screen-item-${screen.id}`}>
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center space-x-4">
-                                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                                  <Monitor className="h-6 w-6 text-purple-600" />
-                                </div>
-                                <div>
-                                  <h3 className="text-lg font-semibold text-gray-900" data-testid={`screen-name-${screen.id}`}>
-                                    {screen.name}
-                                  </h3>
-                                  <div className="flex items-center space-x-2 mt-1">
-                                    <Badge 
-                                      variant={screen.type === 'BETAALSTATUS' ? 'default' : 'secondary'}
-                                      data-testid={`screen-type-${screen.id}`}
-                                    >
-                                      {getScreenTypeLabel(screen.type)}
-                                    </Badge>
-                                    <Badge 
-                                      variant={screen.active ? 'default' : 'destructive'}
-                                      className={screen.active ? 'bg-green-100 text-green-800 hover:bg-green-100' : ''}
-                                      data-testid={`screen-status-${screen.id}`}
-                                    >
-                                      {screen.active ? (
-                                        <div className="flex items-center">
-                                          <Power className="h-3 w-3 mr-1" />
-                                          Actief
-                                        </div>
-                                      ) : (
-                                        <div className="flex items-center">
-                                          <PowerOff className="h-3 w-3 mr-1" />
-                                          Inactief
-                                        </div>
-                                      )}
-                                    </Badge>
-                                  </div>
-                                  <p className="text-sm text-gray-500 mt-1">
-                                    Aangemaakt: {formatDateTime(screen.createdAt)}
-                                  </p>
-                                </div>
-                              </div>
-                              
-                              <div className="flex items-center space-x-2">
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => window.open(`/public/screen/${screen.publicToken}`, '_blank')}
-                                  data-testid={`screen-preview-${screen.id}`}
-                                >
-                                  <Eye className="h-4 w-4 mr-2" />
-                                  Voorvertoning
-                                </Button>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => copyPublicUrl(screen.publicToken)}
-                                  data-testid={`screen-copy-url-${screen.id}`}
-                                >
-                                  <Copy className="h-4 w-4 mr-2" />
-                                  URL Kopiëren
-                                </Button>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  data-testid={`screen-settings-${screen.id}`}
-                                >
-                                  <Settings className="h-4 w-4 mr-2" />
-                                  Instellingen
-                                </Button>
-                              </div>
-                            </div>
-
-                            <div className="mt-4 p-4 bg-gray-50 rounded-xl">
-                              <div className="flex items-center space-x-2 text-sm text-gray-600">
-                                <ExternalLink className="h-4 w-4" />
-                                <span className="font-mono text-xs break-all">
-                                  {window.location.origin}/public/screen/{screen.publicToken}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
+                      </CardContent>
+                    </Card>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {(screens as any[]).map((screen: any) => (
+                        <ScreenCard
+                          key={screen.id}
+                          screen={screen}
+                          onEdit={() => setEditingScreen(screen)}
+                          onToggleStatus={() => toggleScreenMutation.mutate({ id: screen.id, active: !screen.active })}
+                          onDelete={() => deleteScreenMutation.mutate(screen.id)}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
               </TabsContent>
 
               <TabsContent value="announcements" className="space-y-6">
@@ -385,6 +318,20 @@ export default function PubliekeSchermen() {
             open={showNewScreenDialog}
             onOpenChange={setShowNewScreenDialog}
             onComplete={handleCreateScreen}
+          />
+
+          {/* Edit Screen Drawer */}
+          <EditScreenDrawer
+            screen={editingScreen}
+            onClose={() => setEditingScreen(null)}
+            onSave={(updatedScreen) => {
+              queryClient.invalidateQueries({ queryKey: ["/api/public-screens"] });
+              setEditingScreen(null);
+              toast({
+                title: "Scherm bijgewerkt",
+                description: "De wijzigingen zijn opgeslagen.",
+              });
+            }}
           />
         </main>
   );

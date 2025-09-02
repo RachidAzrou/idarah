@@ -29,7 +29,8 @@ import {
   Eye,
   Trash2,
   Edit,
-  KeyRound
+  KeyRound,
+  Copy
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
@@ -90,6 +91,8 @@ export default function Instellingen() {
   const [showEditUserDialog, setShowEditUserDialog] = useState(false);
   const [editingUser, setEditingUser] = useState<any>(null);
   const [showNewRuleDialog, setShowNewRuleDialog] = useState(false);
+  const [showEditRuleDialog, setShowEditRuleDialog] = useState(false);
+  const [editingRule, setEditingRule] = useState<any>(null);
   const [organizationSaved, setOrganizationSaved] = useState(false);
   const [feesSaved, setFeesSaved] = useState(false);
   const { user } = useAuth();
@@ -212,6 +215,15 @@ export default function Instellingen() {
   });
 
   const ruleForm = useForm<RuleFormData>({
+    resolver: zodResolver(ruleSchema),
+    defaultValues: {
+      scope: "STEMRECHT",
+      consecutive: false,
+      categories: [],
+    },
+  });
+
+  const editRuleForm = useForm<RuleFormData>({
     resolver: zodResolver(ruleSchema),
     defaultValues: {
       scope: "STEMRECHT",
@@ -370,6 +382,48 @@ export default function Instellingen() {
     },
   });
 
+  const updateRuleMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: any }) => {
+      const response = await apiRequest("PUT", `/api/rules/${id}`, data);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/rules"] });
+      toast({ title: "Regel bijgewerkt", description: "De regel is succesvol bijgewerkt." });
+      setShowEditRuleDialog(false);
+    },
+    onError: () => {
+      toast({ title: "Fout", description: "Er is een fout opgetreden.", variant: "destructive" });
+    }
+  });
+
+  const deleteRuleMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await apiRequest("DELETE", `/api/rules/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/rules"] });
+      toast({ title: "Regel verwijderd", description: "De regel is succesvol verwijderd." });
+    },
+    onError: () => {
+      toast({ title: "Fout", description: "Er is een fout opgetreden.", variant: "destructive" });
+    }
+  });
+
+  const duplicateRuleMutation = useMutation({
+    mutationFn: async (ruleData: any) => {
+      const response = await apiRequest("POST", "/api/rules", ruleData);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/rules"] });
+      toast({ title: "Regel gedupliceerd", description: "De regel is succesvol gedupliceerd." });
+    },
+    onError: () => {
+      toast({ title: "Fout", description: "Er is een fout opgetreden.", variant: "destructive" });
+    }
+  });
+
   const onOrganizationSubmit = (data: OrganizationFormData) => {
     updateOrganizationMutation.mutate(data);
   };
@@ -388,6 +442,19 @@ export default function Instellingen() {
 
   const onRuleSubmit = (data: RuleFormData) => {
     createRuleMutation.mutate(data);
+  };
+
+  const onEditRuleSubmit = (data: RuleFormData) => {
+    const ruleData = {
+      ...data,
+      parameters: {
+        minYears: data.minYears ? parseInt(data.minYears) : undefined,
+        minPayments: data.minPayments ? parseInt(data.minPayments) : undefined,
+        consecutive: data.consecutive,
+        categories: data.categories,
+      },
+    };
+    updateRuleMutation.mutate({ id: editingRule.id, data: ruleData });
   };
 
   // User management handlers
@@ -421,6 +488,36 @@ export default function Instellingen() {
   const handleDeleteUser = (user: any) => {
     if (confirm(`Weet je zeker dat je ${user.name} wilt verwijderen?`)) {
       deleteUserMutation.mutate(user.id);
+    }
+  };
+
+  const handleEditRule = (rule: any) => {
+    setEditingRule(rule);
+    editRuleForm.reset({
+      name: rule.name,
+      description: rule.description || "",
+      scope: rule.scope,
+      minYears: rule.parameters?.minYears?.toString() || "",
+      minPayments: rule.parameters?.minPayments?.toString() || "",
+      consecutive: rule.parameters?.consecutive || false,
+      categories: rule.parameters?.categories || [],
+    });
+    setShowEditRuleDialog(true);
+  };
+
+  const handleDuplicateRule = (rule: any) => {
+    const duplicatedRule = {
+      name: `${rule.name} (kopie)`,
+      description: rule.description,
+      scope: rule.scope,
+      parameters: rule.parameters,
+    };
+    duplicateRuleMutation.mutate(duplicatedRule);
+  };
+
+  const handleDeleteRule = (rule: any) => {
+    if (confirm(`Weet je zeker dat je de regel "${rule.name}" wilt verwijderen?`)) {
+      deleteRuleMutation.mutate(rule.id);
     }
   };
 
@@ -1268,10 +1365,6 @@ export default function Instellingen() {
                                 </div>
                               </div>
                               <div className="flex items-center space-x-2 ml-4">
-                                <Button variant="outline" size="sm" data-testid={`rule-evaluate-${rule.id}`}>
-                                  <Eye className="h-4 w-4 mr-2" />
-                                  Evalueren
-                                </Button>
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
                                     <Button variant="ghost" size="sm" data-testid={`rule-actions-${rule.id}`}>
@@ -1279,9 +1372,15 @@ export default function Instellingen() {
                                     </Button>
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent align="end">
-                                    <DropdownMenuItem>Bewerken</DropdownMenuItem>
-                                    <DropdownMenuItem>Dupliceren</DropdownMenuItem>
-                                    <DropdownMenuItem className="text-red-600">
+                                    <DropdownMenuItem onClick={() => handleEditRule(rule)} data-testid={`action-edit-rule-${rule.id}`}>
+                                      <Edit className="h-4 w-4 mr-2" />
+                                      Bewerken
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => handleDuplicateRule(rule)} data-testid={`action-duplicate-rule-${rule.id}`}>
+                                      <Copy className="h-4 w-4 mr-2" />
+                                      Dupliceren
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem className="text-red-600" onClick={() => handleDeleteRule(rule)} data-testid={`action-delete-rule-${rule.id}`}>
                                       <Trash2 className="h-4 w-4 mr-2" />
                                       Verwijderen
                                     </DropdownMenuItem>
@@ -1295,6 +1394,133 @@ export default function Instellingen() {
                     )}
                   </CardContent>
                 </Card>
+
+                {/* Edit Rule Dialog */}
+                <Dialog open={showEditRuleDialog} onOpenChange={setShowEditRuleDialog}>
+                  <DialogContent className="max-w-2xl">
+                    <DialogHeader>
+                      <DialogTitle>Organisatieregel Bewerken</DialogTitle>
+                    </DialogHeader>
+                    <Form {...editRuleForm}>
+                      <form onSubmit={editRuleForm.handleSubmit(onEditRuleSubmit)} className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <FormField
+                            control={editRuleForm.control}
+                            name="name"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Regelnaam</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Stemrecht voor standaard leden" {...field} data-testid="input-edit-rule-name" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={editRuleForm.control}
+                            name="scope"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Toepassing</FormLabel>
+                                <Select onValueChange={field.onChange} value={field.value}>
+                                  <FormControl>
+                                    <SelectTrigger data-testid="select-edit-rule-scope">
+                                      <SelectValue placeholder="Selecteer toepassing" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value="STEMRECHT">Stemrecht</SelectItem>
+                                    <SelectItem value="VERKIESBAAR">Verkiesbaarheid</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        <FormField
+                          control={editRuleForm.control}
+                          name="description"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Beschrijving (optioneel)</FormLabel>
+                              <FormControl>
+                                <Textarea placeholder="Uitleg van de regel..." {...field} data-testid="input-edit-rule-description" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <FormField
+                            control={editRuleForm.control}
+                            name="minYears"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Minimaal aantal jaren lid</FormLabel>
+                                <FormControl>
+                                  <Input type="number" placeholder="5" {...field} data-testid="input-edit-rule-min-years" />
+                                </FormControl>
+                                <FormDescription>Optioneel</FormDescription>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={editRuleForm.control}
+                            name="minPayments"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Minimaal aantal betalingen</FormLabel>
+                                <FormControl>
+                                  <Input type="number" placeholder="5" {...field} data-testid="input-edit-rule-min-payments" />
+                                </FormControl>
+                                <FormDescription>Optioneel</FormDescription>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        <FormField
+                          control={editRuleForm.control}
+                          name="consecutive"
+                          render={({ field }) => (
+                            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                              <div className="space-y-0.5">
+                                <FormLabel className="text-base">Opeenvolgende betalingen</FormLabel>
+                                <FormDescription>
+                                  Betalingen moeten opeenvolgend zijn (geen gemiste jaren)
+                                </FormDescription>
+                              </div>
+                              <FormControl>
+                                <Switch
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
+                                  data-testid="switch-edit-rule-consecutive"
+                                />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+
+                        <div className="flex justify-end gap-2 pt-4">
+                          <Button type="button" variant="outline" onClick={() => setShowEditRuleDialog(false)}>
+                            Annuleren
+                          </Button>
+                          <Button type="submit" disabled={updateRuleMutation.isPending} data-testid="button-update-rule">
+                            {updateRuleMutation.isPending ? "Bijwerken..." : "Regel Bijwerken"}
+                          </Button>
+                        </div>
+                      </form>
+                    </Form>
+                  </DialogContent>
+                </Dialog>
               </TabsContent>
             </Tabs>
           </div>

@@ -85,6 +85,7 @@ export interface IStorage {
   getRulesByTenant(tenantId: string): Promise<Rule[]>;
   createRule(rule: InsertRule): Promise<Rule>;
   updateRule(id: string, rule: Partial<InsertRule>): Promise<Rule>;
+  deleteRule(id: string): Promise<void>;
 
   // Rule Outcomes
   getRuleOutcomesByMember(memberId: string): Promise<RuleOutcome[]>;
@@ -302,6 +303,10 @@ export class DatabaseStorage implements IStorage {
   async updateRule(id: string, rule: Partial<InsertRule>): Promise<Rule> {
     const [updatedRule] = await db.update(rules).set(rule).where(eq(rules.id, id)).returning();
     return updatedRule;
+  }
+
+  async deleteRule(id: string): Promise<void> {
+    await db.delete(rules).where(eq(rules.id, id));
   }
 
 

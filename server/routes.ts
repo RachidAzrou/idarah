@@ -467,6 +467,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.put("/api/rules/:id", authMiddleware, tenantMiddleware, async (req, res) => {
+    try {
+      const ruleData = req.body;
+      const rule = await storage.updateRule(req.params.id, ruleData);
+      res.json(rule);
+    } catch (error) {
+      res.status(400).json({ message: "Invalid rule data" });
+    }
+  });
+
+  app.delete("/api/rules/:id", authMiddleware, tenantMiddleware, async (req, res) => {
+    try {
+      await storage.deleteRule(req.params.id);
+      res.json({ message: "Rule deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete rule" });
+    }
+  });
+
   // Public screens routes
   app.get("/api/public-screens", authMiddleware, tenantMiddleware, async (req, res) => {
     try {

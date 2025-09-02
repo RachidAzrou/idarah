@@ -32,7 +32,7 @@ function KpiCard({ title, value, delta, icon, iconBgColor = "bg-blue-50" }: KpiC
             ) : (
               <TrendingDown className="h-3 w-3 text-red-500" />
             )}
-            <span className={`text-xs font-medium ${delta.positive ? 'text-blue-600' : 'text-red-500'}`}>
+            <span className={`text-xs font-medium ${delta.positive ? 'text-green-600' : 'text-red-500'}`}>
               {delta.value}
             </span>
           </div>

@@ -37,6 +37,7 @@ const memberSchema = z.object({
   phone: z.string().optional(),
   street: z.string().min(1, "Straat is verplicht"),
   number: z.string().min(1, "Nummer is verplicht"),
+  bus: z.string().optional(),
   postalCode: z.string().min(1, "Postcode is verplicht"),
   city: z.string().min(1, "Stad is verplicht"),
   country: z.string().min(1, "Land is verplicht").default("België"),
@@ -89,6 +90,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
       phone: '',
       street: '',
       number: '',
+      bus: '',
       postalCode: '',
       city: '',
       country: 'België',
@@ -112,10 +114,14 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
 
   const createMemberMutation = useMutation({
     mutationFn: async (data: MemberFormData) => {
+      console.log('Sending member data to API:', data);
       const response = await apiRequest("POST", "/api/members", data);
-      return response.json();
+      const result = await response.json();
+      console.log('API response:', result);
+      return result;
     },
     onSuccess: () => {
+      console.log('Member created successfully');
       queryClient.invalidateQueries({ queryKey: ["/api/members"] });
       queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
       toast({
@@ -125,6 +131,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
       onSuccess?.();
     },
     onError: (error: any) => {
+      console.error('Member creation error:', error);
       toast({
         title: "Fout bij aanmaken",
         description: error.message || "Er is een fout opgetreden bij het aanmaken van het lid.",
@@ -134,6 +141,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
   });
 
   const onSubmit = (data: MemberFormData) => {
+    console.log('Form submitted with data:', data);
     createMemberMutation.mutate(data);
   };
 

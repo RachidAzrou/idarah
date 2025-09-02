@@ -69,6 +69,7 @@ export const members = pgTable("members", {
   phone: text("phone"),
   street: text("street"),
   number: text("number"),
+  bus: text("bus"),
   postalCode: text("postal_code"),
   city: text("city"),
   country: text("country"),

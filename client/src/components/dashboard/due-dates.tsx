@@ -117,13 +117,6 @@ export default function DueDates() {
           </div>
         ))}
       </div>
-
-      <div className="mt-6 pt-4 border-t border-gray-100">
-        <Button variant="ghost" className="w-full justify-between text-blue-600 hover:text-blue-700 hover:bg-blue-50">
-          <span>Bekijk alle vervaldagen</span>
-          <ChevronRight className="h-4 w-4" />
-        </Button>
-      </div>
     </div>
   );
 }

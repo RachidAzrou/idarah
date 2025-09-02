@@ -199,24 +199,25 @@ export default function LidkaartenPage() {
   };
 
   return (
-    <div className="space-y-8">
-      {/* Page Header */}
-      <div className="mb-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900" data-testid="page-title">Lidkaarten</h1>
-            <p className="mt-1 text-sm text-gray-700">Beheer alle digitale lidkaarten van uw leden</p>
+    <main className="flex-1 py-4">
+      <div className="px-4 sm:px-6 lg:px-8 w-full">
+        {/* Page Header */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900" data-testid="page-title">Lidkaarten</h1>
+              <p className="mt-1 text-sm text-gray-700">Beheer alle digitale lidkaarten van uw leden</p>
+            </div>
+            <Button onClick={handleExport} variant="outline" className="gap-2">
+              <Download className="h-4 w-4" />
+              Exporteer
+            </Button>
           </div>
-          <Button onClick={handleExport} variant="outline" className="gap-2">
-            <Download className="h-4 w-4" />
-            Exporteer
-          </Button>
         </div>
-      </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-        <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow">
+        {/* KPI Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+          <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
             <div className="flex-1">
               <p className="text-xs font-medium text-gray-500 mb-1">Actieve Lidkaarten</p>
@@ -493,6 +494,7 @@ export default function LidkaartenPage() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+      </div>
+    </main>
   );
 }

@@ -6,7 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Member } from "@shared/schema";
 import { formatCurrencyBE, formatDateBE, getMemberCategoryLabel } from "@/lib/format";
-import { User, Calendar, CreditCard, Phone, Mail, MapPin, FileText, Edit, X, UserCircle, Contact, Shield, Settings } from "lucide-react";
+import { User, Calendar, CreditCard, Phone, Mail, MapPin, FileText, Edit, X, UserCircle, Contact, Shield, Settings, Home, Building2, CheckSquare } from "lucide-react";
 
 interface MemberDetailDialogProps {
   member: Member | null;
@@ -47,22 +47,26 @@ export function MemberDetailDialog({ member, open, onClose, onEdit }: MemberDeta
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="personal" className="flex items-center gap-2">
               <UserCircle className="h-4 w-4" />
               <span className="hidden sm:inline">Persoonlijk</span>
             </TabsTrigger>
-            <TabsTrigger value="contact" className="flex items-center gap-2">
-              <Contact className="h-4 w-4" />
-              <span className="hidden sm:inline">Contact</span>
+            <TabsTrigger value="address" className="flex items-center gap-2">
+              <Home className="h-4 w-4" />
+              <span className="hidden sm:inline">Adres</span>
             </TabsTrigger>
-            <TabsTrigger value="membership" className="flex items-center gap-2">
-              <Shield className="h-4 w-4" />
-              <span className="hidden sm:inline">Lidmaatschap</span>
+            <TabsTrigger value="financial" className="flex items-center gap-2">
+              <CreditCard className="h-4 w-4" />
+              <span className="hidden sm:inline">Financieel</span>
             </TabsTrigger>
-            <TabsTrigger value="system" className="flex items-center gap-2">
-              <Settings className="h-4 w-4" />
-              <span className="hidden sm:inline">Systeem</span>
+            <TabsTrigger value="organization" className="flex items-center gap-2">
+              <Building2 className="h-4 w-4" />
+              <span className="hidden sm:inline">Organisatie</span>
+            </TabsTrigger>
+            <TabsTrigger value="permissions" className="flex items-center gap-2">
+              <CheckSquare className="h-4 w-4" />
+              <span className="hidden sm:inline">Toestemmingen</span>
             </TabsTrigger>
           </TabsList>
 
@@ -109,11 +113,11 @@ export function MemberDetailDialog({ member, open, onClose, onEdit }: MemberDeta
             )}
           </TabsContent>
 
-          <TabsContent value="contact" className="space-y-6">
+          <TabsContent value="address" className="space-y-6">
             <div className="space-y-4">
               <h4 className="font-medium flex items-center gap-2">
-                <Mail className="h-4 w-4" />
-                Contactgegevens
+                <Home className="h-4 w-4" />
+                Adresgegevens
               </h4>
               <div className="grid grid-cols-2 gap-6 text-sm">
                 <div>
@@ -167,28 +171,20 @@ export function MemberDetailDialog({ member, open, onClose, onEdit }: MemberDeta
             )}
           </TabsContent>
 
-          <TabsContent value="membership" className="space-y-6">
+          <TabsContent value="financial" className="space-y-6">
             <div className="space-y-4">
               <h4 className="font-medium flex items-center gap-2">
                 <CreditCard className="h-4 w-4" />
-                Lidmaatschap informatie
+                Financiële gegevens
               </h4>
               <div className="grid grid-cols-3 gap-6 text-sm">
                 <div>
-                  <span className="text-gray-500">Lidnummer</span>
-                  <p className="font-mono font-medium">{member.memberNumber}</p>
+                  <span className="text-gray-500">Betaalmethode</span>
+                  <p className="font-medium">{member.paymentMethod || 'SEPA'}</p>
                 </div>
                 <div>
-                  <span className="text-gray-500">Categorie</span>
-                  <p className="font-medium">{getMemberCategoryLabel(member.category)}</p>
-                </div>
-                <div>
-                  <span className="text-gray-500">Status</span>
-                  <p className="font-medium">{member.status === 'ACTIVE' ? 'Actief' : 'Inactief'}</p>
-                </div>
-                <div>
-                  <span className="text-gray-500">Lid sinds</span>
-                  <p className="font-medium">{member.joinDate ? formatDateBE(member.joinDate) : '-'}</p>
+                  <span className="text-gray-500">IBAN</span>
+                  <p className="font-medium font-mono">{member.iban || '-'}</p>
                 </div>
                 <div>
                   <span className="text-gray-500">Lidgeld</span>
@@ -198,11 +194,69 @@ export function MemberDetailDialog({ member, open, onClose, onEdit }: MemberDeta
                   <span className="text-gray-500">SEPA mandaat</span>
                   <p className="font-medium">{member.hasSepaMandate ? 'Actief' : 'Niet actief'}</p>
                 </div>
+                <div>
+                  <span className="text-gray-500">Categorie</span>
+                  <p className="font-medium">{getMemberCategoryLabel(member.category)}</p>
+                </div>
+                <div>
+                  <span className="text-gray-500">Status</span>
+                  <p className="font-medium">{member.status === 'ACTIVE' ? 'Actief' : 'Inactief'}</p>
+                </div>
               </div>
             </div>
           </TabsContent>
 
-          <TabsContent value="system" className="space-y-6">
+          <TabsContent value="organization" className="space-y-6">
+            <div className="space-y-4">
+              <h4 className="font-medium flex items-center gap-2">
+                <Building2 className="h-4 w-4" />
+                Organisatie gegevens
+              </h4>
+              <div className="grid grid-cols-2 gap-6 text-sm">
+                <div>
+                  <span className="text-gray-500">Lidnummer</span>
+                  <p className="font-mono font-medium">{member.memberNumber}</p>
+                </div>
+                <div>
+                  <span className="text-gray-500">Lid sinds</span>
+                  <p className="font-medium">{member.joinDate ? formatDateBE(member.joinDate) : '-'}</p>
+                </div>
+                <div className="col-span-2">
+                  <span className="text-gray-500">Interesse in actieve rol</span>
+                  <p className="font-medium">Niet opgegeven</p>
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="permissions" className="space-y-6">
+            <div className="space-y-4">
+              <h4 className="font-medium flex items-center gap-2">
+                <CheckSquare className="h-4 w-4" />
+                Toestemmingen
+              </h4>
+              <div className="grid grid-cols-1 gap-4 text-sm">
+                <div>
+                  <span className="text-gray-500">Privacy verklaring</span>
+                  <p className="font-medium">Akkoord gegeven</p>
+                </div>
+                <div>
+                  <span className="text-gray-500">Foto/video toestemming</span>
+                  <p className="font-medium">Niet opgegeven</p>
+                </div>
+                <div>
+                  <span className="text-gray-500">Nieuwsbrief</span>
+                  <p className="font-medium">Niet opgegeven</p>
+                </div>
+                <div>
+                  <span className="text-gray-500">WhatsApp lijst</span>
+                  <p className="font-medium">Niet opgegeven</p>
+                </div>
+              </div>
+            </div>
+
+            {/* System Info moved here */}
+            <Separator />
             <div className="space-y-4">
               <h4 className="font-medium flex items-center gap-2">
                 <Calendar className="h-4 w-4" />

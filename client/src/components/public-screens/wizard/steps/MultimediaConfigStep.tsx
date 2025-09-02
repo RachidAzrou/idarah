@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Trash2, Plus, Upload, Eye, GripVertical, ExternalLink, Loader2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 
 interface MultimediaItem {
   id: string;
@@ -108,19 +109,10 @@ export function MultimediaConfigStep({ data, onUpdate }: MultimediaConfigStepPro
         const formData = new FormData();
         formData.append('file', file);
 
-        const response = await fetch('/api/public-screens/upload', {
+        const result = await apiRequest('/api/public-screens/upload', {
           method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          },
           body: formData
         });
-
-        if (!response.ok) {
-          throw new Error('Upload failed');
-        }
-
-        const result = await response.json();
         addMediaItem(result.url, result.type, result.filename);
         toast({
           title: "Upload succesvol",

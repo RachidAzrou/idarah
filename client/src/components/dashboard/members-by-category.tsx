@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { ConcentricRings } from '@/components/charts/concentric-rings';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { useQuery } from '@tanstack/react-query';
 
 export default function MembersByCategoryCard() {
@@ -37,21 +37,24 @@ export default function MembersByCategoryCard() {
         label: 'Standaard',
         count: categoryCounts['Standaard'] || 0,
         percent: totalMembers > 0 ? Math.round(((categoryCounts['Standaard'] || 0) / totalMembers) * 100) : 0,
-        color: '#3B82F6'
+        color: '#3B82F6',
+        value: categoryCounts['Standaard'] || 0
       },
       {
         key: 'senior',
         label: 'Senior',
         count: categoryCounts['Senior'] || 0,
         percent: totalMembers > 0 ? Math.round(((categoryCounts['Senior'] || 0) / totalMembers) * 100) : 0,
-        color: '#1E3A8A'
+        color: '#1E3A8A',
+        value: categoryCounts['Senior'] || 0
       },
       {
         key: 'student',
         label: 'Student',
         count: categoryCounts['Student'] || 0,
         percent: totalMembers > 0 ? Math.round(((categoryCounts['Student'] || 0) / totalMembers) * 100) : 0,
-        color: '#06B6D4'
+        color: '#06B6D4',
+        value: categoryCounts['Student'] || 0
       }
     ];
     
@@ -80,8 +83,38 @@ export default function MembersByCategoryCard() {
       {/* Content Layout - Horizontal for wider space */}
       <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8">
         {/* Left side - Chart */}
-        <div className="flex-shrink-0">
-          <ConcentricRings categories={categories} size={240} />
+        <div className="flex-shrink-0" style={{ width: '240px', height: '240px' }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={categories.filter(cat => cat.value > 0)}
+                dataKey="value"
+                nameKey="label"
+                cx="50%"
+                cy="50%"
+                outerRadius={80}
+                innerRadius={30}
+                paddingAngle={2}
+              >
+                {categories.filter(cat => cat.value > 0).map((category, index) => (
+                  <Cell key={`cell-${index}`} fill={category.color} />
+                ))}
+              </Pie>
+              <Tooltip 
+                formatter={(value: number, name: string) => [
+                  `${value} leden`,
+                  name
+                ]}
+                labelStyle={{ color: '#0F172A' }}
+                contentStyle={{ 
+                  backgroundColor: 'white',
+                  border: '1px solid #E2E8F0',
+                  borderRadius: '8px',
+                  fontSize: '14px'
+                }}
+              />
+            </PieChart>
+          </ResponsiveContainer>
         </div>
 
         {/* Right side - Total + Legend */}

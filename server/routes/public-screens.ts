@@ -1,13 +1,17 @@
 import { Router } from "express";
 import { z } from "zod";
-import { publicScreensStore } from "../../client/src/lib/mock/public-screens";
+import { storage } from "../storage";
 
 const router = Router();
 
 // Get all public screens
 router.get('/', async (req, res) => {
   try {
-    const screens = publicScreensStore.list();
+    const tenantId = req.user?.tenantId;
+    if (!tenantId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const screens = await storage.getPublicScreensByTenant(tenantId);
     res.json(screens);
   } catch (error) {
     console.error('Error fetching public screens:', error);
@@ -18,7 +22,7 @@ router.get('/', async (req, res) => {
 // Get public screen by token (public route)
 router.get('/token/:token', async (req, res) => {
   try {
-    const screen = publicScreensStore.byToken(req.params.token);
+    const screen = await storage.getPublicScreenByToken(req.params.token);
     if (!screen) {
       return res.status(404).json({ error: 'Screen not found' });
     }
@@ -34,13 +38,25 @@ router.post('/', async (req, res) => {
   try {
     const createSchema = z.object({
       name: z.string().min(1),
-      type: z.enum(['PAYMENT_MATRIX', 'ANNOUNCEMENTS']),
+      type: z.enum(['LEDENLIJST', 'MEDEDELINGEN', 'MULTIMEDIA']),
       active: z.boolean(),
-      config: z.any()
+      config: z.any().default({})
     });
 
     const data = createSchema.parse(req.body);
-    const screen = publicScreensStore.create(data);
+    const tenantId = req.user?.tenantId;
+    if (!tenantId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    
+    const screenData = {
+      ...data,
+      tenantId,
+      publicToken: `screen-${Math.random().toString(36).substring(2, 15)}`,
+      config: data.config || {}
+    };
+    
+    const screen = await storage.createPublicScreen(screenData);
     res.status(201).json(screen);
   } catch (error) {
     console.error('Error creating public screen:', error);
@@ -61,7 +77,7 @@ router.put('/:id', async (req, res) => {
     });
 
     const data = updateSchema.parse(req.body);
-    const screen = publicScreensStore.update(req.params.id, data);
+    const screen = await storage.updatePublicScreen(req.params.id, data);
     res.json(screen);
   } catch (error) {
     console.error('Error updating public screen:', error);
@@ -75,7 +91,7 @@ router.put('/:id', async (req, res) => {
 // Delete public screen
 router.delete('/:id', async (req, res) => {
   try {
-    publicScreensStore.remove(req.params.id);
+    await storage.deletePublicScreen(req.params.id);
     res.status(204).send();
   } catch (error) {
     console.error('Error deleting public screen:', error);

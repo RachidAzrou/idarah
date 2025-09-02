@@ -20,7 +20,7 @@ export const memberCategoryEnum = pgEnum('member_category', ['STUDENT', 'VOLWASS
 export const paymentTermEnum = pgEnum('payment_term', ['MONTHLY', 'YEARLY']);
 export const paymentMethodEnum = pgEnum('payment_method', ['SEPA', 'OVERSCHRIJVING', 'BANCONTACT', 'CASH']);
 export const feeStatusEnum = pgEnum('fee_status', ['OPEN', 'PAID', 'OVERDUE']);
-export const screenTypeEnum = pgEnum('screen_type', ['BETAALSTATUS', 'MEDEDELINGEN']);
+export const screenTypeEnum = pgEnum('screen_type', ['LEDENLIJST', 'MEDEDELINGEN', 'MULTIMEDIA']);
 export const cardStatusEnum = pgEnum('card_status', ['ACTUEEL', 'MOMENTOPNAME', 'VERLOPEN']);
 export const ruleScopeEnum = pgEnum('rule_scope', ['STEMRECHT', 'VERKIESBAAR', 'FUNCTIE']);
 

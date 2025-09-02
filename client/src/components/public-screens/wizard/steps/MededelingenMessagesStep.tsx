@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, Plus, GripVertical, Eye, EyeOff } from "lucide-react";
+import { Trash2, Plus, GripVertical, Eye, EyeOff, ChevronUp, ChevronDown } from "lucide-react";
 import { ColorPicker } from "@/components/ui/color-wheel";
 import { MededelingenSlide } from "@/lib/mock/public-screens";
 
@@ -191,6 +191,31 @@ export function MededelingenMessagesStep({ data, onUpdate }: MededelingenMessage
                   </Badge>
                 </div>
                 <div className="flex items-center gap-2">
+                  {/* Volgorde knoppen */}
+                  {settings.slides.length > 1 && (
+                    <>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => moveSlide(index, index - 1)}
+                        disabled={index === 0}
+                        data-testid={`move-up-${slide.id}`}
+                        title="Omhoog"
+                      >
+                        <ChevronUp className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => moveSlide(index, index + 1)}
+                        disabled={index === settings.slides.length - 1}
+                        data-testid={`move-down-${slide.id}`}
+                        title="Omlaag"
+                      >
+                        <ChevronDown className="h-4 w-4" />
+                      </Button>
+                    </>
+                  )}
                   <Button
                     variant="outline"
                     size="sm"

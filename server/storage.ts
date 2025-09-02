@@ -267,6 +267,15 @@ export class DatabaseStorage implements IStorage {
     return newScreen;
   }
 
+  async updatePublicScreen(id: string, screen: Partial<InsertPublicScreen>): Promise<PublicScreen> {
+    const [updatedScreen] = await db.update(publicScreens).set(screen).where(eq(publicScreens.id, id)).returning();
+    return updatedScreen;
+  }
+
+  async deletePublicScreen(id: string): Promise<void> {
+    await db.delete(publicScreens).where(eq(publicScreens.id, id));
+  }
+
   // Announcements
   async getAnnouncementsByTenant(tenantId: string): Promise<Announcement[]> {
     return await db.select().from(announcements)
@@ -332,7 +341,7 @@ export class DatabaseStorage implements IStorage {
 
     const [activeMembersResult] = await db.select({ count: sql<number>`count(*)` })
       .from(members)
-      .where(and(eq(members.tenantId, tenantId), eq(members.active, true)));
+      .where(and(eq(members.tenantId, tenantId), eq(members.isActive, true)));
 
     const [totalRevenueResult] = await db.select({ sum: sql<number>`coalesce(sum(amount), 0)` })
       .from(membershipFees)

@@ -36,6 +36,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { formatCurrency, formatDate } from "@/lib/format";
+import { RiAdminLine } from "react-icons/ri";
 
 // Schemas for form validation
 const organizationSchema = z.object({
@@ -1076,7 +1077,11 @@ export default function Instellingen() {
                           <div key={user.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-xl" data-testid={`user-item-${user.id}`}>
                             <div className="flex items-center space-x-4">
                               <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-                                <Users className="h-5 w-5 text-primary-foreground" />
+                                {user.role === 'BEHEERDER' ? (
+                                  <RiAdminLine className="h-5 w-5 text-primary-foreground" />
+                                ) : (
+                                  <Users className="h-5 w-5 text-primary-foreground" />
+                                )}
                               </div>
                               <div>
                                 <div className="font-medium text-gray-900" data-testid={`user-name-${user.id}`}>

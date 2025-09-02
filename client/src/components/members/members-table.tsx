@@ -379,10 +379,14 @@ function SkeletonTable() {
 
 function EmptyState() {
   return (
-    <div className="p-12 text-center">
-      <Users className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-      <h3 className="text-lg font-medium text-gray-900 mb-2">Geen leden gevonden</h3>
-      <p className="text-gray-500">
+    <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+      <div className="flex items-center justify-center w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full mb-4">
+        <Users className="w-8 h-8 text-gray-400" />
+      </div>
+      <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+        Geen leden gevonden
+      </h3>
+      <p className="text-gray-500 dark:text-gray-400 mb-6 max-w-sm">
         Voeg je eerste lid toe om te beginnen met het beheren van je ledenbestand.
       </p>
     </div>

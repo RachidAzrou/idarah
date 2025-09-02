@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, ArrowUpDown } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, ArrowUpDown, CreditCard } from "lucide-react";
 import { Fee } from "@shared/fees-schema";
 import { formatCurrencyBE, formatPeriodBE, formatDateBE } from "@/lib/format";
 import { RowActions } from "./row-actions";
@@ -116,10 +116,17 @@ export function FeesTable({
           <TableBody>
             {!fees?.length ? (
               <TableRow>
-                <TableCell colSpan={9} className="text-center py-8">
-                  <div className="text-gray-500">
-                    <p>Geen lidgelden gevonden</p>
-                    <p className="text-sm mt-1">Pas je filters aan om resultaten te zien</p>
+                <TableCell colSpan={9} className="text-center py-12">
+                  <div className="flex flex-col items-center justify-center px-4 text-center">
+                    <div className="flex items-center justify-center w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full mb-4">
+                      <CreditCard className="w-8 h-8 text-gray-400" />
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+                      Geen lidgelden gevonden
+                    </h3>
+                    <p className="text-gray-500 dark:text-gray-400 max-w-sm">
+                      Pas je filters aan om resultaten te zien
+                    </p>
                   </div>
                 </TableCell>
               </TableRow>

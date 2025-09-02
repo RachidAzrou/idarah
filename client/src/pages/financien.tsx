@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BarChart3, TrendingUp, Download, Search, Plus, Euro, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { BarChart3, TrendingUp, Download, Search, Plus, Euro, ArrowUpRight, ArrowDownRight, CreditCard } from "lucide-react";
 import { formatCurrency, formatDate, formatDateTime } from "@/lib/format";
 import { useState } from "react";
 
@@ -212,8 +212,16 @@ export default function Financien() {
                   
                   <CardContent className="p-0">
                     {filteredTransactions.length === 0 ? (
-                      <div className="p-6 text-center text-gray-500" data-testid="no-transactions">
-                        {searchTerm ? 'Geen transacties gevonden voor deze zoekopdracht' : 'Nog geen transacties toegevoegd'}
+                      <div className="flex flex-col items-center justify-center py-12 px-4 text-center" data-testid="no-transactions">
+                        <div className="flex items-center justify-center w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full mb-4">
+                          <CreditCard className="w-8 h-8 text-gray-400" />
+                        </div>
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+                          {searchTerm ? 'Geen transacties gevonden' : 'Nog geen transacties toegevoegd'}
+                        </h3>
+                        <p className="text-gray-500 dark:text-gray-400 max-w-sm">
+                          {searchTerm ? 'Probeer je zoekcriteria aan te passen' : 'Transacties worden hier weergegeven wanneer ze worden toegevoegd.'}
+                        </p>
                       </div>
                     ) : (
                       <div className="overflow-hidden">

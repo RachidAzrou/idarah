@@ -3,7 +3,7 @@ import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getUserInitials } from "@/lib/auth";
-import { MoreVertical } from "lucide-react";
+import { MoreVertical, Users } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { nl } from "date-fns/locale";
 import { Link } from "wouter";
@@ -63,8 +63,16 @@ export default function RecentMembers() {
       
       <CardContent className="p-0">
         {recentMembers.length === 0 ? (
-          <div className="p-6 text-center text-gray-500" data-testid="no-recent-members">
-            Geen recente leden gevonden
+          <div className="flex flex-col items-center justify-center py-12 px-4 text-center" data-testid="no-recent-members">
+            <div className="flex items-center justify-center w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full mb-4">
+              <Users className="w-8 h-8 text-gray-400" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+              Geen recente leden gevonden
+            </h3>
+            <p className="text-gray-500 dark:text-gray-400 max-w-sm">
+              Voeg je eerste lid toe om recente activiteit te zien.
+            </p>
           </div>
         ) : (
           <div className="overflow-hidden">

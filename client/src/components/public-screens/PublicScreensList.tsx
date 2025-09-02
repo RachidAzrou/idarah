@@ -6,7 +6,7 @@ import { PublicScreen } from "@/lib/mock/public-screens";
 import { ScreenCard } from "./ScreenCard";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search } from "lucide-react";
+import { Search, Monitor } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface PublicScreensListProps {
@@ -129,14 +129,19 @@ export function PublicScreensList({ onEdit, onDelete }: PublicScreensListProps) 
 
       {/* Results */}
       {filteredScreens.length === 0 ? (
-        <div className="text-center py-12">
-          <div className="text-gray-400 mb-2">Geen schermen gevonden</div>
-          <div className="text-sm text-gray-500">
+        <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+          <div className="flex items-center justify-center w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full mb-4">
+            <Monitor className="w-8 h-8 text-gray-400" />
+          </div>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+            Geen schermen gevonden
+          </h3>
+          <p className="text-gray-500 dark:text-gray-400 mb-6 max-w-sm">
             {searchTerm || typeFilter !== "ALL" || statusFilter !== "ALL" 
               ? "Probeer je zoekcriteria aan te passen" 
               : "Maak je eerste publiek scherm aan"
             }
-          </div>
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

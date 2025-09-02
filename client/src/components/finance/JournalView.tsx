@@ -9,6 +9,7 @@ import { Transaction } from "@/lib/mock/transactions";
 import { MethodChip } from "@/components/ui/MethodChip";
 import { MdOutbox } from "react-icons/md";
 import { HiInboxIn, HiInbox } from "react-icons/hi";
+import { CreditCard } from "lucide-react";
 
 interface JournalViewProps {
   transactions: Transaction[];
@@ -165,8 +166,18 @@ export function JournalView({ transactions }: JournalViewProps) {
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center text-gray-500 dark:text-gray-400 py-8">
-                        Geen uitgaven gevonden
+                      <TableCell colSpan={6} className="text-center py-12">
+                        <div className="flex flex-col items-center justify-center px-4 text-center">
+                          <div className="flex items-center justify-center w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full mb-4">
+                            <CreditCard className="w-8 h-8 text-gray-400" />
+                          </div>
+                          <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+                            Geen uitgaven gevonden
+                          </h3>
+                          <p className="text-gray-500 dark:text-gray-400 max-w-sm">
+                            Uitgaven worden hier weergegeven wanneer ze worden toegevoegd.
+                          </p>
+                        </div>
                       </TableCell>
                     </TableRow>
                   )}
@@ -207,8 +218,18 @@ export function JournalView({ transactions }: JournalViewProps) {
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center text-gray-500 dark:text-gray-400 py-8">
-                        Geen inkomsten gevonden
+                      <TableCell colSpan={6} className="text-center py-12">
+                        <div className="flex flex-col items-center justify-center px-4 text-center">
+                          <div className="flex items-center justify-center w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full mb-4">
+                            <CreditCard className="w-8 h-8 text-gray-400" />
+                          </div>
+                          <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+                            Geen inkomsten gevonden
+                          </h3>
+                          <p className="text-gray-500 dark:text-gray-400 max-w-sm">
+                            Inkomsten worden hier weergegeven wanneer ze worden toegevoegd.
+                          </p>
+                        </div>
                       </TableCell>
                     </TableRow>
                   )}

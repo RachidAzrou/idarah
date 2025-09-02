@@ -99,17 +99,17 @@ export default function IncomeByCategoryCard() {
         {data.map((item, index) => {
           const widthPercentage = maxAmount > 0 ? (item.amount / maxAmount) * 100 : 0;
           
-          // Colors consistent with Leden per categorie
-          const getBarColor = (category: string) => {
+          // Gradient colors for each category
+          const getBarGradient = (category: string) => {
             switch (category) {
               case 'Senior':
-                return '#1E3A8A'; // Dark blue
+                return 'linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%)'; // Dark blue to medium blue
               case 'Standaard':
-                return '#3B82F6'; // Medium blue
+                return 'linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%)'; // Medium blue to light blue
               case 'Student':
-                return '#06B6D4'; // Light blue/cyan
+                return 'linear-gradient(135deg, #06B6D4 0%, #67E8F9 100%)'; // Cyan to light cyan
               default:
-                return '#3B82F6'; // Default blue
+                return 'linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%)'; // Default gradient
             }
           };
           

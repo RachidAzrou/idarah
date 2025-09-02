@@ -13,16 +13,19 @@ import { ImportDialog } from "@/components/finance/ImportDialog";
 import { ExportDialog } from "@/components/finance/ExportDialog";
 import { JournalView } from "@/components/finance/JournalView";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
-import { transactions as mockTransactions, Transaction, generateTransactionId } from "@/lib/mock/transactions";
 import { FilterData } from "@/lib/zod/transaction";
 import { Plus, BarChart3, BookOpen } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 
 export default function FinancePage() {
-  // State management
-  const [transactions, setTransactions] = useState<Transaction[]>(mockTransactions);
-  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
-  const [editTransaction, setEditTransaction] = useState<Transaction | null>(null);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  
+  // State management - now using real API data
+  const [selectedTransaction, setSelectedTransaction] = useState<any | null>(null);
+  const [editTransaction, setEditTransaction] = useState<any | null>(null);
   const [deleteTransactionId, setDeleteTransactionId] = useState<string>('');
   
   // UI state
@@ -50,7 +53,10 @@ export default function FinancePage() {
   // Period filter state
   const [periodFilter, setPeriodFilter] = useState('ALL');
   
-  const { toast } = useToast();
+  // Fetch transactions from API
+  const { data: transactions = [], isLoading } = useQuery({
+    queryKey: ["/api/transactions"],
+  });
 
   // Apply period filters to date range
   const getDateRangeFromPeriod = (period: string) => {

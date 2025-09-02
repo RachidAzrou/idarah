@@ -9,14 +9,17 @@ import { FeesTable } from "@/components/fees/fees-table";
 import { FeeDetailSlideout } from "@/components/fees/fee-detail-slideout";
 import { ImportDialog } from "@/components/fees/import-dialog";
 import { SepaDialog } from "@/components/fees/sepa-dialog";
-import { generateMockFees, filterFees, sortFees, paginateFees, markPaid } from "@/lib/mock/fees";
-import { Fee } from "@shared/fees-schema";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Lidgelden() {
-  // Data state
-  const [allFees] = useState<Fee[]>(() => generateMockFees());
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  
+  // Data state - now using real API
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [selectedFee, setSelectedFee] = useState<Fee | null>(null);
+  const [selectedFee, setSelectedFee] = useState<any | null>(null);
 
   // Filters and search
   const [searchTerm, setSearchTerm] = useState("");
@@ -43,29 +46,60 @@ export default function Lidgelden() {
   const [showSepaDialog, setShowSepaDialog] = useState(false);
   const [showNewFeeDialog, setShowNewFeeDialog] = useState(false);
 
+  // Fetch membership fees from API
+  const { data: allFees = [], isLoading } = useQuery({
+    queryKey: ["/api/fees"],
+  });
+
   // Apply filters and sorting
   const filteredFees = useMemo(() => {
-    const filters = {
-      search: searchTerm,
-      status: statusFilter,
-      year: yearFilter,
-      method: methodFilter,
-      categories: categoryFilter === "all" ? [] : [categoryFilter],
-      amountMin,
-      amountMax,
-      paidFrom,
-      paidTo,
-      onlyWithMandate,
-      onlyOverdue,
-    };
+    if (!allFees?.length) return [];
     
-    const filtered = filterFees(allFees, filters);
-    return sortFees(filtered, sortBy, sortOrder);
-  }, [allFees, searchTerm, statusFilter, yearFilter, methodFilter, categoryFilter, amountMin, amountMax, paidFrom, paidTo, onlyWithMandate, onlyOverdue, sortBy, sortOrder]);
+    return allFees.filter((fee: any) => {
+      // Search filter
+      const searchMatch = searchTerm === "" || 
+        fee.memberName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        fee.memberNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        fee.type?.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      // Status filter
+      const statusMatch = statusFilter === "all" || fee.status === statusFilter;
+      
+      // Year filter
+      const yearMatch = yearFilter === "all" || 
+        new Date(fee.periodStart).getFullYear().toString() === yearFilter;
+      
+      // Method filter
+      const methodMatch = methodFilter === "all" || fee.method === methodFilter;
+      
+      // Category filter
+      const categoryMatch = categoryFilter === "all" || fee.type === categoryFilter;
+      
+      return searchMatch && statusMatch && yearMatch && methodMatch && categoryMatch;
+    }).sort((a: any, b: any) => {
+      const aValue = a[sortBy as keyof typeof a];
+      const bValue = b[sortBy as keyof typeof b];
+      if (sortOrder === "asc") {
+        return aValue > bValue ? 1 : -1;
+      } else {
+        return aValue < bValue ? 1 : -1;
+      }
+    });
+  }, [allFees, searchTerm, statusFilter, yearFilter, methodFilter, categoryFilter, sortBy, sortOrder]);
 
   // Paginate results
   const paginatedResult = useMemo(() => {
-    return paginateFees(filteredFees, page, perPage);
+    const start = (page - 1) * perPage;
+    const end = start + perPage;
+    const items = filteredFees.slice(start, end);
+    return {
+      items,
+      totalCount: filteredFees.length,
+      totalPages: Math.ceil(filteredFees.length / perPage),
+      currentPage: page,
+      hasNext: page < Math.ceil(filteredFees.length / perPage),
+      hasPrev: page > 1
+    };
   }, [filteredFees, page, perPage]);
 
   // Selected fees for bulk actions
@@ -97,10 +131,29 @@ export default function Lidgelden() {
     }
   };
 
-  const handleMarkPaid = (fees: Fee[]) => {
-    // In a real app, this would call an API
-    console.log("Marking paid:", fees.map(f => f.id));
-    // For now, just remove from selection
+  const markPaidMutation = useMutation({
+    mutationFn: async (feeId: string) => {
+      const response = await apiRequest("PUT", `/api/fees/${feeId}/mark-paid`, {});
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/fees"] });
+      toast({
+        title: "Lidgeld gemarkeerd als betaald",
+        description: "De betaalstatus is bijgewerkt.",
+      });
+    },
+    onError: () => {
+      toast({
+        variant: "destructive",
+        title: "Fout",
+        description: "Kon lidgeld niet markeren als betaald.",
+      });
+    },
+  });
+
+  const handleMarkPaid = (fees: any[]) => {
+    fees.forEach(fee => markPaidMutation.mutate(fee.id));
     setSelectedIds(prev => prev.filter(id => !fees.find(f => f.id === id)));
   };
 

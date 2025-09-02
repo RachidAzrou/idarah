@@ -1,9 +1,62 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { ConcentricRings } from '@/components/charts/concentric-rings';
-import { membersByCategory } from '@/lib/mock/members-by-category';
+import { useQuery } from '@tanstack/react-query';
 
 export default function MembersByCategoryCard() {
-  const { total, categories } = membersByCategory;
+  const { data: members } = useQuery({
+    queryKey: ["/api/members"],
+  });
+  
+  const { total, categories } = useMemo(() => {
+    if (!Array.isArray(members)) {
+      return {
+        total: 0,
+        categories: [
+          { key: 'senior', label: 'Senior', count: 0, percent: 0, color: '#1E3A8A' },
+          { key: 'standaard', label: 'Standaard', count: 0, percent: 0, color: '#3B82F6' },
+          { key: 'student', label: 'Student', count: 0, percent: 0, color: '#06B6D4' },
+        ]
+      };
+    }
+    
+    const totalMembers = members.length;
+    const categoryCounts = members.reduce((acc: any, member: any) => {
+      // Map database categories to display categories
+      let category = 'Standaard';
+      if (member.category === 'STUDENT') category = 'Student';
+      else if (member.category === 'SENIOR') category = 'Senior';
+      else if (member.category === 'VOLWASSEN') category = 'Standaard';
+      
+      acc[category] = (acc[category] || 0) + 1;
+      return acc;
+    }, {});
+    
+    const categories = [
+      {
+        key: 'senior',
+        label: 'Senior',
+        count: categoryCounts['Senior'] || 0,
+        percent: totalMembers > 0 ? Math.round(((categoryCounts['Senior'] || 0) / totalMembers) * 100) : 0,
+        color: '#1E3A8A'
+      },
+      {
+        key: 'standaard',
+        label: 'Standaard',
+        count: categoryCounts['Standaard'] || 0,
+        percent: totalMembers > 0 ? Math.round(((categoryCounts['Standaard'] || 0) / totalMembers) * 100) : 0,
+        color: '#3B82F6'
+      },
+      {
+        key: 'student',
+        label: 'Student',
+        count: categoryCounts['Student'] || 0,
+        percent: totalMembers > 0 ? Math.round(((categoryCounts['Student'] || 0) / totalMembers) * 100) : 0,
+        color: '#06B6D4'
+      }
+    ];
+    
+    return { total: totalMembers, categories };
+  }, [members]);
 
   return (
     <div 

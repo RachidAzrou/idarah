@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { SegmentedControl } from '@/components/ui/segmented-control';
-import { yearly, monthly } from '@/lib/mock/income';
+import { useQuery } from '@tanstack/react-query';
 import { formatCurrencyShortEUR } from '@/lib/utils/currency';
 
 interface IncomeData {
@@ -11,8 +11,67 @@ interface IncomeData {
 
 export default function IncomeByCategoryCard() {
   const [period, setPeriod] = useState<'monthly' | 'yearly'>('yearly');
-  const data = period === 'yearly' ? yearly : monthly;
-  const maxAmount = Math.max(...data.map(item => item.amount));
+  
+  const { data: transactions } = useQuery({
+    queryKey: ["/api/transactions"],
+  });
+  
+  const { data: members } = useQuery({
+    queryKey: ["/api/members"],
+  });
+  
+  const data = useMemo(() => {
+    if (!Array.isArray(transactions) || !Array.isArray(members)) {
+      return [
+        { category: 'Senior', amount: 0, members: 0 },
+        { category: 'Standaard', amount: 0, members: 0 },
+        { category: 'Student', amount: 0, members: 0 },
+      ];
+    }
+    
+    // Groepeer leden per categorie
+    const membersByCategory = members.reduce((acc: any, member: any) => {
+      const category = member.membershipType || 'Standaard';
+      if (!acc[category]) {
+        acc[category] = { count: 0, totalIncome: 0 };
+      }
+      acc[category].count++;
+      return acc;
+    }, {});
+    
+    // Bereken inkomsten per categorie
+    const incomeByCategory = transactions
+      .filter((t: any) => t.type === 'INCOME')
+      .reduce((acc: any, transaction: any) => {
+        const member = members.find((m: any) => m.id === transaction.memberId);
+        // Map database categories to display categories
+        let category = 'Standaard';
+        if (member?.category === 'STUDENT') category = 'Student';
+        else if (member?.category === 'SENIOR') category = 'Senior';
+        else if (member?.category === 'VOLWASSEN') category = 'Standaard';
+        
+        if (!acc[category]) {
+          acc[category] = 0;
+        }
+        acc[category] += Math.abs(parseFloat(transaction.amount));
+        return acc;
+      }, {});
+    
+    // Combineer data
+    const result = Object.keys(membersByCategory).map(category => ({
+      category,
+      amount: incomeByCategory[category] || 0,
+      members: membersByCategory[category].count
+    }));
+    
+    return result.length > 0 ? result : [
+      { category: 'Senior', amount: 0, members: 0 },
+      { category: 'Standaard', amount: 0, members: 0 },
+      { category: 'Student', amount: 0, members: 0 },
+    ];
+  }, [transactions, members, period]);
+  
+  const maxAmount = Math.max(...data.map(item => item.amount), 1);
 
   const periodOptions = [
     { value: 'monthly', label: 'Maandelijks' },
@@ -34,21 +93,20 @@ export default function IncomeByCategoryCard() {
         />
       </div>
 
-
       {/* Horizontal Bars */}
       <div className="space-y-6">
         {data.map((item, index) => {
-          const widthPercentage = (item.amount / maxAmount) * 100;
+          const widthPercentage = maxAmount > 0 ? (item.amount / maxAmount) * 100 : 0;
           
           // Colors consistent with Leden per categorie
           const getBarColor = (category: string) => {
             switch (category) {
               case 'Senior':
-                return '#1E3A8A'; // Dark blue - same as members
+                return '#1E3A8A'; // Dark blue
               case 'Standaard':
-                return '#3B82F6'; // Medium blue - same as members
+                return '#3B82F6'; // Medium blue
               case 'Student':
-                return '#06B6D4'; // Light blue/cyan - same as members
+                return '#06B6D4'; // Light blue/cyan
               default:
                 return '#3B82F6'; // Default blue
             }

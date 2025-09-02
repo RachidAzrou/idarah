@@ -62,7 +62,7 @@ export const members = pgTable("members", {
   city: text("city"),
   country: text("country"),
   joinDate: timestamp("join_date"),
-  isActive: boolean("is_active").default(true).notNull(),
+  active: boolean("active").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

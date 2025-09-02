@@ -1,10 +1,65 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StackedBars } from '@/components/charts/stacked-bars';
-import { ageGender } from '@/lib/mock/age-gender';
+import { useQuery } from '@tanstack/react-query';
 import { calcPercents } from '@/lib/utils/age-gender';
 
 export default function AgeGenderCard() {
-  const { total, buckets } = ageGender;
+  const { data: members } = useQuery({
+    queryKey: ["/api/members"],
+  });
+  
+  const { total, buckets } = useMemo(() => {
+    if (!Array.isArray(members)) {
+      return {
+        total: 0,
+        buckets: [
+          { range: '18-25', male: 0, female: 0 },
+          { range: '26-35', male: 0, female: 0 },
+          { range: '36-45', male: 0, female: 0 },
+          { range: '46-55', male: 0, female: 0 },
+          { range: '56-65', male: 0, female: 0 },
+          { range: '65+', male: 0, female: 0 },
+        ]
+      };
+    }
+    
+    const totalMembers = members.length;
+    
+    // Bereken leeftijd uit geboortedatum en groepeer per categorie en geslacht
+    const ageBuckets = {
+      '18-25': { male: 0, female: 0 },
+      '26-35': { male: 0, female: 0 },
+      '36-45': { male: 0, female: 0 },
+      '46-55': { male: 0, female: 0 },
+      '56-65': { male: 0, female: 0 },
+      '65+': { male: 0, female: 0 },
+    };
+    
+    members.forEach((member: any) => {
+      if (!member.birthDate) return;
+      
+      const age = new Date().getFullYear() - new Date(member.birthDate).getFullYear();
+      const gender = member.gender === 'M' ? 'male' : 'female';
+      
+      let bucket = '65+';
+      if (age >= 18 && age <= 25) bucket = '18-25';
+      else if (age >= 26 && age <= 35) bucket = '26-35';
+      else if (age >= 36 && age <= 45) bucket = '36-45';
+      else if (age >= 46 && age <= 55) bucket = '46-55';
+      else if (age >= 56 && age <= 65) bucket = '56-65';
+      
+      ageBuckets[bucket as keyof typeof ageBuckets][gender as 'male' | 'female']++;
+    });
+    
+    const buckets = Object.entries(ageBuckets).map(([range, counts]) => ({
+      range,
+      male: counts.male,
+      female: counts.female
+    }));
+    
+    return { total: totalMembers, buckets };
+  }, [members]);
+  
   const enrichedBuckets = calcPercents(buckets, total);
 
   return (

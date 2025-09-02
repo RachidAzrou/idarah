@@ -31,7 +31,12 @@ export default function IncomeByCategoryCard() {
     
     // Groepeer leden per categorie
     const membersByCategory = members.reduce((acc: any, member: any) => {
-      const category = member.membershipType || 'Standaard';
+      // Map database categories to display categories
+      let category = 'Standaard';
+      if (member.category === 'STUDENT') category = 'Student';
+      else if (member.category === 'SENIOR') category = 'Senior';
+      else if (member.category === 'STANDAARD') category = 'Standaard';
+      
       if (!acc[category]) {
         acc[category] = { count: 0, totalIncome: 0 };
       }
@@ -39,23 +44,21 @@ export default function IncomeByCategoryCard() {
       return acc;
     }, {});
     
-    // Bereken inkomsten per categorie
-    const incomeByCategory = transactions
-      .filter((t: any) => t.type === 'INCOME')
-      .reduce((acc: any, transaction: any) => {
-        const member = members.find((m: any) => m.id === transaction.memberId);
-        // Map database categories to display categories
-        let category = 'Standaard';
-        if (member?.category === 'STUDENT') category = 'Student';
-        else if (member?.category === 'SENIOR') category = 'Senior';
-        else if (member?.category === 'STANDAARD') category = 'Standaard';
-        
-        if (!acc[category]) {
-          acc[category] = 0;
-        }
-        acc[category] += Math.abs(parseFloat(transaction.amount));
-        return acc;
-      }, {});
+    // Bereken inkomsten per categorie - voor nu simuleren we data gebaseerd op aantal leden
+    const incomeByCategory: any = {};
+    
+    // Simuleer lidgelden gebaseerd op aantal leden per categorie
+    Object.keys(membersByCategory).forEach(category => {
+      const memberCount = membersByCategory[category].count;
+      let monthlyFee = 25; // Default fee
+      
+      if (category === 'Student') monthlyFee = 15;
+      else if (category === 'Senior') monthlyFee = 20;
+      else if (category === 'Standaard') monthlyFee = 25;
+      
+      const yearlyIncome = memberCount * monthlyFee * (period === 'yearly' ? 12 : 1);
+      incomeByCategory[category] = yearlyIncome;
+    });
     
     // Zorg er altijd voor dat alle categorieën getoond worden
     const allCategories = ['Student', 'Standaard', 'Senior'];

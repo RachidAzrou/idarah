@@ -816,13 +816,13 @@ export default function Instellingen() {
                   </CardHeader>
                   
                   <CardContent>
-                    {!users || users.length === 0 ? (
+                    {!users || !Array.isArray(users) || users.length === 0 ? (
                       <div className="text-center py-6 text-gray-500" data-testid="no-users">
                         Nog geen gebruikers toegevoegd
                       </div>
                     ) : (
                       <div className="space-y-4">
-                        {users.map((user: any) => (
+                        {Array.isArray(users) && users.map((user: any) => (
                           <div key={user.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-xl" data-testid={`user-item-${user.id}`}>
                             <div className="flex items-center space-x-4">
                               <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
@@ -1009,13 +1009,13 @@ export default function Instellingen() {
                   </CardHeader>
                   
                   <CardContent>
-                    {!rules || rules.length === 0 ? (
+                    {!rules || !Array.isArray(rules) || rules.length === 0 ? (
                       <div className="text-center py-6 text-gray-500" data-testid="no-rules">
                         Nog geen organisatieregels geconfigureerd
                       </div>
                     ) : (
                       <div className="space-y-4">
-                        {rules.map((rule: any) => (
+                        {Array.isArray(rules) && rules.map((rule: any) => (
                           <div key={rule.id} className="p-4 border border-gray-200 rounded-xl" data-testid={`rule-item-${rule.id}`}>
                             <div className="flex items-start justify-between">
                               <div className="flex-1">

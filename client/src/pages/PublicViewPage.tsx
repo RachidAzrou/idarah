@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "wouter";
 import { LedenlijstView } from "@/components/public-view/LedenlijstView";
 import { publicScreensStore } from "@/lib/mock/public-screens";
-import backgroundImage from "@assets/ramadan_15_03_2022_1_1756802762060.jpg";
+import backgroundImage from "../assets/background.jpg";
 
 export function PublicViewPage() {
   const { screenId } = useParams();

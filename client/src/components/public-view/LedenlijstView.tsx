@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { LedenlijstConfig } from "@/lib/mock/public-screens";
 import { mockMembers, monthNames, getFilteredMembers, getMemberDisplayName, Member } from "@/lib/mock/members-data";
 import { Check, X, Vote } from "lucide-react";
-import backgroundImage from "@assets/ramadan_15_03_2022_1_1756802762060.jpg";
+import backgroundImage from "../../assets/background.jpg";
 
 interface LedenlijstViewProps {
   config: LedenlijstConfig;

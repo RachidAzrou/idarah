@@ -163,31 +163,10 @@ export function StylingStep({ data, onUpdate }: StylingStepProps) {
 
             <div>
               <Label htmlFor="title-color">Kleur</Label>
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <input
-                    type="color"
-                    id="title-color-picker"
-                    value={data.title.color}
-                    onChange={(e) => updateTitle('color', e.target.value)}
-                    className="w-10 h-10 border border-gray-300 rounded cursor-pointer"
-                    data-testid="colorpicker-title-color"
-                  />
-                  <Input
-                    id="title-color-hex"
-                    value={data.title.color}
-                    onChange={(e) => updateTitle('color', e.target.value)}
-                    placeholder="#000000"
-                    pattern="^#[0-9A-Fa-f]{6}$"
-                    className="flex-1"
-                    data-testid="input-title-color-hex"
-                  />
-                </div>
-                <ColorPicker
-                  value={data.title.color}
-                  onChange={(color) => updateTitle('color', color)}
-                />
-              </div>
+              <ColorPicker
+                value={data.title.color}
+                onChange={(color) => updateTitle('color', color)}
+              />
             </div>
           </div>
         </div>
@@ -257,31 +236,10 @@ export function StylingStep({ data, onUpdate }: StylingStepProps) {
 
             <div>
               <Label htmlFor="subtitle-color">Kleur</Label>
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <input
-                    type="color"
-                    id="subtitle-color-picker"
-                    value={data.subtitle.color}
-                    onChange={(e) => updateSubtitle('color', e.target.value)}
-                    className="w-10 h-10 border border-gray-300 rounded cursor-pointer"
-                    data-testid="colorpicker-subtitle-color"
-                  />
-                  <Input
-                    id="subtitle-color-hex"
-                    value={data.subtitle.color}
-                    onChange={(e) => updateSubtitle('color', e.target.value)}
-                    placeholder="#000000"
-                    pattern="^#[0-9A-Fa-f]{6}$"
-                    className="flex-1"
-                    data-testid="input-subtitle-color-hex"
-                  />
-                </div>
-                <ColorPicker
-                  value={data.subtitle.color}
-                  onChange={(color) => updateSubtitle('color', color)}
-                />
-              </div>
+              <ColorPicker
+                value={data.subtitle.color}
+                onChange={(color) => updateSubtitle('color', color)}
+              />
             </div>
           </div>
         </div>

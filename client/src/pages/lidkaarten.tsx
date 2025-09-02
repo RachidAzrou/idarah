@@ -307,7 +307,6 @@ export default function LidkaartenPage() {
                   <SelectContent>
                     <SelectItem value="all">Alle statussen</SelectItem>
                     <SelectItem value="ACTUEEL">Actueel</SelectItem>
-                    <SelectItem value="MOMENTOPNAME">Momentopname</SelectItem>
                     <SelectItem value="VERLOPEN">Verlopen</SelectItem>
                     <SelectItem value="geen-kaart">Geen kaart</SelectItem>
                   </SelectContent>

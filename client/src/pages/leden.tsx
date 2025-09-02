@@ -191,28 +191,10 @@ export default function Leden() {
         toast({ title: "Lid bewerken", description: `Bewerk lid ${memberId}` });
         break;
       case 'toggleStatus':
-      case 'delete':
-        toast({ title: "Lid verwijderd", description: "Het lid is permanent verwijderd uit het systeem." });
-        break;
         const member = members?.find((m: any) => m.id === memberId);
-      case 'delete':
-        toast({ title: "Lid verwijderd", description: "Het lid is permanent verwijderd uit het systeem." });
-        break;
         if (member) {
-      case 'delete':
-        toast({ title: "Lid verwijderd", description: "Het lid is permanent verwijderd uit het systeem." });
-        break;
           toggleMemberStatus(memberId, member.active);
-      case 'delete':
-        toast({ title: "Lid verwijderd", description: "Het lid is permanent verwijderd uit het systeem." });
-        break;
         }
-      case 'delete':
-        toast({ title: "Lid verwijderd", description: "Het lid is permanent verwijderd uit het systeem." });
-        break;
-        break;
-      case 'delete':
-        toast({ title: "Lid verwijderd", description: "Het lid is permanent verwijderd uit het systeem." });
         break;
     }
   };

@@ -25,7 +25,10 @@ function polarToCartesian(centerX: number, centerY: number, radius: number, angl
 function describeArc(x: number, y: number, radius: number, startAngle: number, endAngle: number) {
   const start = polarToCartesian(x, y, radius, endAngle);
   const end = polarToCartesian(x, y, radius, startAngle);
-  const largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
+  
+  // For arcs close to 360 degrees, ensure we use the large arc flag
+  const angleSpan = endAngle - startAngle;
+  const largeArcFlag = angleSpan >= 180 ? "1" : "0";
   
   return [
     "M", start.x, start.y, 
@@ -37,6 +40,7 @@ export function ConcentricRings({ categories, size = 280 }: ConcentricRingsProps
   const center = size / 2;
   const radii = [110, 86, 62]; // outer, middle, inner  
   const strokeWidth = 14;
+  
 
   return (
     <div className="flex items-center justify-center">
@@ -73,13 +77,38 @@ export function ConcentricRings({ categories, size = 280 }: ConcentricRingsProps
             return null;
           }
           
-          // Calculate arc based on percentage
+          // For 100%, render a complete circle instead of an arc
+          if (category.percent >= 100) {
+            return (
+              <CustomTooltip
+                key={`circle-${category.key}`}
+                title={category.label}
+                count={category.count}
+                percentage={category.percent}
+                color={category.color}
+              >
+                <circle
+                  cx={center}
+                  cy={center}
+                  r={radius}
+                  fill="none"
+                  stroke={category.color}
+                  strokeWidth={strokeWidth}
+                  className="hover:stroke-opacity-80 transition-all duration-200 cursor-pointer"
+                  style={{ 
+                    strokeOpacity: 1
+                  }}
+                />
+              </CustomTooltip>
+            );
+          }
+          
+          // For partial percentages, calculate arc normally
           const startAngle = -90; // Start at top
           const endAngle = startAngle + (category.percent / 100) * 360;
           
-          // For 100% or full circles, make sure we draw the complete circle
-          const actualEndAngle = category.percent >= 100 ? startAngle + 359.9 : 
-                                 endAngle - startAngle < 10 ? startAngle + 10 : endAngle;
+          // Ensure minimum visible arc for small percentages
+          const actualEndAngle = endAngle - startAngle < 10 ? startAngle + 10 : endAngle;
           
           const pathData = describeArc(center, center, radius, startAngle, actualEndAngle);
           
@@ -98,6 +127,10 @@ export function ConcentricRings({ categories, size = 280 }: ConcentricRingsProps
                 strokeWidth={strokeWidth}
                 strokeLinecap="round"
                 className="hover:stroke-opacity-80 transition-all duration-200 cursor-pointer"
+                style={{ 
+                  strokeDasharray: 'none',
+                  strokeOpacity: 1
+                }}
               />
             </CustomTooltip>
           );

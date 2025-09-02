@@ -84,7 +84,7 @@ export default function PubliekeSchermen() {
                         <div className="ml-4 w-0 flex-1">
                           <dl>
                             <dt className="text-sm font-medium text-gray-500 truncate">Totaal Schermen</dt>
-                            <dd className="text-2xl font-bold text-gray-900" data-testid="total-screens">{screens?.length || 0}</dd>
+                            <dd className="text-2xl font-bold text-gray-900" data-testid="total-screens">{Array.isArray(screens) ? screens.length : 0}</dd>
                           </dl>
                         </div>
                       </div>
@@ -103,7 +103,7 @@ export default function PubliekeSchermen() {
                           <dl>
                             <dt className="text-sm font-medium text-gray-500 truncate">Actieve Schermen</dt>
                             <dd className="text-2xl font-bold text-gray-900" data-testid="active-screens">
-                              {screens?.filter((s: any) => s.active).length || 0}
+                              {Array.isArray(screens) ? screens.filter((s: any) => s.active).length : 0}
                             </dd>
                           </dl>
                         </div>
@@ -123,7 +123,7 @@ export default function PubliekeSchermen() {
                           <dl>
                             <dt className="text-sm font-medium text-gray-500 truncate">Betaalstatus Schermen</dt>
                             <dd className="text-2xl font-bold text-gray-900" data-testid="payment-screens">
-                              {screens?.filter((s: any) => s.type === 'BETAALSTATUS').length || 0}
+                              {Array.isArray(screens) ? screens.filter((s: any) => s.type === 'BETAALSTATUS').length : 0}
                             </dd>
                           </dl>
                         </div>
@@ -143,7 +143,7 @@ export default function PubliekeSchermen() {
                           <dl>
                             <dt className="text-sm font-medium text-gray-500 truncate">Mededelingen Schermen</dt>
                             <dd className="text-2xl font-bold text-gray-900" data-testid="announcement-screens">
-                              {screens?.filter((s: any) => s.type === 'MEDEDELINGEN').length || 0}
+                              {Array.isArray(screens) ? screens.filter((s: any) => s.type === 'MEDEDELINGEN').length : 0}
                             </dd>
                           </dl>
                         </div>
@@ -156,17 +156,17 @@ export default function PubliekeSchermen() {
                 <Card>
                   <CardHeader className="px-6 py-6 border-b border-gray-200">
                     <CardTitle>Publieke Schermen Overzicht</CardTitle>
-                    <p className="text-sm text-gray-500">{screens?.length || 0} schermen geconfigureerd</p>
+                    <p className="text-sm text-gray-500">{Array.isArray(screens) ? screens.length : 0} schermen geconfigureerd</p>
                   </CardHeader>
                   
                   <CardContent className="p-0">
-                    {!screens || screens.length === 0 ? (
+                    {!Array.isArray(screens) || screens.length === 0 ? (
                       <div className="p-6 text-center text-gray-500" data-testid="no-screens">
                         Nog geen publieke schermen geconfigureerd
                       </div>
                     ) : (
                       <div className="divide-y divide-gray-200">
-                        {screens.map((screen: any) => (
+                        {(screens as any[]).map((screen: any) => (
                           <div key={screen.id} className="p-6 hover:bg-gray-50" data-testid={`screen-item-${screen.id}`}>
                             <div className="flex items-center justify-between">
                               <div className="flex items-center space-x-4">
@@ -268,13 +268,13 @@ export default function PubliekeSchermen() {
                   </CardHeader>
                   
                   <CardContent>
-                    {!announcements || announcements.length === 0 ? (
+                    {!Array.isArray(announcements) || announcements.length === 0 ? (
                       <div className="p-6 text-center text-gray-500" data-testid="no-announcements">
                         Nog geen mededelingen toegevoegd
                       </div>
                     ) : (
                       <div className="space-y-4">
-                        {announcements.map((announcement: any) => (
+                        {(announcements as any[]).map((announcement: any) => (
                           <div key={announcement.id} className="p-4 border border-gray-200 rounded-xl" data-testid={`announcement-item-${announcement.id}`}>
                             <div className="flex items-start justify-between">
                               <div className="flex-1">

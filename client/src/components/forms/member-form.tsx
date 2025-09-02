@@ -679,7 +679,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
                     <div className="bg-gray-50 p-4 rounded-lg space-y-2">
                       <div className="flex justify-between">
                         <span className="text-sm text-gray-600">Lidnummer:</span>
-                        <span className="font-mono text-sm">0001</span>
+                        <span className="font-mono text-sm">Wordt automatisch toegewezen</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-sm text-gray-600">Lidgeld:</span>

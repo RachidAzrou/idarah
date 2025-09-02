@@ -44,11 +44,12 @@ export async function createMemberHandler(req: Request, res: Response) {
     const result = await db.transaction(async (tx) => {
       // Create member
       const [member] = await tx.insert(members).values({
+        tenantId,
         memberNumber: body.memberNumber,
         firstName: body.firstName,
         lastName: body.lastName,
         gender: body.gender,
-        birthDate: body.birthDate?.toISOString(),
+        birthDate: body.birthDate,
         category: body.category,
         email: body.email,
         phone: body.phone,
@@ -57,20 +58,15 @@ export async function createMemberHandler(req: Request, res: Response) {
         postalCode: body.postalCode,
         city: body.city,
         country: body.country,
-        joinDate: joinDate.toISOString(),
         active: true
       }).returning();
 
       // Create financial settings
       await tx.insert(memberFinancialSettings).values({
         memberId: member.id,
-        preferredMethod: body.preferredMethod,
-        preferredTerm: body.preferredTerm,
-        monthlyAmount: body.monthlyAmount.toString(),
-        yearlyAmount: body.yearlyAmount.toString(),
-        iban: body.iban,
-        sepaMandate: body.sepaMandate,
-        billingAnchorAt: joinDate
+        paymentMethod: body.preferredMethod,
+        paymentTerm: body.preferredTerm,
+        iban: body.iban
       });
 
       return member;

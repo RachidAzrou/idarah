@@ -11,9 +11,8 @@ import { DescriptionStep } from "./steps/DescriptionStep";
 import { StylingStep } from "./steps/StylingStep";
 import { LedenlijstConfigStep } from "./steps/LedenlijstConfigStep";
 import { MededelingenConfigStep } from "./steps/MededelingenConfigStep";
-// Temporarily import only when needed to avoid module resolution issues
-// import { MededelingenMessagesStep } from "./steps/MededelingenMessagesStep";
-// import { MededelingenCarouselStep } from "./steps/MededelingenCarouselStep";
+import { MededelingenMessagesStep } from "./steps/MededelingenMessagesStep";
+import { MededelingenCarouselStep } from "./steps/MededelingenCarouselStep";
 import { MultimediaConfigStep } from "./steps/MultimediaConfigStep";
 
 interface ScreenWizardProps {
@@ -126,8 +125,8 @@ export function ScreenWizard({ open, onOpenChange, onComplete }: ScreenWizardPro
     } else if (wizardData.type === 'MEDEDELINGEN') {
       // Voor mededelingen slaan we de opmaak stap over en gaan direct naar berichten
       baseSteps.splice(2, 1); // Verwijder de "Opmaak" stap
-      // Use existing MededelingenConfigStep for now until import issues are resolved
-      baseSteps.push({ title: "Configuratie", component: MededelingenConfigStep });
+      baseSteps.push({ title: "Berichten", component: MededelingenMessagesStep });
+      baseSteps.push({ title: "Carrousel", component: MededelingenCarouselStep });
     } else if (wizardData.type === 'MULTIMEDIA') {
       baseSteps.push({ title: "Media", component: MultimediaConfigStep });
     }
@@ -144,7 +143,7 @@ export function ScreenWizard({ open, onOpenChange, onComplete }: ScreenWizardPro
       case 1: return wizardData.name.length > 0;
       case 2: 
         if (wizardData.type === 'MEDEDELINGEN') {
-          // Voor mededelingen is stap 2 de configuratie stap (berichten)
+          // Voor mededelingen is stap 2 de berichten stap
           return !!wizardData.mededelingenSettings && wizardData.mededelingenSettings.slides.length > 0;
         } else {
           // Voor andere types is stap 2 de opmaak stap
@@ -152,6 +151,7 @@ export function ScreenWizard({ open, onOpenChange, onComplete }: ScreenWizardPro
         }
       case 3: 
         if (wizardData.type === 'LEDENLIJST') return !!wizardData.ledenlijstSettings;
+        if (wizardData.type === 'MEDEDELINGEN') return !!wizardData.mededelingenSettings?.autoplay;
         if (wizardData.type === 'MULTIMEDIA') return !!wizardData.multimediaSettings && wizardData.multimediaSettings.mediaItems.length > 0;
         return true;
       case 4:

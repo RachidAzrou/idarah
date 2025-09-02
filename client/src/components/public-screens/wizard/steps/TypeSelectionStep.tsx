@@ -53,7 +53,48 @@ export function TypeSelectionStep({ data, onUpdate }: TypeSelectionStepProps) {
                   ? 'border-primary bg-primary/5 ring-2 ring-primary/20'
                   : 'border-gray-200 hover:border-gray-300'
               }`}
-              onClick={() => onUpdate({ ...data, type: type.value })}
+              onClick={() => {
+                const baseUpdate = { ...data, type: type.value };
+                
+                // Initialize settings based on type
+                if (type.value === 'MEDEDELINGEN') {
+                  onUpdate({
+                    ...baseUpdate,
+                    mededelingenSettings: {
+                      slides: [{
+                        id: 'slide1',
+                        title: 'Eerste bericht',
+                        body: '',
+                        active: true,
+                        durationSec: 10,
+                        styling: {
+                          titleFontSize: 32,
+                          titleFontWeight: 'bold',
+                          titleFontFamily: 'Poppins',
+                          titleColor: '#1f2937',
+                          bodyFontSize: 18,
+                          bodyFontWeight: 'normal',
+                          bodyFontFamily: 'Poppins',
+                          bodyColor: '#374151',
+                          backgroundColor: '#ffffff'
+                        }
+                      }],
+                      autoplay: {
+                        enabled: true,
+                        interval: 8,
+                        order: 'manual'
+                      },
+                      style: {
+                        textColor: '#ffffff',
+                        backgroundColor: '#1f2937',
+                        maxTextWidth: 800
+                      }
+                    }
+                  });
+                } else {
+                  onUpdate(baseUpdate);
+                }
+              }}
               data-testid={`screen-type-${type.value.toLowerCase()}`}
             >
               <div className="flex flex-col items-center text-center space-y-3">

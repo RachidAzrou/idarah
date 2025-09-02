@@ -13,12 +13,13 @@ export default function AgeGenderCard() {
       return {
         total: 0,
         buckets: [
-          { range: '18-25', male: 0, female: 0 },
-          { range: '26-35', male: 0, female: 0 },
-          { range: '36-45', male: 0, female: 0 },
-          { range: '46-55', male: 0, female: 0 },
-          { range: '56-65', male: 0, female: 0 },
-          { range: '65+', male: 0, female: 0 },
+          { label: '<18', male: 0, female: 0 },
+          { label: '18-25', male: 0, female: 0 },
+          { label: '26-35', male: 0, female: 0 },
+          { label: '36-45', male: 0, female: 0 },
+          { label: '46-55', male: 0, female: 0 },
+          { label: '56-65', male: 0, female: 0 },
+          { label: '65+', male: 0, female: 0 },
         ]
       };
     }
@@ -27,6 +28,7 @@ export default function AgeGenderCard() {
     
     // Bereken leeftijd uit geboortedatum en groepeer per categorie en geslacht
     const ageBuckets = {
+      '<18': { male: 0, female: 0 },
       '18-25': { male: 0, female: 0 },
       '26-35': { male: 0, female: 0 },
       '36-45': { male: 0, female: 0 },
@@ -42,7 +44,8 @@ export default function AgeGenderCard() {
       const gender = member.gender === 'M' ? 'male' : 'female';
       
       let bucket = '65+';
-      if (age >= 18 && age <= 25) bucket = '18-25';
+      if (age < 18) bucket = '<18';
+      else if (age >= 18 && age <= 25) bucket = '18-25';
       else if (age >= 26 && age <= 35) bucket = '26-35';
       else if (age >= 36 && age <= 45) bucket = '36-45';
       else if (age >= 46 && age <= 55) bucket = '46-55';
@@ -52,7 +55,7 @@ export default function AgeGenderCard() {
     });
     
     const buckets = Object.entries(ageBuckets).map(([range, counts]) => ({
-      range,
+      label: range,
       male: counts.male,
       female: counts.female
     }));

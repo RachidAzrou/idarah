@@ -38,6 +38,10 @@ interface MembersTableProps {
   onPerPageChange: (perPage: number) => void;
   onRowAction: (action: string, memberId: string) => void;
   onBulkAction: (action: string, memberIds: string[]) => void;
+  onView?: (id: string) => void;
+  onEdit?: (id: string) => void;
+  onToggleStatus?: (id: string, currentStatus: boolean) => void;
+  onDelete?: (id: string) => void;
   loading?: boolean;
 }
 
@@ -50,6 +54,10 @@ export function MembersTable({
   onPerPageChange,
   onRowAction,
   onBulkAction,
+  onView,
+  onEdit,
+  onToggleStatus,
+  onDelete,
   loading = false
 }: MembersTableProps) {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -267,10 +275,10 @@ export function MembersTable({
                         memberId={member.id}
                         memberName={`${member.firstName} ${member.lastName}`}
                         isActive={member.active}
-                        onView={(id) => onRowAction('view', id)}
-                        onEdit={(id) => onRowAction('edit', id)}
-                        onToggleStatus={(id, currentStatus) => onRowAction('toggleStatus', id)}
-                        onDelete={(id) => onRowAction('delete', id)}
+                        onView={onView || ((id) => onRowAction('view', id))}
+                        onEdit={onEdit || ((id) => onRowAction('edit', id))}
+                        onToggleStatus={onToggleStatus || ((id, currentStatus) => onRowAction('toggleStatus', id))}
+                        onDelete={onDelete || ((id) => onRowAction('delete', id))}
                       />
                     </td>
                   </tr>

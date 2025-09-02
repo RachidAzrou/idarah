@@ -20,10 +20,6 @@ export function MededelingenView({ config }: MededelingenViewProps) {
   const autoAdvance = carouselConfig.autoAdvance ?? config?.autoplay?.enabled ?? true;
   const intervalTime = carouselConfig.intervalTime || (config?.autoplay?.interval * 1000) || 10000;
 
-  // Title and subtitle from config
-  const titleConfig = config?.title || {};
-  const subtitleConfig = config?.subtitle || {};
-
   useEffect(() => {
     if (!autoAdvance || activeSlides.length <= 1) return;
 
@@ -65,39 +61,6 @@ export function MededelingenView({ config }: MededelingenViewProps) {
         color: textColor
       }}
     >
-      {/* Header with title and subtitle */}
-      <div className="relative z-10 p-8 text-center">
-        {/* Main title */}
-        {titleConfig.text && (
-          <h1 
-            className="mb-4"
-            style={{
-              fontSize: titleConfig.fontSize ? `${titleConfig.fontSize}px` : '48px',
-              fontFamily: titleConfig.fontFamily || 'Poppins',
-              fontWeight: titleConfig.fontWeight || 'bold',
-              color: titleConfig.color || textColor
-            }}
-          >
-            {titleConfig.text}
-          </h1>
-        )}
-        
-        {/* Subtitle */}
-        {subtitleConfig.text && (
-          <h2 
-            className="mb-6"
-            style={{
-              fontSize: subtitleConfig.fontSize ? `${subtitleConfig.fontSize}px` : '24px',
-              fontFamily: subtitleConfig.fontFamily || 'Poppins',
-              fontWeight: subtitleConfig.fontWeight || 'normal',
-              color: subtitleConfig.color || textColor
-            }}
-          >
-            {subtitleConfig.text}
-          </h2>
-        )}
-      </div>
-
       {/* Main content area with current slide */}
       <div className="relative z-10 flex-1 flex items-center justify-center p-8">
         <div 
@@ -105,32 +68,47 @@ export function MededelingenView({ config }: MededelingenViewProps) {
           style={{ maxWidth: config?.style?.maxTextWidth || '800px' }}
         >
           {/* Slide title */}
-          {currentSlide.title && (
-            <h3 
+          <h1 
+            className="mb-4"
+            style={{
+              fontSize: slideStyle.titleFontSize ? `${slideStyle.titleFontSize}px` : '48px',
+              fontFamily: slideStyle.titleFontFamily || 'Poppins',
+              fontWeight: slideStyle.titleFontWeight || 'bold',
+              color: slideStyle.titleColor || textColor
+            }}
+          >
+            {currentSlide.title}
+          </h1>
+          
+          {/* Slide subtitle */}
+          {currentSlide.subtitle && (
+            <h2 
               className="mb-6"
               style={{
-                fontSize: slideStyle.titleFontSize ? `${slideStyle.titleFontSize}px` : '36px',
-                fontFamily: slideStyle.titleFontFamily || 'Poppins',
-                fontWeight: slideStyle.titleFontWeight || 'bold',
-                color: slideStyle.titleColor || textColor
+                fontSize: slideStyle.subtitleFontSize ? `${slideStyle.subtitleFontSize}px` : '24px',
+                fontFamily: slideStyle.subtitleFontFamily || 'Poppins',
+                fontWeight: slideStyle.subtitleFontWeight || 'normal',
+                color: slideStyle.subtitleColor || textColor
               }}
             >
-              {currentSlide.title}
-            </h3>
+              {currentSlide.subtitle}
+            </h2>
           )}
           
           {/* Slide content/body with line break support */}
-          <div 
-            className="leading-relaxed whitespace-pre-line"
-            style={{
-              fontSize: slideStyle.bodyFontSize ? `${slideStyle.bodyFontSize}px` : '24px',
-              fontFamily: slideStyle.bodyFontFamily || 'Poppins',
-              fontWeight: slideStyle.bodyFontWeight || 'normal',
-              color: slideStyle.bodyColor || textColor
-            }}
-          >
-            {currentSlide.content || currentSlide.body || currentSlide.title}
-          </div>
+          {currentSlide.body && (
+            <div 
+              className="leading-relaxed whitespace-pre-line"
+              style={{
+                fontSize: slideStyle.bodyFontSize ? `${slideStyle.bodyFontSize}px` : '20px',
+                fontFamily: slideStyle.bodyFontFamily || 'Poppins',
+                fontWeight: slideStyle.bodyFontWeight || 'normal',
+                color: slideStyle.bodyColor || textColor
+              }}
+            >
+              {currentSlide.body}
+            </div>
+          )}
         </div>
       </div>
 

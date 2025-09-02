@@ -11,7 +11,6 @@ import { DescriptionStep } from "./steps/DescriptionStep";
 import { StylingStep } from "./steps/StylingStep";
 import { LedenlijstConfigStep } from "./steps/LedenlijstConfigStep";
 import { MededelingenConfigStep } from "./steps/MededelingenConfigStep";
-import { MededelingenTitleStep } from "./steps/MededelingenTitleStep";
 import { MededelingenMessagesStep } from "./steps/MededelingenMessagesStep";
 import { MededelingenCarouselStep } from "./steps/MededelingenCarouselStep";
 import { MultimediaConfigStep } from "./steps/MultimediaConfigStep";
@@ -124,8 +123,8 @@ export function ScreenWizard({ open, onOpenChange, onComplete }: ScreenWizardPro
     if (wizardData.type === 'LEDENLIJST') {
       baseSteps.push({ title: "Configuratie", component: LedenlijstConfigStep });
     } else if (wizardData.type === 'MEDEDELINGEN') {
-      // Voor mededelingen vervangen we de opmaak stap met een titel/ondertitel stap
-      baseSteps.splice(2, 1, { title: "Titel & Ondertitel", component: MededelingenTitleStep });
+      // Voor mededelingen slaan we de opmaak stap over en gaan direct naar berichten
+      baseSteps.splice(2, 1); // Verwijder de "Opmaak" stap
       baseSteps.push({ title: "Berichten", component: MededelingenMessagesStep });
       baseSteps.push({ title: "Carrousel", component: MededelingenCarouselStep });
     } else if (wizardData.type === 'MULTIMEDIA') {
@@ -144,8 +143,8 @@ export function ScreenWizard({ open, onOpenChange, onComplete }: ScreenWizardPro
       case 1: return wizardData.name.length > 0;
       case 2: 
         if (wizardData.type === 'MEDEDELINGEN') {
-          // Voor mededelingen is stap 2 de titel/ondertitel stap - optioneel
-          return true;
+          // Voor mededelingen is stap 2 de berichten stap
+          return !!wizardData.mededelingenSettings && wizardData.mededelingenSettings.slides.length > 0;
         } else {
           // Voor andere types is stap 2 de opmaak stap
           return wizardData.title && wizardData.title.text && wizardData.title.text.length > 0;
@@ -153,16 +152,10 @@ export function ScreenWizard({ open, onOpenChange, onComplete }: ScreenWizardPro
       case 3: 
         if (wizardData.type === 'LEDENLIJST') return !!wizardData.ledenlijstSettings;
         if (wizardData.type === 'MEDEDELINGEN') {
-          // Voor mededelingen is stap 3 de berichten stap
-          return !!wizardData.mededelingenSettings && wizardData.mededelingenSettings.slides.length > 0;
-        }
-        if (wizardData.type === 'MULTIMEDIA') return !!wizardData.multimediaSettings && wizardData.multimediaSettings.mediaItems.length > 0;
-        return true;
-      case 4:
-        if (wizardData.type === 'MEDEDELINGEN') {
-          // Voor mededelingen is stap 4 de carrousel stap
+          // Voor mededelingen is stap 3 de carrousel stap
           return !!wizardData.mededelingenSettings?.autoplay;
         }
+        if (wizardData.type === 'MULTIMEDIA') return !!wizardData.multimediaSettings && wizardData.multimediaSettings.mediaItems.length > 0;
         return true;
       default: return true;
     }

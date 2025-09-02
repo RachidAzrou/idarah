@@ -31,6 +31,7 @@ export interface LedenlijstConfig {
 export interface MededelingenSlide {
   id: string;
   title: string;
+  subtitle?: string;
   body?: string;
   mediaUrl?: string;
   mediaType?: 'image' | 'video';
@@ -43,6 +44,10 @@ export interface MededelingenSlide {
     titleFontWeight: 'normal' | 'bold' | 'lighter';
     titleFontFamily: string;
     titleColor: string;
+    subtitleFontSize: number;
+    subtitleFontWeight: 'normal' | 'bold' | 'lighter';
+    subtitleFontFamily: string;
+    subtitleColor: string;
     bodyFontSize: number;
     bodyFontWeight: 'normal' | 'bold' | 'lighter';
     bodyFontFamily: string;

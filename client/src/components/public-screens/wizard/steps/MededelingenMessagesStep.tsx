@@ -62,6 +62,10 @@ export function MededelingenMessagesStep({ data, onUpdate }: MededelingenMessage
         titleFontWeight: 'bold',
         titleFontFamily: 'Poppins',
         titleColor: '#1f2937',
+        subtitleFontSize: 20,
+        subtitleFontWeight: 'normal',
+        subtitleFontFamily: 'Poppins',
+        subtitleColor: '#6b7280',
         bodyFontSize: 18,
         bodyFontWeight: 'normal',
         bodyFontFamily: 'Poppins',
@@ -103,6 +107,10 @@ export function MededelingenMessagesStep({ data, onUpdate }: MededelingenMessage
         titleFontWeight: 'bold',
         titleFontFamily: 'Poppins',
         titleColor: '#1f2937',
+        subtitleFontSize: 20,
+        subtitleFontWeight: 'normal',
+        subtitleFontFamily: 'Poppins',
+        subtitleColor: '#6b7280',
         bodyFontSize: 18,
         bodyFontWeight: 'normal',
         bodyFontFamily: 'Poppins',
@@ -254,6 +262,17 @@ export function MededelingenMessagesStep({ data, onUpdate }: MededelingenMessage
                   </div>
 
                   <div>
+                    <Label htmlFor={`subtitle-${slide.id}`}>Ondertitel</Label>
+                    <Input
+                      id={`subtitle-${slide.id}`}
+                      value={slide.subtitle || ''}
+                      onChange={(e) => updateSlide(slide.id, { subtitle: e.target.value })}
+                      placeholder="Ondertitel (optioneel)"
+                      data-testid={`input-slide-subtitle-${slide.id}`}
+                    />
+                  </div>
+
+                  <div>
                     <Label htmlFor={`body-${slide.id}`}>Tekst</Label>
                     <Textarea
                       id={`body-${slide.id}`}
@@ -343,6 +362,66 @@ export function MededelingenMessagesStep({ data, onUpdate }: MededelingenMessage
                     </div>
                   </div>
 
+                  {/* Ondertitel styling */}
+                  <div className="space-y-3 p-3 border rounded-lg">
+                    <h5 className="text-sm font-medium">Ondertitel</h5>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label className="text-xs">Grootte</Label>
+                        <Input
+                          type="number"
+                          value={slide.styling?.subtitleFontSize || 20}
+                          onChange={(e) => updateSlideStyle(slide.id, 'subtitleFontSize', parseInt(e.target.value))}
+                          min="12"
+                          max="48"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-xs">Gewicht</Label>
+                        <Select 
+                          value={slide.styling?.subtitleFontWeight || 'normal'} 
+                          onValueChange={(value) => updateSlideStyle(slide.id, 'subtitleFontWeight', value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {fontWeights.map(weight => (
+                              <SelectItem key={weight.value} value={weight.value}>
+                                {weight.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label className="text-xs">Font</Label>
+                        <Select 
+                          value={slide.styling?.subtitleFontFamily || 'Poppins'} 
+                          onValueChange={(value) => updateSlideStyle(slide.id, 'subtitleFontFamily', value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {fontFamilies.map(font => (
+                              <SelectItem key={font.value} value={font.value}>
+                                {font.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label className="text-xs">Kleur</Label>
+                        <ColorPicker
+                          value={slide.styling?.subtitleColor || '#6b7280'}
+                          onChange={(color) => updateSlideStyle(slide.id, 'subtitleColor', color)}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Tekst styling */}
                   <div className="space-y-3 p-3 border rounded-lg">
                     <h5 className="text-sm font-medium">Tekst</h5>
@@ -427,11 +506,26 @@ export function MededelingenMessagesStep({ data, onUpdate }: MededelingenMessage
                         fontFamily: slide.styling?.titleFontFamily || 'Poppins',
                         fontWeight: slide.styling?.titleFontWeight || 'bold',
                         color: slide.styling?.titleColor || '#1f2937',
-                        margin: 0
+                        margin: 0,
+                        marginBottom: slide.subtitle ? '8px' : '16px'
                       }}
                     >
                       {slide.title}
                     </h3>
+                    {slide.subtitle && (
+                      <h4
+                        style={{
+                          fontSize: `${slide.styling?.subtitleFontSize || 20}px`,
+                          fontFamily: slide.styling?.subtitleFontFamily || 'Poppins',
+                          fontWeight: slide.styling?.subtitleFontWeight || 'normal',
+                          color: slide.styling?.subtitleColor || '#6b7280',
+                          margin: 0,
+                          marginBottom: '16px'
+                        }}
+                      >
+                        {slide.subtitle}
+                      </h4>
+                    )}
                     {slide.body && (
                       <p
                         className="whitespace-pre-line"

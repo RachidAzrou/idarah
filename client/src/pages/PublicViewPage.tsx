@@ -95,9 +95,19 @@ export function PublicViewPage() {
       
       case 'MEDEDELINGEN':
         return (
-          <div className="min-h-screen bg-background p-8">
-            <div className="max-w-4xl mx-auto text-center">
-              <div className="bg-card rounded-2xl p-8 shadow-sm border border-border hover:shadow-md transition-shadow duration-200">
+          <div 
+            className="min-h-screen bg-background p-8 relative"
+            style={{
+              backgroundImage: `url('@assets/ramadan_15_03_2022_1_1756802762060.jpg')`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat'
+            }}
+          >
+            {/* Overlay to make background subtle */}
+            <div className="absolute inset-0 bg-background/85 backdrop-blur-sm"></div>
+            <div className="max-w-4xl mx-auto text-center relative z-10">
+              <div className="bg-card/95 backdrop-blur-sm rounded-2xl p-8 shadow-sm border border-border hover:shadow-md transition-shadow duration-200">
                 <h1 
                   style={{
                     fontSize: `${screen.config?.title?.fontSize || 36}px`,
@@ -133,9 +143,19 @@ export function PublicViewPage() {
       
       case 'MULTIMEDIA':
         return (
-          <div className="min-h-screen bg-sidebar p-8">
-            <div className="max-w-4xl mx-auto text-center">
-              <div className="bg-sidebar-accent rounded-2xl p-8 shadow-sm border border-sidebar-border hover:shadow-md transition-shadow duration-200">
+          <div 
+            className="min-h-screen bg-sidebar p-8 relative"
+            style={{
+              backgroundImage: `url('@assets/ramadan_15_03_2022_1_1756802762060.jpg')`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat'
+            }}
+          >
+            {/* Overlay to make background subtle */}
+            <div className="absolute inset-0 bg-sidebar/85 backdrop-blur-sm"></div>
+            <div className="max-w-4xl mx-auto text-center relative z-10">
+              <div className="bg-sidebar-accent/95 backdrop-blur-sm rounded-2xl p-8 shadow-sm border border-sidebar-border hover:shadow-md transition-shadow duration-200">
                 <h1 
                   style={{
                     fontSize: `${screen.config?.title?.fontSize || 36}px`,
@@ -171,8 +191,18 @@ export function PublicViewPage() {
       
       default:
         return (
-          <div className="min-h-screen bg-background flex items-center justify-center p-8">
-            <div className="bg-card rounded-2xl p-8 shadow-sm border border-border text-center max-w-md hover:shadow-md transition-shadow duration-200">
+          <div 
+            className="min-h-screen bg-background flex items-center justify-center p-8 relative"
+            style={{
+              backgroundImage: `url('@assets/ramadan_15_03_2022_1_1756802762060.jpg')`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat'
+            }}
+          >
+            {/* Overlay to make background subtle */}
+            <div className="absolute inset-0 bg-background/85 backdrop-blur-sm"></div>
+            <div className="bg-card/95 backdrop-blur-sm rounded-2xl p-8 shadow-sm border border-border text-center max-w-md hover:shadow-md transition-shadow duration-200 relative z-10">
               <h1 className="text-2xl font-bold text-card-foreground mb-4">
                 ⚠️ Onbekend Schermtype
               </h1>

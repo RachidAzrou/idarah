@@ -65,10 +65,20 @@ export function LedenlijstView({ config }: LedenlijstViewProps) {
   };
 
   return (
-    <div className="min-h-screen bg-background p-8">
+    <div 
+      className="min-h-screen bg-background p-8 relative"
+      style={{
+        backgroundImage: `url('@assets/ramadan_15_03_2022_1_1756802762060.jpg')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      {/* Overlay to make background subtle */}
+      <div className="absolute inset-0 bg-background/85 backdrop-blur-sm"></div>
       {/* Header */}
-      <div className="text-center mb-8">
-        <div className="bg-card rounded-2xl p-8 shadow-sm border border-border mx-auto max-w-4xl hover:shadow-md transition-shadow duration-200">
+      <div className="text-center mb-8 relative z-10">
+        <div className="bg-card/95 backdrop-blur-sm rounded-2xl p-8 shadow-sm border border-border mx-auto max-w-4xl hover:shadow-md transition-shadow duration-200">
           <h1
             style={{
               fontSize: `${config.title.fontSize}px`,
@@ -102,8 +112,8 @@ export function LedenlijstView({ config }: LedenlijstViewProps) {
       </div>
 
       {/* Tabel */}
-      <div className="w-full">
-        <div className="bg-card rounded-2xl shadow-sm border border-border overflow-hidden hover:shadow-md transition-shadow duration-200">
+      <div className="w-full relative z-10">
+        <div className="bg-card/95 backdrop-blur-sm rounded-2xl shadow-sm border border-border overflow-hidden hover:shadow-md transition-shadow duration-200">
           <table className="w-full">
             <thead>
               <tr className="bg-muted border-b border-border">
@@ -182,8 +192,8 @@ export function LedenlijstView({ config }: LedenlijstViewProps) {
 
         {/* Paginering info */}
         {totalPages > 1 && (
-          <div className="mt-8 flex justify-center">
-            <div className="bg-card rounded-2xl p-6 shadow-lg border border-border hover:shadow-xl transition-shadow duration-200">
+          <div className="mt-8 flex justify-center relative z-10">
+            <div className="bg-card/95 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-border hover:shadow-xl transition-shadow duration-200">
               <div className="flex justify-center items-center gap-3 mb-4">
                 {Array.from({ length: totalPages }, (_, i) => (
                   <div

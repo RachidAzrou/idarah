@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { LedenlijstConfig } from "@/lib/mock/public-screens";
 import { mockMembers, monthNames, getFilteredMembers, getMemberDisplayName, Member } from "@/lib/mock/members-data";
 import { Check, X, Vote } from "lucide-react";
+import backgroundImage from "@assets/ramadan_15_03_2022_1_1756811846212.jpg";
 
 interface LedenlijstViewProps {
   config: LedenlijstConfig;
@@ -79,11 +80,15 @@ export function LedenlijstView({ config }: LedenlijstViewProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8 relative">
-      {/* Subtle pattern overlay */}
-      <div className="absolute inset-0 opacity-10" style={{
-        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.1'%3E%3Ccircle cx='7' cy='7' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
-      }}></div>
+    <div 
+      className="min-h-screen p-8 relative"
+      style={{
+        backgroundImage: `url("${backgroundImage}")`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
       {/* Header */}
       <div className="text-center mb-12 relative z-10">
         <div className="bg-white rounded-2xl p-8 border border-gray-200 mx-auto max-w-4xl" style={{ boxShadow: '0 6px 16px rgba(2,6,23,0.08)' }}>

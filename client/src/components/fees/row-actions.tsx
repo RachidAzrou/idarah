@@ -1,4 +1,4 @@
-import { MoreHorizontal, Check, Eye, Edit } from "lucide-react";
+import { MoreHorizontal, Check, Eye, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Fee } from "@shared/fees-schema";
@@ -46,6 +46,13 @@ export function RowActions({ fee, onAction }: RowActionsProps) {
         >
           <Edit className="h-4 w-4" />
           Wijzig methode
+        </DropdownMenuItem>
+        <DropdownMenuItem 
+          onClick={() => onAction("delete")}
+          className="flex items-center gap-2 text-red-600"
+        >
+          <Trash2 className="h-4 w-4" />
+          Verwijderen
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

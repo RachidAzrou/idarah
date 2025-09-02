@@ -71,6 +71,7 @@ export interface IStorage {
   getMembershipFeesByMember(memberId: string): Promise<MembershipFee[]>;
   createMembershipFee(fee: InsertMembershipFee): Promise<MembershipFee>;
   updateMembershipFee(id: string, fee: Partial<InsertMembershipFee>): Promise<MembershipFee>;
+  deleteMembershipFee(id: string, tenantId: string): Promise<void>;
 
   // Transactions
   getTransactionsByTenant(tenantId: string): Promise<Transaction[]>;
@@ -264,6 +265,12 @@ export class DatabaseStorage implements IStorage {
       cache.deletePattern(`dashboard:stats:${updatedFee.tenantId}`);
     }
     return updatedFee;
+  }
+
+  async deleteMembershipFee(id: string, tenantId: string): Promise<void> {
+    await db.delete(membershipFees).where(and(eq(membershipFees.id, id), eq(membershipFees.tenantId, tenantId)));
+    // Invalidate cache
+    cache.deletePattern(`dashboard:stats:${tenantId}`);
   }
 
   // Transactions

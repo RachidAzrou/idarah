@@ -12,6 +12,8 @@ import { SepaDialog } from "@/components/fees/sepa-dialog";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function Lidgelden() {
   const { toast } = useToast();
@@ -44,6 +46,7 @@ export default function Lidgelden() {
   const [showDetailSlideout, setShowDetailSlideout] = useState(false);
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [showSepaDialog, setShowSepaDialog] = useState(false);
+  const [showChangeMethodDialog, setShowChangeMethodDialog] = useState(false);
   const [showNewFeeDialog, setShowNewFeeDialog] = useState(false);
 
   // Fetch membership fees from API
@@ -125,8 +128,11 @@ export default function Lidgelden() {
         setShowDetailSlideout(true);
         break;
       case "changeMethod":
-        // TODO: Implement method change dialog
-        console.log("Change method for", fee.id);
+        setSelectedFee(fee);
+        setShowChangeMethodDialog(true);
+        break;
+      case "delete":
+        handleDeleteFee(fee);
         break;
     }
   };
@@ -161,9 +167,73 @@ export default function Lidgelden() {
     },
   });
 
+  const deleteFeeMutation = useMutation({
+    mutationFn: async (feeId: string) => {
+      const response = await apiRequest("DELETE", `/api/fees/${feeId}`, {});
+      return response.json();
+    },
+    onSuccess: async (result, feeId) => {
+      // Optimistic update - verwijder fee uit lijst
+      queryClient.setQueryData(["/api/fees"], (oldData: any) => {
+        if (!Array.isArray(oldData)) return oldData;
+        return oldData.filter((fee: any) => fee.id !== feeId);
+      });
+      
+      await queryClient.invalidateQueries({ queryKey: ["/api/fees"] });
+      await queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
+      toast({
+        title: "Lidgeld verwijderd",
+        description: "Het lidgeld is verwijderd.",
+      });
+    },
+    onError: () => {
+      toast({
+        variant: "destructive", 
+        title: "Fout",
+        description: "Kon lidgeld niet verwijderen.",
+      });
+    },
+  });
+
+  const changeMethodMutation = useMutation({
+    mutationFn: async ({ feeId, method }: { feeId: string; method: string }) => {
+      const response = await apiRequest("PUT", `/api/fees/${feeId}`, { method });
+      return response.json();
+    },
+    onSuccess: async (result, { feeId }) => {
+      // Optimistic update - verander method
+      queryClient.setQueryData(["/api/fees"], (oldData: any) => {
+        if (!Array.isArray(oldData)) return oldData;
+        return oldData.map((fee: any) => 
+          fee.id === feeId ? { ...fee, method: result.method } : fee
+        );
+      });
+      
+      await queryClient.invalidateQueries({ queryKey: ["/api/fees"] });
+      setShowChangeMethodDialog(false);
+      toast({
+        title: "Betaalmethode gewijzigd",
+        description: "De betaalmethode is bijgewerkt.",
+      });
+    },
+    onError: () => {
+      toast({
+        variant: "destructive", 
+        title: "Fout",
+        description: "Kon betaalmethode niet wijzigen.",
+      });
+    },
+  });
+
   const handleMarkPaid = (fees: any[]) => {
     fees.forEach(fee => markPaidMutation.mutate(fee.id));
     setSelectedIds(prev => prev.filter(id => !fees.find(f => f.id === id)));
+  };
+
+  const handleDeleteFee = (fee: Fee) => {
+    if (confirm(`Weet je zeker dat je het lidgeld voor ${fee.memberName} (${fee.period}) wilt verwijderen?`)) {
+      deleteFeeMutation.mutate(fee.id);
+    }
   };
 
   const handleBulkMarkPaid = () => {
@@ -338,6 +408,35 @@ export default function Lidgelden() {
             // Data wordt automatisch bijgewerkt via optimistic updates
           }}
         />
+
+        <Dialog open={showChangeMethodDialog} onOpenChange={setShowChangeMethodDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Betaalmethode wijzigen</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <p>Wijzig de betaalmethode voor {selectedFee?.memberName} ({selectedFee?.period})</p>
+              <Select 
+                defaultValue={selectedFee?.method}
+                onValueChange={(value) => {
+                  if (selectedFee) {
+                    changeMethodMutation.mutate({ feeId: selectedFee.id, method: value });
+                  }
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecteer betaalmethode" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="SEPA">SEPA</SelectItem>
+                  <SelectItem value="BANCONTACT">Bancontact</SelectItem>
+                  <SelectItem value="TRANSFER">Overschrijving</SelectItem>
+                  <SelectItem value="CASH">Contant</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </main>
   );

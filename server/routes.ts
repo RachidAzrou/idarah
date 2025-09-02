@@ -217,6 +217,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.delete("/api/fees/:id", authMiddleware, tenantMiddleware, async (req, res) => {
+    try {
+      await storage.deleteMembershipFee(req.params.id, req.tenantId!);
+      res.json({ message: "Lidgeld verwijderd" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete membership fee" });
+    }
+  });
+
   // Financial routes
   app.get("/api/transactions", authMiddleware, tenantMiddleware, async (req, res) => {
     try {

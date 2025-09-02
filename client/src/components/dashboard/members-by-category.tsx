@@ -12,8 +12,8 @@ export default function MembersByCategoryCard() {
       return {
         total: 0,
         categories: [
-          { key: 'senior', label: 'Senior', count: 0, percent: 0, color: '#1E3A8A' },
           { key: 'standaard', label: 'Standaard', count: 0, percent: 0, color: '#3B82F6' },
+          { key: 'senior', label: 'Senior', count: 0, percent: 0, color: '#1E3A8A' },
           { key: 'student', label: 'Student', count: 0, percent: 0, color: '#06B6D4' },
         ]
       };
@@ -33,18 +33,18 @@ export default function MembersByCategoryCard() {
     
     const categories = [
       {
-        key: 'senior',
-        label: 'Senior',
-        count: categoryCounts['Senior'] || 0,
-        percent: totalMembers > 0 ? Math.round(((categoryCounts['Senior'] || 0) / totalMembers) * 100) : 0,
-        color: '#1E3A8A'
-      },
-      {
         key: 'standaard',
         label: 'Standaard',
         count: categoryCounts['Standaard'] || 0,
         percent: totalMembers > 0 ? Math.round(((categoryCounts['Standaard'] || 0) / totalMembers) * 100) : 0,
         color: '#3B82F6'
+      },
+      {
+        key: 'senior',
+        label: 'Senior',
+        count: categoryCounts['Senior'] || 0,
+        percent: totalMembers > 0 ? Math.round(((categoryCounts['Senior'] || 0) / totalMembers) * 100) : 0,
+        color: '#1E3A8A'
       },
       {
         key: 'student',

@@ -38,8 +38,8 @@ function describeArc(x: number, y: number, radius: number, startAngle: number, e
 
 export function ConcentricRings({ categories, size = 280 }: ConcentricRingsProps) {
   const center = size / 2;
-  const radii = [110, 86, 62]; // outer, middle, inner  
-  const strokeWidth = 14;
+  const radii = [100, 76, 52]; // outer, middle, inner - adjusted for visibility
+  const strokeWidth = 16;
   
 
   return (
@@ -96,7 +96,8 @@ export function ConcentricRings({ categories, size = 280 }: ConcentricRingsProps
                   strokeWidth={strokeWidth}
                   className="hover:stroke-opacity-80 transition-all duration-200 cursor-pointer"
                   style={{ 
-                    strokeOpacity: 1
+                    strokeOpacity: 1,
+                    strokeLinecap: 'round'
                   }}
                 />
               </CustomTooltip>

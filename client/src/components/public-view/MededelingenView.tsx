@@ -64,65 +64,71 @@ export function MededelingenView({ config }: MededelingenViewProps) {
         backgroundRepeat: 'no-repeat'
       }}
     >
-      {/* Main content card */}
+      {/* Fixed container with beautiful borders */}
       <div className="relative z-10 max-w-5xl w-full">
         <div 
-          className={`bg-white/98 backdrop-blur-md rounded-[2rem] border border-white/30 p-20 text-center transition-all duration-500 ${fadeClass} hover:scale-[1.02]`}
+          className="bg-white/98 backdrop-blur-md rounded-[2rem] border-4 border-white/40 p-20 text-center shadow-2xl"
           style={{ 
             boxShadow: '0 32px 64px -12px rgba(0, 0, 0, 0.35), 0 8px 32px -8px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.6)',
-            backgroundColor: slideStyle.backgroundColor ? `${slideStyle.backgroundColor}FA` : 'rgba(255, 255, 255, 0.98)',
+            backgroundColor: 'rgba(255, 255, 255, 0.98)',
             backdropFilter: 'blur(20px) saturate(180%)',
-            border: '1px solid rgba(255, 255, 255, 0.4)'
+            minHeight: '400px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center'
           }}
         >
-          {/* Slide title */}
-          <h1 
-            className="mb-8"
-            style={{
-              fontSize: slideStyle.titleFontSize ? `${slideStyle.titleFontSize}px` : '56px',
-              fontFamily: slideStyle.titleFontFamily || 'Poppins',
-              fontWeight: slideStyle.titleFontWeight || 'bold',
-              color: slideStyle.titleColor || '#1f2937',
-              lineHeight: '1.1'
-            }}
-            data-testid="mededelingen-title"
-          >
-            {currentSlide.title}
-          </h1>
-          
-          {/* Slide subtitle */}
-          {currentSlide.subtitle && (
-            <h2 
-              className="mb-10"
+          {/* Content that changes with transition */}
+          <div className={`transition-opacity duration-300 ${fadeClass}`}>
+            {/* Slide title */}
+            <h1 
+              className="mb-8"
               style={{
-                fontSize: slideStyle.subtitleFontSize ? `${slideStyle.subtitleFontSize}px` : '32px',
-                fontFamily: slideStyle.subtitleFontFamily || 'Poppins',
-                fontWeight: slideStyle.subtitleFontWeight || 'normal',
-                color: slideStyle.subtitleColor || '#6b7280',
-                lineHeight: '1.3'
+                fontSize: slideStyle.titleFontSize ? `${slideStyle.titleFontSize}px` : '56px',
+                fontFamily: slideStyle.titleFontFamily || 'Poppins',
+                fontWeight: slideStyle.titleFontWeight || 'bold',
+                color: slideStyle.titleColor || '#1f2937',
+                lineHeight: '1.1'
               }}
-              data-testid="mededelingen-subtitle"
+              data-testid="mededelingen-title"
             >
-              {currentSlide.subtitle}
-            </h2>
-          )}
-          
-          {/* Slide content/body with line break support */}
-          {currentSlide.body && (
-            <div 
-              className="leading-relaxed whitespace-pre-line max-w-4xl mx-auto"
-              style={{
-                fontSize: slideStyle.bodyFontSize ? `${slideStyle.bodyFontSize}px` : '26px',
-                fontFamily: slideStyle.bodyFontFamily || 'Poppins',
-                fontWeight: slideStyle.bodyFontWeight || 'normal',
-                color: slideStyle.bodyColor || '#374151',
-                lineHeight: '1.7'
-              }}
-              data-testid="mededelingen-body"
-            >
-              {currentSlide.body}
-            </div>
-          )}
+              {currentSlide.title}
+            </h1>
+            
+            {/* Slide subtitle */}
+            {currentSlide.subtitle && (
+              <h2 
+                className="mb-10"
+                style={{
+                  fontSize: slideStyle.subtitleFontSize ? `${slideStyle.subtitleFontSize}px` : '32px',
+                  fontFamily: slideStyle.subtitleFontFamily || 'Poppins',
+                  fontWeight: slideStyle.subtitleFontWeight || 'normal',
+                  color: slideStyle.subtitleColor || '#6b7280',
+                  lineHeight: '1.3'
+                }}
+                data-testid="mededelingen-subtitle"
+              >
+                {currentSlide.subtitle}
+              </h2>
+            )}
+            
+            {/* Slide content/body with line break support */}
+            {currentSlide.body && (
+              <div 
+                className="leading-relaxed whitespace-pre-line max-w-4xl mx-auto"
+                style={{
+                  fontSize: slideStyle.bodyFontSize ? `${slideStyle.bodyFontSize}px` : '26px',
+                  fontFamily: slideStyle.bodyFontFamily || 'Poppins',
+                  fontWeight: slideStyle.bodyFontWeight || 'normal',
+                  color: slideStyle.bodyColor || '#374151',
+                  lineHeight: '1.7'
+                }}
+                data-testid="mededelingen-body"
+              >
+                {currentSlide.body}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

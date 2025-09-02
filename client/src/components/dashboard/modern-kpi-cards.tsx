@@ -43,49 +43,39 @@ export default function ModernKpiCards() {
     queryKey: ["/api/dashboard/stats"],
   });
 
-  if (isLoading || !stats) {
-    return (
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-6">
-        {[...Array(5)].map((_, i) => (
-          <Skeleton key={i} className="h-20 rounded-xl" />
-        ))}
-      </div>
-    );
-  }
-
-  // KPI data gebaseerd op echte database stats
-  const kpiData = stats ? [
+  // Altijd KPI data tonen, ook zonder stats
+  const kpiData = [
     {
       title: "Totaal Leden",
-      value: (stats as any).totalMembers?.toString() || "0",
+      value: isLoading ? "..." : ((stats as any)?.totalMembers?.toString() || "0"),
       delta: { value: "Totaal aantal leden", positive: true },
       icon: <Users className="h-4 w-4 text-blue-600" />
     },
     {
-      title: "Actieve Leden",
-      value: (stats as any).activeMembers?.toString() || "0",
+      title: "Actieve Leden", 
+      value: isLoading ? "..." : ((stats as any)?.activeMembers?.toString() || "0"),
       delta: { value: "Actieve leden", positive: true },
       icon: <UserCheck className="h-4 w-4 text-blue-600" />
     },
     {
       title: "Stemgerechtigden",
-      value: (stats as any).activeMembers?.toString() || "0",
+      value: isLoading ? "..." : ((stats as any)?.activeMembers?.toString() || "0"),
       delta: { value: "Van actieve leden", positive: true },
       icon: <Vote className="h-4 w-4 text-blue-600" />
     },
     {
       title: "Openstaande Betalingen",
-      value: `€${((stats as any).openPayments || 0).toFixed(2)}`,
+      value: isLoading ? "..." : `€${(((stats as any)?.openPayments || 0)).toFixed(2)}`,
       delta: { value: "Te betalen bedragen", positive: false },
       icon: <Clock className="h-4 w-4 text-blue-600" />
     },
     {
       title: "Inkomsten Deze Maand",
-      value: `€${((stats as any).monthlyIncome || 0).toFixed(2)}`,
+      value: isLoading ? "..." : `€${(((stats as any)?.monthlyIncome || 0)).toFixed(2)}`,
       delta: { value: "Deze maand", positive: true },
       icon: <Euro className="h-4 w-4 text-blue-600" />
     }
-  ] : [];
+  ];
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-6">

@@ -266,7 +266,7 @@ export function ImportDialog({ open, onClose, onImport }: ImportDialogProps) {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="">Geen</SelectItem>
+                      <SelectItem value="none">Geen</SelectItem>
                       {headers.map(header => (
                         <SelectItem key={header} value={header}>{header}</SelectItem>
                       ))}
@@ -290,7 +290,7 @@ export function ImportDialog({ open, onClose, onImport }: ImportDialogProps) {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="">Geen</SelectItem>
+                      <SelectItem value="none">Geen</SelectItem>
                       {headers.map(header => (
                         <SelectItem key={header} value={header}>{header}</SelectItem>
                       ))}

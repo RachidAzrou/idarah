@@ -51,7 +51,7 @@ export function FiltersDrawer({
                 <SelectValue placeholder="Selecteer categorie" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Alle categorieën</SelectItem>
+                <SelectItem value="all">Alle categorieën</SelectItem>
                 {allCategories.map((category) => (
                   <SelectItem key={category} value={category}>
                     {category}
@@ -86,7 +86,7 @@ export function FiltersDrawer({
                 <SelectValue placeholder="Selecteer lid" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Alle leden</SelectItem>
+                <SelectItem value="all">Alle leden</SelectItem>
                 {mockMembers.map((member) => (
                   <SelectItem key={member.id} value={member.id}>
                     {member.name}

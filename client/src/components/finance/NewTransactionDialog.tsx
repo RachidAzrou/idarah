@@ -106,6 +106,10 @@ export function NewTransactionDialog({
 
   // Update member name when member is selected
   const handleMemberChange = (memberId: string) => {
+    if (memberId === 'none') {
+      form.setValue('memberName', '');
+      return;
+    }
     const member = Array.isArray(members) ? members.find((m: any) => m.id === memberId) : null;
     form.setValue('memberName', member ? `${member.firstName} ${member.lastName}` : '');
   };
@@ -113,10 +117,17 @@ export function NewTransactionDialog({
   const onSubmit = async (data: TransactionFormData) => {
     setLoading(true);
     try {
+      // Clean up data before submission
+      const cleanedData = {
+        ...data,
+        memberId: data.memberId === 'none' ? undefined : data.memberId,
+        memberName: data.memberId === 'none' ? '' : data.memberName
+      };
+      
       if (isEditing) {
-        updateTransactionMutation.mutate(data);
+        updateTransactionMutation.mutate(cleanedData);
       } else {
-        createTransactionMutation.mutate(data);
+        createTransactionMutation.mutate(cleanedData);
       }
     } catch (error) {
       console.error('Error saving transaction:', error);
@@ -286,7 +297,7 @@ export function NewTransactionDialog({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="">Geen lid gekoppeld</SelectItem>
+                      <SelectItem value="none">Geen lid gekoppeld</SelectItem>
                       {Array.isArray(members) && members.map((member: any) => (
                         <SelectItem key={member.id} value={member.id}>
                           {member.firstName} {member.lastName}

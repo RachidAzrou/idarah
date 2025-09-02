@@ -100,7 +100,7 @@ export function LedenlijstView({ config }: LedenlijstViewProps) {
       </div>
 
       {/* Tabel */}
-      <div className="max-w-7xl mx-auto">
+      <div className="w-full">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
           <table className="w-full">
             <thead>
@@ -180,21 +180,28 @@ export function LedenlijstView({ config }: LedenlijstViewProps) {
 
         {/* Paginering info */}
         {totalPages > 1 && (
-          <div className="mt-6 text-center">
-            <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200 mx-auto max-w-md">
-              <div className="flex justify-center items-center gap-2 mb-2">
+          <div className="mt-8 flex justify-center">
+            <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
+              <div className="flex justify-center items-center gap-3 mb-4">
                 {Array.from({ length: totalPages }, (_, i) => (
                   <div
                     key={i}
-                    className={`w-2 h-2 rounded-full ${
-                      i === currentPage ? 'bg-blue-500' : 'bg-gray-300'
+                    className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                      i === currentPage 
+                        ? 'bg-blue-600 scale-125 shadow-lg' 
+                        : 'bg-gray-300 hover:bg-gray-400'
                     }`}
                   />
                 ))}
               </div>
-              <p className="text-gray-600 text-sm">
-                Pagina {currentPage + 1} van {totalPages} • {filteredMembers.length} leden
-              </p>
+              <div className="text-center">
+                <p className="text-gray-700 font-medium text-lg">
+                  Pagina {currentPage + 1} van {totalPages}
+                </p>
+                <p className="text-gray-500 text-sm mt-1">
+                  {filteredMembers.length} leden weergegeven
+                </p>
+              </div>
             </div>
           </div>
         )}

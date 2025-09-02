@@ -211,21 +211,7 @@ export function LedenlijstConfigStep({ data, onUpdate }: LedenlijstConfigStepPro
         </div>
       </div>
 
-      {/* Preview info */}
-      <div className="p-4 bg-blue-50 rounded-lg">
-        <h4 className="font-medium text-blue-900 mb-2">Configuratie overzicht</h4>
-        <div className="text-sm text-blue-700 space-y-1">
-          <p>• Namen: {
-            settings.useFullNames && !settings.useInitials ? 'Volledige namen' :
-            !settings.useFullNames && settings.useInitials ? 'Alleen initialen' :
-            'Korte namen'
-          }</p>
-          <p>• Rijen per pagina: {settings.rowsPerPage}</p>
-          <p>• Jaar: {settings.year}</p>
-          <p>• Categorieën: {settings.categories.join(', ') || 'Geen geselecteerd'}</p>
-          {settings.showVotingRights && <p>• Stemrecht wordt getoond</p>}
-        </div>
-      </div>
+      
     </div>
   );
 }

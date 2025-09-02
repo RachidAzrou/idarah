@@ -43,8 +43,7 @@ class MemberService {
       // Create financial settings if provided
       if (memberData.financialSettings) {
         // In a real implementation, you'd create the financial settings record
-        // For now, we'll just log it as the schema is already set up
-        console.log("Financial settings would be created:", memberData.financialSettings);
+        // For now, we'll just store it as the schema is already set up
       }
 
       // Generate initial membership fee

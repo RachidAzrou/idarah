@@ -112,16 +112,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/members", authMiddleware, tenantMiddleware, async (req, res) => {
     try {
-      console.log("Raw request body:", JSON.stringify(req.body, null, 2));
-      
       // Transform the data to match expected format
       const transformedData = {
         ...req.body,
         // Convert string date to Date object if needed
         birthDate: typeof req.body.birthDate === 'string' ? new Date(req.body.birthDate) : req.body.birthDate,
       };
-      
-      console.log("Transformed data:", JSON.stringify(transformedData, null, 2));
       
       const memberData = createMemberSchema.parse(transformedData);
       const result = await memberService.createMember(req.tenantId!, memberData);
@@ -134,7 +130,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error creating member:", error);
       if (error instanceof z.ZodError) {
-        console.error("Validation errors:", error.issues);
         return res.status(400).json({ 
           message: "Invalid member data", 
           errors: error.issues 

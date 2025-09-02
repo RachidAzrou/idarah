@@ -115,14 +115,10 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
 
   const createMemberMutation = useMutation({
     mutationFn: async (data: MemberFormData) => {
-      console.log('Sending member data to API:', data);
       const response = await apiRequest("POST", "/api/members", data);
-      const result = await response.json();
-      console.log('API response:', result);
-      return result;
+      return response.json();
     },
     onSuccess: () => {
-      console.log('Member created successfully');
       queryClient.invalidateQueries({ queryKey: ["/api/members"] });
       queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
       toast({
@@ -132,7 +128,6 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
       onSuccess?.();
     },
     onError: (error: any) => {
-      console.error('Member creation error:', error);
       toast({
         title: "Fout bij aanmaken",
         description: error.message || "Er is een fout opgetreden bij het aanmaken van het lid.",
@@ -142,22 +137,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
   });
 
   const onSubmit = (data: MemberFormData) => {
-    console.log('Form submitted with data:', data);
-    console.log('Form is valid:', form.formState.isValid);
-    console.log('Form errors:', form.formState.errors);
     createMemberMutation.mutate(data);
-  };
-
-  const handleFormSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('Submit button clicked');
-    console.log('Current form values:', form.getValues());
-    console.log('Form state:', {
-      isValid: form.formState.isValid,
-      isSubmitting: form.formState.isSubmitting,
-      errors: form.formState.errors
-    });
-    form.handleSubmit(onSubmit)(e);
   };
 
   // Mock EID scan functionaliteit - in productie zou dit een echte EID reader library gebruiken
@@ -228,7 +208,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
   return (
     <div className="w-full">
       <Form {...form}>
-          <form onSubmit={handleFormSubmit} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div className="pt-4">
               <div className="mb-6 flex justify-end border-b pb-4">
                 <Button

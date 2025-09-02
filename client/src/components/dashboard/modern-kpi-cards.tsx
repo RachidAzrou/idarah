@@ -12,9 +12,10 @@ interface KpiCardProps {
   };
   icon: React.ReactNode;
   iconBgColor: string;
+  deltaColor?: string;
 }
 
-function KpiCard({ title, value, delta, icon, iconBgColor }: KpiCardProps) {
+function KpiCard({ title, value, delta, icon, iconBgColor, deltaColor }: KpiCardProps) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow">
       <div className="flex items-center justify-between">
@@ -27,7 +28,7 @@ function KpiCard({ title, value, delta, icon, iconBgColor }: KpiCardProps) {
             ) : (
               <TrendingDown className="h-3 w-3 text-red-500" />
             )}
-            <span className={`text-xs font-medium ${delta.positive ? 'text-blue-600' : 'text-red-500'}`}>
+            <span className={`text-xs font-medium ${deltaColor || (delta.positive ? 'text-blue-600' : 'text-red-500')}`}>
               {delta.value}
             </span>
           </div>
@@ -59,14 +60,16 @@ export default function ModernKpiCards() {
       value: isLoading ? "..." : ((stats as any)?.activeMembers?.toString() || "0"),
       delta: { value: "Actieve leden", positive: true },
       icon: <UserCheck className="h-4 w-4 text-green-600" />,
-      iconBgColor: "bg-green-50"
+      iconBgColor: "bg-green-50",
+      deltaColor: "text-green-600"
     },
     {
       title: "Stemgerechtigden",
       value: isLoading ? "..." : ((stats as any)?.activeMembers?.toString() || "0"),
       delta: { value: "Van actieve leden", positive: true },
       icon: <Vote className="h-4 w-4 text-amber-500" />,
-      iconBgColor: "bg-amber-50"
+      iconBgColor: "bg-amber-50",
+      deltaColor: "text-amber-500"
     },
     {
       title: "Openstaande Betalingen",
@@ -94,6 +97,7 @@ export default function ModernKpiCards() {
           delta={kpi.delta}
           icon={kpi.icon}
           iconBgColor={kpi.iconBgColor}
+          deltaColor={kpi.deltaColor}
         />
       ))}
     </div>

@@ -22,19 +22,18 @@ export function PublicScreensList({ onEdit, onDelete }: PublicScreensListProps) 
   const { toast } = useToast();
   
   const { data: screens = [], isLoading } = useQuery({
-    queryKey: ['/api/public-screens'],
-    queryFn: async () => {
-      const response = await fetch('/api/public-screens');
-      if (!response.ok) throw new Error('Failed to fetch screens');
-      return response.json();
-    }
+    queryKey: ['/api/public-screens']
   });
 
   const toggleStatusMutation = useMutation({
     mutationFn: async ({ id, active }: { id: string; active: boolean }) => {
+      const token = localStorage.getItem("authToken");
       const response = await fetch(`/api/public-screens/${id}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` })
+        },
         body: JSON.stringify({ active })
       });
       if (!response.ok) throw new Error('Failed to update screen');
@@ -47,8 +46,12 @@ export function PublicScreensList({ onEdit, onDelete }: PublicScreensListProps) 
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
+      const token = localStorage.getItem("authToken");
       const response = await fetch(`/api/public-screens/${id}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: {
+          ...(token && { 'Authorization': `Bearer ${token}` })
+        }
       });
       if (!response.ok) throw new Error('Failed to delete screen');
     },

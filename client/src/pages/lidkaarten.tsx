@@ -200,18 +200,18 @@ export default function LidkaartenPage() {
 
   return (
     <div className="space-y-8">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Lidkaarten</h1>
-          <p className="text-muted-foreground">
-            Beheer alle digitale lidkaarten van uw leden
-          </p>
+      {/* Page Header */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900" data-testid="page-title">Lidkaarten</h1>
+            <p className="mt-1 text-sm text-gray-700">Beheer alle digitale lidkaarten van uw leden</p>
+          </div>
+          <Button onClick={handleExport} variant="outline" className="gap-2">
+            <Download className="h-4 w-4" />
+            Exporteer
+          </Button>
         </div>
-        <Button onClick={handleExport} variant="outline" className="gap-2">
-          <Download className="h-4 w-4" />
-          Exporteer
-        </Button>
       </div>
 
       {/* KPI Cards */}

@@ -1,0 +1,249 @@
+Je bent een senior SaaS architect & full-stack engineer. Bouw de Digitale Lidkaart als een op zichzelf staande module in TypeScript met Next.js (app router), Prisma + PostgreSQL, Tailwind + shadcn/ui, Zod, NextAuth (Credentials), qrcode.react, Workbox (of eigen SW) voor PWA.
+Taal: Nederlands (België), tijdzone Europe/Brussels.
+
+0) Project setup
+
+Stack:
+
+Next.js 14+, React 18, TS strict.
+
+Prisma ORM + PostgreSQL.
+
+NextAuth (Credentials) voor login (alleen voor beheer/preview, Live Card zelf gebruikt token).
+
+Tailwind + shadcn/ui voor UI.
+
+qrcode.react voor QR.
+
+Scripts: dev, build, start, prisma migrate, prisma generate, seed.
+
+.env:
+
+DATABASE_URL=postgresql://user:pass@localhost:5432/lidkaart
+NEXTAUTH_SECRET=...
+NEXTAUTH_URL=http://localhost:3000
+APP_TIMEZONE=Europe/Brussels
+
+
+Kwaliteit: ESLint/Prettier, Zod validatie.
+
+1) Prisma schema (alleen wat nodig is voor kaart)
+
+Maak prisma/schema.prisma:
+
+datasource db { provider = "postgresql"; url = env("DATABASE_URL") }
+generator client { provider = "prisma-client-js" }
+
+enum CardStatus { ACTUEEL MOMENTOPNAME VERLOPEN }
+enum MemberCategory { STUDENT VOLWASSEN SENIOR }
+
+model Tenant {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  logoUrl     String?
+  primaryColor String?
+  brandingVersion Int   @default(1)
+  members     Member[]
+  cards       CardMeta[]
+  createdAt   DateTime @default(now())
+}
+
+model Member {
+  id           String   @id @default(cuid())
+  tenantId     String
+  tenant       Tenant   @relation(fields: [tenantId], references: [id])
+  memberNumber String   @unique
+  firstName    String
+  lastName     String
+  category     MemberCategory
+  active       Boolean  @default(true)
+  currentYearPaid Boolean @default(false)
+  validUntil   DateTime?
+  createdAt    DateTime @default(now())
+  card         CardMeta?
+}
+
+model CardMeta {
+  id            String     @id @default(cuid())
+  tenantId      String
+  tenant        Tenant     @relation(fields: [tenantId], references: [id])
+  memberId      String     @unique
+  member        Member     @relation(fields: [memberId], references: [id])
+  version       Int        @default(1)
+  etag          String
+  secureToken   String     @unique   // voor asset/snapshot urls
+  qrToken       String     @unique   // voor verify endpoint
+  status        CardStatus @default(ACTUEEL)
+  lastRenderedAt DateTime  @default(now())
+}
+
+
+Voeg prisma/seed.ts toe: 1 tenant, 2–3 leden met kaartmeta.
+
+2) Service-laag & versiebeheer
+
+ETag berekenen: hash van {member core: naam, nummer, category, active, currentYearPaid, validUntil} + tenant.brandingVersion.
+
+Invalidate (bump): bij wijziging in member of brandingVersion → version++, secureToken en qrToken (opnieuw random/opaque), lastRenderedAt=now().
+
+3) Routes & API’s
+
+Publiek/extern (geen login):
+
+GET /card/[memberId] → Live Card HTML (server component) + client interop.
+
+Query: ?standalone=1 (PWA start) en optioneel ?v=version.
+
+GET /api/card/verify/[qrToken] → JSON:
+
+{ "ok": true, "member": { "naam": "...", "nummer": "..." },
+  "status": { "actief": true, "betaaldDitJaar": true, "geldigTot": "2025-12-31" },
+  "tenant": { "naam": "...", "slug": "..." }, "ts": 1699999999 }
+
+
+GET /api/card/snapshot.png?memberId=...&v=...&t=secureToken → render PNG (optie).
+
+GET /api/card/snapshot.pdf?memberId=...&v=...&t=secureToken → render PDF (optie).
+
+Intern (met login RBAC of alleen beheer):
+
+POST /api/card/invalidate {memberId? tenantBrandingBump?} → herbereken etag + bump version/tokens.
+
+POST /api/card/batch {memberIds[]} → pre-render snapshots (optioneel).
+
+POST /api/tenant/branding/bump → verhoog brandingVersion (triggert invalidatie).
+
+Beveiliging:
+
+Public endpoints zijn tenant-scoped: lookup member → read tenant.
+
+Snapshots vereisen secureToken + v=version → cache-busting.
+
+Verify endpoint geen caching (always live).
+
+4) Live Card UI (landscape, modern, glossy)
+
+Pagina: /card/[memberId]
+
+Layout:
+
+Landscape kaart ~90–95% van mobiel (landscape) met 16–24px safe margin.
+
+Corner radius 16–20px; subtiele 3D shadow.
+
+Achtergrond kaart: merk/accentkleur (uit tenant) met subtle gradient; gloss overlay (white diagonal 8–12%).
+
+Inhoud:
+
+Logo + orgnaam in header.
+
+Linkerblok: Naam (groot, sterk), Lidnummer (mono), Categorie (pill).
+
+Statuschips onderaan links:
+
+“Betaald 20XX” (groen) / “Onbetaald” (amber)
+
+“Geldig tot dd/mm/jjjj”
+
+Rechterblok: QR-plate (witte isolatie, 12px radius, min 180px). Label “Scan voor verificatie”.
+
+Status-LED linksboven bij orgnaam:
+
+Groen “Actueel” (network fresh)
+
+Oranje “Momentopname” (offline cache)
+
+Rood “Verlopen” (server meldt outdated versie)
+
+Interactie:
+
+QR-plate is klikbaar → open modal met grote QR (≥ 320px) + “Sluiten”.
+
+Ververs knop (ghost icon rechtsboven) → icon spin (1x) + gloss sweep over kaart (≤ 800ms), dan data refresh.
+
+Banner “Op beginscherm installeren” (PWA hint) indien niet geïnstalleerd.
+
+Toegankelijkheid:
+
+aria-labels, focus-trap in modal, prefers-reduced-motion → animaties uit/fade.
+
+5) PWA
+
+public/manifest.webmanifest:
+
+name: "Digitale Lidkaart", short_name: "Lidkaart",
+
+start_url: "/card/[memberId]?standalone=1", display: "standalone",
+
+theme_color uit tenant of fallback, maskable icons 192–512.
+
+public/sw.js (of Workbox):
+
+Static assets: CacheFirst (versie-cache).
+
+Live Card HTML/JSON: NetworkFirst; bij offline → toon “Momentopname” + datum.
+
+Verify endpoint: NetworkOnly.
+
+Icons/Logo: StaleWhileRevalidate.
+
+Updatelogica: bij nieuw SW → toast “Nieuwe versie beschikbaar” → skipWaiting/clients.claim() bij bevestiging.
+
+Install UX:
+
+beforeinstallprompt → discrete CTA “Installeer Lidkaart”.
+
+iOS instructies (Add to Home Screen) + apple-touch-icon.
+
+6) Styling tokens (Tailwind)
+
+Neutrals (bg, text, border), 1 accent uit tenant.branding (fallback #bb2e2e).
+
+Chips:
+
+Success bg rgba(22,163,74,.18), fg #16a34a
+
+Warning bg rgba(245,158,11,.18), fg #f59e0b
+
+QR plate: altijd wit (scanbaarheid).
+
+Status-LED: klein rondje + label “Actueel / Momentopname / Verlopen”.
+
+7) Animaties
+
+Ververs:
+
+Refresh-icoon: 1 rotatie (500–600ms) cubic-bezier(.22,1,.36,1).
+
+Kaart gloss “sweep”: diagonal gradient slide (600ms).
+
+Tekstwaarden cross-fade 120–180ms na fetch.
+
+Respect prefers-reduced-motion: reduce → alleen korte fade.
+
+8) Security & Caching
+
+Snapshots: vereisen t=secureToken + v=version; headers Cache-Control: public, max-age=31536000, immutable; URL-versioning bust caches bij wijziging.
+
+Live Card HTML: ETag/Last-Modified; korte max-age, rely op SW NetworkFirst.
+
+Tokens:
+
+secureToken (asset toegang), rotate bij versie bump.
+
+qrToken (verify link), mag langer leven maar server beslist live status.
+
+Tenant-isolatie afdwingen op alle queries; voorkom IDOR.
+
+9) Admin hooks (minimaal)
+
+Eenvoudige beveiligde route /admin/card/[memberId] met knoppen:
+
+“Invalidate kaart” → bump version/tokens.
+
+“Genereer snapshot (PNG/PDF)”.
+
+“Toon preview als publiek”.
+
+Alleen rol beheerder/superadmin via NextAuth guard.

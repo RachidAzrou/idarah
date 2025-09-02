@@ -3,33 +3,33 @@ import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { membersLite, type MemberLite } from "../../../../../lib/mock/members-lite";
 
 interface MemberSelectProps {
   value?: string;
   onChange: (memberId: string) => void;
   error?: string;
+  members?: any[];
 }
 
-export function MemberSelect({ value, onChange, error }: MemberSelectProps) {
+export function MemberSelect({ value, onChange, error, members = [] }: MemberSelectProps) {
   const [inputValue, setInputValue] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
   
-  const selectedMember = value ? membersLite.find(m => m.id === value) : null;
+  const selectedMember = value ? members.find((m: any) => m.id === value) : null;
   
   // Filter members based on input
   const filteredMembers = useMemo(() => {
-    if (!inputValue.trim()) return membersLite;
+    if (!inputValue.trim()) return members;
     
     const searchTerm = inputValue.toLowerCase();
-    return membersLite.filter(member => 
+    return members.filter((member: any) => 
       member.firstName.toLowerCase().includes(searchTerm) ||
       member.lastName.toLowerCase().includes(searchTerm) ||
       member.memberNumber.includes(searchTerm) ||
       `${member.firstName} ${member.lastName}`.toLowerCase().includes(searchTerm) ||
       `${member.lastName}, ${member.firstName}`.toLowerCase().includes(searchTerm)
     );
-  }, [inputValue]);
+  }, [inputValue, members]);
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
@@ -42,7 +42,7 @@ export function MemberSelect({ value, onChange, error }: MemberSelectProps) {
     }
   };
 
-  const handleMemberSelect = (member: MemberLite) => {
+  const handleMemberSelect = (member: any) => {
     onChange(member.id);
     setInputValue(`${member.lastName}, ${member.firstName}`);
     setShowSuggestions(false);

@@ -17,9 +17,10 @@ import { AmountInput } from "./new/amount-input";
 import { PreviewCard } from "./new/preview-card";
 import { ConfirmDialog } from "./new/confirm-dialog";
 import { NewFeeSchema, type NewFeeFormData } from "../../../../lib/zod-fee";
-import { createFee, markPaid } from "../../../../lib/mock/fees-store";
-import { membersLite } from "../../../../lib/mock/members-lite";
 import { calculateEndDate, toISO } from "../../../../lib/period";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 interface NewFeeDialogProps {
   open: boolean;
@@ -28,9 +29,16 @@ interface NewFeeDialogProps {
 }
 
 export function NewFeeDialog({ open, onOpenChange, onSuccess }: NewFeeDialogProps) {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState("member");
+
+  // Fetch members for dropdown
+  const { data: members = [] } = useQuery({
+    queryKey: ["/api/members"],
+  });
 
   const form = useForm<NewFeeFormData>({
     resolver: zodResolver(NewFeeSchema),
@@ -41,6 +49,8 @@ export function NewFeeDialog({ open, onOpenChange, onSuccess }: NewFeeDialogProp
       iban: '',
       note: '',
       autoCreate: false,
+      periodStart: new Date().toISOString().split('T')[0],
+      periodEnd: new Date(Date.now() + 365*24*60*60*1000).toISOString().split('T')[0],
     },
   });
 
@@ -49,59 +59,71 @@ export function NewFeeDialog({ open, onOpenChange, onSuccess }: NewFeeDialogProp
 
   // Auto-calculate end date when start date or term changes
   const handleStartDateChange = (date: Date) => {
-    setValue('startDate', date);
+    setValue('periodStart', date.toISOString().split('T')[0]);
     const endDate = calculateEndDate(date, watchedValues.term);
-    setValue('endDate', endDate);
+    setValue('periodEnd', endDate.toISOString().split('T')[0]);
   };
 
   const handleTermChange = (term: 'MONTHLY' | 'YEARLY') => {
     setValue('term', term);
-    if (watchedValues.startDate) {
-      const endDate = calculateEndDate(watchedValues.startDate, term);
-      setValue('endDate', endDate);
+    if (watchedValues.periodStart) {
+      const startDate = new Date(watchedValues.periodStart);
+      const endDate = calculateEndDate(startDate, term);
+      setValue('periodEnd', endDate.toISOString().split('T')[0]);
     }
   };
+
+  // Create fee mutation
+  const createFeeMutation = useMutation({
+    mutationFn: async (data: NewFeeFormData) => {
+      const member = Array.isArray(members) ? members.find((m: any) => m.id === data.memberId) : null;
+      if (!member) {
+        throw new Error("Lid niet gevonden");
+      }
+
+      const feeData = {
+        memberId: data.memberId,
+        memberNumber: member.memberNumber,
+        memberName: `${member.firstName} ${member.lastName}`,
+        periodStart: new Date(data.periodStart!),
+        periodEnd: new Date(data.periodEnd!),
+        amount: data.amount,
+        method: data.method,
+        sepaEligible: data.method === 'SEPA',
+        note: data.note || null,
+        status: 'OPEN'
+      };
+
+      const response = await apiRequest("POST", "/api/fees", feeData);
+      return response.json();
+    },
+    onSuccess: (fee) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/fees"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
+      toast({
+        title: "Lidgeld aangemaakt",
+        description: "Het lidgeld is succesvol aangemaakt.",
+      });
+      reset();
+      onOpenChange(false);
+      setShowConfirmDialog(false);
+      onSuccess?.();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fout bij aanmaken",
+        description: error.message || "Er is een fout opgetreden bij het aanmaken van het lidgeld.",
+        variant: "destructive",
+      });
+    },
+  });
 
   const onSubmit = async (data: NewFeeFormData) => {
     try {
       setIsSubmitting(true);
-      
-      const member = membersLite.find(m => m.id === data.memberId);
-      if (!member) {
-        toast({
-          title: "Fout",
-          description: "Lid niet gevonden",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Create the fee
-      const newFee = createFee({
-        memberId: data.memberId,
-        memberNumber: member.memberNumber,
-        memberName: `${member.firstName} ${member.lastName}`,
-        periodStart: toISO(data.startDate),
-        periodEnd: toISO(data.endDate),
-        amount: data.amount,
-        method: data.method,
-        sepaEligible: data.method === 'SEPA' && member.hasMandate && !!data.iban,
-        note: data.note || undefined,
-      });
-
-      toast({
-        title: "Succes",
-        description: "Lidgeld succesvol aangemaakt",
-      });
-
-      return newFee;
+      createFeeMutation.mutate(data);
     } catch (error) {
-      toast({
-        title: "Fout",
-        description: "Er ging iets mis bij het aanmaken van het lidgeld",
-        variant: "destructive",
-      });
-      throw error;
+      console.error('Error submitting fee:', error);
     } finally {
       setIsSubmitting(false);
     }
@@ -112,16 +134,11 @@ export function NewFeeDialog({ open, onOpenChange, onSuccess }: NewFeeDialogProp
       setIsSubmitting(true);
       
       const formData = form.getValues();
-      const newFee = await onSubmit(formData);
+      await onSubmit(formData);
       
-      if (newFee && markAsPaid && paidDate) {
-        markPaid(newFee.id, toISO(paidDate));
-        toast({
-          title: "Lidgeld gemarkeerd als betaald",
-          description: `Betaaldatum: ${paidDate.toLocaleDateString('nl-BE')}`,
-        });
-      }
-
+      // For now, we create the fee as open and let the user mark it as paid separately
+      // Future enhancement: integrate direct payment marking
+      
       setShowConfirmDialog(false);
       reset();
       onOpenChange(false);
@@ -197,6 +214,7 @@ export function NewFeeDialog({ open, onOpenChange, onSuccess }: NewFeeDialogProp
                             value={watchedValues.memberId}
                             onChange={(memberId) => setValue('memberId', memberId)}
                             error={errors.memberId?.message}
+                            members={Array.isArray(members) ? members : []}
                           />
                         </SectionCard>
                       </TabsContent>
@@ -209,14 +227,14 @@ export function NewFeeDialog({ open, onOpenChange, onSuccess }: NewFeeDialogProp
                           <PeriodPicker
                             term={watchedValues.term}
                             onTermChange={handleTermChange}
-                            startDate={watchedValues.startDate}
+                            startDate={watchedValues.periodStart ? new Date(watchedValues.periodStart) : undefined}
                             onStartDateChange={handleStartDateChange}
-                            endDate={watchedValues.endDate}
-                            onEndDateChange={(date) => setValue('endDate', date)}
+                            endDate={watchedValues.periodEnd ? new Date(watchedValues.periodEnd) : undefined}
+                            onEndDateChange={(date) => setValue('periodEnd', date.toISOString().split('T')[0])}
                             errors={{
                               term: errors.term?.message,
-                              startDate: errors.startDate?.message,
-                              endDate: errors.endDate?.message,
+                              startDate: errors.periodStart?.message,
+                              endDate: errors.periodEnd?.message,
                             }}
                           />
                         </SectionCard>
@@ -280,8 +298,8 @@ export function NewFeeDialog({ open, onOpenChange, onSuccess }: NewFeeDialogProp
                     memberId={watchedValues.memberId}
                     term={watchedValues.term}
                     method={watchedValues.method}
-                    startDate={watchedValues.startDate}
-                    endDate={watchedValues.endDate}
+                    startDate={watchedValues.periodStart ? new Date(watchedValues.periodStart) : undefined}
+                    endDate={watchedValues.periodEnd ? new Date(watchedValues.periodEnd) : undefined}
                     amount={watchedValues.amount}
                     iban={watchedValues.iban}
                     note={watchedValues.note}

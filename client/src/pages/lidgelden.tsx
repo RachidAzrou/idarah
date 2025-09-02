@@ -14,6 +14,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 export default function Lidgelden() {
   const { toast } = useToast();
@@ -47,6 +48,7 @@ export default function Lidgelden() {
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [showSepaDialog, setShowSepaDialog] = useState(false);
   const [showChangeMethodDialog, setShowChangeMethodDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showNewFeeDialog, setShowNewFeeDialog] = useState(false);
 
   // Fetch membership fees from API
@@ -231,8 +233,14 @@ export default function Lidgelden() {
   };
 
   const handleDeleteFee = (fee: Fee) => {
-    if (confirm(`Weet je zeker dat je het lidgeld voor ${fee.memberName} (${fee.period}) wilt verwijderen?`)) {
-      deleteFeeMutation.mutate(fee.id);
+    setSelectedFee(fee);
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDeleteFee = () => {
+    if (selectedFee) {
+      deleteFeeMutation.mutate(selectedFee.id);
+      setShowDeleteDialog(false);
     }
   };
 
@@ -437,6 +445,28 @@ export default function Lidgelden() {
             </div>
           </DialogContent>
         </Dialog>
+
+        <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Lidgeld verwijderen</AlertDialogTitle>
+              <AlertDialogDescription>
+                Weet je zeker dat je het lidgeld voor <strong>{selectedFee?.memberName}</strong> ({selectedFee?.period}) wilt verwijderen? 
+                Deze actie kan niet ongedaan worden gemaakt.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Annuleren</AlertDialogCancel>
+              <AlertDialogAction 
+                onClick={confirmDeleteFee}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                data-testid="button-confirm-delete"
+              >
+                Verwijderen
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </main>
   );

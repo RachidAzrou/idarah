@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,10 +9,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Monitor, Plus, Eye, Copy, Settings, Power, PowerOff, ExternalLink } from "lucide-react";
 import { formatDateTime } from "@/lib/format";
 import { useToast } from "@/hooks/use-toast";
+import { ScreenWizard } from "@/components/public-screens/wizard/ScreenWizard";
 
 export default function PubliekeSchermen() {
   const [showNewScreenDialog, setShowNewScreenDialog] = useState(false);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const { data: screens, isLoading } = useQuery({
     queryKey: ["/api/public-screens"],
@@ -21,6 +23,54 @@ export default function PubliekeSchermen() {
   const { data: announcements } = useQuery({
     queryKey: ["/api/announcements"],
   });
+
+  const handleCreateScreen = async (screenData: {
+    name: string;
+    type: any;
+    config: any;
+  }) => {
+    try {
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        throw new Error('Not authenticated');
+      }
+
+      const response = await fetch('/api/public-screens', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name: screenData.name,
+          type: screenData.type,
+          active: true,
+          config: screenData.config
+        }),
+      });
+
+      if (response.ok) {
+        const screen = await response.json();
+        toast({
+          title: "Scherm aangemaakt",
+          description: `${screen.name} is succesvol aangemaakt.`,
+        });
+        
+        // Invalidate and refetch the screens data
+        queryClient.invalidateQueries({ queryKey: ["/api/public-screens"] });
+        setShowNewScreenDialog(false);
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create screen');
+      }
+    } catch (error: any) {
+      toast({
+        title: "Fout",
+        description: error.message || "Er is een fout opgetreden bij het aanmaken van het scherm.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const copyPublicUrl = (token: string) => {
     const url = `${window.location.origin}/public/screen/${token}`;
@@ -35,6 +85,8 @@ export default function PubliekeSchermen() {
     const labels: Record<string, string> = {
       'BETAALSTATUS': 'Betaalstatus Matrix',
       'MEDEDELINGEN': 'Mededelingen Carousel',
+      'LEDENLIJST': 'Ledenlijst',
+      'MULTIMEDIA': 'Multimedia Scherm',
     };
     return labels[type] || type;
   };
@@ -58,9 +110,19 @@ export default function PubliekeSchermen() {
           <div className="px-4 sm:px-6 lg:px-8">
             {/* Page Header */}
             <div className="mb-6">
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900" data-testid="page-title">Publieke Schermen</h1>
-                <p className="mt-1 text-sm text-gray-700">Beheer informatiedisplays en digitale mededelingenborden</p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-900" data-testid="page-title">Publieke Schermen</h1>
+                  <p className="mt-1 text-sm text-gray-700">Beheer informatiedisplays en digitale mededelingenborden</p>
+                </div>
+                <Button 
+                  onClick={() => setShowNewScreenDialog(true)}
+                  className="gap-2"
+                  data-testid="button-new-screen"
+                >
+                  <Plus className="w-4 h-4" />
+                  Nieuw Scherm
+                </Button>
               </div>
             </div>
 
@@ -318,6 +380,13 @@ export default function PubliekeSchermen() {
               </TabsContent>
             </Tabs>
           </div>
+
+          {/* Screen Wizard */}
+          <ScreenWizard
+            open={showNewScreenDialog}
+            onOpenChange={setShowNewScreenDialog}
+            onComplete={handleCreateScreen}
+          />
         </main>
   );
 }

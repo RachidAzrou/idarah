@@ -10,25 +10,33 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { TransactionSchema, TransactionFormData } from "@/lib/zod/transaction";
-import { categories, mockMembers, Transaction, generateTransactionId } from "@/lib/mock/transactions";
+import { categories } from "@/lib/mock/transactions";
 import { format } from "date-fns";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 interface NewTransactionDialogProps {
   open: boolean;
   onClose: () => void;
-  onSave: (transaction: Transaction) => void;
-  editTransaction?: Transaction | null;
+  editTransaction?: any | null;
 }
 
 export function NewTransactionDialog({
   open,
   onClose,
-  onSave,
   editTransaction
 }: NewTransactionDialogProps) {
   const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   
   const isEditing = !!editTransaction;
+
+  // Fetch members for dropdown
+  const { data: members = [] } = useQuery({
+    queryKey: ["/api/members"],
+  });
   
   const form = useForm<TransactionFormData>({
     resolver: zodResolver(TransactionSchema),
@@ -47,33 +55,69 @@ export function NewTransactionDialog({
   const selectedType = form.watch('type');
   const selectedMemberId = form.watch('memberId');
   
+  // Create transaction mutation
+  const createTransactionMutation = useMutation({
+    mutationFn: async (data: TransactionFormData) => {
+      const response = await apiRequest("POST", "/api/transactions", data);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/transactions"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
+      toast({
+        title: "Transactie toegevoegd",
+        description: "De transactie is succesvol toegevoegd.",
+      });
+      form.reset();
+      onClose();
+    },
+    onError: (error) => {
+      toast({
+        title: "Fout bij opslaan",
+        description: "Er is een fout opgetreden bij het opslaan van de transactie.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Update transaction mutation
+  const updateTransactionMutation = useMutation({
+    mutationFn: async (data: TransactionFormData) => {
+      const response = await apiRequest("PUT", `/api/transactions/${editTransaction.id}`, data);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/transactions"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
+      toast({
+        title: "Transactie bijgewerkt",
+        description: "De transactie is succesvol bijgewerkt.",
+      });
+      onClose();
+    },
+    onError: (error) => {
+      toast({
+        title: "Fout bij bijwerken",
+        description: "Er is een fout opgetreden bij het bijwerken van de transactie.",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Update member name when member is selected
   const handleMemberChange = (memberId: string) => {
-    const member = mockMembers.find(m => m.id === memberId);
-    form.setValue('memberName', member?.name || '');
+    const member = Array.isArray(members) ? members.find((m: any) => m.id === memberId) : null;
+    form.setValue('memberName', member ? `${member.firstName} ${member.lastName}` : '');
   };
 
   const onSubmit = async (data: TransactionFormData) => {
     setLoading(true);
     try {
-      const transaction: Transaction = {
-        id: editTransaction?.id || generateTransactionId(),
-        date: data.date,
-        type: data.type,
-        category: data.category,
-        amount: data.amount,
-        method: data.method,
-        memberId: data.memberId || undefined,
-        memberName: data.memberName || undefined,
-        description: data.description || undefined
-      };
-      
-      onSave(transaction);
-      
-      if (!isEditing) {
-        form.reset();
+      if (isEditing) {
+        updateTransactionMutation.mutate(data);
+      } else {
+        createTransactionMutation.mutate(data);
       }
-      onClose();
     } catch (error) {
       console.error('Error saving transaction:', error);
     } finally {
@@ -243,9 +287,9 @@ export function NewTransactionDialog({
                     </FormControl>
                     <SelectContent>
                       <SelectItem value="">Geen lid gekoppeld</SelectItem>
-                      {mockMembers.map((member) => (
+                      {Array.isArray(members) && members.map((member: any) => (
                         <SelectItem key={member.id} value={member.id}>
-                          {member.name}
+                          {member.firstName} {member.lastName}
                         </SelectItem>
                       ))}
                     </SelectContent>

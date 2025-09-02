@@ -101,7 +101,8 @@ export default function FinancePage() {
 
   // Filtered transactions
   const filteredTransactions = useMemo(() => {
-    return transactions.filter(transaction => {
+    if (!Array.isArray(transactions)) return [];
+    return transactions.filter((transaction: any) => {
       // Apply all filters here for consistency across components
       if (effectiveFilters.search) {
         const search = effectiveFilters.search.toLowerCase();
@@ -183,42 +184,7 @@ export default function FinancePage() {
     setDeleteTransactionId('');
   };
 
-  const createTransactionMutation = useMutation({
-    mutationFn: async (transactionData: any) => {
-      const response = await apiRequest("POST", "/api/transactions", transactionData);
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/transactions"] });
-      toast({
-        title: "Transactie toegevoegd",
-        description: "De nieuwe transactie is succesvol toegevoegd.",
-      });
-    },
-  });
 
-  const updateTransactionMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: any }) => {
-      const response = await apiRequest("PUT", `/api/transactions/${id}`, data);
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/transactions"] });
-      toast({
-        title: "Transactie bijgewerkt",
-        description: "De wijzigingen zijn succesvol opgeslagen.",
-      });
-    },
-  });
-
-  const handleTransactionSave = (transaction: any) => {
-    if (editTransaction) {
-      updateTransactionMutation.mutate({ id: transaction.id, data: transaction });
-    } else {
-      createTransactionMutation.mutate(transaction);
-    }
-    setEditTransaction(null);
-  };
 
   const handleImport = (importedTransactions: any[]) => {
     // For now, just show the notification - bulk import can be implemented later
@@ -332,7 +298,6 @@ export default function FinancePage() {
             setShowNewTransactionDialog(false);
             setEditTransaction(null);
           }}
-          onSave={handleTransactionSave}
           editTransaction={editTransaction}
         />
 

@@ -227,6 +227,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/transactions", authMiddleware, tenantMiddleware, async (req, res) => {
+    try {
+      const transactionData = { 
+        ...req.body, 
+        tenantId: req.tenantId,
+        date: new Date(req.body.date)
+      };
+      const transaction = await storage.createTransaction(transactionData);
+      res.status(201).json(transaction);
+    } catch (error) {
+      console.error("Error creating transaction:", error);
+      res.status(400).json({ message: "Invalid transaction data" });
+    }
+  });
+
+  app.put("/api/transactions/:id", authMiddleware, tenantMiddleware, async (req, res) => {
+    try {
+      const transactionData = { 
+        ...req.body, 
+        date: req.body.date ? new Date(req.body.date) : undefined
+      };
+      const transaction = await storage.updateTransaction(req.params.id, transactionData);
+      res.json(transaction);
+    } catch (error) {
+      console.error("Error updating transaction:", error);
+      res.status(400).json({ message: "Invalid transaction data" });
+    }
+  });
+
+  app.delete("/api/transactions/:id", authMiddleware, tenantMiddleware, async (req, res) => {
+    try {
+      await storage.deleteTransaction(req.params.id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting transaction:", error);
+      res.status(500).json({ message: "Failed to delete transaction" });
+    }
+  });
+
   app.get("/api/financial/reports", authMiddleware, tenantMiddleware, async (req, res) => {
     try {
       const reports = await financialService.generateReports(req.tenantId!);

@@ -73,6 +73,8 @@ export interface IStorage {
   // Transactions
   getTransactionsByTenant(tenantId: string): Promise<Transaction[]>;
   createTransaction(transaction: InsertTransaction): Promise<Transaction>;
+  updateTransaction(id: string, transaction: Partial<InsertTransaction>): Promise<Transaction>;
+  deleteTransaction(id: string): Promise<void>;
   
   // Dashboard
   getDashboardStats(tenantId: string): Promise<any>;
@@ -233,6 +235,15 @@ export class DatabaseStorage implements IStorage {
   async createTransaction(transaction: InsertTransaction): Promise<Transaction> {
     const [newTransaction] = await db.insert(transactions).values(transaction).returning();
     return newTransaction;
+  }
+
+  async updateTransaction(id: string, transaction: Partial<InsertTransaction>): Promise<Transaction> {
+    const [updatedTransaction] = await db.update(transactions).set(transaction).where(eq(transactions.id, id)).returning();
+    return updatedTransaction;
+  }
+
+  async deleteTransaction(id: string): Promise<void> {
+    await db.delete(transactions).where(eq(transactions.id, id));
   }
 
   // Rules

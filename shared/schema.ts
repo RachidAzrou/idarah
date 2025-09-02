@@ -61,7 +61,6 @@ export const members = pgTable("members", {
   postalCode: text("postal_code"),
   city: text("city"),
   country: text("country"),
-  joinDate: timestamp("join_date"),
   active: boolean("active").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });

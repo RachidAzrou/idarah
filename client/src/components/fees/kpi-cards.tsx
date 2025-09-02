@@ -1,6 +1,7 @@
 import { Fee } from "@shared/fees-schema";
 import { formatCurrencyBE, formatPercentage } from "@/lib/format";
-import { Euro, TrendingUp, TrendingDown, AlertTriangle, FileText } from "lucide-react";
+import { Check, TrendingUp, TrendingDown, AlertTriangle, FileText } from "lucide-react";
+import { TbClockHour3 } from "react-icons/tb";
 
 interface KpiCardProps {
   title: string;
@@ -10,9 +11,10 @@ interface KpiCardProps {
     positive: boolean;
   };
   icon: React.ReactNode;
+  iconBgColor: string;
 }
 
-function KpiCard({ title, value, delta, icon }: KpiCardProps) {
+function KpiCard({ title, value, delta, icon, iconBgColor }: KpiCardProps) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow">
       <div className="flex items-center justify-between">
@@ -30,7 +32,7 @@ function KpiCard({ title, value, delta, icon }: KpiCardProps) {
             </span>
           </div>
         </div>
-        <div className="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center">
+        <div className={`w-8 h-8 ${iconBgColor} rounded-full flex items-center justify-center`}>
           {icon}
         </div>
       </div>
@@ -62,25 +64,29 @@ export function KpiCards({ fees }: KpiCardsProps) {
       title: "Openstaand",
       value: formatCurrencyBE(openAmount),
       delta: { value: `${openFees.length} facturen`, positive: openFees.length < 60 },
-      icon: <Euro className="h-4 w-4 text-blue-600" />
+      icon: <TbClockHour3 className="h-4 w-4 text-orange-600" />,
+      iconBgColor: "bg-orange-50"
     },
     {
       title: "Betaald",
       value: formatPercentage(paidPercentage),
       delta: { value: `${formatCurrencyBE(paidAmount)} ontvangen`, positive: paidPercentage > 65 },
-      icon: <TrendingUp className="h-4 w-4 text-blue-600" />
+      icon: <Check className="h-4 w-4 text-green-600" />,
+      iconBgColor: "bg-green-50"
     },
     {
       title: "Achterstallig", 
       value: formatCurrencyBE(overdueAmount),
       delta: { value: `${overdueFees.length} facturen`, positive: overdueFees.length < 60 },
-      icon: <AlertTriangle className="h-4 w-4 text-blue-600" />
+      icon: <AlertTriangle className="h-4 w-4 text-red-600" />,
+      iconBgColor: "bg-red-50"
     },
     {
       title: "Totaal Facturen",
       value: totalCount.toString(),
       delta: { value: formatCurrencyBE(totalAmount), positive: true },
-      icon: <FileText className="h-4 w-4 text-blue-600" />
+      icon: <FileText className="h-4 w-4 text-blue-600" />,
+      iconBgColor: "bg-blue-50"
     }
   ];
 
@@ -93,6 +99,7 @@ export function KpiCards({ fees }: KpiCardsProps) {
           value={kpi.value}
           delta={kpi.delta}
           icon={kpi.icon}
+          iconBgColor={kpi.iconBgColor}
         />
       ))}
     </div>

@@ -142,7 +142,21 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
 
   const onSubmit = (data: MemberFormData) => {
     console.log('Form submitted with data:', data);
+    console.log('Form is valid:', form.formState.isValid);
+    console.log('Form errors:', form.formState.errors);
     createMemberMutation.mutate(data);
+  };
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log('Submit button clicked');
+    console.log('Current form values:', form.getValues());
+    console.log('Form state:', {
+      isValid: form.formState.isValid,
+      isSubmitting: form.formState.isSubmitting,
+      errors: form.formState.errors
+    });
+    form.handleSubmit(onSubmit)(e);
   };
 
   // Mock EID scan functionaliteit - in productie zou dit een echte EID reader library gebruiken
@@ -213,7 +227,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
   return (
     <div className="w-full">
       <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={handleFormSubmit} className="space-y-6">
             <div className="pt-4">
               <div className="mb-6 flex justify-end border-b pb-4">
                 <Button

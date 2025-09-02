@@ -218,7 +218,7 @@ export function ScreenWizard({ open, onOpenChange, onComplete }: ScreenWizardPro
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-5xl h-[85vh] flex flex-col" data-testid="screen-wizard">
+      <DialogContent className="max-w-6xl h-[95vh] flex flex-col" data-testid="screen-wizard">
         <DialogHeader className="flex-shrink-0 pb-6 border-b border-border">
           <DialogTitle className="flex items-center gap-3 text-xl">
             <Monitor className="h-6 w-6" />
@@ -258,7 +258,7 @@ export function ScreenWizard({ open, onOpenChange, onComplete }: ScreenWizardPro
         </DialogHeader>
 
         {/* Main content area with fixed height */}
-        <div className="flex-1 py-6 overflow-y-auto" style={{ minHeight: '400px', maxHeight: '500px' }}>
+        <div className="flex-1 py-6 overflow-y-auto" style={{ minHeight: '600px', maxHeight: '700px' }}>
           {StepComponent && (
             <StepComponent
               data={wizardData}

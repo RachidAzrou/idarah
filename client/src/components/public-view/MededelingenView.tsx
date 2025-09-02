@@ -76,14 +76,14 @@ export function MededelingenView({ config }: MededelingenViewProps) {
             minHeight: '85vh',
             display: 'flex',
             flexDirection: 'column',
-            justifyContent: 'center'
+            justifyContent: 'flex-start'
           }}
         >
-          {/* Content that changes with transition */}
-          <div className={`transition-opacity duration-300 ${fadeClass}`}>
+          {/* Header section - always at top */}
+          <div className="mb-12">
             {/* Slide title */}
             <h1 
-              className="mb-8"
+              className={`mb-4 transition-opacity duration-300 ${fadeClass}`}
               style={{
                 fontSize: slideStyle.titleFontSize ? `${slideStyle.titleFontSize}px` : '56px',
                 fontFamily: slideStyle.titleFontFamily || 'Poppins',
@@ -99,7 +99,7 @@ export function MededelingenView({ config }: MededelingenViewProps) {
             {/* Slide subtitle */}
             {currentSlide.subtitle && (
               <h2 
-                className="mb-10"
+                className={`transition-opacity duration-300 ${fadeClass}`}
                 style={{
                   fontSize: slideStyle.subtitleFontSize ? `${slideStyle.subtitleFontSize}px` : '32px',
                   fontFamily: slideStyle.subtitleFontFamily || 'Poppins',
@@ -112,13 +112,15 @@ export function MededelingenView({ config }: MededelingenViewProps) {
                 {currentSlide.subtitle}
               </h2>
             )}
-            
-            {/* Slide content/body with line break support */}
-            {currentSlide.body && (
+          </div>
+          
+          {/* Body content below header */}
+          {currentSlide.body && (
+            <div className="flex-1 flex items-start justify-center pt-4">
               <div 
-                className="leading-relaxed whitespace-pre-line max-w-4xl mx-auto"
+                className={`leading-relaxed whitespace-pre-line max-w-5xl transition-opacity duration-300 ${fadeClass}`}
                 style={{
-                  fontSize: slideStyle.bodyFontSize ? `${slideStyle.bodyFontSize}px` : '26px',
+                  fontSize: slideStyle.bodyFontSize ? `${slideStyle.bodyFontSize}px` : '28px',
                   fontFamily: slideStyle.bodyFontFamily || 'Poppins',
                   fontWeight: slideStyle.bodyFontWeight || 'normal',
                   color: slideStyle.bodyColor || '#374151',
@@ -128,8 +130,8 @@ export function MededelingenView({ config }: MededelingenViewProps) {
               >
                 {currentSlide.body}
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
 

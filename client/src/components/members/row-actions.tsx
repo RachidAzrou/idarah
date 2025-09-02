@@ -90,7 +90,7 @@ export function RowActions({
             onClick={handleToggleStatus}
             className={`cursor-pointer ${
               isActive 
-                ? 'text-red-600 focus:text-red-600 focus:bg-red-50' 
+                ? '' 
                 : 'text-green-600 focus:text-green-600 focus:bg-green-50'
             }`}
             data-testid={`action-toggle-status-${memberId}`}

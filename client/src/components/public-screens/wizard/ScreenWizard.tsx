@@ -79,12 +79,6 @@ interface WizardData {
   };
 }
 
-const resetWizardData = (): WizardData => ({
-  name: "",
-  title: { ...defaultTitleStyling },
-  subtitle: { ...defaultSubtitleStyling }
-});
-
 const defaultTitleStyling: TitleStyling = {
   text: "",
   fontSize: 32,
@@ -100,6 +94,12 @@ const defaultSubtitleStyling: TitleStyling = {
   color: "#6b7280",
   fontWeight: "normal"
 };
+
+const resetWizardData = (): WizardData => ({
+  name: "",
+  title: { ...defaultTitleStyling },
+  subtitle: { ...defaultSubtitleStyling }
+});
 
 export function ScreenWizard({ open, onOpenChange, onComplete }: ScreenWizardProps) {
   const [currentStep, setCurrentStep] = useState(0);

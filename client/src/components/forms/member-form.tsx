@@ -25,13 +25,14 @@ import { IdCard } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { Member } from "@shared/schema";
 
 
 const memberSchema = z.object({
   firstName: z.string().min(1, "Voornaam is verplicht"),
   lastName: z.string().min(1, "Achternaam is verplicht"),
   gender: z.enum(['M', 'V'], { required_error: "Geslacht is verplicht" }),
-  birthDate: z.date({ required_error: "Geboortedatum is verplicht" }),
+  dateOfBirth: z.date({ required_error: "Geboortedatum is verplicht" }),
   category: z.enum(['STUDENT', 'STANDAARD', 'SENIOR'], { required_error: "Categorie is verplicht" }),
   email: z.string().email("Ongeldig e-mailadres").optional().or(z.literal("")),
   phone: z.string().optional(),
@@ -70,19 +71,59 @@ const memberSchema = z.object({
 type MemberFormData = z.infer<typeof memberSchema>;
 
 interface MemberFormProps {
+  member?: Member;
   onSuccess?: () => void;
   onCancel?: () => void;
 }
 
-export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
+export function MemberForm({ member, onSuccess, onCancel }: MemberFormProps) {
   const [activeTab, setActiveTab] = useState("personal");
   const [isScanning, setIsScanning] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const form = useForm<MemberFormData>({
-    resolver: zodResolver(memberSchema),
-    defaultValues: {
+  // Build default values based on whether we're editing or creating
+  const getDefaultValues = (): Partial<MemberFormData> => {
+    if (member) {
+      // Parse address for editing
+      const addressParts = member.address ? member.address.split(' ') : [];
+      const number = addressParts.length > 0 ? addressParts.pop() || '' : '';
+      const street = addressParts.join(' ');
+      
+      return {
+        firstName: member.firstName || '',
+        lastName: member.lastName || '',
+        gender: (member.gender as 'M' | 'V') || 'M',
+        dateOfBirth: member.dateOfBirth ? new Date(member.dateOfBirth) : undefined,
+        category: member.category || 'STANDAARD',
+        email: member.email || '',
+        phone: member.phone || '',
+        street: street,
+        number: number,
+        bus: '',
+        postalCode: member.postalCode || '',
+        city: member.city || '',
+        country: member.country || 'België',
+        financialSettings: {
+          paymentMethod: (member.paymentMethod as any) || 'SEPA',
+          iban: member.iban || '',
+          paymentTerm: 'YEARLY',
+        },
+        organization: {
+          interestedInActiveRole: false,
+          roleDescription: '',
+        },
+        permissions: {
+          privacyAgreement: !member, // Only require for new members
+          photoVideoConsent: false,
+          newsletterSubscription: false,
+          whatsappList: false,
+        },
+      };
+    }
+    
+    // Default values for new member
+    return {
       firstName: '',
       lastName: '',
       gender: 'M',
@@ -110,12 +151,19 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
         newsletterSubscription: false,
         whatsappList: false,
       },
-    },
+    };
+  };
+
+  const form = useForm<MemberFormData>({
+    resolver: zodResolver(memberSchema),
+    defaultValues: getDefaultValues(),
   });
 
   const createMemberMutation = useMutation({
     mutationFn: async (data: MemberFormData) => {
-      const response = await apiRequest("POST", "/api/members", data);
+      const method = member ? "PATCH" : "POST";
+      const url = member ? `/api/members/${member.id}` : "/api/members";
+      const response = await apiRequest(method, url, data);
       return response.json();
     },
     onSuccess: async (newMember, variables) => {
@@ -138,15 +186,15 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
       await queryClient.invalidateQueries({ queryKey: ["/api/members"] });
       await queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
       toast({
-        title: "Lid aangemaakt",
-        description: "Het nieuwe lid is succesvol toegevoegd.",
+        title: member ? "Lid bijgewerkt" : "Lid aangemaakt",
+        description: member ? "Het lid is succesvol bijgewerkt." : "Het nieuwe lid is succesvol toegevoegd.",
       });
       onSuccess?.();
     },
     onError: (error: any) => {
       toast({
-        title: "Fout bij aanmaken",
-        description: error.message || "Er is een fout opgetreden bij het aanmaken van het lid.",
+        title: member ? "Fout bij bijwerken" : "Fout bij aanmaken",
+        description: error.message || (member ? "Er is een fout opgetreden bij het bijwerken van het lid." : "Er is een fout opgetreden bij het aanmaken van het lid."),
         variant: "destructive",
       });
     },
@@ -196,7 +244,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
         firstName: "Ahmed",
         lastName: "Ben Mansour",
         gender: "M" as const,
-        birthDate: new Date("1985-03-15"),
+        dateOfBirth: new Date("1985-03-15"),
         street: "Nieuwstraat",
         number: "25",
         bus: "",
@@ -209,7 +257,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
       form.setValue("firstName", eidData.firstName);
       form.setValue("lastName", eidData.lastName);
       form.setValue("gender", eidData.gender);
-      form.setValue("birthDate", eidData.birthDate);
+      form.setValue("dateOfBirth", eidData.dateOfBirth);
       form.setValue("street", eidData.street);
       form.setValue("number", eidData.number);
       form.setValue("bus", eidData.bus);
@@ -254,7 +302,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
     
     switch (tabName) {
       case "personal":
-        return !!(errors.firstName || errors.lastName || errors.gender || errors.birthDate || errors.category || errors.email || errors.phone);
+        return !!(errors.firstName || errors.lastName || errors.gender || errors.dateOfBirth || errors.category || errors.email || errors.phone);
       case "address":
         return !!(errors.street || errors.number || errors.postalCode || errors.city || errors.country);
       case "financial":
@@ -372,7 +420,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
 
                   <FormField
                     control={form.control}
-                    name="birthDate"
+                    name="dateOfBirth"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Geboortedatum *</FormLabel>

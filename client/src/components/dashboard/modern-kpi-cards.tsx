@@ -42,8 +42,10 @@ function KpiCard({ title, value, delta, icon, iconBgColor, deltaColor }: KpiCard
 }
 
 export default function ModernKpiCards() {
-  const { data: stats, isLoading } = useQuery({
+  const { data: stats, isLoading, isFetching } = useQuery({
     queryKey: ["/api/dashboard/stats"],
+    staleTime: 5000, // 5 seconds for dashboard stats
+    refetchInterval: 30000, // Refresh every 30 seconds
   });
 
   // Altijd KPI data tonen, ook zonder stats

@@ -48,13 +48,15 @@ Preferred communication style: Simple, everyday language.
 ## Database & ORM
 - **Neon Database**: Serverless PostgreSQL database with WebSocket support
 - **Drizzle ORM**: Type-safe database operations with migration support
-- **Database Pooling**: Connection pooling for efficient database resource management
+- **Database Pooling**: Enhanced connection pooling with 20 max connections, 30s idle timeout, 2s connection timeout
+- **In-Memory Caching**: Simple TTL-based cache for frequently accessed data (dashboard stats, members, fees)
 
 ## UI & Design System
 - **Radix UI**: Headless UI primitives for accessibility and keyboard navigation
 - **Lucide React**: Icon library for consistent iconography
 - **TailwindCSS**: Utility-first CSS framework with custom design tokens
 - **shadcn/ui**: Pre-built component library with consistent styling
+- **TanStack Query**: Enhanced client-side caching with 10s stale time, optimistic updates for all mutations
 
 ## Development & Build Tools
 - **Vite**: Fast development server and build tool with React plugin

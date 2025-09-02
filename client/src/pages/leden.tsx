@@ -47,8 +47,9 @@ export default function Leden() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: members, isLoading } = useQuery({
+  const { data: members, isLoading, isFetching } = useQuery({
     queryKey: ["/api/members"],
+    staleTime: 5000, // 5 seconds for member data
   });
 
   const updateMemberMutation = useMutation({

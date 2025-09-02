@@ -40,6 +40,7 @@ import {
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, sql, gte, lte } from "drizzle-orm";
+import { cache } from "./cache";
 
 export interface IStorage {
   // Tenants
@@ -122,7 +123,14 @@ export interface IStorage {
 export class DatabaseStorage implements IStorage {
   // Tenants
   async getTenant(id: string): Promise<Tenant | undefined> {
+    const cacheKey = `tenant:${id}`;
+    const cached = cache.get<Tenant>(cacheKey);
+    if (cached) return cached;
+    
     const [tenant] = await db.select().from(tenants).where(eq(tenants.id, id));
+    if (tenant) {
+      cache.set(cacheKey, tenant, 60000); // Cache for 1 minute
+    }
     return tenant || undefined;
   }
 
@@ -173,9 +181,17 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getMembersByTenant(tenantId: string): Promise<Member[]> {
-    return await db.select().from(members)
+    const cacheKey = `members:tenant:${tenantId}`;
+    const cached = cache.get<Member[]>(cacheKey);
+    if (cached) return cached;
+    
+    const membersData = await db.select().from(members)
       .where(eq(members.tenantId, tenantId))
-      .orderBy(desc(members.createdAt));
+      .orderBy(desc(members.createdAt))
+      .limit(1000); // Limit to prevent large data loads
+    
+    cache.set(cacheKey, membersData, 15000); // Cache for 15 seconds
+    return membersData;
   }
 
   async getMemberByNumber(memberNumber: string): Promise<Member | undefined> {
@@ -185,16 +201,28 @@ export class DatabaseStorage implements IStorage {
 
   async createMember(member: InsertMember): Promise<Member> {
     const [newMember] = await db.insert(members).values(member).returning();
+    // Invalidate cache
+    cache.deletePattern(`members:tenant:${member.tenantId}`);
+    cache.deletePattern(`dashboard:stats:${member.tenantId}`);
     return newMember;
   }
 
   async updateMember(id: string, member: Partial<InsertMember>): Promise<Member> {
     const [updatedMember] = await db.update(members).set(member).where(eq(members.id, id)).returning();
+    // Invalidate cache
+    cache.deletePattern(`members:tenant:${updatedMember.tenantId}`);
+    cache.deletePattern(`dashboard:stats:${updatedMember.tenantId}`);
     return updatedMember;
   }
 
   async deleteMember(id: string): Promise<void> {
+    // Get member first to know tenant for cache invalidation
+    const [member] = await db.select().from(members).where(eq(members.id, id));
     await db.delete(members).where(eq(members.id, id));
+    if (member) {
+      cache.deletePattern(`members:tenant:${member.tenantId}`);
+      cache.deletePattern(`dashboard:stats:${member.tenantId}`);
+    }
   }
 
   // Membership Fees
@@ -206,7 +234,8 @@ export class DatabaseStorage implements IStorage {
   async getMembershipFeesByTenant(tenantId: string): Promise<MembershipFee[]> {
     return await db.select().from(membershipFees)
       .where(eq(membershipFees.tenantId, tenantId))
-      .orderBy(desc(membershipFees.createdAt));
+      .orderBy(desc(membershipFees.createdAt))
+      .limit(2000); // Limit to prevent large data loads
   }
 
   async getMembershipFeesByMember(memberId: string): Promise<MembershipFee[]> {
@@ -217,11 +246,17 @@ export class DatabaseStorage implements IStorage {
 
   async createMembershipFee(fee: InsertMembershipFee): Promise<MembershipFee> {
     const [newFee] = await db.insert(membershipFees).values(fee).returning();
+    // Invalidate cache
+    cache.deletePattern(`dashboard:stats:${fee.tenantId}`);
     return newFee;
   }
 
   async updateMembershipFee(id: string, fee: Partial<InsertMembershipFee>): Promise<MembershipFee> {
     const [updatedFee] = await db.update(membershipFees).set(fee).where(eq(membershipFees.id, id)).returning();
+    // Invalidate cache
+    if (updatedFee.tenantId) {
+      cache.deletePattern(`dashboard:stats:${updatedFee.tenantId}`);
+    }
     return updatedFee;
   }
 
@@ -229,7 +264,8 @@ export class DatabaseStorage implements IStorage {
   async getTransactionsByTenant(tenantId: string): Promise<Transaction[]> {
     return await db.select().from(transactions)
       .where(eq(transactions.tenantId, tenantId))
-      .orderBy(desc(transactions.date));
+      .orderBy(desc(transactions.date))
+      .limit(1000); // Limit to prevent large data loads
   }
 
   async createTransaction(transaction: InsertTransaction): Promise<Transaction> {
@@ -354,35 +390,56 @@ export class DatabaseStorage implements IStorage {
     return newExport;
   }
 
-  // Dashboard stats
+  // Dashboard stats - Optimized single query with caching
   async getDashboardStats(tenantId: string): Promise<{
     totalMembers: number;
     activeMembers: number;
     totalRevenue: number;
     outstanding: number;
   }> {
-    const [totalMembersResult] = await db.select({ count: sql<number>`count(*)` })
-      .from(members)
-      .where(eq(members.tenantId, tenantId));
+    const cacheKey = `dashboard:stats:${tenantId}`;
+    const cached = cache.get<{
+      totalMembers: number;
+      activeMembers: number;
+      totalRevenue: number;
+      outstanding: number;
+    }>(cacheKey);
+    if (cached) return cached;
 
-    const [activeMembersResult] = await db.select({ count: sql<number>`count(*)` })
-      .from(members)
-      .where(and(eq(members.tenantId, tenantId), eq(members.active, true)));
+    // Single optimized query using CTEs for better performance
+    const result = await db.execute(sql`
+      WITH member_stats AS (
+        SELECT 
+          COUNT(*) as total_members,
+          COUNT(CASE WHEN active = true THEN 1 END) as active_members
+        FROM ${members} 
+        WHERE tenant_id = ${tenantId}
+      ),
+      fee_stats AS (
+        SELECT 
+          COALESCE(SUM(CASE WHEN status = 'PAID' THEN amount ELSE 0 END), 0) as total_revenue,
+          COALESCE(SUM(CASE WHEN status = 'OPEN' THEN amount ELSE 0 END), 0) as outstanding
+        FROM ${membershipFees} 
+        WHERE tenant_id = ${tenantId}
+      )
+      SELECT 
+        m.total_members::int,
+        m.active_members::int,
+        f.total_revenue::numeric,
+        f.outstanding::numeric
+      FROM member_stats m, fee_stats f
+    `);
 
-    const [totalRevenueResult] = await db.select({ sum: sql<number>`coalesce(sum(amount), 0)` })
-      .from(membershipFees)
-      .where(and(eq(membershipFees.tenantId, tenantId), eq(membershipFees.status, 'PAID')));
-
-    const [outstandingResult] = await db.select({ sum: sql<number>`coalesce(sum(amount), 0)` })
-      .from(membershipFees)
-      .where(and(eq(membershipFees.tenantId, tenantId), eq(membershipFees.status, 'OPEN')));
-
-    return {
-      totalMembers: totalMembersResult.count,
-      activeMembers: activeMembersResult.count,
-      totalRevenue: totalRevenueResult.sum,
-      outstanding: outstandingResult.sum,
+    const stats = result.rows[0] as any;
+    const dashboardStats = {
+      totalMembers: parseInt(stats.total_members) || 0,
+      activeMembers: parseInt(stats.active_members) || 0,
+      totalRevenue: parseFloat(stats.total_revenue) || 0,
+      outstanding: parseFloat(stats.outstanding) || 0,
     };
+
+    cache.set(cacheKey, dashboardStats, 10000); // Cache for 10 seconds
+    return dashboardStats;
   }
 }
 

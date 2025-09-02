@@ -93,8 +93,9 @@ export default function Instellingen() {
   const queryClient = useQueryClient();
 
   // Queries
-  const { data: tenant, isLoading: tenantLoading } = useQuery({
+  const { data: tenant, isLoading: tenantLoading, isFetching: tenantFetching } = useQuery({
     queryKey: ["/api/tenant/current"],
+    staleTime: 30000, // 30 seconds for tenant data
   });
 
   const { data: users } = useQuery({
@@ -266,9 +267,14 @@ export default function Instellingen() {
       const response = await apiRequest("POST", "/api/users", data);
       return response.json();
     },
-    onSuccess: async () => {
+    onSuccess: async (newUser) => {
+      // Optimistic update - add new user to list immediately
+      queryClient.setQueryData(["/api/users"], (oldData: any) => {
+        if (!Array.isArray(oldData)) return [newUser];
+        return [newUser, ...oldData];
+      });
+      
       await queryClient.invalidateQueries({ queryKey: ["/api/users"] });
-      await queryClient.refetchQueries({ queryKey: ["/api/users"] });
       setShowNewUserDialog(false);
       userForm.reset();
       toast({
@@ -292,9 +298,14 @@ export default function Instellingen() {
       const response = await apiRequest("POST", "/api/rules", ruleData);
       return response.json();
     },
-    onSuccess: async () => {
+    onSuccess: async (newRule) => {
+      // Optimistic update - add new rule to list immediately
+      queryClient.setQueryData(["/api/rules"], (oldData: any) => {
+        if (!Array.isArray(oldData)) return [newRule];
+        return [newRule, ...oldData];
+      });
+      
       await queryClient.invalidateQueries({ queryKey: ["/api/rules"] });
-      await queryClient.refetchQueries({ queryKey: ["/api/rules"] });
       setShowNewRuleDialog(false);
       ruleForm.reset();
       toast({

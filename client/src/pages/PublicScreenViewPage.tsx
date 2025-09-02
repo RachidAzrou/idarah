@@ -15,26 +15,26 @@ export default function PublicScreenViewPage() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showControls, setShowControls] = useState(true);
 
-  useEffect(() => {
-    const loadScreen = async () => {
-      if (publicToken) {
-        try {
-          const response = await fetch(`/api/public-screens/token/${publicToken}`);
-          if (response.ok) {
-            const foundScreen = await response.json();
-            setScreen(foundScreen);
-          } else {
-            setScreen(null);
-          }
-        } catch (error) {
-          console.error('Error loading screen:', error);
+  const loadScreen = async () => {
+    if (publicToken) {
+      try {
+        const response = await fetch(`/api/public-screens/token/${publicToken}`);
+        if (response.ok) {
+          const foundScreen = await response.json();
+          setScreen(foundScreen);
+        } else {
           setScreen(null);
-        } finally {
-          setLoading(false);
         }
+      } catch (error) {
+        console.error('Error loading screen:', error);
+        setScreen(null);
+      } finally {
+        setLoading(false);
       }
-    };
+    }
+  };
 
+  useEffect(() => {
     loadScreen();
   }, [publicToken]);
 
@@ -70,7 +70,9 @@ export default function PublicScreenViewPage() {
           break;
         case 'r':
           e.preventDefault();
-          window.location.reload();
+          // Refresh data instead of reloading page
+          setLoading(true);
+          loadScreen();
           break;
       }
     };

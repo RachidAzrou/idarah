@@ -65,6 +65,28 @@ export default function Leden() {
     },
   });
 
+  const deleteMemberMutation = useMutation({
+    mutationFn: async (memberId: string) => {
+      const response = await apiRequest("DELETE", `/api/members/${memberId}`);
+      return response;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/members"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
+      toast({
+        title: "Lid verwijderd",
+        description: "Het lid is permanent verwijderd uit het systeem.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Fout bij verwijderen",
+        description: "Er is een fout opgetreden bij het verwijderen van het lid.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const importMembersMutation = useMutation({
     mutationFn: async (membersData: any[]) => {
       const importedMembers = [];
@@ -195,6 +217,9 @@ export default function Leden() {
         if (member) {
           toggleMemberStatus(memberId, member.active);
         }
+        break;
+      case 'delete':
+        deleteMemberMutation.mutate(memberId);
         break;
     }
   };

@@ -282,6 +282,7 @@ export function MembersTable({
                         onView={(id) => onRowAction('view', id)}
                         onEdit={(id) => onRowAction('edit', id)}
                         onToggleStatus={(id, currentStatus) => onRowAction('toggleStatus', id)}
+                        onDelete={(id) => onRowAction('delete', id)}
                       />
                     </td>
                   </tr>

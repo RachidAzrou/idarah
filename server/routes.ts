@@ -155,6 +155,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.delete("/api/members/:id", authMiddleware, tenantMiddleware, async (req, res) => {
+    try {
+      const member = await storage.getMember(req.params.id);
+      
+      if (!member || member.tenantId !== req.tenantId) {
+        return res.status(404).json({ message: "Member not found" });
+      }
+
+      await storage.deleteMember(req.params.id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting member:", error);
+      res.status(500).json({ message: "Failed to delete member" });
+    }
+  });
+
   // Membership fees routes
   app.get("/api/fees", authMiddleware, tenantMiddleware, async (req, res) => {
     try {

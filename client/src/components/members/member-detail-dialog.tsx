@@ -238,15 +238,6 @@ export function MemberDetailDialog({ member, open, onClose, onEdit }: MemberDeta
                 Bewerken
               </Button>
             )}
-            <Button 
-              onClick={onClose}
-              variant="outline"
-              className="flex-1"
-              data-testid="button-close-detail"
-            >
-              <X className="h-4 w-4 mr-2" />
-              Sluiten
-            </Button>
           </div>
         </div>
       </DialogContent>

@@ -11,9 +11,10 @@ interface KpiCardProps {
     positive: boolean;
   };
   icon: React.ReactNode;
+  iconBgColor: string;
 }
 
-function KpiCard({ title, value, delta, icon }: KpiCardProps) {
+function KpiCard({ title, value, delta, icon, iconBgColor }: KpiCardProps) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow">
       <div className="flex items-center justify-between">
@@ -31,7 +32,7 @@ function KpiCard({ title, value, delta, icon }: KpiCardProps) {
             </span>
           </div>
         </div>
-        <div className="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center">
+        <div className={`w-8 h-8 ${iconBgColor} rounded-full flex items-center justify-center`}>
           {icon}
         </div>
       </div>
@@ -50,31 +51,36 @@ export default function ModernKpiCards() {
       title: "Totaal Leden",
       value: isLoading ? "..." : ((stats as any)?.totalMembers?.toString() || "0"),
       delta: { value: "Totaal aantal leden", positive: true },
-      icon: <Users className="h-4 w-4 text-blue-600" />
+      icon: <Users className="h-4 w-4 text-blue-600" />,
+      iconBgColor: "bg-blue-50"
     },
     {
       title: "Actieve Leden", 
       value: isLoading ? "..." : ((stats as any)?.activeMembers?.toString() || "0"),
       delta: { value: "Actieve leden", positive: true },
-      icon: <UserCheck className="h-4 w-4 text-green-600" />
+      icon: <UserCheck className="h-4 w-4 text-green-600" />,
+      iconBgColor: "bg-green-50"
     },
     {
       title: "Stemgerechtigden",
       value: isLoading ? "..." : ((stats as any)?.activeMembers?.toString() || "0"),
       delta: { value: "Van actieve leden", positive: true },
-      icon: <Vote className="h-4 w-4 text-amber-500" />
+      icon: <Vote className="h-4 w-4 text-amber-500" />,
+      iconBgColor: "bg-amber-50"
     },
     {
       title: "Openstaande Betalingen",
       value: isLoading ? "..." : `€${(((stats as any)?.openPayments || 0)).toFixed(2)}`,
       delta: { value: "Te betalen bedragen", positive: false },
-      icon: <Clock className="h-4 w-4 text-orange-500" />
+      icon: <Clock className="h-4 w-4 text-orange-500" />,
+      iconBgColor: "bg-orange-50"
     },
     {
       title: "Inkomsten Deze Maand",
       value: isLoading ? "..." : `€${(((stats as any)?.monthlyIncome || 0)).toFixed(2)}`,
       delta: { value: "Deze maand", positive: true },
-      icon: <HiInboxArrowDown className="h-4 w-4 text-blue-600" />
+      icon: <HiInboxArrowDown className="h-4 w-4 text-blue-600" />,
+      iconBgColor: "bg-blue-50"
     }
   ];
 
@@ -87,6 +93,7 @@ export default function ModernKpiCards() {
           value={kpi.value}
           delta={kpi.delta}
           icon={kpi.icon}
+          iconBgColor={kpi.iconBgColor}
         />
       ))}
     </div>

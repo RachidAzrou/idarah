@@ -12,7 +12,7 @@ const RecentActivities = React.memo(function RecentActivities() {
   });
   
   const activities = useMemo(() => {
-    if (!Array.isArray(transactions)) {
+    if (!Array.isArray(transactions) || transactions.length === 0) {
       return [
         {
           id: 1,

@@ -125,6 +125,22 @@ export function LedenlijstConfigStep({ data, onUpdate }: LedenlijstConfigStepPro
           <div className="mt-2 space-y-2">
             <div className="flex items-center space-x-2">
               <Checkbox
+                id="category-alle"
+                checked={settings.categories.length === 4}
+                onCheckedChange={() => {
+                  if (settings.categories.length === 4) {
+                    updateSettings('categories', []);
+                  } else {
+                    updateSettings('categories', ['Student', 'Standaard', 'Senior', 'Stemgerechtigd']);
+                  }
+                }}
+                data-testid="checkbox-category-alle"
+              />
+              <Label htmlFor="category-alle" className="font-medium">Alle</Label>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <Checkbox
                 id="category-student"
                 checked={settings.categories.includes('Student')}
                 onCheckedChange={() => toggleCategory('Student')}

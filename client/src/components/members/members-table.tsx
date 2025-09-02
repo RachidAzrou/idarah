@@ -9,7 +9,6 @@ import { RowActions } from "./row-actions";
 import { ChevronUp, ChevronDown, Users, UserX } from "lucide-react";
 import { CiExport } from "react-icons/ci";
 import { formatDate, getMemberCategoryLabel } from "@/lib/format";
-import { getUserInitials } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
 interface Member {
@@ -242,22 +241,11 @@ export function MembersTable({
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0 h-8 w-8">
-                          <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
-                            <span className="text-xs font-medium text-blue-700">
-                              {getUserInitials(`${member.firstName} ${member.lastName}`)}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="ml-3">
-                          <div className="text-sm font-medium text-gray-900">
-                            {member.lastName}
-                          </div>
-                          <div className="text-sm text-gray-500 lg:hidden">
-                            {member.firstName}
-                          </div>
-                        </div>
+                      <div className="text-sm font-medium text-gray-900">
+                        {member.lastName}
+                      </div>
+                      <div className="text-sm text-gray-500 lg:hidden">
+                        {member.firstName}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">

@@ -95,35 +95,45 @@ export function PublicViewPage() {
       
       case 'MEDEDELINGEN':
         return (
-          <div className="min-h-screen bg-white p-8">
-            <div className="max-w-4xl mx-auto text-center">
-              <h1 
-                style={{
-                  fontSize: `${screen.config?.title?.fontSize || 36}px`,
-                  fontFamily: screen.config?.title?.fontFamily || 'Poppins',
-                  color: screen.config?.title?.color || '#1f2937',
-                  fontWeight: screen.config?.title?.fontWeight || 'bold'
-                }}
-                className="mb-4"
-              >
-                {screen.config?.title?.text || screen.name}
-              </h1>
-              {screen.config?.subtitle?.text && (
-                <h2
-                  style={{
-                    fontSize: `${screen.config?.subtitle?.fontSize || 24}px`,
-                    fontFamily: screen.config?.subtitle?.fontFamily || 'Poppins',
-                    color: screen.config?.subtitle?.color || '#6b7280',
-                    fontWeight: screen.config?.subtitle?.fontWeight || 'normal'
-                  }}
-                  className="mb-8"
-                >
-                  {screen.config?.subtitle?.text}
-                </h2>
-              )}
-              <div className="text-gray-600">
-                <p className="text-lg">Mededelingen scherm</p>
-                <p className="text-sm mt-2">Wordt automatisch ververst elke 5 minuten</p>
+          <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 relative overflow-hidden">
+            {/* Background decoration */}
+            <div className="absolute inset-0 opacity-5">
+              <div className="absolute top-20 right-20 w-80 h-80 bg-purple-400 rounded-full filter blur-3xl"></div>
+              <div className="absolute bottom-20 left-20 w-96 h-96 bg-blue-400 rounded-full filter blur-3xl"></div>
+            </div>
+            
+            <div className="relative z-10 p-8">
+              <div className="max-w-4xl mx-auto text-center">
+                <div className="backdrop-blur-lg bg-white/30 rounded-3xl p-12 shadow-2xl border border-white/20 mb-12">
+                  <h1 
+                    style={{
+                      fontSize: `${screen.config?.title?.fontSize || 48}px`,
+                      fontFamily: screen.config?.title?.fontFamily || 'Poppins',
+                      color: screen.config?.title?.color || '#1f2937',
+                      fontWeight: screen.config?.title?.fontWeight || 'bold'
+                    }}
+                    className="mb-6 drop-shadow-sm"
+                  >
+                    {screen.config?.title?.text || screen.name}
+                  </h1>
+                  {screen.config?.subtitle?.text && (
+                    <h2
+                      style={{
+                        fontSize: `${screen.config?.subtitle?.fontSize || 28}px`,
+                        fontFamily: screen.config?.subtitle?.fontFamily || 'Poppins',
+                        color: screen.config?.subtitle?.color || '#6b7280',
+                        fontWeight: screen.config?.subtitle?.fontWeight || 'normal'
+                      }}
+                      className="mb-8 drop-shadow-sm"
+                    >
+                      {screen.config?.subtitle?.text}
+                    </h2>
+                  )}
+                  <div className="text-gray-700">
+                    <p className="text-xl font-medium mb-4">📢 Mededelingen Scherm</p>
+                    <p className="text-sm opacity-75">Automatische verversing elke 5 minuten</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -131,35 +141,46 @@ export function PublicViewPage() {
       
       case 'MULTIMEDIA':
         return (
-          <div className="min-h-screen bg-black p-8">
-            <div className="max-w-4xl mx-auto text-center">
-              <h1 
-                style={{
-                  fontSize: `${screen.config?.title?.fontSize || 36}px`,
-                  fontFamily: screen.config?.title?.fontFamily || 'Poppins',
-                  color: screen.config?.title?.color || '#ffffff',
-                  fontWeight: screen.config?.title?.fontWeight || 'bold'
-                }}
-                className="mb-4"
-              >
-                {screen.config?.title?.text || screen.name}
-              </h1>
-              {screen.config?.subtitle?.text && (
-                <h2
-                  style={{
-                    fontSize: `${screen.config?.subtitle?.fontSize || 24}px`,
-                    fontFamily: screen.config?.subtitle?.fontFamily || 'Poppins',
-                    color: screen.config?.subtitle?.color || '#9ca3af',
-                    fontWeight: screen.config?.subtitle?.fontWeight || 'normal'
-                  }}
-                  className="mb-8"
-                >
-                  {screen.config?.subtitle?.text}
-                </h2>
-              )}
-              <div className="text-gray-400">
-                <p className="text-lg">Multimedia scherm</p>
-                <p className="text-sm mt-2">Wordt automatisch ververst elke 5 minuten</p>
+          <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 relative overflow-hidden">
+            {/* Background decoration */}
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-10 left-10 w-72 h-72 bg-blue-500 rounded-full filter blur-3xl"></div>
+              <div className="absolute bottom-10 right-10 w-96 h-96 bg-purple-500 rounded-full filter blur-3xl"></div>
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-green-500 rounded-full filter blur-3xl"></div>
+            </div>
+            
+            <div className="relative z-10 p-8">
+              <div className="max-w-4xl mx-auto text-center">
+                <div className="backdrop-blur-lg bg-white/10 rounded-3xl p-12 shadow-2xl border border-white/20 mb-12">
+                  <h1 
+                    style={{
+                      fontSize: `${screen.config?.title?.fontSize || 48}px`,
+                      fontFamily: screen.config?.title?.fontFamily || 'Poppins',
+                      color: screen.config?.title?.color || '#ffffff',
+                      fontWeight: screen.config?.title?.fontWeight || 'bold'
+                    }}
+                    className="mb-6 drop-shadow-lg"
+                  >
+                    {screen.config?.title?.text || screen.name}
+                  </h1>
+                  {screen.config?.subtitle?.text && (
+                    <h2
+                      style={{
+                        fontSize: `${screen.config?.subtitle?.fontSize || 28}px`,
+                        fontFamily: screen.config?.subtitle?.fontFamily || 'Poppins',
+                        color: screen.config?.subtitle?.color || '#e5e7eb',
+                        fontWeight: screen.config?.subtitle?.fontWeight || 'normal'
+                      }}
+                      className="mb-8 drop-shadow-lg"
+                    >
+                      {screen.config?.subtitle?.text}
+                    </h2>
+                  )}
+                  <div className="text-gray-300">
+                    <p className="text-xl font-medium mb-4">🎬 Multimedia Scherm</p>
+                    <p className="text-sm opacity-75">Automatische verversing elke 5 minuten</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

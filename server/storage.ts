@@ -60,6 +60,7 @@ export interface IStorage {
   getMemberByNumber(memberNumber: string): Promise<Member | undefined>;
   createMember(member: InsertMember): Promise<Member>;
   updateMember(id: string, member: Partial<InsertMember>): Promise<Member>;
+  deleteMember(id: string): Promise<void>;
 
   // Membership Fees
   getMembershipFee(id: string): Promise<MembershipFee | undefined>;
@@ -182,6 +183,10 @@ export class DatabaseStorage implements IStorage {
   async updateMember(id: string, member: Partial<InsertMember>): Promise<Member> {
     const [updatedMember] = await db.update(members).set(member).where(eq(members.id, id)).returning();
     return updatedMember;
+  }
+
+  async deleteMember(id: string): Promise<void> {
+    await db.delete(members).where(eq(members.id, id));
   }
 
   // Membership Fees

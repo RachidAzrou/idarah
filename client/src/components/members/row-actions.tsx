@@ -16,7 +16,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { MoreVertical, Eye, Edit2, UserX, UserCheck } from "lucide-react";
+import { MoreVertical, Eye, Edit2, UserX, UserCheck, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 interface RowActionsProps {
@@ -26,6 +26,7 @@ interface RowActionsProps {
   onView: (id: string) => void;
   onEdit: (id: string) => void;
   onToggleStatus: (id: string, currentStatus: boolean) => void;
+  onDelete: (id: string) => void;
 }
 
 export function RowActions({ 
@@ -34,9 +35,11 @@ export function RowActions({
   isActive, 
   onView, 
   onEdit, 
-  onToggleStatus 
+  onToggleStatus,
+  onDelete 
 }: RowActionsProps) {
   const [showDeactivateDialog, setShowDeactivateDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const handleToggleStatus = () => {
     if (isActive) {
@@ -104,6 +107,15 @@ export function RowActions({
               </>
             )}
           </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem 
+            onClick={() => setShowDeleteDialog(true)}
+            className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50"
+            data-testid={`action-delete-${memberId}`}
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            Verwijderen
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -123,6 +135,30 @@ export function RowActions({
               className="bg-red-600 hover:bg-red-700 text-white"
             >
               Deactiveren
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Lid permanent verwijderen</AlertDialogTitle>
+            <AlertDialogDescription>
+              Weet je zeker dat je <strong>{memberName}</strong> permanent wilt verwijderen? 
+              Deze actie kan niet ongedaan worden gemaakt. Alle gegevens, betalingshistoriek en transacties van dit lid worden definitief gewist.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuleren</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={() => {
+                onDelete(memberId);
+                setShowDeleteDialog(false);
+              }}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              Permanent Verwijderen
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

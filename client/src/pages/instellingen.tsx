@@ -186,7 +186,6 @@ export default function Instellingen() {
         defaultPaymentMethod: tenantData.defaultPaymentMethod || "SEPA",
       };
       
-      console.log('Resetting fee form with data:', feeFormData);
       feeForm.reset(feeFormData);
       
       setOrganizationSaved(false);

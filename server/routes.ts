@@ -300,6 +300,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         companyType: tenant.companyType,
         logoUrl: tenant.logoUrl,
         primaryColor: tenant.primaryColor,
+        // Include fee settings
+        studentFee: tenant.studentFee,
+        adultFee: tenant.adultFee,
+        seniorFee: tenant.seniorFee,
+        defaultPaymentTerm: tenant.defaultPaymentTerm,
+        defaultPaymentMethod: tenant.defaultPaymentMethod,
         createdAt: tenant.createdAt,
       };
       

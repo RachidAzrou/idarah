@@ -184,9 +184,7 @@ export function MemberDetailDialog({ member, open, onClose, onEdit }: MemberDeta
                 </div>
                 <div>
                   <span className="text-gray-500">Status</span>
-                  <Badge variant={member.status === 'ACTIVE' ? "default" : "secondary"}>
-                    {member.status === 'ACTIVE' ? 'Actief' : 'Inactief'}
-                  </Badge>
+                  <p className="font-medium">{member.status === 'ACTIVE' ? 'Actief' : 'Inactief'}</p>
                 </div>
                 <div>
                   <span className="text-gray-500">Lid sinds</span>
@@ -198,9 +196,7 @@ export function MemberDetailDialog({ member, open, onClose, onEdit }: MemberDeta
                 </div>
                 <div>
                   <span className="text-gray-500">SEPA mandaat</span>
-                  <Badge variant={member.hasSepaMandate ? "default" : "secondary"}>
-                    {member.hasSepaMandate ? 'Actief' : 'Niet actief'}
-                  </Badge>
+                  <p className="font-medium">{member.hasSepaMandate ? 'Actief' : 'Niet actief'}</p>
                 </div>
               </div>
             </div>

@@ -203,15 +203,9 @@ export default function LidkaartenPage() {
       <div className="px-4 sm:px-6 lg:px-8 w-full">
         {/* Page Header */}
         <div className="mb-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900" data-testid="page-title">Lidkaarten</h1>
-              <p className="mt-1 text-sm text-gray-700">Beheer alle digitale lidkaarten van uw leden</p>
-            </div>
-            <Button onClick={handleExport} variant="outline" className="gap-2">
-              <Download className="h-4 w-4" />
-              Exporteer
-            </Button>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900" data-testid="page-title">Lidkaarten</h1>
+            <p className="mt-1 text-sm text-gray-700">Beheer alle digitale lidkaarten van uw leden</p>
           </div>
         </div>
 
@@ -274,48 +268,66 @@ export default function LidkaartenPage() {
         </div>
       </div>
 
-      {/* Search and Filters */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="flex-1">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-            <Input
-              placeholder="Zoek op lidnummer of naam..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-              data-testid="input-search"
-            />
-          </div>
-        </div>
-        
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-48" data-testid="select-status">
-            <Filter className="h-4 w-4 mr-2" />
-            <SelectValue placeholder="Filter status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Alle statussen</SelectItem>
-            <SelectItem value="ACTUEEL">Actueel</SelectItem>
-            <SelectItem value="MOMENTOPNAME">Momentopname</SelectItem>
-            <SelectItem value="VERLOPEN">Verlopen</SelectItem>
-            <SelectItem value="geen-kaart">Geen kaart</SelectItem>
-          </SelectContent>
-        </Select>
+        {/* Search and Filters */}
+        <Card className="mb-6">
+          <CardContent className="p-6">
+            <div className="space-y-4">
+              {/* Search and Export Button */}
+              <div className="flex flex-col lg:flex-row gap-4">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Input
+                    placeholder="Zoek op lidnummer of naam..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 pr-16 h-10 border-gray-200 focus:border-blue-500 focus:ring-blue-500/20"
+                    data-testid="input-search"
+                  />
+                </div>
+                
+                <div className="flex gap-2 lg:flex-shrink-0">
+                  <Button 
+                    variant="outline" 
+                    onClick={handleExport}
+                    className="h-10 px-4 border-gray-200 hover:border-gray-300 gap-2"
+                    data-testid="export-button"
+                  >
+                    <Download className="h-4 w-4" />
+                    Exporteer
+                  </Button>
+                </div>
+              </div>
 
-        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-          <SelectTrigger className="w-48" data-testid="select-category">
-            <Users className="h-4 w-4 mr-2" />
-            <SelectValue placeholder="Filter categorie" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Alle categorieën</SelectItem>
-            <SelectItem value="STUDENT">Student</SelectItem>
-            <SelectItem value="STANDAARD">Volwassen</SelectItem>
-            <SelectItem value="SENIOR">Senior</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+              {/* Filters */}
+              <div className="flex flex-wrap gap-3">
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-[160px] h-9 border-gray-200" data-testid="select-status">
+                    <SelectValue placeholder="Alle statussen" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Alle statussen</SelectItem>
+                    <SelectItem value="ACTUEEL">Actueel</SelectItem>
+                    <SelectItem value="MOMENTOPNAME">Momentopname</SelectItem>
+                    <SelectItem value="VERLOPEN">Verlopen</SelectItem>
+                    <SelectItem value="geen-kaart">Geen kaart</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                  <SelectTrigger className="w-[170px] h-9 border-gray-200" data-testid="select-category">
+                    <SelectValue placeholder="Alle categorieën" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Alle categorieën</SelectItem>
+                    <SelectItem value="STUDENT">Student</SelectItem>
+                    <SelectItem value="STANDAARD">Volwassen</SelectItem>
+                    <SelectItem value="SENIOR">Senior</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
       {/* Cards Table */}
       <Card>

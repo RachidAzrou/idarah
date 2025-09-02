@@ -65,14 +65,14 @@ export function MededelingenView({ config }: MededelingenViewProps) {
       }}
     >
       {/* Fixed container with beautiful borders */}
-      <div className="relative z-10 max-w-5xl w-full">
+      <div className="relative z-10 max-w-7xl w-full">
         <div 
-          className="bg-white/98 backdrop-blur-md rounded-[2rem] border-4 border-white/40 p-20 text-center shadow-2xl"
+          className="bg-white/98 backdrop-blur-md rounded-[2rem] border-4 border-white/40 p-24 text-center shadow-2xl"
           style={{ 
             boxShadow: '0 32px 64px -12px rgba(0, 0, 0, 0.35), 0 8px 32px -8px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.6)',
             backgroundColor: 'rgba(255, 255, 255, 0.98)',
             backdropFilter: 'blur(20px) saturate(180%)',
-            minHeight: '400px',
+            minHeight: '600px',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center'

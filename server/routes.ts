@@ -70,6 +70,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const members = await storage.getMembersByTenant(req.tenantId!);
       res.json(members);
     } catch (error) {
+      console.error("Members API error:", error);
       res.status(500).json({ message: "Failed to fetch members" });
     }
   });

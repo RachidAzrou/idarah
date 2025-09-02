@@ -64,29 +64,21 @@ export function MededelingenView({ config }: MededelingenViewProps) {
         backgroundRepeat: 'no-repeat'
       }}
     >
-      {/* Large elegant container for announcements */}
-      <div className="relative z-10 w-full max-w-8xl mx-auto">
+      {/* Large centered container for announcements */}
+      <div className="relative z-10 flex items-center justify-center min-h-screen">
         <div 
-          className="bg-gradient-to-br from-white/98 via-white/96 to-white/94 backdrop-blur-xl rounded-[3rem] border-8 border-white/50 p-32 text-center shadow-2xl relative overflow-hidden"
+          className="bg-white/95 backdrop-blur-lg rounded-3xl border-2 border-white/30 p-24 text-center shadow-xl"
           style={{ 
-            boxShadow: '0 40px 100px -20px rgba(0, 0, 0, 0.4), 0 16px 64px -16px rgba(0, 0, 0, 0.2), inset 0 2px 0 rgba(255, 255, 255, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.3)',
-            backdropFilter: 'blur(24px) saturate(200%) brightness(110%)',
-            minHeight: '75vh',
+            boxShadow: '0 25px 60px -12px rgba(0, 0, 0, 0.3), 0 8px 25px -8px rgba(0, 0, 0, 0.1)',
+            backdropFilter: 'blur(16px)',
+            width: '85vw',
+            maxWidth: '1200px',
+            minHeight: '70vh',
             display: 'flex',
             flexDirection: 'column',
-            justifyContent: 'center',
-            width: '90vw',
-            maxWidth: '1400px'
+            justifyContent: 'center'
           }}
         >
-          {/* Decorative corner elements */}
-          <div className="absolute top-6 left-6 w-16 h-16 border-l-4 border-t-4 border-gold-400/30 rounded-tl-2xl"></div>
-          <div className="absolute top-6 right-6 w-16 h-16 border-r-4 border-t-4 border-gold-400/30 rounded-tr-2xl"></div>
-          <div className="absolute bottom-6 left-6 w-16 h-16 border-l-4 border-b-4 border-gold-400/30 rounded-bl-2xl"></div>
-          <div className="absolute bottom-6 right-6 w-16 h-16 border-r-4 border-b-4 border-gold-400/30 rounded-br-2xl"></div>
-          
-          {/* Subtle inner glow */}
-          <div className="absolute inset-4 rounded-[2.5rem] border border-white/20 pointer-events-none"></div>
           {/* Content that changes with transition */}
           <div className={`transition-opacity duration-300 ${fadeClass}`}>
             {/* Slide title */}

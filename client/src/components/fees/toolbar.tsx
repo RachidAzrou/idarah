@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Search, Download, Upload, CreditCard, Plus, CalendarIcon } from "lucide-react";
+import { Search, CreditCard, Plus, CalendarIcon } from "lucide-react";
+import { CiExport, CiImport } from "react-icons/ci";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -159,7 +160,7 @@ export function Toolbar({
                 className="h-10 px-4 border-gray-200 hover:border-gray-300"
                 data-testid="export-button"
               >
-                <Download className="h-4 w-4 mr-2" />
+                <CiExport className="h-4 w-4 mr-2" />
                 Export
               </Button>
               <Button 
@@ -168,7 +169,7 @@ export function Toolbar({
                 className="h-10 px-4 border-gray-200 hover:border-gray-300"
                 data-testid="import-button"
               >
-                <Upload className="h-4 w-4 mr-2" />
+                <CiImport className="h-4 w-4 mr-2" />
                 Import
               </Button>
               {newButton && newButton}

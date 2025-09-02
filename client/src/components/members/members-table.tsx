@@ -6,7 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { RowActions } from "./row-actions";
-import { ChevronUp, ChevronDown, Users, Download, UserX } from "lucide-react";
+import { ChevronUp, ChevronDown, Users, UserX } from "lucide-react";
+import { CiExport } from "react-icons/ci";
 import { formatDate, getMemberCategoryLabel } from "@/lib/format";
 import { getUserInitials } from "@/lib/auth";
 import { cn } from "@/lib/utils";
@@ -117,7 +118,7 @@ export function MembersTable({
                 className="border-blue-200 text-blue-700 hover:bg-blue-100"
                 data-testid="bulk-export"
               >
-                <Download className="h-4 w-4 mr-2" />
+                <CiExport className="h-4 w-4 mr-2" />
                 Export selectie
               </Button>
               <Button 

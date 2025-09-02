@@ -7,7 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Upload, FileText, Download, Check, X, AlertTriangle } from "lucide-react";
+import { FileText, Check, X, AlertTriangle } from "lucide-react";
+import { CiImport, CiExport } from "react-icons/ci";
 import { formatCurrencyBE, formatDateBE } from "@/lib/format";
 import { parseCsv, parseMt940, guessMatches } from "@/lib/mock/fees";
 import { Fee } from "@shared/fees-schema";
@@ -153,7 +154,7 @@ export function ImportDialog({ open, onClose, fees, onImport }: ImportDialogProp
               </div>
 
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                <CiImport className="mx-auto h-12 w-12 text-gray-400 mb-4" />
                 <div className="space-y-2">
                   <p className="text-lg font-medium">Sleep een bestand hierheen</p>
                   <p className="text-gray-600">of klik om een bestand te selecteren</p>
@@ -304,7 +305,7 @@ export function ImportDialog({ open, onClose, fees, onImport }: ImportDialogProp
 
             <div className="flex gap-3 pt-4 border-t">
               <Button onClick={handleConfirmImport} className="flex-1">
-                <Check className="h-4 w-4 mr-2" />
+                <CiImport className="h-4 w-4 mr-2" />
                 Bevestig import
               </Button>
               <Button onClick={() => setStep("preview")} variant="outline">

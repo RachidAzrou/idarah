@@ -12,7 +12,8 @@ import { Badge } from "@/components/ui/badge";
 import { ImportMappingSchema, ImportMappingData } from "@/lib/zod/transaction";
 import { parseCSV, parseMT940, parseCODA, CSVRow } from "@/lib/csv";
 import { generateTransactionId, Transaction } from "@/lib/mock/transactions";
-import { Upload, FileText, AlertTriangle, CheckCircle } from "lucide-react";
+import { FileText, AlertTriangle, CheckCircle } from "lucide-react";
+import { CiImport } from "react-icons/ci";
 
 interface ImportDialogProps {
   open: boolean;
@@ -401,6 +402,7 @@ export function ImportDialog({ open, onClose, onImport }: ImportDialogProps) {
           Terug
         </Button>
         <Button onClick={handleImport} data-testid="button-confirm-import">
+          <CiImport className="h-4 w-4 mr-2" />
           Transacties importeren
         </Button>
       </div>

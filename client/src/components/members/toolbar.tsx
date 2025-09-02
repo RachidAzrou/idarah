@@ -5,7 +5,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { Search, Download, Upload, Plus, SlidersHorizontal, Command, CalendarIcon } from "lucide-react";
+import { Search, Plus, SlidersHorizontal, Command, CalendarIcon } from "lucide-react";
+import { CiExport, CiImport } from "react-icons/ci";
 import { RiResetLeftFill } from "react-icons/ri";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
@@ -135,7 +136,7 @@ export function Toolbar({
                 className="h-10 px-4 border-gray-200 hover:border-gray-300"
                 data-testid="export-button"
               >
-                <Download className="h-4 w-4 mr-2" />
+                <CiExport className="h-4 w-4 mr-2" />
                 Export
               </Button>
               <Button 
@@ -144,7 +145,7 @@ export function Toolbar({
                 className="h-10 px-4 border-gray-200 hover:border-gray-300"
                 data-testid="import-button"
               >
-                <Upload className="h-4 w-4 mr-2" />
+                <CiImport className="h-4 w-4 mr-2" />
                 Import
               </Button>
               <Button 

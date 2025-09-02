@@ -4,7 +4,8 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Download, Upload, Plus, Filter } from "lucide-react";
+import { Search, Plus, Filter } from "lucide-react";
+import { CiExport, CiImport } from "react-icons/ci";
 
 interface ToolbarProps {
   onSearch: (search: string) => void;
@@ -93,7 +94,7 @@ export function Toolbar({
           className="gap-2 flex-1 sm:flex-none"
           data-testid="button-import"
         >
-          <Upload className="h-4 w-4" />
+          <CiImport className="h-4 w-4" />
           Import
         </Button>
         <Button
@@ -102,7 +103,7 @@ export function Toolbar({
           className="gap-2 flex-1 sm:flex-none"
           data-testid="button-export"
         >
-          <Download className="h-4 w-4" />
+          <CiExport className="h-4 w-4" />
           Export
         </Button>
         <Button

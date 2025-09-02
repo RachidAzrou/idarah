@@ -9,7 +9,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Transaction } from "@/lib/mock/transactions";
 import { formatDateBE, formatCurrencyBE } from "@/lib/format";
 import { exportToCSV } from "@/lib/csv";
-import { Download, FileText, FileSpreadsheet, FileImage } from "lucide-react";
+import { FileText, FileSpreadsheet, FileImage } from "lucide-react";
+import { CiExport } from "react-icons/ci";
 
 interface ExportDialogProps {
   open: boolean;
@@ -157,7 +158,7 @@ export function ExportDialog({ open, onClose, transactions }: ExportDialogProps)
             className="gap-2"
             data-testid="button-start-export"
           >
-            <Download className="h-4 w-4" />
+            <CiExport className="h-4 w-4" />
             {loading ? 'Exporteren...' : 'Exporteren'}
           </Button>
         </DialogFooter>

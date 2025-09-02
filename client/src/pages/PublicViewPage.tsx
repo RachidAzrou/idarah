@@ -60,23 +60,36 @@ export function PublicViewPage() {
   const renderScreen = () => {
     switch (screen.type) {
       case 'LEDENLIJST':
+        const defaultConfig = {
+          description: screen.name,
+          title: screen.config?.title || { 
+            text: screen.name, 
+            fontSize: 36, 
+            fontFamily: 'Poppins', 
+            color: '#1f2937', 
+            fontWeight: 'bold' 
+          },
+          subtitle: screen.config?.subtitle || { 
+            text: '', 
+            fontSize: 24, 
+            fontFamily: 'Poppins', 
+            color: '#6b7280', 
+            fontWeight: 'normal' 
+          },
+          display: {
+            useFullNames: screen.config?.ledenlijstSettings?.useFullNames ?? true,
+            useInitials: screen.config?.ledenlijstSettings?.useInitials ?? false,
+            filterByCategories: screen.config?.ledenlijstSettings?.filterByCategories ?? true,
+            showVotingRights: screen.config?.ledenlijstSettings?.showVotingRights ?? false,
+            rowsPerPage: screen.config?.ledenlijstSettings?.rowsPerPage ?? 20,
+          },
+          year: screen.config?.ledenlijstSettings?.year ?? new Date().getFullYear(),
+          categories: screen.config?.ledenlijstSettings?.categories ?? ['Student', 'Standaard']
+        };
+        
         return (
           <LedenlijstView 
-            config={screen.config}
-            titleStyling={screen.config?.title || { 
-              text: screen.name, 
-              fontSize: 36, 
-              fontFamily: 'Poppins', 
-              color: '#1f2937', 
-              fontWeight: 'bold' 
-            }}
-            subtitleStyling={screen.config?.subtitle || { 
-              text: '', 
-              fontSize: 24, 
-              fontFamily: 'Poppins', 
-              color: '#6b7280', 
-              fontWeight: 'normal' 
-            }}
+            config={defaultConfig}
           />
         );
       

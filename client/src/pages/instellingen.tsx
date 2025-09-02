@@ -93,9 +93,8 @@ export default function Instellingen() {
   const queryClient = useQueryClient();
 
   // Queries
-  const { data: tenant } = useQuery({
+  const { data: tenant, isLoading: tenantLoading } = useQuery({
     queryKey: ["/api/tenant/current"],
-    enabled: !!user?.tenantId,
   });
 
   const { data: users } = useQuery({
@@ -161,7 +160,6 @@ export default function Instellingen() {
   useEffect(() => {
     if (tenant && typeof tenant === 'object' && 'name' in tenant) {
       const tenantData = tenant as any;
-      console.log('Tenant data received:', tenantData); // Debug log
       organizationForm.reset({
         name: tenantData.name || "",
         slug: tenantData.slug || "",
@@ -179,7 +177,6 @@ export default function Instellingen() {
         primaryColor: tenantData.primaryColor || "#6366f1",
       });
       setOrganizationSaved(false);
-      console.log('Form reset with data'); // Debug log
     }
   }, [tenant]);
 

@@ -7,8 +7,9 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Trash2, Plus, Upload, Eye, GripVertical, ExternalLink } from "lucide-react";
+import { Trash2, Plus, Upload, Eye, GripVertical, ExternalLink, Loader2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from "@/hooks/use-toast";
 
 interface MultimediaItem {
   id: string;
@@ -48,6 +49,8 @@ export function MultimediaConfigStep({ data, onUpdate }: MultimediaConfigStepPro
   const [currentPreview, setCurrentPreview] = useState(0);
   const [draggedItem, setDraggedItem] = useState<string | null>(null);
   const [uploadUrl, setUploadUrl] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
+  const { toast } = useToast();
 
   const settings = data.multimediaSettings || {
     mediaItems: [],
@@ -97,12 +100,46 @@ export function MultimediaConfigStep({ data, onUpdate }: MultimediaConfigStepPro
     });
   };
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      const fileUrl = URL.createObjectURL(file);
-      const fileType = file.type.startsWith('video/') ? 'video' : 'image';
-      addMediaItem(fileUrl, fileType, file.name);
+      setIsUploading(true);
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await fetch('/api/public-screens/upload', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          body: formData
+        });
+
+        if (!response.ok) {
+          throw new Error('Upload failed');
+        }
+
+        const result = await response.json();
+        addMediaItem(result.url, result.type, result.filename);
+        toast({
+          title: "Upload succesvol",
+          description: `${result.filename} is toegevoegd aan je multimedia scherm`
+        });
+      } catch (error) {
+        console.error('Upload error:', error);
+        toast({
+          title: "Upload mislukt",
+          description: "Er is een fout opgetreden bij het uploaden. Probeer het opnieuw.",
+          variant: "destructive"
+        });
+        // Fallback to blob URL for development/testing
+        const fileUrl = URL.createObjectURL(file);
+        const fileType = file.type.startsWith('video/') ? 'video' : 'image';
+        addMediaItem(fileUrl, fileType, file.name);
+      } finally {
+        setIsUploading(false);
+      }
     }
   };
 
@@ -189,16 +226,24 @@ export function MultimediaConfigStep({ data, onUpdate }: MultimediaConfigStepPro
                   onChange={handleFileUpload}
                   className="hidden"
                   id="media-upload"
+                  disabled={isUploading}
                 />
                 <Button
                   variant="outline"
                   asChild
                   className="w-full gap-2 h-20 border-dashed"
+                  disabled={isUploading}
                 >
-                  <label htmlFor="media-upload" className="cursor-pointer">
-                    <Upload className="w-6 h-6" />
+                  <label htmlFor="media-upload" className={isUploading ? "cursor-not-allowed" : "cursor-pointer"}>
+                    {isUploading ? (
+                      <Loader2 className="w-6 h-6 animate-spin" />
+                    ) : (
+                      <Upload className="w-6 h-6" />
+                    )}
                     <div className="text-center">
-                      <div className="font-medium">Afbeelding of video uploaden</div>
+                      <div className="font-medium">
+                        {isUploading ? "Bezig met uploaden..." : "Afbeelding of video uploaden"}
+                      </div>
                       <div className="text-sm text-muted-foreground">Ondersteunt: JPG, PNG, GIF, MP4, WebM</div>
                     </div>
                   </label>

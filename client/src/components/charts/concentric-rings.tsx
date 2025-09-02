@@ -37,7 +37,6 @@ export function ConcentricRings({ categories, size = 280 }: ConcentricRingsProps
   const center = size / 2;
   const radii = [110, 86, 62]; // outer, middle, inner  
   const strokeWidth = 14;
-  const startAngle = -90; // Start at 12 o'clock
 
   return (
     <div className="flex items-center justify-center">
@@ -49,7 +48,7 @@ export function ConcentricRings({ categories, size = 280 }: ConcentricRingsProps
         aria-label="Leden per categorie"
         className="drop-shadow-sm"
       >
-        {/* Background tracks - show all rings */}
+        {/* Background circles for all categories */}
         {categories.map((category, index) => {
           const radius = radii[index];
           return (
@@ -65,7 +64,7 @@ export function ConcentricRings({ categories, size = 280 }: ConcentricRingsProps
           );
         })}
         
-        {/* Progress arcs - show arcs for categories with data */}
+        {/* Progress arcs for categories with data */}
         {categories.map((category, index) => {
           const radius = radii[index];
           
@@ -74,13 +73,18 @@ export function ConcentricRings({ categories, size = 280 }: ConcentricRingsProps
             return null;
           }
           
-          const sweep = Math.min((category.percent / 100) * 360, 360);
-          const endAngle = startAngle + sweep;
-          const pathData = describeArc(center, center, radius, startAngle, endAngle);
+          // Calculate arc based on percentage
+          const startAngle = -90; // Start at top
+          const endAngle = startAngle + (category.percent / 100) * 360;
+          
+          // For small percentages, ensure minimum visible arc
+          const actualEndAngle = endAngle - startAngle < 10 ? startAngle + 10 : endAngle;
+          
+          const pathData = describeArc(center, center, radius, startAngle, actualEndAngle);
           
           return (
             <CustomTooltip
-              key={category.key}
+              key={`arc-${category.key}`}
               title={category.label}
               count={category.count}
               percentage={category.percent}

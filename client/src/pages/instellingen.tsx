@@ -166,16 +166,16 @@ export default function Instellingen() {
         slug: tenantData.slug || "",
         street: tenantData.street || "",
         number: tenantData.number || "",
-        postalCode: tenantData.postalCode || "",
+        postalCode: tenantData.postal_code || tenantData.postalCode || "",
         city: tenantData.city || "",
         country: tenantData.country || "België",
         email: tenantData.email || "",
         phone: tenantData.phone || "",
         website: tenantData.website || "",
-        companyNumber: tenantData.companyNumber || "",
-        companyType: tenantData.companyType || undefined,
-        logoUrl: tenantData.logoUrl || "",
-        primaryColor: tenantData.primaryColor || "#6366f1",
+        companyNumber: tenantData.company_number || tenantData.companyNumber || "",
+        companyType: tenantData.company_type || tenantData.companyType || undefined,
+        logoUrl: tenantData.logo_url || tenantData.logoUrl || "",
+        primaryColor: tenantData.primary_color || tenantData.primaryColor || "#6366f1",
       });
       setOrganizationSaved(false);
     }

@@ -90,26 +90,6 @@ export function ColorPicker({ value, onChange, className = "" }: ColorPickerProp
             />
           </div>
 
-          {/* Predefined Colors Grid */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Vooraf gedefinieerde kleuren</label>
-            <div className="grid grid-cols-12 gap-1">
-              {predefinedColors.map((color) => (
-                <button
-                  key={color}
-                  onClick={() => {
-                    onChange(color);
-                    setHexInput(color);
-                  }}
-                  className={`w-6 h-6 rounded border-2 transition-all hover:scale-110 ${
-                    value === color ? 'border-gray-800 ring-2 ring-blue-500' : 'border-gray-300 hover:border-gray-500'
-                  }`}
-                  style={{ backgroundColor: color }}
-                  title={color.toUpperCase()}
-                />
-              ))}
-            </div>
-          </div>
 
           {/* Common Colors */}
           <div className="space-y-2">

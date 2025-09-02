@@ -127,6 +127,17 @@ export default function Instellingen() {
     },
   });
 
+  const feeForm = useForm<MembershipFeeFormData>({
+    resolver: zodResolver(membershipFeeSchema),
+    defaultValues: {
+      studentFee: "15.00",
+      adultFee: "25.00",
+      seniorFee: "20.00",
+      defaultPaymentTerm: "YEARLY",
+      defaultPaymentMethod: "SEPA",
+    },
+  });
+
   // Watch for form changes to enable/disable save buttons
   const organizationFormValues = organizationForm.watch();
   const feeFormValues = feeForm.watch();
@@ -142,17 +153,6 @@ export default function Instellingen() {
       setFeesSaved(false);
     }
   }, [feeFormValues]);
-
-  const feeForm = useForm<MembershipFeeFormData>({
-    resolver: zodResolver(membershipFeeSchema),
-    defaultValues: {
-      studentFee: "15.00",
-      adultFee: "25.00",
-      seniorFee: "20.00",
-      defaultPaymentTerm: "YEARLY",
-      defaultPaymentMethod: "SEPA",
-    },
-  });
 
   const userForm = useForm<UserFormData>({
     resolver: zodResolver(userSchema),

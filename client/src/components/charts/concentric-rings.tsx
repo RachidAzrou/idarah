@@ -39,6 +39,9 @@ export function ConcentricRings({ categories, size = 280 }: ConcentricRingsProps
   const strokeWidth = 14;
   const startAngle = -90; // Start at 12 o'clock
 
+  // Filter categories with data
+  const validCategories = categories.filter(cat => cat.count > 0 && cat.percent > 0);
+
   return (
     <div className="flex items-center justify-center">
       <svg 
@@ -49,23 +52,26 @@ export function ConcentricRings({ categories, size = 280 }: ConcentricRingsProps
         aria-label="Leden per categorie"
         className="drop-shadow-sm"
       >
-        {/* Background tracks */}
-        {radii.map((radius, index) => (
-          <circle
-            key={`track-${index}`}
-            cx={center}
-            cy={center}
-            r={radius}
-            fill="none"
-            stroke="#E9EDF5"
-            strokeWidth={strokeWidth}
-          />
-        ))}
+        {/* Background tracks - only show for categories with data */}
+        {validCategories.map((category, index) => {
+          const radius = radii[index];
+          return (
+            <circle
+              key={`track-${category.key}`}
+              cx={center}
+              cy={center}
+              r={radius}
+              fill="none"
+              stroke="#E9EDF5"
+              strokeWidth={strokeWidth}
+            />
+          );
+        })}
         
         {/* Progress arcs */}
-        {categories.map((category, index) => {
+        {validCategories.map((category, index) => {
           const radius = radii[index];
-          const sweep = Math.min((category.percent / 100) * 300, 300);
+          const sweep = Math.min((category.percent / 100) * 360, 360);
           const endAngle = startAngle + sweep;
           const pathData = describeArc(center, center, radius, startAngle, endAngle);
           
@@ -83,11 +89,7 @@ export function ConcentricRings({ categories, size = 280 }: ConcentricRingsProps
                 stroke={category.color}
                 strokeWidth={strokeWidth}
                 strokeLinecap="round"
-                className="animate-drawArc hover:stroke-opacity-80 transition-all duration-200 cursor-pointer"
-                style={{
-                  animationDelay: `${index * 0.3}s`,
-                  animationDuration: '1.2s'
-                }}
+                className="hover:stroke-opacity-80 transition-all duration-200 cursor-pointer"
               />
             </CustomTooltip>
           );

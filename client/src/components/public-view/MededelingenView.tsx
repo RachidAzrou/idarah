@@ -67,10 +67,12 @@ export function MededelingenView({ config }: MededelingenViewProps) {
       {/* Main content card */}
       <div className="relative z-10 max-w-5xl w-full">
         <div 
-          className={`bg-white/95 backdrop-blur-sm rounded-3xl border border-white/20 p-16 text-center transition-opacity duration-300 ${fadeClass}`}
+          className={`bg-white/98 backdrop-blur-md rounded-[2rem] border border-white/30 p-20 text-center transition-all duration-500 ${fadeClass} hover:scale-[1.02]`}
           style={{ 
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1)',
-            backgroundColor: slideStyle.backgroundColor ? `${slideStyle.backgroundColor}F5` : 'rgba(255, 255, 255, 0.95)'
+            boxShadow: '0 32px 64px -12px rgba(0, 0, 0, 0.35), 0 8px 32px -8px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.6)',
+            backgroundColor: slideStyle.backgroundColor ? `${slideStyle.backgroundColor}FA` : 'rgba(255, 255, 255, 0.98)',
+            backdropFilter: 'blur(20px) saturate(180%)',
+            border: '1px solid rgba(255, 255, 255, 0.4)'
           }}
         >
           {/* Slide title */}

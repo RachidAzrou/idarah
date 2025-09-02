@@ -1,7 +1,10 @@
 "use client";
 
 import { formatCurrencyBE } from "@/lib/format";
-import { TrendingUp, TrendingDown, DollarSign, AlertTriangle } from "lucide-react";
+import { TrendingUp, TrendingDown, Euro } from "lucide-react";
+import { HiInboxIn } from "react-icons/hi";
+import { MdOutlineOutbox } from "react-icons/md";
+import { TbClockExclamation } from "react-icons/tb";
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 
@@ -69,13 +72,13 @@ export function KpiCards() {
       title: "Totale Inkomsten",
       value: formatCurrencyBE(kpiData.income),
       delta: { value: "Totaal inkomsten", positive: true },
-      icon: <TrendingUp className="h-4 w-4 text-blue-600" />
+      icon: <HiInboxIn className="h-4 w-4 text-green-600" />
     },
     {
       title: "Totale Uitgaven",
       value: formatCurrencyBE(kpiData.expense),
       delta: { value: "Totaal uitgaven", positive: false },
-      icon: <TrendingDown className="h-4 w-4 text-blue-600" />
+      icon: <MdOutlineOutbox className="h-4 w-4 text-red-600" />
     },
     {
       title: "Netto Saldo",
@@ -84,13 +87,13 @@ export function KpiCards() {
         value: kpiData.balance >= 0 ? "Overschot" : "Tekort", 
         positive: kpiData.balance >= 0 
       },
-      icon: <DollarSign className="h-4 w-4 text-blue-600" />
+      icon: <Euro className="h-4 w-4 text-blue-600" />
     },
     {
       title: "Achterstallig Lidgeld",
       value: formatCurrencyBE(kpiData.overdue),
       delta: { value: "Openstaande bedragen", positive: false },
-      icon: <AlertTriangle className="h-4 w-4 text-blue-600" />
+      icon: <TbClockExclamation className="h-4 w-4 text-red-600" />
     }
   ];
 

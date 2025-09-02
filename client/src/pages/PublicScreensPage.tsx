@@ -20,10 +20,17 @@ export default function PublicScreensPage() {
     config: any;
   }) => {
     try {
+      // Get auth token from localStorage
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        throw new Error('Not authenticated');
+      }
+
       const response = await fetch('/api/public-screens', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
           name: screenData.name,
@@ -42,12 +49,13 @@ export default function PublicScreensPage() {
         // Refresh the screen list
         window.location.reload();
       } else {
-        throw new Error('Failed to create screen');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create screen');
       }
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Fout",
-        description: "Er is een fout opgetreden bij het aanmaken van het scherm.",
+        description: error.message || "Er is een fout opgetreden bij het aanmaken van het scherm.",
         variant: "destructive",
       });
     }

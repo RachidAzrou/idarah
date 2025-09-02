@@ -116,7 +116,7 @@ export function MededelingenView({ config }: MededelingenViewProps) {
           
           {/* Body content below header */}
           {currentSlide.body && (
-            <div className="flex-1 flex items-start justify-center pt-4">
+            <div className="flex-1 flex items-center justify-center">
               <div 
                 className={`leading-relaxed whitespace-pre-line max-w-5xl transition-opacity duration-300 ${fadeClass}`}
                 style={{

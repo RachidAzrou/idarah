@@ -79,14 +79,14 @@ export function LedenlijstView({ config }: LedenlijstViewProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 p-8 relative">
+    <div className="min-h-screen bg-gray-50 p-8 relative">
       {/* Subtle pattern overlay */}
       <div className="absolute inset-0 opacity-10" style={{
         backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.1'%3E%3Ccircle cx='7' cy='7' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
       }}></div>
       {/* Header */}
       <div className="text-center mb-12 relative z-10">
-        <div className="bg-white/95 backdrop-blur-sm rounded-xl p-8 shadow-lg border border-slate-200/50 mx-auto max-w-4xl">
+        <div className="bg-white rounded-2xl p-8 border border-gray-200 mx-auto max-w-4xl" style={{ boxShadow: '0 6px 16px rgba(2,6,23,0.08)' }}>
           <h1
             style={{
               fontSize: `${config.title.fontSize}px`,
@@ -121,10 +121,10 @@ export function LedenlijstView({ config }: LedenlijstViewProps) {
 
       {/* Tabel */}
       <div className="w-full relative z-10">
-        <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg border border-slate-200/50 overflow-hidden">
+        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden" style={{ boxShadow: '0 6px 16px rgba(2,6,23,0.08)' }}>
           <table className="w-full">
             <thead>
-              <tr className="bg-blue-50/80 border-b border-blue-200">
+              <tr className="bg-gray-50 border-b border-gray-200">
                 <th className="px-6 py-3 text-left font-semibold text-blue-900 text-xs uppercase tracking-wider">
                   Lidnr.
                 </th>

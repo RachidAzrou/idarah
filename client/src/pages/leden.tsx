@@ -5,6 +5,7 @@ import { MemberForm } from "@/components/forms/member-form";
 import { Toolbar } from "@/components/members/toolbar";
 import { MembersTable } from "@/components/members/members-table";
 import { FiltersDrawer } from "@/components/members/filters-drawer";
+import { MemberImportDialog } from "@/components/members/member-import-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { FiUserPlus } from "react-icons/fi";
@@ -38,6 +39,7 @@ export default function Leden() {
   const [joinDateTo, setJoinDateTo] = useState<Date | undefined>();
   const [paymentStatusFilter, setPaymentStatusFilter] = useState("all");
   const [showNewMemberDialog, setShowNewMemberDialog] = useState(false);
+  const [showImportDialog, setShowImportDialog] = useState(false);
   const [showFiltersDrawer, setShowFiltersDrawer] = useState(false);
   const [advancedFilters, setAdvancedFilters] = useState<FilterValues>(initialFilters);
   const [page, setPage] = useState(1);
@@ -59,6 +61,41 @@ export default function Leden() {
       toast({
         title: "Lid bijgewerkt",
         description: "De wijzigingen zijn opgeslagen.",
+      });
+    },
+  });
+
+  const importMembersMutation = useMutation({
+    mutationFn: async (membersData: any[]) => {
+      const importedMembers = [];
+      
+      for (const memberData of membersData) {
+        try {
+          const response = await apiRequest("POST", "/api/members", memberData);
+          const member = await response.json();
+          importedMembers.push(member);
+        } catch (error) {
+          console.error('Error importing member:', memberData.memberNumber, error);
+          throw error;
+        }
+      }
+      
+      return importedMembers;
+    },
+    onSuccess: (importedMembers) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/members"] });
+      toast({
+        title: "Import voltooid",
+        description: `${importedMembers.length} leden succesvol geïmporteerd.`,
+      });
+      setShowImportDialog(false);
+    },
+    onError: (error) => {
+      console.error('Import error:', error);
+      toast({
+        title: "Import fout",
+        description: "Er is een fout opgetreden bij het importeren van de leden.",
+        variant: "destructive",
       });
     },
   });
@@ -178,7 +215,11 @@ export default function Leden() {
   };
 
   const handleImport = () => {
-    toast({ title: "Import", description: "Import functie geopend" });
+    setShowImportDialog(true);
+  };
+
+  const handleImportMembers = (membersData: any[]) => {
+    importMembersMutation.mutate(membersData);
   };
 
   const handleResetFilters = () => {
@@ -268,6 +309,13 @@ export default function Leden() {
             />
           </DialogContent>
         </Dialog>
+
+        {/* Import Dialog */}
+        <MemberImportDialog
+          open={showImportDialog}
+          onClose={() => setShowImportDialog(false)}
+          onImport={handleImportMembers}
+        />
 
         {/* Filters Drawer */}
         <FiltersDrawer

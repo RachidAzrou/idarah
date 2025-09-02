@@ -176,7 +176,18 @@ export default function Instellingen() {
         logoUrl: tenantData.logoUrl || "",
         primaryColor: tenantData.primaryColor || "#6366f1",
       });
+      
+      // Initialize fee form with tenant data
+      feeForm.reset({
+        studentFee: tenantData.studentFee || "15.00",
+        adultFee: tenantData.adultFee || "25.00",
+        seniorFee: tenantData.seniorFee || "20.00",
+        defaultPaymentTerm: tenantData.defaultPaymentTerm || "YEARLY",
+        defaultPaymentMethod: tenantData.defaultPaymentMethod || "SEPA",
+      });
+      
       setOrganizationSaved(false);
+      setFeesSaved(false);
     }
   }, [tenant]);
 
@@ -218,6 +229,7 @@ export default function Instellingen() {
       return response.json();
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/tenant/current"] });
       setFeesSaved(true);
       toast({
         title: "Lidgeld instellingen bijgewerkt",

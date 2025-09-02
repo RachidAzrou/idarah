@@ -42,6 +42,12 @@ export const tenants = pgTable("tenants", {
   companyType: companyTypeEnum("company_type"),
   logoUrl: text("logo_url"),
   primaryColor: text("primary_color"),
+  // Membership fee settings
+  studentFee: decimal("student_fee", { precision: 10, scale: 2 }).default('15.00'),
+  adultFee: decimal("adult_fee", { precision: 10, scale: 2 }).default('25.00'),
+  seniorFee: decimal("senior_fee", { precision: 10, scale: 2 }).default('20.00'),
+  defaultPaymentTerm: paymentTermEnum("default_payment_term").default('YEARLY'),
+  defaultPaymentMethod: paymentMethodEnum("default_payment_method").default('SEPA'),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

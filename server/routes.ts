@@ -323,10 +323,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Settings routes
   app.put("/api/settings/fees", authMiddleware, tenantMiddleware, async (req, res) => {
     try {
-      // This endpoint can store fee settings in tenant metadata or create a separate settings table
-      // For now, we'll just return success as the settings are applied client-side
-      res.json({ success: true, message: "Fee settings updated" });
+      const { studentFee, adultFee, seniorFee, defaultPaymentTerm, defaultPaymentMethod } = req.body;
+      
+      // Update tenant with fee settings
+      const updatedTenant = await storage.updateTenant(req.tenantId!, {
+        studentFee: studentFee ? parseFloat(studentFee).toString() : undefined,
+        adultFee: adultFee ? parseFloat(adultFee).toString() : undefined,
+        seniorFee: seniorFee ? parseFloat(seniorFee).toString() : undefined,
+        defaultPaymentTerm,
+        defaultPaymentMethod,
+      });
+      
+      res.json({ success: true, message: "Fee settings updated", data: updatedTenant });
     } catch (error) {
+      console.error("Error updating fee settings:", error);
       res.status(500).json({ message: "Failed to update fee settings" });
     }
   });

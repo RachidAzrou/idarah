@@ -61,7 +61,7 @@ const userSchema = z.object({
 const ruleSchema = z.object({
   name: z.string().min(1, "Regelnaam is verplicht"),
   description: z.string().optional(),
-  scope: z.enum(['STEMRECHT', 'VERKIESBAAR', 'FUNCTIE']),
+  scope: z.enum(['STEMRECHT', 'VERKIESBAAR']),
   minYears: z.string().optional(),
   minPayments: z.string().optional(),
   consecutive: z.boolean().default(false),
@@ -222,7 +222,6 @@ export default function Instellingen() {
     const labels: Record<string, string> = {
       'STEMRECHT': 'Stemrecht',
       'VERKIESBAAR': 'Verkiesbaarheid',
-      'FUNCTIE': 'Functiebeperking',
     };
     return labels[scope] || scope;
   };
@@ -755,7 +754,6 @@ export default function Instellingen() {
                                       <SelectContent>
                                         <SelectItem value="STEMRECHT">Stemrecht</SelectItem>
                                         <SelectItem value="VERKIESBAAR">Verkiesbaarheid</SelectItem>
-                                        <SelectItem value="FUNCTIE">Functiebeperking</SelectItem>
                                       </SelectContent>
                                     </Select>
                                     <FormMessage />

@@ -6,7 +6,7 @@ export interface Member {
   voornaam: string;
   achternaam: string;
   initialen: string;
-  categorie: 'Volwassene' | 'Student' | 'Kind' | 'Senior' | 'Gezin';
+  categorie: 'Standaard' | 'Student' | 'Kind' | 'Senior' | 'Gezin';
   stemrecht: boolean;
   actief: boolean;
   betalingen: {
@@ -24,7 +24,7 @@ export const mockMembers: Member[] = [
     voornaam: "Ahmed",
     achternaam: "Hassan",
     initialen: "A.H.",
-    categorie: "Volwassene",
+    categorie: "Standaard",
     stemrecht: true,
     actief: true,
     betalingen: {
@@ -40,7 +40,7 @@ export const mockMembers: Member[] = [
     voornaam: "Fatima",
     achternaam: "Al-Zahra",
     initialen: "F.A.",
-    categorie: "Volwassene",
+    categorie: "Standaard",
     stemrecht: true,
     actief: true,
     betalingen: {
@@ -72,7 +72,7 @@ export const mockMembers: Member[] = [
     voornaam: "Aisha",
     achternaam: "Rahman",
     initialen: "A.R.",
-    categorie: "Volwassene",
+    categorie: "Standaard",
     stemrecht: true,
     actief: true,
     betalingen: {
@@ -104,7 +104,7 @@ export const mockMembers: Member[] = [
     voornaam: "Khadija",
     achternaam: "Benali",
     initialen: "K.B.",
-    categorie: "Volwassene",
+    categorie: "Standaard",
     stemrecht: true,
     actief: true,
     betalingen: {

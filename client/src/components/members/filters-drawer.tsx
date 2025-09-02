@@ -121,7 +121,7 @@ export function FiltersDrawer({
               <CardContent className="p-4 space-y-3">
                 {[
                   { value: 'SENIOR', label: 'Senior' },
-                  { value: 'VOLWASSEN', label: 'Volwassene' },
+                  { value: 'STANDAARD', label: 'Standaard' },
                   { value: 'STUDENT', label: 'Student' },
                   { value: 'JEUGD', label: 'Jeugd' }
                 ].map((category) => (

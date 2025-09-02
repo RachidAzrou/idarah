@@ -16,7 +16,7 @@ import { z } from "zod";
 // Enums
 export const roleEnum = pgEnum('role', ['SUPERADMIN', 'BEHEERDER', 'MEDEWERKER']);
 export const genderEnum = pgEnum('gender', ['M', 'V']);
-export const memberCategoryEnum = pgEnum('member_category', ['STUDENT', 'VOLWASSEN', 'SENIOR']);
+export const memberCategoryEnum = pgEnum('member_category', ['STUDENT', 'STANDAARD', 'SENIOR']);
 export const paymentTermEnum = pgEnum('payment_term', ['MONTHLY', 'YEARLY']);
 export const paymentMethodEnum = pgEnum('payment_method', ['SEPA', 'OVERSCHRIJVING', 'BANCONTACT', 'CASH']);
 export const feeStatusEnum = pgEnum('fee_status', ['OPEN', 'PAID', 'OVERDUE']);

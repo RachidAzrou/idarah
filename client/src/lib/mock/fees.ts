@@ -22,7 +22,7 @@ export function generateMockFees(): Fee[] {
   
   const methods: PaymentMethod[] = ["SEPA", "OVERSCHRIJVING", "BANCONTACT", "CASH"];
   const amounts = [15, 30, 45, 60]; // Monthly amounts in euros
-  const categories = ["STUDENT", "VOLWASSEN", "SENIOR"];
+  const categories = ["STUDENT", "STANDAARD", "SENIOR"];
   
   let feeId = 1;
   

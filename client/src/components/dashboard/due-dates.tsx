@@ -35,7 +35,7 @@ export default function DueDates() {
         const memberCategory = fee.memberName?.split(' - ')[1]; // Assuming format "Name - Category"
         if (memberCategory === 'STUDENT') category = 'Student';
         else if (memberCategory === 'SENIOR') category = 'Senior';
-        else if (memberCategory === 'VOLWASSEN') category = 'Volwassene';
+        else if (memberCategory === 'STANDAARD') category = 'Standaard';
         
         let status = 'upcoming';
         if (daysLeft <= 0) status = 'today';

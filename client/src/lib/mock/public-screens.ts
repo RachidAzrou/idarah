@@ -134,7 +134,7 @@ let screens: PublicScreen[] = [
         rowsPerPage: 20
       },
       year: 2025,
-      categories: ["Volwassene", "Student"]
+      categories: ["Standaard", "Student"]
     } as LedenlijstConfig
   },
   {

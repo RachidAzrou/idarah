@@ -179,7 +179,7 @@ export function Toolbar({
                 <SelectContent>
                   <SelectItem value="all">Alle categorieën</SelectItem>
                   <SelectItem value="SENIOR">Senior</SelectItem>
-                  <SelectItem value="VOLWASSEN">Volwassene</SelectItem>
+                  <SelectItem value="STANDAARD">Standaard</SelectItem>
                   <SelectItem value="STUDENT">Student</SelectItem>
                   <SelectItem value="JEUGD">Jeugd</SelectItem>
                 </SelectContent>

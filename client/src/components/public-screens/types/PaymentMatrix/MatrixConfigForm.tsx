@@ -49,7 +49,7 @@ export function MatrixConfigForm({ config, onChange }: MatrixConfigFormProps) {
     });
   };
 
-  const categories = ['Senior', 'Volwassene', 'Student'];
+  const categories = ['Senior', 'Standaard', 'Student'];
 
   const toggleCategory = (category: string) => {
     const newCategories = config.filters.categories.includes(category)

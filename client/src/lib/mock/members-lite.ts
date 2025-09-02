@@ -3,7 +3,7 @@ export type MemberLite = {
   memberNumber: string;
   firstName: string;
   lastName: string;
-  category: 'Senior' | 'Volwassene' | 'Student' | 'Jeugd';
+  category: 'Senior' | 'Standaard' | 'Student' | 'Jeugd';
   hasMandate: boolean;
   iban?: string;
 };
@@ -31,7 +31,7 @@ export const membersLite: MemberLite[] = [
     memberNumber: '0003', 
     firstName: 'Fatima', 
     lastName: 'El Amrani', 
-    category: 'Volwassene', 
+    category: 'Standaard', 
     hasMandate: true,
     iban: 'BE68 5390 0754 7034'
   },
@@ -40,7 +40,7 @@ export const membersLite: MemberLite[] = [
     memberNumber: '0004', 
     firstName: 'Ahmed', 
     lastName: 'Hassan', 
-    category: 'Volwassene', 
+    category: 'Standaard', 
     hasMandate: true,
     iban: 'BE02 2100 0012 3456'
   },
@@ -57,7 +57,7 @@ export const membersLite: MemberLite[] = [
     memberNumber: '0006', 
     firstName: 'Omar', 
     lastName: 'Benali', 
-    category: 'Volwassene', 
+    category: 'Standaard', 
     hasMandate: true,
     iban: 'BE45 2300 1234 5678'
   },
@@ -74,7 +74,7 @@ export const membersLite: MemberLite[] = [
     memberNumber: '0008', 
     firstName: 'Ibrahim', 
     lastName: 'Yilmaz', 
-    category: 'Volwassene', 
+    category: 'Standaard', 
     hasMandate: true,
     iban: 'BE12 0001 2345 6789'
   }

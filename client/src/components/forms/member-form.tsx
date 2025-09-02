@@ -332,7 +332,7 @@ export function MemberForm({ onSuccess, onCancel }: MemberFormProps) {
                           </FormControl>
                           <SelectContent>
                             <SelectItem value="STUDENT">Student</SelectItem>
-                            <SelectItem value="VOLWASSEN">Volwassen</SelectItem>
+                            <SelectItem value="STANDAARD">Standaard</SelectItem>
                             <SelectItem value="SENIOR">Senior</SelectItem>
                           </SelectContent>
                         </Select>

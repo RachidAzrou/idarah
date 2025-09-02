@@ -82,7 +82,7 @@ export const formatDateTime = (date: string | Date): string => {
 // Additional helper functions
 export function getMemberCategoryLabel(category: string): string {
   const labels: Record<string, string> = {
-    'VOLWASSENE': 'Volwassene',
+    'STANDAARD': 'Standaard',
     'KIND': 'Kind',
     'STUDENT': 'Student',
     'SENIOR': 'Senior',

@@ -3,7 +3,7 @@ export type Cell = 'PAID' | 'OPEN' | 'OVERDUE' | 'NA';
 export interface MemberRow {
   memberId: string;
   name: string;
-  category: 'Senior' | 'Volwassene' | 'Student';
+  category: 'Senior' | 'Standaard' | 'Student';
   months: Record<number, Cell>; // 1..12
 }
 
@@ -22,7 +22,7 @@ const mockMembers: MemberRow[] = [
   {
     memberId: "1",
     name: "Ahmed Hassan",
-    category: "Volwassene",
+    category: "Standaard",
     months: {
       1: 'PAID', 2: 'PAID', 3: 'PAID', 4: 'PAID',
       5: 'PAID', 6: 'OPEN', 7: 'OPEN', 8: 'OPEN',
@@ -32,7 +32,7 @@ const mockMembers: MemberRow[] = [
   {
     memberId: "2",
     name: "Fatima Al-Zahra",
-    category: "Volwassene", 
+    category: "Standaard", 
     months: {
       1: 'PAID', 2: 'PAID', 3: 'PAID', 4: 'PAID',
       5: 'PAID', 6: 'PAID', 7: 'PAID', 8: 'OPEN',
@@ -62,7 +62,7 @@ const mockMembers: MemberRow[] = [
   {
     memberId: "5",
     name: "Youssef Mansour",
-    category: "Volwassene",
+    category: "Standaard",
     months: {
       1: 'PAID', 2: 'PAID', 3: 'PAID', 4: 'OVERDUE',
       5: 'OVERDUE', 6: 'OPEN', 7: 'OPEN', 8: 'OPEN',

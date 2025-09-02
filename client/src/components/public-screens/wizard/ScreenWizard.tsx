@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useState, useEffect } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { ChevronLeft, ChevronRight, Monitor } from "lucide-react";
 import { ScreenType, TitleStyling, LedenlijstConfig, MededelingenConfig, MultimediaConfig } from "@/lib/mock/public-screens";
 import { TypeSelectionStep } from "./steps/TypeSelectionStep";
 import { DescriptionStep } from "./steps/DescriptionStep";
@@ -76,6 +77,12 @@ interface WizardData {
   };
 }
 
+const resetWizardData = () => ({
+  name: "",
+  title: { ...defaultTitleStyling },
+  subtitle: { ...defaultSubtitleStyling }
+});
+
 const defaultTitleStyling: TitleStyling = {
   text: "",
   fontSize: 32,
@@ -94,11 +101,15 @@ const defaultSubtitleStyling: TitleStyling = {
 
 export function ScreenWizard({ open, onOpenChange, onComplete }: ScreenWizardProps) {
   const [currentStep, setCurrentStep] = useState(0);
-  const [wizardData, setWizardData] = useState<WizardData>({
-    name: "",
-    title: { ...defaultTitleStyling },
-    subtitle: { ...defaultSubtitleStyling }
-  });
+  const [wizardData, setWizardData] = useState<WizardData>(resetWizardData());
+
+  // Reset wizard when dialog opens
+  useEffect(() => {
+    if (open) {
+      setCurrentStep(0);
+      setWizardData(resetWizardData());
+    }
+  }, [open]);
 
   const getSteps = () => {
     const baseSteps = [
@@ -199,13 +210,7 @@ export function ScreenWizard({ open, onOpenChange, onComplete }: ScreenWizardPro
       config
     });
 
-    // Reset wizard
-    setCurrentStep(0);
-    setWizardData({
-      name: "",
-      title: { ...defaultTitleStyling },
-      subtitle: { ...defaultSubtitleStyling }
-    });
+    // Close dialog (reset happens automatically when reopened)
     onOpenChange(false);
   };
 
@@ -213,12 +218,47 @@ export function ScreenWizard({ open, onOpenChange, onComplete }: ScreenWizardPro
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" data-testid="screen-wizard">
-        <DialogHeader>
-          <DialogTitle>{steps[currentStep]?.title}</DialogTitle>
+      <DialogContent className="max-w-5xl h-[85vh] flex flex-col" data-testid="screen-wizard">
+        <DialogHeader className="flex-shrink-0 pb-6 border-b border-border">
+          <DialogTitle className="flex items-center gap-3 text-xl">
+            <Monitor className="h-6 w-6" />
+            {steps[currentStep]?.title}
+          </DialogTitle>
+          <DialogDescription className="text-base mt-2">
+            {currentStep === 0 && "Kies het type scherm dat je wilt aanmaken"}
+            {currentStep === 1 && "Geef je scherm een duidelijke naam"}
+            {currentStep === 2 && "Pas de titel en ondertitel aan"}
+            {currentStep === 3 && "Configureer de specifieke instellingen"}
+          </DialogDescription>
+          
+          {/* Progress indicator */}
+          <div className="flex items-center gap-4 mt-4">
+            <div className="flex items-center gap-2">
+              {steps.map((step, index) => (
+                <div key={index} className="flex items-center">
+                  <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium transition-colors ${
+                    index < currentStep ? 'bg-primary text-primary-foreground' :
+                    index === currentStep ? 'bg-primary text-primary-foreground' :
+                    'bg-muted text-muted-foreground'
+                  }`}>
+                    {index + 1}
+                  </div>
+                  {index < steps.length - 1 && (
+                    <div className={`w-12 h-px mx-2 transition-colors ${
+                      index < currentStep ? 'bg-primary' : 'bg-muted'
+                    }`} />
+                  )}
+                </div>
+              ))}
+            </div>
+            <Badge variant="outline" className="ml-auto">
+              Stap {currentStep + 1} van {steps.length}
+            </Badge>
+          </div>
         </DialogHeader>
 
-        <div className="py-6">
+        {/* Main content area with fixed height */}
+        <div className="flex-1 py-6 overflow-y-auto" style={{ minHeight: '400px', maxHeight: '500px' }}>
           {StepComponent && (
             <StepComponent
               data={wizardData}
@@ -227,36 +267,38 @@ export function ScreenWizard({ open, onOpenChange, onComplete }: ScreenWizardPro
           )}
         </div>
 
-        <div className="flex justify-between">
+        {/* Fixed footer */}
+        <div className="flex-shrink-0 flex justify-between items-center pt-6 border-t border-border">
           <Button
             variant="outline"
             onClick={() => setCurrentStep(prev => prev - 1)}
             disabled={currentStep === 0}
             data-testid="wizard-back"
+            size="lg"
           >
             <ChevronLeft className="w-4 h-4 mr-2" />
             Vorige
           </Button>
 
-          <div className="flex items-center gap-2">
-            {steps.map((_, index) => (
-              <div
-                key={index}
-                className={`w-2 h-2 rounded-full ${
-                  index <= currentStep ? 'bg-primary' : 'bg-gray-300'
-                }`}
-              />
-            ))}
+          <div className="flex items-center gap-3">
+            <Button
+              variant="ghost"
+              onClick={() => onOpenChange(false)}
+              data-testid="wizard-cancel"
+            >
+              Annuleren
+            </Button>
+            
+            <Button
+              onClick={handleNext}
+              disabled={!canGoNext()}
+              data-testid="wizard-next"
+              size="lg"
+            >
+              {isLastStep ? 'Scherm Aanmaken' : 'Volgende'}
+              {!isLastStep && <ChevronRight className="w-4 h-4 ml-2" />}
+            </Button>
           </div>
-
-          <Button
-            onClick={handleNext}
-            disabled={!canGoNext()}
-            data-testid="wizard-next"
-          >
-            {isLastStep ? 'Voltooien' : 'Volgende'}
-            {!isLastStep && <ChevronRight className="w-4 h-4 ml-2" />}
-          </Button>
         </div>
       </DialogContent>
     </Dialog>

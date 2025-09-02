@@ -10,9 +10,11 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileText, Upload, Download, Check, X, AlertTriangle } from "lucide-react";
+import { FileText, Upload, Download, Check, X, AlertTriangle, FileSpreadsheet } from "lucide-react";
 import { CiImport } from "react-icons/ci";
 import { MdDownloading } from "react-icons/md";
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
 interface MemberImportDialogProps {
   open: boolean;
@@ -31,6 +33,12 @@ interface ValidationError {
   field: string;
   message: string;
 }
+
+// Excel MIME types
+const EXCEL_MIME_TYPES = [
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  'application/vnd.ms-excel'
+];
 
 // Template met alle member velden
 const MEMBER_TEMPLATE_HEADERS = [
@@ -106,7 +114,15 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
     onClose();
   };
 
-  const downloadTemplate = () => {
+  const downloadTemplate = (format: 'csv' | 'excel' = 'csv') => {
+    if (format === 'excel') {
+      downloadExcelTemplate();
+    } else {
+      downloadCSVTemplate();
+    }
+  };
+
+  const downloadCSVTemplate = () => {
     const csvContent = MEMBER_TEMPLATE_HEADERS.join(',') + '\n';
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
@@ -117,6 +133,31 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+  };
+
+  const downloadExcelTemplate = () => {
+    // Voorbeelddata voor Excel template
+    const exampleData = [
+      '001', 'Ahmed', 'Hassan', 'M', '15/03/1980', 'STANDAARD', 'ahmed@email.com', '+32123456789',
+      'Kerkstraat', '25', '1000', 'Brussel', 'België', 'SEPA', 'BE68539007547034', 'MONTHLY',
+      'NEE', '', 'JA', 'JA', 'JA', 'NEE'
+    ];
+
+    const workbook = XLSX.utils.book_new();
+    
+    // Maak werkblad met headers en voorbeelddata
+    const worksheet = XLSX.utils.aoa_to_sheet([
+      MEMBER_TEMPLATE_HEADERS,
+      exampleData
+    ]);
+    
+    // Voeg werkblad toe aan workbook
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Leden');
+    
+    // Genereer Excel bestand en download
+    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    saveAs(blob, 'leden-template.xlsx');
   };
 
   const parseCSV = (content: string): { headers: string[], rows: CSVRow[] } => {
@@ -134,20 +175,79 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
     return { headers, rows };
   };
 
+  const parseExcel = (file: File): Promise<{ headers: string[], rows: CSVRow[] }> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = new Uint8Array(e.target?.result as ArrayBuffer);
+          const workbook = XLSX.read(data, { type: 'array' });
+          
+          // Neem het eerste werkblad
+          const worksheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[worksheetName];
+          
+          // Converteer naar JSON
+          const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as string[][];
+          
+          if (jsonData.length === 0) {
+            reject(new Error('Excel bestand is leeg'));
+            return;
+          }
+          
+          const headers = jsonData[0].map(h => String(h || '').trim());
+          const rows = jsonData.slice(1).map(rowData => {
+            const row: CSVRow = {};
+            headers.forEach((header, index) => {
+              row[header] = String(rowData[index] || '').trim();
+            });
+            return row;
+          });
+          
+          resolve({ headers, rows });
+        } catch (error) {
+          reject(new Error('Fout bij het lezen van Excel bestand: ' + (error as Error).message));
+        }
+      };
+      reader.onerror = () => reject(new Error('Fout bij het lezen van bestand'));
+      reader.readAsArrayBuffer(file);
+    });
+  };
+
+  const isExcelFile = (file: File): boolean => {
+    const fileName = file.name.toLowerCase();
+    return fileName.endsWith('.xlsx') || fileName.endsWith('.xls') || 
+           EXCEL_MIME_TYPES.includes(file.type);
+  };
+
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const uploadedFile = event.target.files?.[0];
     if (!uploadedFile) return;
 
-    if (!uploadedFile.name.toLowerCase().endsWith('.csv')) {
-      alert('Alleen CSV bestanden zijn toegestaan');
+    const isCSV = uploadedFile.name.toLowerCase().endsWith('.csv');
+    const isExcel = isExcelFile(uploadedFile);
+
+    if (!isCSV && !isExcel) {
+      alert('Alleen CSV en Excel bestanden (.csv, .xlsx, .xls) zijn toegestaan');
       return;
     }
 
     setFile(uploadedFile);
     
     try {
-      const content = await uploadedFile.text();
-      const { headers, rows } = parseCSV(content);
+      let headers: string[];
+      let rows: CSVRow[];
+
+      if (isExcel) {
+        const result = await parseExcel(uploadedFile);
+        headers = result.headers;
+        rows = result.rows;
+      } else {
+        const content = await uploadedFile.text();
+        const result = parseCSV(content);
+        headers = result.headers;
+        rows = result.rows;
+      }
       
       setHeaders(headers);
       setCsvData(rows);
@@ -156,8 +256,8 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
       // Start validatie direct
       validateData(rows);
     } catch (error) {
-      console.error('Error parsing CSV:', error);
-      alert('Fout bij het lezen van het CSV bestand');
+      console.error('Error parsing file:', error);
+      alert('Fout bij het lezen van het bestand: ' + (error as Error).message);
     }
   };
 
@@ -384,7 +484,7 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
         <DialogHeader>
           <DialogTitle>Leden Importeren</DialogTitle>
           <DialogDescription>
-            Import leden via CSV bestand. Download eerst de template om het juiste formaat te gebruiken.
+            Import leden via CSV of Excel bestand. Download eerst een template om het juiste formaat te gebruiken.
           </DialogDescription>
         </DialogHeader>
 
@@ -402,29 +502,35 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
               <div>
                 <Label className="text-base font-medium">Download Template</Label>
                 <p className="text-sm text-gray-600 mb-4">
-                  Download eerst de CSV template met alle benodigde velden en voorbeelden
+                  Download eerst een template met alle benodigde velden en voorbeelden
                 </p>
-                <Button onClick={downloadTemplate} variant="outline" className="gap-2">
-                  <MdDownloading className="h-4 w-4" />
-                  Download Template
-                </Button>
+                <div className="flex gap-2">
+                  <Button onClick={() => downloadTemplate('csv')} variant="outline" className="gap-2">
+                    <MdDownloading className="h-4 w-4" />
+                    CSV Template
+                  </Button>
+                  <Button onClick={() => downloadTemplate('excel')} variant="outline" className="gap-2">
+                    <FileSpreadsheet className="h-4 w-4" />
+                    Excel Template
+                  </Button>
+                </div>
               </div>
 
               <div className="border-t pt-4">
-                <Label className="text-base font-medium">Upload CSV Bestand</Label>
+                <Label className="text-base font-medium">Upload CSV of Excel Bestand</Label>
                 <p className="text-sm text-gray-600 mb-4">
-                  Sleep een CSV bestand hieronder of klik om een bestand te selecteren
+                  Sleep een CSV of Excel bestand hieronder of klik om een bestand te selecteren
                 </p>
                 
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
                   <CiImport className="mx-auto h-12 w-12 text-gray-400 mb-4" />
                   <div className="space-y-2">
-                    <p className="text-lg font-medium">Sleep een CSV bestand hierheen</p>
+                    <p className="text-lg font-medium">Sleep een CSV of Excel bestand hierheen</p>
                     <p className="text-gray-600">of klik om een bestand te selecteren</p>
                     <Input
                       ref={fileInputRef}
                       type="file"
-                      accept=".csv"
+                      accept=".csv,.xlsx,.xls"
                       onChange={handleFileUpload}
                       className="hidden"
                     />

@@ -71,9 +71,9 @@ export function MededelingenView({ config }: MededelingenViewProps) {
           style={{ 
             boxShadow: '0 25px 60px -12px rgba(0, 0, 0, 0.3), 0 8px 25px -8px rgba(0, 0, 0, 0.1)',
             backdropFilter: 'blur(16px)',
-            width: '85vw',
-            maxWidth: '1200px',
-            minHeight: '70vh',
+            width: '95vw',
+            maxWidth: '1600px',
+            minHeight: '85vh',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center'

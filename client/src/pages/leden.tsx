@@ -6,9 +6,11 @@ import { Toolbar } from "@/components/members/toolbar";
 import { MembersTable } from "@/components/members/members-table";
 import { FiltersDrawer } from "@/components/members/filters-drawer";
 import { MemberImportDialog } from "@/components/members/member-import-dialog";
+import { MemberDetailDialog } from "@/components/members/member-detail-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { FiUserPlus } from "react-icons/fi";
+import { Edit2 } from "lucide-react";
 
 interface FilterValues {
   categories: string[];
@@ -41,6 +43,9 @@ export default function Leden() {
   const [showNewMemberDialog, setShowNewMemberDialog] = useState(false);
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [showFiltersDrawer, setShowFiltersDrawer] = useState(false);
+  const [showMemberDetail, setShowMemberDetail] = useState(false);
+  const [showEditMember, setShowEditMember] = useState(false);
+  const [selectedMember, setSelectedMember] = useState<any | null>(null);
   const [advancedFilters, setAdvancedFilters] = useState<FilterValues>(initialFilters);
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(20);
@@ -278,6 +283,31 @@ export default function Leden() {
     }
   };
 
+  const handleMemberView = (memberId: string) => {
+    const member = filteredMembers.find((m: any) => m.id === memberId);
+    if (member) {
+      setSelectedMember(member);
+      setShowMemberDetail(true);
+    }
+  };
+
+  const handleMemberEdit = (memberId: string) => {
+    const member = filteredMembers.find((m: any) => m.id === memberId);
+    if (member) {
+      setSelectedMember(member);
+      setShowEditMember(true);
+    }
+  };
+
+  const handleMemberToggleStatus = (memberId: string, currentStatus: boolean) => {
+    const newStatus = currentStatus ? 'INACTIVE' : 'ACTIVE';
+    updateMemberMutation.mutate({ id: memberId, data: { status: newStatus } });
+  };
+
+  const handleMemberDelete = (memberId: string) => {
+    deleteMemberMutation.mutate(memberId);
+  };
+
   const handleExport = () => {
     toast({ title: "Export", description: "Alle leden geëxporteerd" });
   };
@@ -356,6 +386,10 @@ export default function Leden() {
           onPerPageChange={handlePerPageChange}
           onRowAction={handleRowAction}
           onBulkAction={handleBulkAction}
+          onView={handleMemberView}
+          onEdit={handleMemberEdit}
+          onToggleStatus={handleMemberToggleStatus}
+          onDelete={handleMemberDelete}
           loading={isLoading}
         />
 
@@ -384,6 +418,51 @@ export default function Leden() {
           onClose={() => setShowImportDialog(false)}
           onImport={handleImportMembers}
         />
+
+        {/* Member Detail Dialog */}
+        <MemberDetailDialog
+          member={selectedMember}
+          open={showMemberDetail}
+          onClose={() => {
+            setShowMemberDetail(false);
+            setSelectedMember(null);
+          }}
+          onEdit={(member) => {
+            setSelectedMember(member);
+            setShowEditMember(true);
+          }}
+        />
+
+        {/* Edit Member Dialog */}
+        <Dialog open={showEditMember} onOpenChange={(open) => {
+          setShowEditMember(open);
+          if (!open) setSelectedMember(null);
+        }}>
+          <DialogContent className="max-w-6xl max-h-[95vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Edit2 className="h-5 w-5" />
+                Lid Bewerken
+              </DialogTitle>
+              <DialogDescription>
+                Bewerk de gegevens van {selectedMember?.firstName} {selectedMember?.lastName}
+              </DialogDescription>
+            </DialogHeader>
+            {selectedMember && (
+              <MemberForm
+                member={selectedMember}
+                onSuccess={() => {
+                  setShowEditMember(false);
+                  setSelectedMember(null);
+                }}
+                onCancel={() => {
+                  setShowEditMember(false);
+                  setSelectedMember(null);
+                }}
+              />
+            )}
+          </DialogContent>
+        </Dialog>
 
         {/* Filters Drawer */}
         <FiltersDrawer

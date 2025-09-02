@@ -3,6 +3,7 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ColorWheel } from "@/components/ui/color-wheel";
 import { TitleStyling } from "@/lib/mock/public-screens";
 
 interface StylingStepProps {
@@ -182,19 +183,10 @@ export function StylingStep({ data, onUpdate }: StylingStepProps) {
                     data-testid="input-title-color-hex"
                   />
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  {colors.slice(0, 12).map(color => (
-                    <button
-                      key={color.value}
-                      type="button"
-                      onClick={() => updateTitle('color', color.value)}
-                      className="w-6 h-6 rounded border border-gray-300 hover:border-gray-500 transition-colors"
-                      style={{ backgroundColor: color.value }}
-                      title={color.label}
-                      data-testid={`colorbutton-title-${color.value}`}
-                    />
-                  ))}
-                </div>
+                <ColorWheel
+                  value={data.title.color}
+                  onChange={(color) => updateTitle('color', color)}
+                />
               </div>
             </div>
           </div>
@@ -285,19 +277,10 @@ export function StylingStep({ data, onUpdate }: StylingStepProps) {
                     data-testid="input-subtitle-color-hex"
                   />
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  {colors.slice(0, 12).map(color => (
-                    <button
-                      key={color.value}
-                      type="button"
-                      onClick={() => updateSubtitle('color', color.value)}
-                      className="w-6 h-6 rounded border border-gray-300 hover:border-gray-500 transition-colors"
-                      style={{ backgroundColor: color.value }}
-                      title={color.label}
-                      data-testid={`colorbutton-subtitle-${color.value}`}
-                    />
-                  ))}
-                </div>
+                <ColorWheel
+                  value={data.subtitle.color}
+                  onChange={(color) => updateSubtitle('color', color)}
+                />
               </div>
             </div>
           </div>

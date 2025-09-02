@@ -319,7 +319,7 @@ export default function LidkaartenPage() {
                   <SelectContent>
                     <SelectItem value="all">Alle categorieën</SelectItem>
                     <SelectItem value="STUDENT">Student</SelectItem>
-                    <SelectItem value="STANDAARD">Volwassen</SelectItem>
+                    <SelectItem value="STANDAARD">Standaard</SelectItem>
                     <SelectItem value="SENIOR">Senior</SelectItem>
                   </SelectContent>
                 </Select>

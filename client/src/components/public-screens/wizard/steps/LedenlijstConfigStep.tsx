@@ -20,7 +20,7 @@ interface LedenlijstConfigStepProps {
   onUpdate: (data: any) => void;
 }
 
-const availableCategories = ['Student', 'Standaard', 'Senior', 'Stemgerechtigd'];
+const availableCategories = ['Student', 'Standaard', 'Senior', 'Stemgerechtigd', 'Mannen', 'Vrouwen'];
 
 export function LedenlijstConfigStep({ data, onUpdate }: LedenlijstConfigStepProps) {
   const settings = data.ledenlijstSettings || {
@@ -126,12 +126,12 @@ export function LedenlijstConfigStep({ data, onUpdate }: LedenlijstConfigStepPro
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="category-alle"
-                checked={settings.categories.length === 4}
+                checked={settings.categories.length === 6}
                 onCheckedChange={() => {
-                  if (settings.categories.length === 4) {
+                  if (settings.categories.length === 6) {
                     updateSettings('categories', []);
                   } else {
-                    updateSettings('categories', ['Student', 'Standaard', 'Senior', 'Stemgerechtigd']);
+                    updateSettings('categories', ['Student', 'Standaard', 'Senior', 'Stemgerechtigd', 'Mannen', 'Vrouwen']);
                   }
                 }}
                 data-testid="checkbox-category-alle"
@@ -177,6 +177,26 @@ export function LedenlijstConfigStep({ data, onUpdate }: LedenlijstConfigStepPro
                 data-testid="checkbox-category-stemgerechtigd"
               />
               <Label htmlFor="category-stemgerechtigd">Stemgerechtigd</Label>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="category-mannen"
+                checked={settings.categories.includes('Mannen')}
+                onCheckedChange={() => toggleCategory('Mannen')}
+                data-testid="checkbox-category-mannen"
+              />
+              <Label htmlFor="category-mannen">Mannen</Label>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="category-vrouwen"
+                checked={settings.categories.includes('Vrouwen')}
+                onCheckedChange={() => toggleCategory('Vrouwen')}
+                data-testid="checkbox-category-vrouwen"
+              />
+              <Label htmlFor="category-vrouwen">Vrouwen</Label>
             </div>
           </div>
           <p className="text-xs text-gray-500 mt-2">

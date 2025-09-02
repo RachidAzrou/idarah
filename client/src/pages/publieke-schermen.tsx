@@ -366,37 +366,6 @@ export default function PubliekeSchermen() {
             mode={wizardMode}
           />
 
-          {/* Edit Screen Modal */}
-          <EditScreenModal
-            screen={editingScreen}
-            open={!!editingScreen}
-            onClose={() => setEditingScreen(null)}
-            onSave={(updatedScreen) => {
-              // Update screen via API
-              const updateScreen = async () => {
-                try {
-                  await apiRequest('PUT', `/api/public-screens/${updatedScreen.id}`, {
-                    name: updatedScreen.name,
-                    active: updatedScreen.active
-                  });
-                  
-                  queryClient.invalidateQueries({ queryKey: ["/api/public-screens"] });
-                  setEditingScreen(null);
-                  toast({
-                    title: "Scherm bijgewerkt",
-                    description: "De wijzigingen zijn opgeslagen.",
-                  });
-                } catch (error) {
-                  toast({
-                    title: "Fout",
-                    description: "Er is een fout opgetreden bij het opslaan.",
-                    variant: "destructive",
-                  });
-                }
-              };
-              updateScreen();
-            }}
-          />
         </main>
   );
 }

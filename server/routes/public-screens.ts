@@ -29,6 +29,12 @@ router.get('/token/:token', async (req, res) => {
     if (!screen) {
       return res.status(404).json({ error: 'Screen not found' });
     }
+    
+    // Check if the screen is active
+    if (!screen.active) {
+      return res.status(404).json({ error: 'Screen not found' });
+    }
+    
     res.json(screen);
   } catch (error) {
     console.error('Error fetching public screen:', error);

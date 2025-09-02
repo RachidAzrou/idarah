@@ -18,7 +18,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { 
   Settings, 
   Building2, 
-  Palette, 
   CreditCard, 
   Shield, 
   Scale, 
@@ -281,14 +280,10 @@ export default function Instellingen() {
             </div>
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-              <TabsList className="grid w-full grid-cols-5">
+              <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="organization" className="flex items-center gap-2" data-testid="tab-organization">
                   <Building2 className="h-4 w-4" />
                   Organisatie
-                </TabsTrigger>
-                <TabsTrigger value="branding" className="flex items-center gap-2" data-testid="tab-branding">
-                  <Palette className="h-4 w-4" />
-                  Branding
                 </TabsTrigger>
                 <TabsTrigger value="fees" className="flex items-center gap-2" data-testid="tab-fees">
                   <CreditCard className="h-4 w-4" />
@@ -547,86 +542,6 @@ export default function Instellingen() {
                 </Card>
               </TabsContent>
 
-              <TabsContent value="branding" className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Visuele Identiteit</CardTitle>
-                    <p className="text-sm text-gray-500">Logo en kleurenschema voor uw organisatie</p>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div>
-                      <Label>Organisatie Logo</Label>
-                      <div className="mt-2 flex items-center space-x-4">
-                        <div className="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center">
-                          {tenant?.logoUrl ? (
-                            <img src={tenant.logoUrl} alt="Logo" className="w-full h-full object-cover rounded-xl" />
-                          ) : (
-                            <Building2 className="h-8 w-8 text-gray-400" />
-                          )}
-                        </div>
-                        <Button variant="outline" data-testid="button-upload-logo">
-                          <Upload className="h-4 w-4 mr-2" />
-                          Logo Uploaden
-                        </Button>
-                      </div>
-                    </div>
-
-                    <Form {...organizationForm}>
-                      <form onSubmit={organizationForm.handleSubmit(onOrganizationSubmit)}>
-                        <FormField
-                          control={organizationForm.control}
-                          name="primaryColor"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Primaire Kleur</FormLabel>
-                              <div className="flex items-center space-x-4">
-                                <FormControl>
-                                  <Input type="color" {...field} className="w-20 h-10" data-testid="input-primary-color" />
-                                </FormControl>
-                                <FormControl>
-                                  <Input {...field} placeholder="#6366f1" className="font-mono" data-testid="input-color-hex" />
-                                </FormControl>
-                              </div>
-                              <FormDescription>
-                                Deze kleur wordt gebruikt voor knoppen, accenten en branding elementen
-                              </FormDescription>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </form>
-                    </Form>
-
-                    <div className="pt-4 border-t">
-                      <h4 className="font-medium mb-4">Kleur Voorvertoning</h4>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="p-4 bg-white border rounded-xl">
-                          <Button 
-                            style={{ backgroundColor: organizationForm.watch('primaryColor') }}
-                            className="w-full text-white"
-                          >
-                            Primaire Knop
-                          </Button>
-                        </div>
-                        <div className="p-4 bg-white border rounded-xl">
-                          <Badge 
-                            style={{ backgroundColor: organizationForm.watch('primaryColor') }}
-                            className="text-white"
-                          >
-                            Status Badge
-                          </Badge>
-                        </div>
-                        <div className="p-4 bg-white border rounded-xl">
-                          <div 
-                            className="w-full h-8 rounded"
-                            style={{ backgroundColor: organizationForm.watch('primaryColor') }}
-                          ></div>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
 
               <TabsContent value="fees" className="space-y-6">
                 <Card>

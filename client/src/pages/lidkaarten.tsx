@@ -215,50 +215,62 @@ export default function LidkaartenPage() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Actieve Lidkaarten</CardTitle>
-            <CreditCard className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats?.totalActive || 0}</div>
-            <p className="text-xs text-muted-foreground">
-              kaarten met status 'Actueel'
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Geldigheidspercentage</CardTitle>
-            <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats?.validPercentage || 0}%</div>
-            <p className="text-xs text-muted-foreground">
-              leden met geldige kaart
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Laatst Bijgewerkt</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {stats?.lastUpdated 
-                ? format(new Date(stats.lastUpdated), 'dd MMM', { locale: nl })
-                : 'N.v.t.'
-              }
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+        <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <p className="text-xs font-medium text-gray-500 mb-1">Actieve Lidkaarten</p>
+              <p className="text-lg font-bold text-gray-900 mb-1">{stats?.totalActive || 0}</p>
+              <div className="flex items-center space-x-1">
+                <span className="text-xs font-medium text-blue-600">
+                  kaarten met status 'Actueel'
+                </span>
+              </div>
             </div>
-            <p className="text-xs text-muted-foreground">
-              meest recente kaartupdate
-            </p>
-          </CardContent>
-        </Card>
+            <div className="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center">
+              <CreditCard className="h-4 w-4 text-blue-600" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <p className="text-xs font-medium text-gray-500 mb-1">Geldigheidspercentage</p>
+              <p className="text-lg font-bold text-gray-900 mb-1">{stats?.validPercentage || 0}%</p>
+              <div className="flex items-center space-x-1">
+                <span className="text-xs font-medium text-green-600">
+                  leden met geldige kaart
+                </span>
+              </div>
+            </div>
+            <div className="w-8 h-8 bg-green-50 rounded-full flex items-center justify-center">
+              <CheckCircle2 className="h-4 w-4 text-green-600" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <p className="text-xs font-medium text-gray-500 mb-1">Laatst Bijgewerkt</p>
+              <p className="text-lg font-bold text-gray-900 mb-1">
+                {stats?.lastUpdated 
+                  ? format(new Date(stats.lastUpdated), 'dd MMM', { locale: nl })
+                  : 'N.v.t.'
+                }
+              </p>
+              <div className="flex items-center space-x-1">
+                <span className="text-xs font-medium text-amber-500">
+                  meest recente kaartupdate
+                </span>
+              </div>
+            </div>
+            <div className="w-8 h-8 bg-amber-50 rounded-full flex items-center justify-center">
+              <Clock className="h-4 w-4 text-amber-500" />
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Search and Filters */}

@@ -91,6 +91,13 @@ export default function Lidgelden() {
         const feeStart = new Date(fee.periodStart);
         const feeEnd = new Date(fee.periodEnd);
         
+        // Debug logging
+        if (fee.memberName === "Abo Ali") {
+          console.log(`Period filter debug for ${fee.memberName}:`);
+          console.log(`Fee period: ${feeStart.toDateString()} - ${feeEnd.toDateString()}`);
+          console.log(`Filter period: ${periodFrom?.toDateString()} - ${periodTo?.toDateString()}`);
+        }
+        
         if (periodFrom) {
           // Check if fee period overlaps with filter period start
           periodMatch = periodMatch && feeEnd >= periodFrom;
@@ -98,6 +105,11 @@ export default function Lidgelden() {
         if (periodTo) {
           // Check if fee period overlaps with filter period end  
           periodMatch = periodMatch && feeStart <= periodTo;
+        }
+        
+        // More debug logging
+        if (fee.memberName === "Abo Ali") {
+          console.log(`Period match result: ${periodMatch}`);
         }
       }
       

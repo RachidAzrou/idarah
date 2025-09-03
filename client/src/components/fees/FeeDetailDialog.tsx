@@ -3,14 +3,12 @@ import {
   DialogContent, 
   DialogHeader, 
   DialogTitle, 
-  DialogDescription,
-  DialogFooter 
+  DialogDescription
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Calendar, 
   Euro, 
@@ -18,11 +16,11 @@ import {
   Check, 
   Download, 
   Trash2, 
-  X, 
   User,
   Phone,
   Mail,
-  Info
+  UserCircle,
+  Building2
 } from "lucide-react";
 import { format, addDays } from "date-fns";
 import { toZonedTime, fromZonedTime } from "date-fns-tz";
@@ -191,145 +189,193 @@ export function FeeDetailDialog({
                           !fee.sepaBatchRef;
 
   return (
-    <TooltipProvider>
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-2xl">
-          <DialogHeader>
-            <div className="flex justify-between items-start">
-              <div>
-                <DialogTitle className="flex items-center gap-2">
-                  <Euro className="h-5 w-5" />
-                  Lidgeld Detail
-                </DialogTitle>
-                <DialogDescription>
-                  #{fee.member.memberNumber} – {fee.member.firstName} {fee.member.lastName}
-                </DialogDescription>
-              </div>
-            </div>
-          </DialogHeader>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Lidgeld Details</DialogTitle>
+          <DialogDescription>
+            Bekijk alle details van dit lidgeld
+          </DialogDescription>
+        </DialogHeader>
 
-          <div className="space-y-6">
-            {/* Header Info */}
-            <div className="bg-muted/50 rounded-lg p-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-mono text-sm text-muted-foreground">#{fee.member.memberNumber}</span>
-                <Badge className={getStatusBadgeVariant(fee.status)}>
-                  {statusLabel(fee.status)}
-                </Badge>
-              </div>
-              <h3 className="font-semibold text-lg">
-                {fee.member.firstName} {fee.member.lastName}
-              </h3>
-              <p className="text-muted-foreground text-sm">
-                {formatDateBE(fee.periodStart)} – {formatDateBE(fee.periodEnd)}
-              </p>
-              <p className="text-xl font-bold mt-2">{formatEUR(fee.amountCents)}</p>
-            </div>
+        {/* Header Info */}
+        <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3 mb-4">
+          <div className="flex items-center justify-between mb-2">
+            <span className="font-mono text-sm text-gray-600">#{fee.member.memberNumber}</span>
+            <Badge className={getStatusBadgeVariant(fee.status)}>
+              {statusLabel(fee.status)}
+            </Badge>
+          </div>
+          <h3 className="font-semibold text-lg">
+            {fee.member.firstName} {fee.member.lastName}
+          </h3>
+          <p className="text-gray-600 dark:text-gray-400">
+            {formatEUR(fee.amountCents)} • {formatDateBE(fee.periodStart)} – {formatDateBE(fee.periodEnd)}
+          </p>
+        </div>
 
-            {/* Details */}
-            <div className="space-y-4">
-              <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">
-                Details
+        <Tabs defaultValue="fee" className="space-y-4">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="fee" className="flex items-center gap-2">
+              <Euro className="h-4 w-4" />
+              <span className="hidden sm:inline">Lidgeld</span>
+            </TabsTrigger>
+            <TabsTrigger value="member" className="flex items-center gap-2">
+              <UserCircle className="h-4 w-4" />
+              <span className="hidden sm:inline">Lid</span>
+            </TabsTrigger>
+            {canManage && (
+              <TabsTrigger value="actions" className="flex items-center gap-2">
+                <Building2 className="h-4 w-4" />
+                <span className="hidden sm:inline">Acties</span>
+              </TabsTrigger>
+            )}
+          </TabsList>
+
+          <TabsContent value="fee" className="space-y-3">
+            <div className="space-y-3">
+              <h4 className="font-medium flex items-center gap-2 text-sm">
+                <Euro className="h-4 w-4" />
+                Lidgeld gegevens
               </h4>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <span className="text-muted-foreground">Vervalt op</span>
+                  <span className="text-gray-500">Bedrag</span>
+                  <p className="font-medium text-lg">{formatEUR(fee.amountCents)}</p>
+                </div>
+                <div>
+                  <span className="text-gray-500">Status</span>
+                  <div>
+                    <Badge className={getStatusBadgeVariant(fee.status)}>
+                      {statusLabel(fee.status)}
+                    </Badge>
+                  </div>
+                </div>
+                <div>
+                  <span className="text-gray-500">Periode van</span>
+                  <p className="font-medium">{formatDateBE(fee.periodStart)}</p>
+                </div>
+                <div>
+                  <span className="text-gray-500">Periode tot</span>
+                  <p className="font-medium">{formatDateBE(fee.periodEnd)}</p>
+                </div>
+                <div>
+                  <span className="text-gray-500">Vervalt op</span>
                   <p className="font-medium">{expiryDate(fee.periodEnd)}</p>
                 </div>
                 <div>
-                  <span className="text-muted-foreground">Betaaltermijn</span>
+                  <span className="text-gray-500">Betaaltermijn</span>
                   <p className="font-medium">{getTermLabel(fee.term)}</p>
                 </div>
                 <div>
-                  <span className="text-muted-foreground">Betaalmethode</span>
+                  <span className="text-gray-500">Betaalmethode</span>
                   <p className="font-medium">{getPaymentMethodLabel(fee.method)}</p>
                 </div>
                 {fee.paidAt && (
                   <div>
-                    <span className="text-muted-foreground">Betaald op</span>
+                    <span className="text-gray-500">Betaald op</span>
                     <p className="font-medium">{formatDateBE(fee.paidAt)}</p>
                   </div>
                 )}
                 {fee.sepaBatchRef && (
                   <div>
-                    <span className="text-muted-foreground">SEPA batch</span>
+                    <span className="text-gray-500">SEPA batch</span>
                     <p className="font-mono text-xs">{fee.sepaBatchRef}</p>
                   </div>
                 )}
               </div>
             </div>
+          </TabsContent>
 
-            {/* Contact informatie */}
-            {(fee.member.email || fee.member.phone) && (
-              <div className="space-y-4">
-                <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">
-                  Contact
+          <TabsContent value="member" className="space-y-3">
+            <div className="space-y-3">
+              <h4 className="font-medium flex items-center gap-2 text-sm">
+                <User className="h-4 w-4" />
+                Lid informatie
+              </h4>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="text-gray-500">Naam</span>
+                  <p className="font-medium">{fee.member.firstName} {fee.member.lastName}</p>
+                </div>
+                <div>
+                  <span className="text-gray-500">Lidnummer</span>
+                  <p className="font-medium font-mono">#{fee.member.memberNumber}</p>
+                </div>
+                <div>
+                  <span className="text-gray-500">Categorie</span>
+                  <p className="font-medium">{getCategoryLabel(fee.member.category)}</p>
+                </div>
+                {fee.member.email && (
+                  <div>
+                    <span className="text-gray-500">E-mail</span>
+                    <p>
+                      <a 
+                        href={`mailto:${fee.member.email}`} 
+                        className="text-blue-600 hover:text-blue-800"
+                      >
+                        {fee.member.email}
+                      </a>
+                    </p>
+                  </div>
+                )}
+                {fee.member.phone && (
+                  <div>
+                    <span className="text-gray-500">Telefoon</span>
+                    <p>
+                      <a 
+                        href={`tel:${fee.member.phone}`} 
+                        className="text-blue-600 hover:text-blue-800"
+                      >
+                        {fee.member.phone}
+                      </a>
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </TabsContent>
+
+          {canManage && (
+            <TabsContent value="actions" className="space-y-3">
+              <div className="space-y-3">
+                <h4 className="font-medium flex items-center gap-2 text-sm">
+                  <Building2 className="h-4 w-4" />
+                  Beschikbare acties
                 </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                  {fee.member.email && (
-                    <div>
-                      <span className="text-muted-foreground">E-mail</span>
-                      <p>
-                        <a 
-                          href={`mailto:${fee.member.email}`} 
-                          className="text-blue-600 hover:text-blue-800"
-                        >
-                          {fee.member.email}
-                        </a>
-                      </p>
-                    </div>
+                <div className="space-y-3">
+                  {canMarkAsPaid && (
+                    <Button onClick={handleMarkPaid} className="w-full flex items-center gap-2">
+                      <Check className="h-4 w-4" />
+                      Markeer als betaald
+                    </Button>
                   )}
-                  {fee.member.phone && (
-                    <div>
-                      <span className="text-muted-foreground">Telefoon</span>
-                      <p>
-                        <a 
-                          href={`tel:${fee.member.phone}`} 
-                          className="text-blue-600 hover:text-blue-800"
-                        >
-                          {fee.member.phone}
-                        </a>
-                      </p>
-                    </div>
+                  
+                  {canGenerateSepa && (
+                    <Button 
+                      onClick={handleGenerateSepa} 
+                      variant="outline"
+                      className="w-full flex items-center gap-2"
+                    >
+                      <Download className="h-4 w-4" />
+                      Genereer SEPA-export
+                    </Button>
                   )}
+                  
+                  <Button 
+                    onClick={handleDelete}
+                    variant="destructive"
+                    className="w-full flex items-center gap-2"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    Verwijder lidgeld
+                  </Button>
                 </div>
               </div>
-            )}
-          </div>
-
-          {/* Acties */}
-          {canManage && (
-            <DialogFooter className="pt-4 border-t">
-              {canMarkAsPaid && (
-                <Button onClick={handleMarkPaid} className="flex items-center gap-2">
-                  <Check className="h-4 w-4" />
-                  Markeer als betaald
-                </Button>
-              )}
-              
-              {canGenerateSepa && (
-                <Button 
-                  onClick={handleGenerateSepa} 
-                  variant="outline"
-                  className="flex items-center gap-2"
-                >
-                  <Download className="h-4 w-4" />
-                  Genereer SEPA-export
-                </Button>
-              )}
-              
-              <Button 
-                onClick={handleDelete}
-                variant="destructive"
-                className="flex items-center gap-2"
-              >
-                <Trash2 className="h-4 w-4" />
-                Verwijder
-              </Button>
-            </DialogFooter>
+            </TabsContent>
           )}
-        </DialogContent>
-      </Dialog>
-    </TooltipProvider>
+        </Tabs>
+      </DialogContent>
+    </Dialog>
   );
 }

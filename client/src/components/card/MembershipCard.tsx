@@ -219,9 +219,12 @@ export function MembershipCard({
                     color: '#FFD700',
                     textShadow: `
                       1px 1px 0 #FFF8DC,
-                      2px 2px 3px rgba(0,0,0,0.4)
+                      2px 2px 0 #F0E68C,
+                      3px 3px 0 #DAA520,
+                      4px 4px 6px rgba(0,0,0,0.5),
+                      0 0 15px rgba(255,215,0,0.4)
                     `,
-                    filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.3))'
+                    filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.4)) brightness(1.1)'
                   }}
                 />
                 

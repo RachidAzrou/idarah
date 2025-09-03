@@ -15,6 +15,29 @@ interface KpiCardProps {
 }
 
 function KpiCard({ title, value, delta, icon, iconBgColor }: KpiCardProps) {
+  // Bepaal kleuren op basis van kaarttype
+  const getColorClasses = () => {
+    if (title === "Betaald") {
+      return {
+        iconClass: "text-green-600",
+        textClass: "text-green-600"
+      };
+    } else if (title === "Vervallen") {
+      return {
+        iconClass: "text-red-500",
+        textClass: "text-red-500"
+      };
+    } else {
+      // Voor andere kaarten gebruik de bestaande logica
+      return {
+        iconClass: delta.positive ? "text-blue-600" : "text-red-500",
+        textClass: delta.positive ? "text-blue-600" : "text-red-500"
+      };
+    }
+  };
+
+  const colors = getColorClasses();
+
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow">
       <div className="flex items-center justify-between">
@@ -23,11 +46,11 @@ function KpiCard({ title, value, delta, icon, iconBgColor }: KpiCardProps) {
           <p className="text-lg font-bold text-gray-900 mb-1">{value}</p>
           <div className="flex items-center space-x-1">
             {delta.positive ? (
-              <TrendingUp className="h-3 w-3 text-blue-600" />
+              <TrendingUp className={`h-3 w-3 ${colors.iconClass}`} />
             ) : (
-              <TrendingDown className="h-3 w-3 text-red-500" />
+              <TrendingDown className={`h-3 w-3 ${colors.iconClass}`} />
             )}
-            <span className={`text-xs font-medium ${delta.positive ? 'text-blue-600' : 'text-red-500'}`}>
+            <span className={`text-xs font-medium ${colors.textClass}`}>
               {delta.value}
             </span>
           </div>

@@ -65,7 +65,9 @@ export interface IStorage {
   // Members
   getMember(id: string): Promise<Member | undefined>;
   getMembersByTenant(tenantId: string): Promise<Member[]>;
-  getMemberByNumber(memberNumber: string): Promise<Member | undefined>;
+  getMemberByNumber(tenantId: string, memberNumber: string): Promise<Member | undefined>;
+  getMemberByNameAndAddress(tenantId: string, firstName: string, lastName: string, street: string, number: string): Promise<Member | undefined>;
+  getNextAvailableMemberNumber(tenantId: string, startFrom?: string): Promise<string>;
   createMember(member: InsertMember): Promise<Member>;
   updateMember(id: string, member: Partial<InsertMember>): Promise<Member>;
   deleteMember(id: string): Promise<void>;
@@ -220,8 +222,10 @@ export class DatabaseStorage implements IStorage {
     return membersData;
   }
 
-  async getMemberByNumber(memberNumber: string): Promise<Member | undefined> {
-    const [member] = await db.select().from(members).where(eq(members.memberNumber, memberNumber));
+  async getMemberByNumber(tenantId: string, memberNumber: string): Promise<Member | undefined> {
+    const [member] = await db.select().from(members).where(
+      and(eq(members.tenantId, tenantId), eq(members.memberNumber, memberNumber))
+    );
     return member || undefined;
   }
 
@@ -274,12 +278,6 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Duplicate detection methods
-  async getMemberByNumber(tenantId: string, memberNumber: string): Promise<Member | undefined> {
-    const [member] = await db.select().from(members).where(
-      and(eq(members.tenantId, tenantId), eq(members.memberNumber, memberNumber))
-    );
-    return member || undefined;
-  }
 
   async getMemberByNameAndAddress(tenantId: string, firstName: string, lastName: string, street: string, number: string): Promise<Member | undefined> {
     const [member] = await db.select().from(members).where(

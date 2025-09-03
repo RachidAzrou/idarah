@@ -523,6 +523,8 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
     if (duplicates.length > 0) {
       setDuplicateCheckResults(duplicates);
       setShowDuplicateConfirmation(true);
+      // STOP de import - gebruiker moet eerst bevestigen
+      return;
     } else {
       // No duplicates, proceed with import
       proceedWithImport(validMembers);

@@ -176,9 +176,9 @@ export function MembersTable({
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+              <thead className="bg-[#f3f4f6]">
                 <tr>
-                  <th className="sticky top-0 w-12 px-6 py-3 text-left">
+                  <th className="sticky top-0 w-12 px-6 py-3 text-left bg-[#f3f4f6] text-[#65758b] font-poppins">
                     <Checkbox
                       checked={selectedIds.length === members.length && members.length > 0}
                       onCheckedChange={handleSelectAll}
@@ -186,7 +186,7 @@ export function MembersTable({
                     />
                   </th>
                   <th 
-                    className="sticky top-0 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                    className="sticky top-0 px-6 py-3 text-left text-xs font-medium text-[#65758b] bg-[#f3f4f6] font-poppins uppercase tracking-wider cursor-pointer hover:bg-gray-200"
                     onClick={() => handleSort('memberNumber')}
                   >
                     <div className="flex items-center gap-2">
@@ -195,7 +195,7 @@ export function MembersTable({
                     </div>
                   </th>
                   <th 
-                    className="sticky top-0 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                    className="sticky top-0 px-6 py-3 text-left text-xs font-medium text-[#65758b] bg-[#f3f4f6] font-poppins uppercase tracking-wider cursor-pointer hover:bg-gray-200"
                     onClick={() => handleSort('lastName')}
                   >
                     <div className="flex items-center gap-2">
@@ -203,17 +203,17 @@ export function MembersTable({
                       {getSortIcon('lastName')}
                     </div>
                   </th>
-                  <th className="sticky top-0 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
+                  <th className="sticky top-0 px-6 py-3 text-left text-xs font-medium text-[#65758b] bg-[#f3f4f6] font-poppins uppercase tracking-wider hidden lg:table-cell">
                     Voornaam
                   </th>
-                  <th className="sticky top-0 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="sticky top-0 px-6 py-3 text-left text-xs font-medium text-[#65758b] bg-[#f3f4f6] font-poppins uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="sticky top-0 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="sticky top-0 px-6 py-3 text-left text-xs font-medium text-[#65758b] bg-[#f3f4f6] font-poppins uppercase tracking-wider">
                     Categorie
                   </th>
                   <th 
-                    className="sticky top-0 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                    className="sticky top-0 px-6 py-3 text-left text-xs font-medium text-[#65758b] bg-[#f3f4f6] font-poppins uppercase tracking-wider cursor-pointer hover:bg-gray-200"
                     onClick={() => handleSort('createdAt')}
                   >
                     <div className="flex items-center gap-2">
@@ -221,7 +221,7 @@ export function MembersTable({
                       {getSortIcon('createdAt')}
                     </div>
                   </th>
-                  <th className="sticky top-0 px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="sticky top-0 px-6 py-3 text-right text-xs font-medium text-[#65758b] bg-[#f3f4f6] font-poppins uppercase tracking-wider">
                     Acties
                   </th>
                 </tr>

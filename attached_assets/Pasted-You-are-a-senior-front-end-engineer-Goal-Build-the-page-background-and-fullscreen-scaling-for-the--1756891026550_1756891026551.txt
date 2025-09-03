@@ -1,0 +1,102 @@
+You are a senior front-end engineer.
+Goal: Build the page background and fullscreen scaling for the Digital Membership Card so the card visually “pops” on a dark stage. Keep the existing card component; focus on the canvas/layout around it. Locale nl-BE, PWA-friendly, accessible.
+
+Tech
+
+Next.js 14 (App Router) + React 18 + TypeScript strict
+
+TailwindCSS (utilities only)
+
+Optional tiny CSS module for background layers (no heavy libs)
+
+Files to create
+
+app/card/[memberId]/page.tsx — route that renders the canvas + card.
+
+components/card/CardCanvas.tsx — background + centering + scaling logic.
+
+components/card/FullScreenButton.tsx — optional desktop fullscreen toggle.
+
+styles/card-canvas.css — background layers (spotlight, vignette, sheen, grain).
+
+Ensure <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">.
+
+Visual direction — Dark stage, card as the hero
+
+Base background: deep navy to ink blue radial gradient (center slightly above the card):
+
+Colors (suggestion): #0B1220 → #0E264A → #0B1220.
+
+Vignette: subtle radial darkening at edges (40–60% opacity gradient) for focus.
+
+Sheen: faint diagonal linear gradient (135°) to add a glossy “studio light” feel (very low opacity).
+
+Grain/noise: ultra-fine texture at 3–5% opacity to prevent banding.
+
+Optional rim-light behind the card: a soft blurred ellipse (rgba(37, 99, 235, 0.20)) to separate the card from the background (blue that matches your brand).
+
+No heavy blurs; keep GPU-friendly.
+
+Layout & scaling — Card must fill the screen without blurring
+
+Keep credit-card aspect ratio ~ 1.586:1 (aspect-[1586/1000]).
+
+Use container sizing (width/height) not CSS transform: scale() (prevents text blur).
+
+Rules:
+
+Portrait phones: w-[min(92vw,70vh*1.586)] centered.
+
+Landscape (phones/tablets): h-[min(94vh,94vw/1.586)].
+
+Desktop: w-[clamp(560px, 70vmin, 880px)].
+
+iOS safe areas: outer padding with env(safe-area-inset-*).
+
+Place <MembershipCard className="h-full w-full" /> inside the aspect box.
+
+Accessibility & motion
+
+Respect prefers-reduced-motion: disable any idle shimmer on background.
+
+Fullscreen button (F hotkey on desktop) with aria-label="Volledig scherm".
+
+Maintain AA contrast; focus-visible rings on interactive elements.
+
+Implementation details (Tailwind + CSS)
+
+CardCanvas.tsx wrapper:
+
+relative min-h-screen w-full overflow-hidden
+
+padding: px-[max(env(safe-area-inset-left),16px)] py-[max(env(safe-area-inset-top),16px)]
+
+include classes from card-canvas.css for:
+
+.bg-spotlight (radial center light)
+
+.bg-vignette (dark edges)
+
+.bg-sheen (faint diagonal light)
+
+.bg-grain (noise overlay)
+
+.bg-rimlight (blurred ellipse behind card)
+
+Centering:
+
+grid place-items-center
+
+Aspect box:
+
+mx-auto aspect-[1586/1000] w-full with responsive width/height utilities above.
+
+Acceptance criteria
+
+Background is dark, premium, with spotlight/vignette/sheen that makes the card pop.
+
+Card fills as much of the viewport as possible (portrait/landscape/desktop) without text blur.
+
+Optional rim-light creates separation; respects reduced motion.
+
+Safe for PWA standalone (viewport-fit=cover), accessible controls

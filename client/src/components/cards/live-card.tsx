@@ -16,6 +16,7 @@ interface LiveCardProps {
   onRefresh?: () => void;
   isRefreshing?: boolean;
   standalone?: boolean;
+  className?: string;
 }
 
 interface StatusLEDProps {
@@ -80,7 +81,8 @@ export function LiveCard({
   tenant, 
   onRefresh, 
   isRefreshing = false,
-  standalone = false 
+  standalone = false,
+  className = ""
 }: LiveCardProps) {
   const [showQRModal, setShowQRModal] = useState(false);
   const [showGloss, setShowGloss] = useState(false);
@@ -127,9 +129,9 @@ export function LiveCard({
   const validUntil = cardMeta.validUntil || new Date(currentYear, 11, 31);
 
   return (
-    <div className="min-h-screen w-full relative overflow-hidden flex items-center justify-center p-4 sm:p-6" style={{
+    <div className={cn("w-full h-full relative overflow-hidden flex items-center justify-center", standalone ? "" : "min-h-screen p-4 sm:p-6", className)} style={!standalone ? {
       background: `radial-gradient(circle at 50% 40%, #0B2440 0%, #0E3A6E 45%, #0B2440 100%), radial-gradient(circle at 50% 50%, transparent 40%, rgba(0,0,0,0.3) 100%), linear-gradient(135deg, rgba(255,255,255,0.02) 0%, transparent 50%, rgba(0,0,0,0.05) 100%)`
-    }}>
+    } : {}}>
       {/* PWA Install Banner */}
       {isInstallable && !standalone && (
         <div className="fixed top-4 left-4 right-4 bg-blue-600 text-white p-3 rounded-lg shadow-lg z-10">

@@ -182,6 +182,20 @@ export function ExportDialog({ open, onOpenChange, filteredMembers }: ExportDial
     onOpenChange(false);
   };
 
+  const goToNext = () => {
+    if (currentStep === 'selection') {
+      handleExport();
+    }
+  };
+
+  const goToPrevious = () => {
+    if (currentStep === 'complete') {
+      setCurrentStep('selection');
+      setExportProgress(0);
+      setExportedFile(null);
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[650px] max-h-[85vh] flex flex-col">
@@ -273,17 +287,17 @@ export function ExportDialog({ open, onOpenChange, filteredMembers }: ExportDial
                 </div>
               </div>
 
-              <DialogFooter>
+              <DialogFooter className="flex justify-between">
                 <Button variant="outline" onClick={handleClose}>
                   Annuleren
                 </Button>
                 <Button 
-                  onClick={handleExport}
+                  onClick={goToNext}
                   disabled={selectedFields.length === 0}
                   className="gap-2"
                 >
                   <CiExport className="h-4 w-4" />
-                  Exporteren ({selectedFields.length} velden)
+                  Volgende - Exporteren ({selectedFields.length} velden)
                 </Button>
               </DialogFooter>
             </TabsContent>
@@ -325,8 +339,11 @@ export function ExportDialog({ open, onOpenChange, filteredMembers }: ExportDial
                 </div>
               </div>
 
-              <DialogFooter>
-                <Button onClick={handleClose} className="w-full">
+              <DialogFooter className="flex justify-between">
+                <Button variant="outline" onClick={goToPrevious}>
+                  Vorige
+                </Button>
+                <Button onClick={handleClose}>
                   Sluiten
                 </Button>
               </DialogFooter>

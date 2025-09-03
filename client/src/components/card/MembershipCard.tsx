@@ -216,19 +216,7 @@ export function MembershipCard({
                   className={`${isConstrained ? 'w-12 h-12' : 'w-16 h-16'}`}
                   data-testid="voting-icon"
                   style={{
-                    color: '#FFD700',
-                    background: `
-                      radial-gradient(circle at 20% 20%, #B8860B 2px, transparent 2px),
-                      radial-gradient(circle at 60% 40%, #8B6914 1.5px, transparent 1.5px),
-                      radial-gradient(circle at 80% 70%, #996515 2px, transparent 2px),
-                      radial-gradient(circle at 30% 80%, #A0751A 1px, transparent 1px),
-                      radial-gradient(circle at 70% 20%, #B8860B 1.5px, transparent 1.5px),
-                      linear-gradient(135deg, #B8860B 0%, #DAA520 25%, #FFD700 50%, #FFF8DC 75%, #DAA520 100%)
-                    `,
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundSize: '25px 25px, 30px 30px, 20px 20px, 35px 35px, 28px 28px, 400% 400%',
-                    animation: 'goldShimmer 4s ease-in-out infinite',
+                    color: '#DAA520',
                     textShadow: `
                       3px 3px 0 rgba(255,248,220,0.4),
                       -3px -3px 0 rgba(0,0,0,0.9),
@@ -238,10 +226,10 @@ export function MembershipCard({
                       -7px -7px 0 rgba(0,0,0,0.2),
                       inset 4px 4px 8px rgba(0,0,0,0.8),
                       inset -2px -2px 4px rgba(255,215,0,0.2),
-                      0 0 15px rgba(255,215,0,0.4),
-                      0 0 25px rgba(255,215,0,0.2)
+                      0 0 12px rgba(218,165,32,0.4),
+                      0 0 20px rgba(218,165,32,0.2)
                     `,
-                    filter: 'drop-shadow(3px 3px 8px rgba(0,0,0,0.6)) brightness(1.2) contrast(1.1)'
+                    filter: 'drop-shadow(3px 3px 8px rgba(0,0,0,0.6)) brightness(1.1)'
                   }}
                 />
                 

@@ -716,41 +716,38 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
                 <div>
                   <h3 className="text-lg font-semibold">Import Preview</h3>
                   <p className="text-sm text-gray-600">
-                    {validMembers.length} leden klaar voor import. Controleer de lijst en klik op 'Importeren' om door te gaan.
+                    {validMembers.length} rijen klaar voor import. Controleer de gegevens en klik op 'Importeren' om door te gaan.
                   </p>
                 </div>
 
-                <div className="max-h-64 overflow-y-auto border rounded">
+                <div className="max-h-64 overflow-auto border rounded">
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Lidnummer</TableHead>
-                        <TableHead>Naam</TableHead>
-                        <TableHead>Categorie</TableHead>
-                        <TableHead>E-mail</TableHead>
-                        <TableHead>Betaalwijze</TableHead>
+                        {csvData.length > 0 && Object.keys(csvData[0]).map((header) => (
+                          <TableHead key={header} className="whitespace-nowrap min-w-[120px]">{header}</TableHead>
+                        ))}
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {validMembers.slice(0, 10).map((member, index) => (
+                      {csvData.slice(0, validMembers.length).map((row, index) => (
                         <TableRow key={index}>
-                          <TableCell>{member.memberNumber}</TableCell>
-                          <TableCell>{member.firstName} {member.lastName}</TableCell>
-                          <TableCell>
-                            <Badge variant="outline">{member.category}</Badge>
-                          </TableCell>
-                          <TableCell>{member.email || 'Geen e-mail'}</TableCell>
-                          <TableCell>{member.financialSettings?.paymentMethod || 'SEPA'}</TableCell>
+                          {Object.entries(row).map(([key, value]) => (
+                            <TableCell key={key} className="whitespace-nowrap min-w-[120px] text-sm">
+                              {value || '-'}
+                            </TableCell>
+                          ))}
                         </TableRow>
                       ))}
                     </TableBody>
                   </Table>
-                  {validMembers.length > 10 && (
-                    <div className="p-2 text-center text-sm text-gray-500">
-                      ... en {validMembers.length - 10} andere leden
-                    </div>
-                  )}
                 </div>
+
+                {validMembers.length !== csvData.length && (
+                  <div className="text-sm text-amber-600 bg-amber-50 p-3 rounded border">
+                    Let op: {csvData.length - validMembers.length} rijen hebben validatiefouten en worden niet geïmporteerd.
+                  </div>
+                )}
 
                 <DialogFooter>
                   <Button variant="outline" onClick={() => setStep('validation')}>

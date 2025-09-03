@@ -211,23 +211,44 @@ export function MembershipCard({
             {/* Voting Rights Badge - Right side */}
             {(cardData.badges.includes("Stemgerechtigd") || true) && (
               <div className="flex flex-col items-center mr-8">
-                <GoVerified 
-                  className={`text-white/90 debossed-icon ${isConstrained ? 'w-12 h-12' : 'w-16 h-16'}`}
-                  data-testid="voting-icon"
+                {/* Engraved Container with depth */}
+                <div 
+                  className="relative p-4 rounded-xl"
                   style={{
-                    textShadow: '3px 3px 6px rgba(0,0,0,0.9), -2px -2px 4px rgba(255,255,255,0.3), 0 0 12px rgba(255,255,255,0.1)',
-                    filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.6))'
-                  }}
-                />
-                <span 
-                  className={`embossed-text ${isConstrained ? 'text-sm' : 'text-lg'} uppercase tracking-wider mt-2 opacity-90 font-bold`}
-                  style={{
-                    textShadow: '2px 2px 4px rgba(0,0,0,0.9), -1px -1px 2px rgba(255,255,255,0.3), 0 0 8px rgba(255,255,255,0.1)',
-                    filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))'
+                    background: 'linear-gradient(145deg, rgba(0,0,0,0.4), rgba(255,255,255,0.1))',
+                    boxShadow: 'inset 4px 4px 8px rgba(0,0,0,0.6), inset -4px -4px 8px rgba(255,255,255,0.1), 0 0 20px rgba(0,0,0,0.3)',
+                    border: '1px solid rgba(255,255,255,0.1)'
                   }}
                 >
-                  STEMGERECHTIGD
-                </span>
+                  <GoVerified 
+                    className={`text-white/80 ${isConstrained ? 'w-10 h-10' : 'w-14 h-14'}`}
+                    data-testid="voting-icon"
+                    style={{
+                      textShadow: 'inset 2px 2px 4px rgba(0,0,0,0.8), inset -1px -1px 2px rgba(255,255,255,0.2)',
+                      filter: 'drop-shadow(0 0 8px rgba(255,255,255,0.2))'
+                    }}
+                  />
+                </div>
+                
+                {/* Engraved Text */}
+                <div 
+                  className="mt-3 px-3 py-1 rounded-lg"
+                  style={{
+                    background: 'linear-gradient(145deg, rgba(0,0,0,0.3), rgba(255,255,255,0.05))',
+                    boxShadow: 'inset 3px 3px 6px rgba(0,0,0,0.5), inset -3px -3px 6px rgba(255,255,255,0.1)',
+                    border: '1px solid rgba(255,255,255,0.08)'
+                  }}
+                >
+                  <span 
+                    className={`${isConstrained ? 'text-xs' : 'text-sm'} uppercase tracking-widest font-bold text-white/85`}
+                    style={{
+                      textShadow: 'inset 1px 1px 2px rgba(0,0,0,0.8), inset -1px -1px 2px rgba(255,255,255,0.2), 0 0 10px rgba(255,255,255,0.1)',
+                      letterSpacing: '0.2em'
+                    }}
+                  >
+                    STEMGERECHTIGD
+                  </span>
+                </div>
               </div>
             )}
           </div>

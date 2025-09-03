@@ -759,7 +759,7 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
                 ).length > 0 && (
                   <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                     <h4 className="font-medium text-red-800 mb-3">
-                      Leden die NIET worden geïmporteerd (bestaan al):
+                      Leden die NIET worden geïmporteerd:
                     </h4>
                     <div className="space-y-2">
                       {duplicateCheckResults
@@ -771,10 +771,15 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
                           <div key={index} className="flex items-start gap-2 text-sm">
                             <X className="h-4 w-4 mt-0.5 flex-shrink-0 text-red-600" />
                             <div className="text-red-800">
-                              <strong>{result.member.firstName} {result.member.lastName}</strong> bestaat al
-                              {result.duplicateCheck.duplicateNameAddress && (
-                                <span className="text-red-600"> (bestaand lidnummer: {result.duplicateCheck.duplicateNameAddress.memberNumber})</span>
-                              )}
+                              <div className="font-medium mb-1">{result.member.firstName} {result.member.lastName}</div>
+                              <div className="space-y-1 text-sm">
+                                {result.duplicateCheck.duplicateNumber && (
+                                  <div>• Lidnummer bestaat al: {result.duplicateCheck.duplicateNumber.memberNumber}</div>
+                                )}
+                                {result.duplicateCheck.duplicateNameAddress && (
+                                  <div>• De persoon lijkt al te bestaan met dezelfde gegevens</div>
+                                )}
+                              </div>
                             </div>
                           </div>
                         ))}

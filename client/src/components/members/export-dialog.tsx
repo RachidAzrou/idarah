@@ -226,7 +226,7 @@ export function ExportDialog({ open, onOpenChange, filteredMembers }: ExportDial
                 </Button>
               </div>
 
-              <div className="flex-1 min-h-0 overflow-auto border rounded-lg p-4">
+              <div className="border rounded-lg p-4 max-h-[400px] overflow-y-auto">
                 <div className="space-y-4">
                   {CATEGORIES.map(category => {
                     const categoryFields = EXPORT_FIELDS.filter(field => field.category === category);

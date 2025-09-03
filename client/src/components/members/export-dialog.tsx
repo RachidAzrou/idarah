@@ -209,21 +209,34 @@ export function ExportDialog({ open, onOpenChange, filteredMembers }: ExportDial
           </p>
         </DialogHeader>
 
-        <Tabs value={currentStep} className="flex-1 flex flex-col overflow-hidden">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="selection" disabled={currentStep === 'exporting'}>
-              1. Velden Selecteren
-            </TabsTrigger>
-            <TabsTrigger value="exporting" disabled={currentStep !== 'exporting'}>
-              2. Exporteren
-            </TabsTrigger>
-            <TabsTrigger value="complete" disabled={currentStep !== 'complete'}>
-              3. Voltooid
-            </TabsTrigger>
-          </TabsList>
+        {/* Progress Steps */}
+        <div className="flex items-center justify-between mb-6">
+          <div className={`flex items-center gap-2 ${currentStep === 'selection' ? 'text-blue-600' : currentStep === 'exporting' || currentStep === 'complete' ? 'text-green-600' : 'text-gray-400'}`}>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${currentStep === 'selection' ? 'bg-blue-100' : currentStep === 'exporting' || currentStep === 'complete' ? 'bg-green-100' : 'bg-gray-100'}`}>
+              1
+            </div>
+            <span className="text-sm font-medium">Velden</span>
+          </div>
+          <div className={`flex-1 h-0.5 mx-4 ${currentStep === 'exporting' || currentStep === 'complete' ? 'bg-green-200' : 'bg-gray-200'}`}></div>
+          <div className={`flex items-center gap-2 ${currentStep === 'exporting' ? 'text-blue-600' : currentStep === 'complete' ? 'text-green-600' : 'text-gray-400'}`}>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${currentStep === 'exporting' ? 'bg-blue-100' : currentStep === 'complete' ? 'bg-green-100' : 'bg-gray-100'}`}>
+              2
+            </div>
+            <span className="text-sm font-medium">Export</span>
+          </div>
+          <div className={`flex-1 h-0.5 mx-4 ${currentStep === 'complete' ? 'bg-green-200' : 'bg-gray-200'}`}></div>
+          <div className={`flex items-center gap-2 ${currentStep === 'complete' ? 'text-green-600' : 'text-gray-400'}`}>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${currentStep === 'complete' ? 'bg-green-100' : 'bg-gray-100'}`}>
+              3
+            </div>
+            <span className="text-sm font-medium">Klaar</span>
+          </div>
+        </div>
 
-          <div className="flex-1 flex flex-col">
-            <TabsContent value="selection" className="flex-1 flex flex-col space-y-4 mt-4">
+        {/* Step Content */}
+        <div className="flex-1 flex flex-col min-h-0">
+          {currentStep === 'selection' && (
+            <div className="flex-1 flex flex-col space-y-4">
               <div>
                 <h3 className="text-lg font-semibold">Selecteer Export Velden</h3>
                 <p className="text-sm text-gray-600">
@@ -286,23 +299,11 @@ export function ExportDialog({ open, onOpenChange, filteredMembers }: ExportDial
                   })}
                 </div>
               </div>
+            </div>
+          )}
 
-              <div className="flex justify-between pt-4 border-t bg-white">
-                <Button variant="outline" onClick={handleClose}>
-                  Annuleren
-                </Button>
-                <Button 
-                  onClick={goToNext}
-                  disabled={selectedFields.length === 0}
-                  className="gap-2"
-                >
-                  <CiExport className="h-4 w-4" />
-                  Volgende - Exporteren ({selectedFields.length} velden)
-                </Button>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="exporting" className="space-y-4 flex-1 flex flex-col mt-4">
+          {currentStep === 'exporting' && (
+            <div className="flex-1 flex items-center justify-center">
               <div className="text-center space-y-4">
                 <div>
                   <h3 className="text-lg font-semibold">Export wordt uitgevoerd...</h3>
@@ -318,40 +319,61 @@ export function ExportDialog({ open, onOpenChange, filteredMembers }: ExportDial
                   </p>
                 </div>
               </div>
-            </TabsContent>
+            </div>
+          )}
 
-            <TabsContent value="complete" className="flex-1 flex flex-col mt-4">
-              <div className="flex-1 flex items-center justify-center">
-                <div className="text-center space-y-4">
-                  <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-                    <Check className="h-8 w-8 text-green-600" />
-                  </div>
-                  
-                  <div>
-                    <h3 className="text-lg font-semibold text-green-800">Export Voltooid!</h3>
-                    <p className="text-sm text-gray-600">
-                      {filteredMembers.length} leden succesvol geëxporteerd
+          {currentStep === 'complete' && (
+            <div className="flex-1 flex items-center justify-center">
+              <div className="text-center space-y-4">
+                <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                  <Check className="h-8 w-8 text-green-600" />
+                </div>
+                
+                <div>
+                  <h3 className="text-lg font-semibold text-green-800">Export Voltooid!</h3>
+                  <p className="text-sm text-gray-600">
+                    {filteredMembers.length} leden succesvol geëxporteerd
+                  </p>
+                  {exportedFile && (
+                    <p className="text-sm text-gray-500 mt-2">
+                      Bestand: {exportedFile}
                     </p>
-                    {exportedFile && (
-                      <p className="text-sm text-gray-500 mt-2">
-                        Bestand: {exportedFile}
-                      </p>
-                    )}
-                  </div>
+                  )}
                 </div>
               </div>
+            </div>
+          )}
+        </div>
 
-              <div className="flex justify-between pt-4 border-t bg-white">
-                <Button variant="outline" onClick={goToPrevious}>
-                  Vorige
-                </Button>
-                <Button onClick={handleClose}>
-                  Sluiten
-                </Button>
-              </div>
-            </TabsContent>
-          </div>
-        </Tabs>
+        {/* Footer Buttons */}
+        <div className="flex justify-between pt-4 border-t">
+          {currentStep === 'selection' && (
+            <>
+              <Button variant="outline" onClick={handleClose}>
+                Annuleren
+              </Button>
+              <Button 
+                onClick={goToNext}
+                disabled={selectedFields.length === 0}
+                className="gap-2"
+              >
+                <CiExport className="h-4 w-4" />
+                Volgende - Exporteren ({selectedFields.length} velden)
+              </Button>
+            </>
+          )}
+
+          {currentStep === 'complete' && (
+            <>
+              <Button variant="outline" onClick={goToPrevious}>
+                Vorige
+              </Button>
+              <Button onClick={handleClose}>
+                Sluiten
+              </Button>
+            </>
+          )}
+        </div>
       </DialogContent>
     </Dialog>
   );

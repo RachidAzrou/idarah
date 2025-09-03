@@ -55,7 +55,7 @@ export function KpiCards({ fees }: KpiCardsProps) {
   const overdueAmount = overdueFees.reduce((sum, fee) => sum + Number(fee.amount || 0), 0);
   const totalAmount = fees.reduce((sum, fee) => sum + Number(fee.amount || 0), 0);
   
-  const paidPercentage = totalAmount > 0 ? (paidAmount / totalAmount) * 100 : 0;
+  const paidPercentage = totalAmount > 0 ? (paidAmount / totalAmount) : 0;
   const totalCount = fees.length;
 
   // Calculate month-over-month changes (mock data for demo)

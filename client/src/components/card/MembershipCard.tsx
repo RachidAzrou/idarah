@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { RefreshCw, Wifi, WifiOff, Clock } from "lucide-react";
-import { GoVerified } from "react-icons/go";
+import { PiUserCircleCheckLight } from "react-icons/pi";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
@@ -212,7 +212,7 @@ export function MembershipCard({
             {(cardData.badges.includes("Stemgerechtigd") || true) && (
               <div className="flex flex-col items-center mr-8">
                 {/* Embossed Gold Icon Lines */}
-                <GoVerified 
+                <PiUserCircleCheckLight 
                   className={`${isConstrained ? 'w-12 h-12' : 'w-16 h-16'}`}
                   data-testid="voting-icon"
                   style={{

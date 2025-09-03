@@ -76,9 +76,8 @@ const PaymentStatusChart = React.memo(function PaymentStatusChart() {
       <div className="space-y-3">
         {data.map((item, index) => {
           // Bereken de echte waarde voor de legenda
-          const realValue = useMemo(() => {
-            if (!Array.isArray(fees) || fees.length === 0) return 0;
-            
+          let realValue = 0;
+          if (Array.isArray(fees) && fees.length > 0) {
             const counts = fees.reduce((acc: any, f: any) => {
               if (f.status === 'PAID') acc.paid++;
               else if (f.status === 'OPEN') acc.open++;
@@ -86,11 +85,10 @@ const PaymentStatusChart = React.memo(function PaymentStatusChart() {
               return acc;
             }, { paid: 0, open: 0, overdue: 0 });
             
-            if (item.name === 'Betaald') return counts.paid;
-            if (item.name === 'Openstaand') return counts.open;
-            if (item.name === 'Achterstallig') return counts.overdue;
-            return 0;
-          }, [fees, item.name]);
+            if (item.name === 'Betaald') realValue = counts.paid;
+            else if (item.name === 'Openstaand') realValue = counts.open;
+            else if (item.name === 'Achterstallig') realValue = counts.overdue;
+          }
           
           return (
             <div key={index} className="flex items-center justify-between">

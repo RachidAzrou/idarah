@@ -98,7 +98,14 @@ export default function MembersByCategoryCard() {
                 </linearGradient>
               </defs>
               <Pie
-                data={categories.filter(cat => cat.count > 0)}
+                data={(() => {
+                  // Als er geen data is, toon een lege cirkel met gelijke stukken
+                  const hasData = categories.some(cat => cat.count > 0);
+                  if (!hasData) {
+                    return categories.map(cat => ({ ...cat, count: 1 }));
+                  }
+                  return categories.filter(cat => cat.count > 0);
+                })()}
                 dataKey="count"
                 nameKey="label"
                 cx="50%"
@@ -108,19 +115,27 @@ export default function MembersByCategoryCard() {
                 strokeWidth={2}
                 stroke="#ffffff"
               >
-                {categories.filter(cat => cat.count > 0).map((category, index) => {
-                  const getGradientId = (key: string) => {
-                    switch (key) {
-                      case 'standaard': return 'url(#gradient-standaard)';
-                      case 'senior': return 'url(#gradient-senior)';
-                      case 'student': return 'url(#gradient-student)';
-                      default: return 'url(#gradient-standaard)';
-                    }
-                  };
-                  return (
-                    <Cell key={`cell-${index}`} fill={getGradientId(category.key)} />
-                  );
-                })}
+                {(() => {
+                  const hasData = categories.some(cat => cat.count > 0);
+                  const dataToRender = hasData 
+                    ? categories.filter(cat => cat.count > 0)
+                    : categories;
+                  
+                  return dataToRender.map((category, index) => {
+                    const getGradientId = (key: string) => {
+                      if (!hasData) return '#E5E7EB'; // Grijs voor lege state
+                      switch (key) {
+                        case 'standaard': return 'url(#gradient-standaard)';
+                        case 'senior': return 'url(#gradient-senior)';
+                        case 'student': return 'url(#gradient-student)';
+                        default: return 'url(#gradient-standaard)';
+                      }
+                    };
+                    return (
+                      <Cell key={`cell-${index}`} fill={getGradientId(category.key)} />
+                    );
+                  });
+                })()}
               </Pie>
               <Tooltip 
                 formatter={(value: number, name: string) => [

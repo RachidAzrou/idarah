@@ -815,14 +815,6 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
                   </div>
                 )}
 
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <p className="text-sm text-blue-800">
-                    <strong>Wat gebeurt er:</strong>
-                    <br />• Leden met dubbele lidnummers krijgen een nieuw uniek nummer
-                    <br />• Leden die volledig bestaan worden niet geïmporteerd
-                    <br />• Andere leden worden normaal geïmporteerd
-                  </p>
-                </div>
 
                 <DialogFooter>
                   <Button variant="outline" onClick={() => setShowDuplicateConfirmation(false)}>

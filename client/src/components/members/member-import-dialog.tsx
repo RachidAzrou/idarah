@@ -716,7 +716,11 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
                 Annuleren
               </Button>
               <Button 
-                onClick={() => setStep('importing')}
+                onClick={() => {
+                  setStep('importing');
+                  // Start direct met duplicaat controle
+                  checkDuplicatesBeforeImport();
+                }}
                 disabled={validationErrors.length > 0 || validMembers.length === 0}
                 className="gap-2"
               >

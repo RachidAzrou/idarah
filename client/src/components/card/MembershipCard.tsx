@@ -211,30 +211,44 @@ export function MembershipCard({
             {/* Voting Rights Badge - Right side */}
             {(cardData.badges.includes("Stemgerechtigd") || true) && (
               <div className="flex flex-col items-center mr-8">
-                {/* Realistic Gold Icon */}
-                <GoVerified 
-                  className={`${isConstrained ? 'w-12 h-12' : 'w-16 h-16'}`}
-                  data-testid="voting-icon"
+                {/* Embossed Gold Icon */}
+                <div 
+                  className="relative"
                   style={{
-                    color: '#B8860B',
-                    background: `
-                      radial-gradient(ellipse at 30% 20%, #DAA520 0%, transparent 50%),
-                      radial-gradient(ellipse at 70% 80%, #D4AF37 0%, transparent 50%),
-                      linear-gradient(135deg, #996515 0%, #B8860B 20%, #D4AF37 40%, #DAA520 60%, #B8860B 80%, #8B6914 100%)
-                    `,
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundSize: '150% 150%, 150% 150%, 300% 300%',
-                    textShadow: `
-                      1px 1px 0 #B8860B,
-                      2px 2px 0 #A0751A,
-                      3px 3px 0 #8B6914,
-                      4px 4px 8px rgba(0,0,0,0.6),
-                      0 0 15px rgba(255,215,0,0.4)
-                    `,
-                    filter: 'drop-shadow(2px 2px 6px rgba(0,0,0,0.4)) contrast(1.1) saturate(1.2)'
+                    background: 'linear-gradient(145deg, rgba(255,255,255,0.1), rgba(0,0,0,0.2))',
+                    borderRadius: '50%',
+                    padding: '8px',
+                    boxShadow: `
+                      8px 8px 16px rgba(0,0,0,0.4),
+                      -8px -8px 16px rgba(255,255,255,0.1),
+                      inset -2px -2px 4px rgba(0,0,0,0.3),
+                      inset 2px 2px 4px rgba(255,255,255,0.1)
+                    `
                   }}
-                />
+                >
+                  <GoVerified 
+                    className={`${isConstrained ? 'w-10 h-10' : 'w-14 h-14'}`}
+                    data-testid="voting-icon"
+                    style={{
+                      color: '#B8860B',
+                      background: `
+                        radial-gradient(ellipse at 30% 20%, #DAA520 0%, transparent 50%),
+                        radial-gradient(ellipse at 70% 80%, #D4AF37 0%, transparent 50%),
+                        linear-gradient(135deg, #996515 0%, #B8860B 20%, #D4AF37 40%, #DAA520 60%, #B8860B 80%, #8B6914 100%)
+                      `,
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      backgroundSize: '150% 150%, 150% 150%, 300% 300%',
+                      textShadow: `
+                        1px 1px 0 #8B6914,
+                        2px 2px 0 #75590F,
+                        3px 3px 6px rgba(0,0,0,0.8),
+                        0 0 12px rgba(212,175,55,0.6)
+                      `,
+                      filter: 'drop-shadow(1px 1px 3px rgba(0,0,0,0.5)) contrast(1.2) saturate(1.3)'
+                    }}
+                  />
+                </div>
                 
                 {/* Minimal Gold Text */}
                 <span 

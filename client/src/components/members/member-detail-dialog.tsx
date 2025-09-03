@@ -35,7 +35,7 @@ export function MemberDetailDialog({ member, open, onClose, onEdit }: MemberDeta
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Lid Details</DialogTitle>
           <DialogDescription>

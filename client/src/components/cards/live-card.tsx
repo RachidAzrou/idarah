@@ -162,7 +162,7 @@ export function LiveCard({
       )}
 
       {/* Live Card - Credit card aspect ratio */}
-      <div className="w-[min(92vw,70vh*1.586)] sm:w-[min(94vw,94vh*1.586)] lg:w-[clamp(540px,70vmin,860px)] aspect-[1586/1000]">
+      <div className="w-[min(95vw,75vh*1.586)] sm:w-[min(96vw,96vh*1.586)] lg:w-[clamp(600px,75vmin,920px)] aspect-[1586/1000]">
         <div 
           className={cn(
             "card-gradient relative w-full h-full rounded-3xl overflow-hidden border border-white/10 card-font transition-transform duration-800",

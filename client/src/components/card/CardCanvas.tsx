@@ -30,7 +30,7 @@ export function CardCanvas({ children, className = '' }: CardCanvasProps) {
       <div 
         className={`
           mx-auto aspect-[1586/1000] 
-          ${isConstrained ? 'w-full h-auto' : 'w-[min(92vw,calc(70vh*1.586))] sm:w-[min(94vw,calc(94vh*1.586))] lg:w-[clamp(560px,70vmin,880px)]'}
+          ${isConstrained ? 'w-full h-auto' : 'w-[min(95vw,calc(75vh*1.586))] sm:w-[min(96vw,calc(96vh*1.586))] lg:w-[clamp(600px,75vmin,920px)]'}
           relative z-10
         `}
       >

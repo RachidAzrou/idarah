@@ -348,6 +348,27 @@ export default function LidkaartenPage() {
         <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
             <div className="flex-1">
+              <p className="text-xs font-medium text-gray-500 mb-1">Verlopen Kaarten</p>
+              <p className="text-lg font-bold text-gray-900 mb-1">
+                {filteredCards.filter(({ cardMeta }) => 
+                  cardMeta?.status === 'VERLOPEN'
+                ).length}
+              </p>
+              <div className="flex items-center space-x-1">
+                <span className="text-xs font-medium text-red-500">
+                  kaarten met status 'Verlopen'
+                </span>
+              </div>
+            </div>
+            <div className="w-8 h-8 bg-red-50 rounded-full flex items-center justify-center">
+              <AlertTriangle className="h-4 w-4 text-red-500" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
               <p className="text-xs font-medium text-gray-500 mb-1">Geen Kaart</p>
               <p className="text-lg font-bold text-gray-900 mb-1">
                 {filteredCards.filter(({ cardMeta }) => 
@@ -384,27 +405,6 @@ export default function LidkaartenPage() {
             </div>
             <div className="w-8 h-8 bg-amber-50 rounded-full flex items-center justify-center">
               <MdOutlineBrowserUpdated className="h-4 w-4 text-amber-500" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between">
-            <div className="flex-1">
-              <p className="text-xs font-medium text-gray-500 mb-1">Verlopen Kaarten</p>
-              <p className="text-lg font-bold text-gray-900 mb-1">
-                {filteredCards.filter(({ cardMeta }) => 
-                  cardMeta?.status === 'VERLOPEN'
-                ).length}
-              </p>
-              <div className="flex items-center space-x-1">
-                <span className="text-xs font-medium text-red-500">
-                  kaarten met status 'Verlopen'
-                </span>
-              </div>
-            </div>
-            <div className="w-8 h-8 bg-red-50 rounded-full flex items-center justify-center">
-              <AlertTriangle className="h-4 w-4 text-red-500" />
             </div>
           </div>
         </div>

@@ -545,7 +545,7 @@ export function MemberForm({ member, onSuccess, onCancel }: MemberFormProps) {
                                   }
                                 }
                               }}
-                              placeholder="DD/MM/YYYY of 04061993"
+                              placeholder="DD/MM/YYYY"
                               className="pr-10 border-gray-200"
                               data-testid="input-birthdate"
                               maxLength={10}

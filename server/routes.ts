@@ -246,6 +246,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/members/:id", authMiddleware, tenantMiddleware, async (req, res) => {
     try {
+      console.log("PUT member request body:", JSON.stringify(req.body, null, 2));
+      
       // Transform the data to match expected format (same as PATCH endpoint)
       const transformedData = {
         ...req.body,
@@ -254,11 +256,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
       
       // Remove undefined/null birthDate to avoid validation issues
-      if (!transformedData.birthDate) {
+      if (!transformedData.birthDate || isNaN(transformedData.birthDate.getTime())) {
         delete transformedData.birthDate;
       }
       
+      console.log("PUT transformed data:", JSON.stringify(transformedData, null, 2));
+      
       const memberData = insertMemberSchema.partial().parse(transformedData);
+      console.log("PUT parsed member data:", JSON.stringify(memberData, null, 2));
+      
       const member = await storage.getMember(req.params.id);
       
       if (!member || member.tenantId !== req.tenantId) {
@@ -266,10 +272,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const updatedMember = await storage.updateMember(req.params.id, memberData);
+      console.log("PUT updated member successfully:", updatedMember.id);
       res.json(updatedMember);
     } catch (error) {
-      console.error("Error updating member:", error);
-      res.status(400).json({ message: "Invalid member data" });
+      console.error("Error updating member - detailed:", error);
+      if (error instanceof z.ZodError) {
+        console.error("Zod validation errors:", error.issues);
+        return res.status(400).json({ 
+          message: "Invalid member data", 
+          errors: error.issues 
+        });
+      }
+      res.status(500).json({ message: "Server error updating member" });
     }
   });
 

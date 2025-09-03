@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { LiveCard } from "@/components/cards/live-card";
+import { apiRequest } from "@/lib/queryClient";
 import { 
   Search, 
   Filter, 
@@ -89,8 +90,7 @@ export default function LidkaartenPage() {
   const { data: cards = [], isLoading: cardsLoading } = useQuery<CardWithMember[]>({
     queryKey: ['/api/cards'],
     queryFn: async () => {
-      const response = await fetch('/api/cards');
-      if (!response.ok) throw new Error('Failed to fetch cards');
+      const response = await apiRequest('GET', '/api/cards');
       return response.json();
     },
   });
@@ -99,8 +99,7 @@ export default function LidkaartenPage() {
   const { data: stats } = useQuery<CardStats>({
     queryKey: ['/api/cards/stats'],
     queryFn: async () => {
-      const response = await fetch('/api/cards/stats');
-      if (!response.ok) throw new Error('Failed to fetch card stats');
+      const response = await apiRequest('GET', '/api/cards/stats');
       return response.json();
     },
   });
@@ -109,8 +108,7 @@ export default function LidkaartenPage() {
   const { data: tenant } = useQuery<Tenant>({
     queryKey: ['/api/tenant/current'],
     queryFn: async () => {
-      const response = await fetch('/api/tenant/current');
-      if (!response.ok) throw new Error('Failed to fetch tenant');
+      const response = await apiRequest('GET', '/api/tenant/current');
       return response.json();
     },
   });
@@ -118,10 +116,7 @@ export default function LidkaartenPage() {
   // Regenerate card mutation
   const regenerateCardMutation = useMutation({
     mutationFn: async (memberId: string) => {
-      const response = await fetch(`/api/cards/${memberId}/regenerate`, {
-        method: 'POST',
-      });
-      if (!response.ok) throw new Error('Failed to regenerate card');
+      const response = await apiRequest('POST', `/api/cards/${memberId}/regenerate`);
       return response.json();
     },
     onSuccess: () => {
@@ -141,10 +136,7 @@ export default function LidkaartenPage() {
   // Deactivate card mutation
   const deactivateCardMutation = useMutation({
     mutationFn: async (memberId: string) => {
-      const response = await fetch(`/api/cards/${memberId}/deactivate`, {
-        method: 'POST',
-      });
-      if (!response.ok) throw new Error('Failed to deactivate card');
+      const response = await apiRequest('POST', `/api/cards/${memberId}/deactivate`);
       return response.json();
     },
     onSuccess: () => {

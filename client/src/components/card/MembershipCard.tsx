@@ -223,16 +223,18 @@ export function MembershipCard({
                     backgroundSize: '300% 300%',
                     animation: 'goldShimmer 3s ease-in-out infinite',
                     textShadow: `
-                      2px 2px 0 rgba(255,255,255,0.6),
-                      -2px -2px 0 rgba(0,0,0,0.8),
-                      -3px -3px 0 rgba(0,0,0,0.6),
-                      -4px -4px 0 rgba(0,0,0,0.4),
-                      -5px -5px 0 rgba(0,0,0,0.2),
-                      inset 3px 3px 6px rgba(0,0,0,0.7),
-                      0 0 12px rgba(255,255,255,0.4),
-                      0 0 20px rgba(192,192,192,0.3)
+                      3px 3px 0 rgba(255,255,255,0.4),
+                      -3px -3px 0 rgba(0,0,0,0.9),
+                      -4px -4px 0 rgba(0,0,0,0.8),
+                      -5px -5px 0 rgba(0,0,0,0.6),
+                      -6px -6px 0 rgba(0,0,0,0.4),
+                      -7px -7px 0 rgba(0,0,0,0.2),
+                      inset 4px 4px 8px rgba(0,0,0,0.8),
+                      inset -2px -2px 4px rgba(255,255,255,0.1),
+                      0 0 10px rgba(255,255,255,0.3),
+                      0 0 20px rgba(192,192,192,0.2)
                     `,
-                    filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.4)) brightness(1.1)'
+                    filter: 'drop-shadow(3px 3px 8px rgba(0,0,0,0.6)) brightness(1.1)'
                   }}
                 />
                 

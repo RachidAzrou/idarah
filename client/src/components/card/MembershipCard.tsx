@@ -168,10 +168,13 @@ export function MembershipCard({
             </h2>
           </div>
 
-          {/* Card Number - Tabular style */}
+          {/* Member Number */}
           <div className="mb-6">
-            <p className="embossed-text text-[clamp(12px,1.8vmin,16px)] font-medium tracking-[0.04em] font-mono tabular-nums">
-              {cardData.memberNumber.padStart(16, '0').replace(/(.{4})/g, '$1 ').trim()}
+            <p className="embossed-text text-[clamp(10px,1.4vmin,12px)] uppercase tracking-wide opacity-80 mb-1">
+              LIDNUMMER
+            </p>
+            <p className="embossed-text text-[clamp(12px,1.8vmin,16px)] font-medium font-mono tabular-nums">
+              {cardData.memberNumber}
             </p>
           </div>
 

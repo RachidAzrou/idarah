@@ -80,7 +80,36 @@ export default function Lidgelden() {
       // Category filter
       const categoryMatch = categoryFilter === "all" || fee.type === categoryFilter;
       
-      return searchMatch && statusMatch && yearMatch && methodMatch && categoryMatch;
+      // Amount filter
+      const amountValue = parseFloat(fee.amount || "0");
+      const amountMinMatch = amountMin === undefined || amountValue >= amountMin;
+      const amountMaxMatch = amountMax === undefined || amountValue <= amountMax;
+      
+      // Paid date filter (betaald op)
+      let paidDateMatch = true;
+      if (paidFrom || paidTo) {
+        if (fee.status === "PAID" && fee.paidAt) {
+          const paidDate = new Date(fee.paidAt);
+          if (paidFrom) {
+            paidDateMatch = paidDateMatch && paidDate >= paidFrom;
+          }
+          if (paidTo) {
+            paidDateMatch = paidDateMatch && paidDate <= paidTo;
+          }
+        } else if (fee.status !== "PAID") {
+          // If filter is set but fee is not paid, exclude it
+          paidDateMatch = false;
+        }
+      }
+      
+      // Only with mandate filter
+      const mandateMatch = !onlyWithMandate || (fee.method === "SEPA" && fee.hasMandate);
+      
+      // Only overdue filter
+      const overdueMatch = !onlyOverdue || (fee.status === "OPEN" && new Date(fee.periodEnd) < new Date());
+      
+      return searchMatch && statusMatch && yearMatch && methodMatch && categoryMatch && 
+             amountMinMatch && amountMaxMatch && paidDateMatch && mandateMatch && overdueMatch;
     }).sort((a: any, b: any) => {
       const aValue = a[sortBy as keyof typeof a];
       const bValue = b[sortBy as keyof typeof b];
@@ -90,7 +119,8 @@ export default function Lidgelden() {
         return aValue < bValue ? 1 : -1;
       }
     });
-  }, [allFees, searchTerm, statusFilter, yearFilter, methodFilter, categoryFilter, sortBy, sortOrder]);
+  }, [allFees, searchTerm, statusFilter, yearFilter, methodFilter, categoryFilter, 
+      amountMin, amountMax, paidFrom, paidTo, onlyWithMandate, onlyOverdue, sortBy, sortOrder]);
 
   // Paginate results
   const paginatedResult = useMemo(() => {

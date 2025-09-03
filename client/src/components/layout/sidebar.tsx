@@ -33,10 +33,11 @@ export default function Sidebar() {
         {/* Logo */}
         <div className="flex h-16 shrink-0 items-center" data-testid="logo">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <Building2 className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <span className="text-lg font-semibold text-sidebar-foreground">Ledenbeheer</span>
+            <img 
+              src="/attached_assets/DARAH_1756909309495.png" 
+              alt="DARAH Logo" 
+              className="w-32 h-8 object-contain"
+            />
           </div>
         </div>
 

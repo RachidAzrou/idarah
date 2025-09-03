@@ -545,7 +545,7 @@ export default function Instellingen() {
             </div>
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-              <TabsList className="grid w-full grid-cols-5">
+              <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="organization" className="flex items-center gap-2" data-testid="tab-organization">
                   <Building2 className="h-4 w-4" />
                   Organisatie
@@ -561,10 +561,6 @@ export default function Instellingen() {
                 <TabsTrigger value="rules" className="flex items-center gap-2" data-testid="tab-rules">
                   <Scale className="h-4 w-4" />
                   Organisatieregels
-                </TabsTrigger>
-                <TabsTrigger value="pwa" className="flex items-center gap-2" data-testid="tab-pwa">
-                  <Smartphone className="h-4 w-4" />
-                  PWA
                 </TabsTrigger>
               </TabsList>
 
@@ -1514,17 +1510,6 @@ export default function Instellingen() {
                 </Dialog>
               </TabsContent>
 
-              <TabsContent value="pwa" className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Progressive Web App (PWA)</CardTitle>
-                    <p className="text-sm text-gray-500">Beheer PWA functies zoals installatie, offline ondersteuning en meldingen</p>
-                  </CardHeader>
-                  <CardContent>
-                    <PWAManager />
-                  </CardContent>
-                </Card>
-              </TabsContent>
             </Tabs>
           </div>
         </main>

@@ -102,8 +102,12 @@ export function MembershipCard({
   // Trigger flip animation when refreshing state changes
   useEffect(() => {
     if (isRefreshing) {
+      console.log('PWA Card: Starting flip animation');
       setIsFlipping(true);
-      setTimeout(() => setIsFlipping(false), 800);
+      setTimeout(() => {
+        setIsFlipping(false);
+        console.log('PWA Card: Flip animation ended');
+      }, 800);
     }
   }, [isRefreshing]);
 
@@ -120,7 +124,9 @@ export function MembershipCard({
         )}
         style={{
           background: "linear-gradient(135deg, #0E3A6E 0%, #0B4E9C 100%)",
-          boxShadow: "0 18px 40px rgba(0,0,0,0.35)"
+          boxShadow: "0 18px 40px rgba(0,0,0,0.35)",
+          transform: isFlipping ? 'rotateY(360deg)' : 'rotateY(0deg)',
+          transition: 'transform 800ms ease-in-out'
         }}
         data-testid="membership-card"
       >

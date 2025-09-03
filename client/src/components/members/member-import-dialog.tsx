@@ -755,7 +755,7 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
                           <div key={index} className="flex items-start gap-2 text-sm">
                             <X className="h-4 w-4 mt-0.5 flex-shrink-0 text-red-600" />
                             <div className="text-red-800">
-                              <strong>{result.member.firstName} {result.member.lastName}</strong> 
+                              <strong>{result.member.firstName} {result.member.lastName}</strong> bestaat al
                               {result.duplicateCheck.duplicateNameAddress && (
                                 <span className="text-red-600"> (bestaand lidnummer: {result.duplicateCheck.duplicateNameAddress.memberNumber})</span>
                               )}

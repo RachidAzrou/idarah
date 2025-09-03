@@ -227,7 +227,7 @@ export function Toolbar({
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0 hover:bg-gray-100"
+                        className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0 hover:bg-gray-100 transition-none"
                         onClick={() => setFromPopoverOpen(true)}
                       >
                         <CalendarIcon className="h-4 w-4" />
@@ -316,7 +316,7 @@ export function Toolbar({
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0 hover:bg-gray-100"
+                        className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0 hover:bg-gray-100 transition-none"
                         onClick={() => setToPopoverOpen(true)}
                       >
                         <CalendarIcon className="h-4 w-4" />

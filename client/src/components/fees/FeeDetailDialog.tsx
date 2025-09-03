@@ -378,20 +378,6 @@ export function FeeDetailDialog({
                 <Trash2 className="h-4 w-4" />
                 Verwijder
               </Button>
-              
-              <Button onClick={() => onOpenChange(false)} variant="outline">
-                <X className="h-4 w-4 mr-2" />
-                Sluiten
-              </Button>
-            </DialogFooter>
-          )}
-          
-          {!canManage && (
-            <DialogFooter className="pt-6 border-t bg-gray-50 rounded-lg p-4 mt-6">
-              <Button onClick={() => onOpenChange(false)} variant="outline">
-                <X className="h-4 w-4 mr-2" />
-                Sluiten
-              </Button>
             </DialogFooter>
           )}
         </DialogContent>

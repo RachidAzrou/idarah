@@ -169,8 +169,7 @@ export function LiveCard({
             isFlipping && "animate-flip-horizontal"
           )}
           style={{ 
-            transform: isFlipping ? 'rotateY(360deg)' : 'rotateY(0deg)',
-            transition: 'transform 800ms ease-in-out',
+            transformStyle: 'preserve-3d',
             boxShadow: `
               0 0 0 1px rgba(255,255,255,0.1) inset,
               0 18px 40px rgba(0,0,0,0.35),

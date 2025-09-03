@@ -118,13 +118,19 @@
 
 /* 360° flip animation for card refresh */
 @keyframes flip-horizontal {
-  0% { transform: rotateY(0deg); }
-  50% { transform: rotateY(-90deg); }
-  100% { transform: rotateY(0deg); }
+  0% {
+    transform: perspective(1000px) rotateY(0deg);
+  }
+  50% {
+    transform: perspective(1000px) rotateY(180deg);
+  }
+  100% {
+    transform: perspective(1000px) rotateY(360deg);
+  }
 }
 
 .animate-flip-horizontal {
-  animation: flip-horizontal var(--animation-duration) ease-in-out;
+  animation: flip-horizontal 800ms ease-in-out;
   transform-style: preserve-3d;
 }
 
@@ -376,24 +382,6 @@
 
   .card-shine {
     animation: card-shine 800ms ease-out;
-  }
-
-  /* Flip animation for card refresh */
-  @keyframes flip-horizontal {
-    0% {
-      transform: perspective(1000px) rotateY(0deg);
-    }
-    50% {
-      transform: perspective(1000px) rotateY(180deg);
-    }
-    100% {
-      transform: perspective(1000px) rotateY(360deg);
-    }
-  }
-
-  .animate-flip-horizontal {
-    animation: flip-horizontal 800ms ease-in-out;
-    transform-style: preserve-3d;
   }
 
   @media (prefers-reduced-motion: reduce) {

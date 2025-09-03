@@ -209,7 +209,7 @@ export function MembershipCard({
             </button>
 
             {/* Voting Rights Badge - Right side */}
-            {(cardData.badges.includes("Stemgerechtigd") || true) && (
+            {cardData.badges.includes("Stemgerechtigd") && (
               <div className="flex flex-col items-center mr-8">
                 {/* Embossed Gold Icon Lines */}
                 <GoVerified 

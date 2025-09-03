@@ -601,10 +601,6 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
                   Download eerst een template met alle benodigde velden en voorbeelden
                 </p>
                 <div className="flex gap-2">
-                  <Button onClick={() => downloadTemplate('csv')} variant="outline" className="gap-2">
-                    <MdDownloading className="h-4 w-4" />
-                    CSV Template
-                  </Button>
                   <Button onClick={() => downloadTemplate('excel')} variant="outline" className="gap-2">
                     <FileSpreadsheet className="h-4 w-4" />
                     Excel Template

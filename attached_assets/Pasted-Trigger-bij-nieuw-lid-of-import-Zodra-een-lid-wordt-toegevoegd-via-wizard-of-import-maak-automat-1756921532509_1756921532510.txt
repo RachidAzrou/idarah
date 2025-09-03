@@ -1,0 +1,81 @@
+Trigger bij nieuw lid of import
+
+Zodra een lid wordt toegevoegd (via wizard of import), maak automatisch een CardMeta record aan.
+
+Zet: version=1, etag, secureToken, qrToken, status=ACTUEEL.
+
+Genereer meteen de eerste digitale kaart en koppel deze aan het lid.
+
+Versiebeheer
+
+etag = hash(member + status + regels + branding).
+
+Elke relevante wijziging (betalingen, stemrecht, branding, lidstatus) → version++, tokens roteren, caches invalid.
+
+Status
+
+Actueel: lid is actief en lidgeld voor huidige periode is betaald.
+
+Niet actueel: offline of verificatie niet mogelijk → toon als tijdelijk niet actueel.
+
+Verlopen: lid gedeactiveerd of lidgeld vervallen.
+
+Live kaart tonen
+
+Route /card/[memberId]: toont de kaart fullscreen (PWA).
+
+QR-code op kaart is decoratief; klik opent modal met scanbare QR.
+
+Verify endpoint: /api/card/verify/[qrToken] geeft JSON met status, geldig tot, stemrecht.
+
+Automatische updates
+
+Dagelijkse job (03:00 Europe/Brussels):
+
+Zet Openstaand → Vervallen indien periode voorbij zonder betaling.
+
+Herbereken kaartstatus en update CardMeta.
+
+Bij betaling: kaart direct op Actueel, tokens roteren, PWA refresh.
+
+Beheerpagina /lidkaarten
+
+Lijst van alle kaarten met filters (status, categorie, actief/inactief).
+
+Voor elke kaart: preview, status, geldig tot, versie, acties.
+
+Acties: Ververs, Deel link, Opschorten.
+
+Beveiliging & privacy
+
+secureToken = intern (server-only).
+
+qrToken = publiek maar random, enkel gebruikt voor verify.
+
+Geen PII in QR of URL; enkel token.
+
+Rate limiting en tenant-scope verplicht.
+
+Lidervaring (PWA)
+
+Leden krijgen automatisch hun kaart via welkomstmail met deeplink.
+
+PWA is installeerbaar (A2HS) en toont uitleg via InstallCoach.
+
+Offline → kaart toont Niet actueel + banner.
+
+Acceptance criteria
+
+Nieuw lid of import = kaart automatisch aanwezig.
+
+/lidkaarten pagina toont alle kaarten met status en acties.
+
+Betaling → status Actueel binnen seconden.
+
+Periode voorbij → status Vervallen (dag na periodEnd).
+
+Tokens roteren bij wijzigingen; caches worden ongeldig gemaakt.
+
+Verify endpoint veilig, rate-limited en tenant-scoped.
+
+Leden gebruiken enkel de PWA, nooit statische PNG’s.

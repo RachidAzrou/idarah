@@ -165,10 +165,14 @@ export function LiveCard({
       <div className="w-[min(95vw,75vh*1.586)] sm:w-[min(96vw,96vh*1.586)] lg:w-[clamp(600px,75vmin,920px)] aspect-[1586/1000]">
         <div 
           className={cn(
-            "card-gradient relative w-full h-full rounded-3xl overflow-hidden border border-white/10 card-font transition-transform duration-800",
+            "relative w-full h-full rounded-3xl overflow-hidden border border-white/10 card-font transition-transform duration-800",
             isFlipping && "animate-flip-horizontal"
           )}
-          style={{ 
+          style={{
+            backgroundImage: `url(${fadingBlueBackground}), linear-gradient(135deg, rgba(8, 35, 66, 0.9) 0%, rgba(6, 47, 89, 0.95) 100%)`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundBlendMode: "overlay",
             transformStyle: 'preserve-3d',
             boxShadow: `
               0 0 0 1px rgba(255,255,255,0.1) inset,

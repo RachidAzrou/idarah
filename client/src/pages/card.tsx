@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useRoute } from "wouter";
-import { LiveCard } from "@/components/cards/live-card";
+import { MembershipCard } from "@/components/card/MembershipCard";
 import { CardCanvas } from "@/components/card/CardCanvas";
 import { AspectBox } from "@/components/card/AspectBox";
 import { InstallCoach, useInstallCoach } from "@/components/pwa/InstallCoach";
@@ -154,85 +154,24 @@ export function CardPage() {
         </div>
       )}
       
-      {displayData ? (
-        <div className="relative aspect-[16/10] rounded-lg overflow-hidden">
-          <CardCanvas className="rounded-lg">
-            <LiveCard
-              member={{
-                id: params?.memberId || '',
-                tenantId: displayData.tenant.name,
-                memberNumber: displayData.memberNumber,
-                firstName: displayData.firstName,
-                lastName: displayData.lastName,
-                gender: 'M',
-                birthDate: null,
-                category: displayData.category,
-                email: null,
-                phone: null,
-                street: null,
-                number: null,
-                bus: null,
-                postalCode: null,
-                city: null,
-                country: null,
-                active: true,
-                votingRights: displayData.badges.includes('Stemgerechtigd'),
-                createdAt: new Date(),
-              }}
-              cardMeta={{
-                id: 'card-id',
-                tenantId: 'tenant-id',
-                memberId: params?.memberId || '',
-                version: 1,
-                etag: displayData.etag,
-                secureToken: 'secure-token',
-                qrToken: displayData.qrToken,
-                status: displayData.status,
-                validUntil: displayData.validUntil,
-                lastRenderedAt: new Date(),
-              }}
-              tenant={{
-                id: 'tenant-id',
-                name: displayData.tenant.name,
-                slug: 'tenant-slug',
-                street: null,
-                number: null,
-                postalCode: null,
-                city: null,
-                country: 'België',
-                email: null,
-                phone: null,
-                website: null,
-                companyNumber: null,
-                companyType: null,
-                logoUrl: displayData.tenant.logoUrl,
-                primaryColor: displayData.tenant.primaryColor,
-                studentFee: '15.00',
-                adultFee: '25.00',
-                seniorFee: '20.00',
-                defaultPaymentTerm: 'YEARLY',
-                defaultPaymentMethod: 'SEPA',
-                createdAt: new Date(),
-              }}
-              onRefresh={handleRefresh}
-              isRefreshing={isLoading}
-              standalone={true}
-              className="h-full w-full"
-            />
-          </CardCanvas>
-        </div>
-      ) : (
-        <div className="relative aspect-[16/10] rounded-lg overflow-hidden">
-          <CardCanvas className="rounded-lg">
-            <div className="w-full h-full flex items-center justify-center text-white">
-              <div className="text-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-4"></div>
-                <p>Lidkaart laden...</p>
-              </div>
+      <AspectBox>
+        {displayData ? (
+          <MembershipCard
+            cardData={displayData}
+            onRefresh={handleRefresh}
+            isRefreshing={isLoading}
+            isOffline={isOffline || !!error}
+            className="w-full h-full"
+          />
+        ) : (
+          <div className="w-full h-full rounded-3xl bg-gray-800 flex items-center justify-center text-white">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-4"></div>
+              <p>Lidkaart laden...</p>
             </div>
-          </CardCanvas>
-        </div>
-      )}
+          </div>
+        )}
+      </AspectBox>
       
       <InstallCoach 
         isOpen={installCoach.isOpen} 

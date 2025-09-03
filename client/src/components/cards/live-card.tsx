@@ -343,17 +343,17 @@ export function LiveCard({
               </div>
             </div>
 
-            {/* Bottom right: Valid until */}
-            <div className="flex-1 flex justify-end items-end">
-              <div className="text-right mr-6 mb-2 flex items-center gap-2">
-                <span className="embossed-text text-[clamp(10px,1.4vmin,12px)] uppercase tracking-wide opacity-70 font-medium">
-                  GELDIG TOT
-                </span>
-                <span className="embossed-text text-[clamp(10px,1.4vmin,12px)] font-medium font-mono tabular-nums">
-                  {cardMeta.validUntil ? format(cardMeta.validUntil, 'dd-MM-yyyy', { locale: nl }) : '31-12-2025'}
-                </span>
-              </div>
+          {/* Bottom right: Valid until */}
+          <div className="absolute bottom-4 right-4">
+            <div className="flex items-center gap-2">
+              <span className="embossed-text text-[clamp(10px,1.4vmin,12px)] uppercase tracking-wide opacity-70 font-medium">
+                GELDIG TOT
+              </span>
+              <span className="embossed-text text-[clamp(10px,1.4vmin,12px)] font-medium font-mono tabular-nums">
+                {cardMeta.validUntil ? format(cardMeta.validUntil, 'dd-MM-yyyy', { locale: nl }) : '31-12-2025'}
+              </span>
             </div>
+          </div>
           </div>
       </div>
       </div>

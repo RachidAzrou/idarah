@@ -135,103 +135,110 @@ export function MembershipCard({
 
         {/* Card Content */}
         <div className="relative h-full p-6 flex flex-col text-white">
-          {/* Top-left: Member name (large, semibold) */}
-          <div className="mb-4">
-            <h1 className="embossed-text text-[clamp(20px,3.2vmin,32px)] font-semibold uppercase tracking-wide leading-tight">
-              {cardData.firstName} {cardData.lastName}
-            </h1>
-            {/* Below it a Category chip */}
-            <div className="mt-2">
-              <span className="bg-white/15 backdrop-blur-sm text-white text-xs font-medium px-2.5 py-1 rounded-full uppercase tracking-wide">
-                {getMemberCategoryLabel(cardData.category)}
-              </span>
-            </div>
-          </div>
-
-          {/* Top-right: Status LED + label and Refresh button */}
-          <div className="absolute top-6 right-6 flex items-center gap-3">
-            <StatusLED status={displayStatus} />
-          </div>
-
-          {/* Middle: Member number and Valid until */}
-          <div className="mb-6 space-y-3">
-            <div>
-              <p className="embossed-text text-[clamp(10px,1.5vmin,12px)] uppercase tracking-wide opacity-80 mb-1">
-                LIDNUMMER
-              </p>
-              <p className="embossed-text text-[clamp(14px,2.2vmin,18px)] font-medium tracking-[0.08em] font-mono tabular-nums">
-                {cardData.memberNumber.padStart(16, '0').replace(/(.{4})/g, '$1 ').trim()}
-              </p>
-            </div>
-            
-            {cardData.validUntil && (
-              <div>
-                <p className="embossed-text text-[clamp(10px,1.5vmin,12px)] uppercase tracking-wide opacity-80 mb-1">
-                  GELDIG TOT
-                </p>
-                <p className="embossed-text text-[clamp(12px,1.8vmin,15px)] font-medium font-mono tabular-nums">
-                  {format(cardData.validUntil, 'dd-MM-yyyy', { locale: nl })}
-                </p>
-              </div>
-            )}
-          </div>
-
-          {/* Badges row */}
-          {cardData.badges.length > 0 && (
-            <div className="mb-6">
-              <div className="flex flex-wrap gap-2">
-                {cardData.badges.map((badge, index) => (
-                  <span
-                    key={index}
-                    className="bg-white/15 backdrop-blur-sm text-white text-xs font-medium px-2.5 py-1 rounded-full uppercase tracking-wide"
-                    data-testid={`badge-${index}`}
-                  >
-                    {badge}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Bottom row: Tenant logo and QR */}
-          <div className="flex-1 flex justify-between items-end">
-            {/* Bottom-left: Tenant logo */}
-            <div className="flex items-end">
+          {/* Top row: Organization and Status */}
+          <div className="flex items-start justify-between mb-4">
+            <div className="flex-1">
               {cardData.tenant.logoUrl && (
                 <img 
                   src={cardData.tenant.logoUrl} 
                   alt={cardData.tenant.name}
-                  className="h-8 w-auto opacity-90"
-                  data-testid="tenant-logo"
+                  className="h-5 w-auto mb-1 opacity-90"
                 />
+              )}
+              <h1 className="embossed-text text-sm font-medium uppercase tracking-widest">
+                {cardData.tenant.name}
+              </h1>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <StatusLED status={displayStatus} />
+            </div>
+          </div>
+
+          {/* Member Name - Prominent */}
+          <div className="mb-6">
+            <h2 className="embossed-text text-[clamp(18px,2.6vmin,28px)] font-semibold uppercase tracking-wide leading-tight">
+              {cardData.firstName} {cardData.lastName}
+            </h2>
+          </div>
+
+          {/* Card Number - Tabular style */}
+          <div className="mb-6">
+            <p className="embossed-text text-[clamp(12px,1.8vmin,16px)] font-medium tracking-[0.04em] font-mono tabular-nums">
+              {cardData.memberNumber.padStart(16, '0').replace(/(.{4})/g, '$1 ').trim()}
+            </p>
+          </div>
+
+          {/* Bottom row: Details and QR */}
+          <div className="flex-1 flex justify-between items-end">
+            {/* Left: Member details */}
+            <div className="flex-1 space-y-3">
+              {/* Category */}
+              <div>
+                <p className="embossed-text text-[clamp(10px,1.4vmin,12px)] uppercase tracking-wide opacity-80 mb-1">
+                  CATEGORIE
+                </p>
+                <div className="flex items-center gap-2">
+                  <span className="embossed-text text-[clamp(11px,1.6vmin,14px)] font-medium">
+                    {getMemberCategoryLabel(cardData.category)}
+                  </span>
+                  {cardData.badges.includes("Stemgerechtigd") && (
+                    <span className="bg-white/15 text-white text-[10px] font-medium px-2 py-0.5 rounded-full uppercase tracking-wide">
+                      STEMGERECHTIGD
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Payment Status */}
+              <div>
+                <p className="embossed-text text-[clamp(10px,1.4vmin,12px)] uppercase tracking-wide opacity-80 mb-1">
+                  STATUS
+                </p>
+                <span className={cn(
+                  "text-[clamp(11px,1.6vmin,14px)] font-medium",
+                  cardData.badges.some(badge => badge.includes("Betaald"))
+                    ? "text-green-300" 
+                    : "text-red-300"
+                )}>
+                  {cardData.badges.find(badge => badge.includes("Betaald")) || 'ONBETAALD'}
+                </span>
+              </div>
+
+              {/* Valid until */}
+              {cardData.validUntil && (
+                <div>
+                  <p className="embossed-text text-[clamp(10px,1.4vmin,12px)] uppercase tracking-wide opacity-80 mb-1">
+                    GELDIG TOT
+                  </p>
+                  <p className="embossed-text text-[clamp(12px,1.8vmin,16px)] font-medium font-mono tabular-nums">
+                    {format(cardData.validUntil, 'dd-MM-yyyy', { locale: nl })}
+                  </p>
+                </div>
               )}
             </div>
 
-            {/* Bottom-right: QR zone */}
+            {/* Right: QR Code */}
             <div className="flex flex-col items-center">
               <button
                 onClick={() => setShowQRModal(true)}
-                className="bg-white rounded-xl p-2 shadow-md hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/50 focus-visible:ring-2 focus-visible:ring-white/50"
-                data-testid="qr-code-button"
-                aria-label="Toon grotere QR-code"
-                style={{ minWidth: '128px', minHeight: '128px' }}
+                className="bg-white rounded-xl p-3 shadow-lg hover:shadow-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/50 mb-2"
+                data-testid="qr-plate"
+                aria-label="Open grote QR code"
+                style={{ minWidth: '80px', minHeight: '80px' }}
               >
                 <QRCodeSVG
                   value={qrCodeUrl}
-                  size={112}
+                  size={56}
                   className="w-full h-full"
                   fgColor="#000000"
                   bgColor="#ffffff"
                 />
               </button>
+              <p className="embossed-text text-[clamp(10px,1.4vmin,12px)] text-center leading-tight opacity-80">
+                SCAN
+              </p>
             </div>
-          </div>
-
-          {/* Bottom-right: tiny etag/version text */}
-          <div className="absolute bottom-2 right-2">
-            <span className="text-[10px] opacity-60 font-mono">
-              {cardData.etag.substring(0, 8)}
-            </span>
           </div>
         </div>
       </div>

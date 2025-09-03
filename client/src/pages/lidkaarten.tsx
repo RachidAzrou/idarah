@@ -218,32 +218,18 @@ export default function LidkaartenPage() {
     const cardUrl = `${window.location.origin}/card/${member.id}`;
     
     try {
-      // Try to use native share API if available
-      if (navigator.share) {
-        await navigator.share({
-          title: `Digitale Lidkaart - ${member.firstName} ${member.lastName}`,
-          text: 'Bekijk mijn digitale lidkaart. Je kunt deze als app installeren op je startscherm!',
-          url: cardUrl
-        });
-        
-        toast({ 
-          title: "Gedeeld", 
-          description: `Lidkaart URL is gedeeld.` 
-        });
-      } else {
-        // Fallback: copy to clipboard
-        await navigator.clipboard.writeText(cardUrl);
-        
-        toast({ 
-          title: "URL gekopieerd", 
-          description: `De lidkaart URL is gekopieerd naar je klembord. Deel deze om de kaart als PWA te installeren.` 
-        });
-      }
-    } catch (error) {
-      console.error('Delen mislukt:', error);
+      // Copy URL to clipboard
+      await navigator.clipboard.writeText(cardUrl);
       
-      // Ultimate fallback: show URL in alert
-      alert(`Lidkaart URL (kopieer en deel deze):\n${cardUrl}`);
+      toast({ 
+        title: "URL gekopieerd", 
+        description: `De lidkaart URL is gekopieerd. Deel deze om de kaart als PWA te installeren.` 
+      });
+    } catch (error) {
+      console.error('Kopiëren mislukt:', error);
+      
+      // Fallback: show URL in alert
+      window.prompt('Kopieer deze URL om de lidkaart te delen:', cardUrl);
       
       toast({ 
         title: "URL beschikbaar", 

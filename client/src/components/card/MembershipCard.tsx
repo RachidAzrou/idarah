@@ -211,44 +211,43 @@ export function MembershipCard({
             {/* Voting Rights Badge - Right side */}
             {(cardData.badges.includes("Stemgerechtigd") || true) && (
               <div className="flex flex-col items-center mr-8">
-                {/* Engraved Container with depth */}
-                <div 
-                  className="relative p-4 rounded-xl"
+                {/* Deep Engraved Icon */}
+                <GoVerified 
+                  className={`${isConstrained ? 'w-12 h-12' : 'w-16 h-16'}`}
+                  data-testid="voting-icon"
                   style={{
-                    background: 'linear-gradient(145deg, rgba(0,0,0,0.4), rgba(255,255,255,0.1))',
-                    boxShadow: 'inset 4px 4px 8px rgba(0,0,0,0.6), inset -4px -4px 8px rgba(255,255,255,0.1), 0 0 20px rgba(0,0,0,0.3)',
-                    border: '1px solid rgba(255,255,255,0.1)'
+                    color: 'rgba(255,255,255,0.3)',
+                    textShadow: `
+                      inset 2px 2px 4px rgba(0,0,0,0.9),
+                      inset -2px -2px 4px rgba(255,255,255,0.1),
+                      1px 1px 0 rgba(0,0,0,0.8),
+                      2px 2px 0 rgba(0,0,0,0.7),
+                      3px 3px 0 rgba(0,0,0,0.6),
+                      4px 4px 8px rgba(0,0,0,0.4)
+                    `,
+                    filter: 'contrast(1.2) brightness(0.8)'
                   }}
-                >
-                  <GoVerified 
-                    className={`text-white/80 ${isConstrained ? 'w-10 h-10' : 'w-14 h-14'}`}
-                    data-testid="voting-icon"
-                    style={{
-                      textShadow: 'inset 2px 2px 4px rgba(0,0,0,0.8), inset -1px -1px 2px rgba(255,255,255,0.2)',
-                      filter: 'drop-shadow(0 0 8px rgba(255,255,255,0.2))'
-                    }}
-                  />
-                </div>
+                />
                 
-                {/* Engraved Text */}
-                <div 
-                  className="mt-3 px-3 py-1 rounded-lg"
+                {/* Deep Engraved Text */}
+                <span 
+                  className={`${isConstrained ? 'text-xs' : 'text-sm'} uppercase tracking-[0.3em] font-black mt-3`}
                   style={{
-                    background: 'linear-gradient(145deg, rgba(0,0,0,0.3), rgba(255,255,255,0.05))',
-                    boxShadow: 'inset 3px 3px 6px rgba(0,0,0,0.5), inset -3px -3px 6px rgba(255,255,255,0.1)',
-                    border: '1px solid rgba(255,255,255,0.08)'
+                    color: 'rgba(255,255,255,0.25)',
+                    textShadow: `
+                      inset 1px 1px 2px rgba(0,0,0,0.9),
+                      inset -1px -1px 2px rgba(255,255,255,0.1),
+                      1px 1px 0 rgba(0,0,0,0.8),
+                      2px 2px 0 rgba(0,0,0,0.7),
+                      3px 3px 0 rgba(0,0,0,0.6),
+                      4px 4px 6px rgba(0,0,0,0.4)
+                    `,
+                    WebkitTextStroke: '0.5px rgba(0,0,0,0.3)',
+                    filter: 'contrast(1.3) brightness(0.7)'
                   }}
                 >
-                  <span 
-                    className={`${isConstrained ? 'text-xs' : 'text-sm'} uppercase tracking-widest font-bold text-white/85`}
-                    style={{
-                      textShadow: 'inset 1px 1px 2px rgba(0,0,0,0.8), inset -1px -1px 2px rgba(255,255,255,0.2), 0 0 10px rgba(255,255,255,0.1)',
-                      letterSpacing: '0.2em'
-                    }}
-                  >
-                    STEMGERECHTIGD
-                  </span>
-                </div>
+                  STEMGERECHTIGD
+                </span>
               </div>
             )}
           </div>

@@ -32,8 +32,8 @@ export default function Lidgelden() {
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [amountMin, setAmountMin] = useState<number | undefined>();
   const [amountMax, setAmountMax] = useState<number | undefined>();
-  const [paidFrom, setPaidFrom] = useState<Date | undefined>();
-  const [paidTo, setPaidTo] = useState<Date | undefined>();
+  const [periodFrom, setPeriodFrom] = useState<Date | undefined>();
+  const [periodTo, setPeriodTo] = useState<Date | undefined>();
   const [onlyWithMandate, setOnlyWithMandate] = useState(false);
   const [onlyOverdue, setOnlyOverdue] = useState(false);
 
@@ -85,20 +85,19 @@ export default function Lidgelden() {
       const amountMinMatch = amountMin === undefined || amountValue >= amountMin;
       const amountMaxMatch = amountMax === undefined || amountValue <= amountMax;
       
-      // Paid date filter (betaald op)
-      let paidDateMatch = true;
-      if (paidFrom || paidTo) {
-        if (fee.status === "PAID" && fee.paidAt) {
-          const paidDate = new Date(fee.paidAt);
-          if (paidFrom) {
-            paidDateMatch = paidDateMatch && paidDate >= paidFrom;
-          }
-          if (paidTo) {
-            paidDateMatch = paidDateMatch && paidDate <= paidTo;
-          }
-        } else if (fee.status !== "PAID") {
-          // If filter is set but fee is not paid, exclude it
-          paidDateMatch = false;
+      // Period filter (periode start/end)
+      let periodMatch = true;
+      if (periodFrom || periodTo) {
+        const feeStart = new Date(fee.periodStart);
+        const feeEnd = new Date(fee.periodEnd);
+        
+        if (periodFrom) {
+          // Check if fee period overlaps with filter period start
+          periodMatch = periodMatch && feeEnd >= periodFrom;
+        }
+        if (periodTo) {
+          // Check if fee period overlaps with filter period end  
+          periodMatch = periodMatch && feeStart <= periodTo;
         }
       }
       
@@ -109,7 +108,7 @@ export default function Lidgelden() {
       const overdueMatch = !onlyOverdue || (fee.status === "OPEN" && new Date(fee.periodEnd) < new Date());
       
       return searchMatch && statusMatch && yearMatch && methodMatch && categoryMatch && 
-             amountMinMatch && amountMaxMatch && paidDateMatch && mandateMatch && overdueMatch;
+             amountMinMatch && amountMaxMatch && periodMatch && mandateMatch && overdueMatch;
     }).sort((a: any, b: any) => {
       const aValue = a[sortBy as keyof typeof a];
       const bValue = b[sortBy as keyof typeof b];
@@ -120,7 +119,7 @@ export default function Lidgelden() {
       }
     });
   }, [allFees, searchTerm, statusFilter, yearFilter, methodFilter, categoryFilter, 
-      amountMin, amountMax, paidFrom, paidTo, onlyWithMandate, onlyOverdue, sortBy, sortOrder]);
+      amountMin, amountMax, periodFrom, periodTo, onlyWithMandate, onlyOverdue, sortBy, sortOrder]);
 
   // Paginate results
   const paginatedResult = useMemo(() => {
@@ -326,8 +325,8 @@ export default function Lidgelden() {
     setCategoryFilter("all");
     setAmountMin(undefined);
     setAmountMax(undefined);
-    setPaidFrom(undefined);
-    setPaidTo(undefined);
+    setPeriodFrom(undefined);
+    setPeriodTo(undefined);
     setOnlyWithMandate(false);
     setOnlyOverdue(false);
   };
@@ -369,10 +368,10 @@ export default function Lidgelden() {
             onAmountMinChange={setAmountMin}
             amountMax={amountMax}
             onAmountMaxChange={setAmountMax}
-            paidFrom={paidFrom}
-            onPaidFromChange={setPaidFrom}
-            paidTo={paidTo}
-            onPaidToChange={setPaidTo}
+            periodFrom={periodFrom}
+            onPeriodFromChange={setPeriodFrom}
+            periodTo={periodTo}
+            onPeriodToChange={setPeriodTo}
             onlyWithMandate={onlyWithMandate}
             onOnlyWithMandateChange={setOnlyWithMandate}
             onlyOverdue={onlyOverdue}

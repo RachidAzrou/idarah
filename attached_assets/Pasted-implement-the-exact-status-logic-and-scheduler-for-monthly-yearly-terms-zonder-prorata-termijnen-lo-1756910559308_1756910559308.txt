@@ -1,0 +1,152 @@
+implement the exact status logic and scheduler for monthly/yearly terms zonder prorata (termijnen lopen van startdatum tot exact +1 maand/jaar). Stack: Next.js 14 (App Router), TypeScript strict, Prisma + PostgreSQL, Zod, tRPC/REST. Timezone Europe/Brussels.
+
+1) Prisma: enum + model updates (migration-safe)
+
+Replace existing FeeStatus enum values from OPEN | PAID | OVERDUE to OPENSTAAND | BETAALD | VERVALLEN.
+
+Add a safe migration:
+
+Create new enum FeeStatus_new with the 3 Dutch values.
+
+Alter MembershipFee.status to FeeStatus_new and map:
+
+OPEN → OPENSTAAND
+
+PAID → BETAALD
+
+OVERDUE → VERVALLEN
+
+Drop old enum and rename FeeStatus_new → FeeStatus.
+
+Keep PaymentTerm as is (MONTHLY | YEARLY).
+
+Acceptance: prisma migrate runs clean; existing rows get mapped to Dutch statuses.
+
+2) Business rules (zonder prorata)
+
+Monthly: first term = [startDate, addMonths(startDate, 1)).
+
+Yearly: first term = [startDate, addYears(startDate, 1)).
+
+Next terms chain from the previous period end, not calendar month/year.
+
+Use date-fns addMonths/addYears and tz Europe/Brussels. Store periods in UTC; display dd-mm-jjjj.
+
+3) Status transitions (deterministisch)
+
+Openstaand → Betaald: zodra betaling geregistreerd wordt (manueel of import).
+
+Openstaand → Vervallen: de dag ná periodEnd (local Europe/Brussels) indien geen betaling.
+
+E.g. 03/09/2025–03/10/2025 → op 04/10/2025 wordt het Vervallen.
+
+Jaarlijks idem: 03/09/2025–03/09/2026 → 04/09/2026.
+
+Betaald blijft betaald, nooit automatisch gewijzigd.
+
+4) Services (TypeScript)
+
+Create lib/fees/:
+
+computePeriods.ts
+
+nextMonthlyPeriod(from: Date): { start: Date; end: Date }
+
+nextYearlyPeriod(from: Date): { start: Date; end: Date }
+
+All functions pure, tested; use addMonths/addYears.
+
+status.ts
+
+shouldMarkOverdue(todayBE: Date, fee: MembershipFee): boolean
+
+return true if fee.status === OPENSTAAND and isAfter(todayBE, endOfDay(periodEnd in BE) ).
+
+generate.ts
+
+ensureNextFeeForMember(memberId, term):
+
+If no future/open fee after latest periodEnd, create next Openstaand fee with correct [start,end).
+
+5) Scheduler (cron route)
+
+Create idempotente job route app/api/jobs/fees/rollover/route.ts:
+
+Daily at 03:00 Europe/Brussels (use external scheduler to hit this route).
+
+Steps:
+
+Markeer vervallen: for each MembershipFee with status=OPENSTAAND and todayBE > periodEnd → set status=VERVALLEN.
+
+Genereer volgende termijnen:
+
+For members with active term setting, ensure next period exists (Openstaand) chained from last periodEnd.
+
+Log a summary: {checked, setOverdue, createdNext}.
+
+Add Zod guards + RBAC:
+
+Only BEHEERDER or SUPERADMIN can trigger manually.
+
+6) Create/update APIs (tRPC/REST)
+
+POST /api/fees/mark-paid (Zod: { feeId: string, paidAt?: string })
+→ sets status BETAALD, stamps paidAt.
+
+GET /api/fees/list filters: status in [OPENSTAAND,BETAALD,VERVALLEN], member, periode.
+
+POST /api/jobs/fees/rollover (manual trigger; uses same service as the cron handler).
+
+All inputs validated with Zod; handlers are type-safe.
+
+7) UI copy (nl-BE) — labels & badges
+
+Status badge text:
+
+Openstaand (neutraal/amber)
+
+Betaald (groen)
+
+Vervallen (rood)
+
+Kolomkoppen: Periode van, Periode tot, Bedrag, Status, Methode.
+
+Detail: “Vervalt na” = toon dag na periodEnd in tooltip/infotekst.
+
+8) Seeding & tests
+
+Seed: add members with both maandelijks en jaarlijks, start op willekeurige dag (niet de 1e), zodat ketting goed getest is.
+
+Vitest unit tests for:
+
+nextMonthlyPeriod / nextYearlyPeriod (incl. maandlengtes 28–31, schrikkeljaar).
+
+shouldMarkOverdue with boundary at midnight Europe/Brussels.
+
+E2E smoke: create member → initial fee Openstaand → simulate passing end date → scheduler → Vervallen → mark paid → Betaald.
+
+9) Acceptance criteria
+
+Database enum gebruikt OPENSTAAND | BETAALD | VERVALLEN (niet langer Engels).
+
+Bij nieuw lid ontstaat meteen Openstaand lidgeld met periode [start, +1 term].
+
+Dagelijkse job:
+
+zet Openstaand → Vervallen de dag na periodEnd;
+
+genereert volgende periode Openstaand doorlopend (zonder prorata).
+
+Handmatig markeren werkt; API’s Zod-gevalideerd; RBAC respecteert rollen.
+
+UI toont NL-labels en filtert op de drie statussen.
+
+Tests groen voor periodeberekening en verval-moment.
+
+10) Implementation notes
+
+Use date-fns-tz: compute “today” in Europe/Brussels before comparing, to avoid UTC off-by-one.
+
+Periods are [start, end) (end exclusive). For messaging, toon end als “laatste dag geldig”; “vervalt op” = end + 1 day.
+
+Idempotency: scheduler guard per dag (store lastRunAt in a JobLog row or run stateless with deterministic updates).

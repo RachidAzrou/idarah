@@ -29,10 +29,10 @@ interface ToolbarProps {
   onAmountMinChange: (value: number | undefined) => void;
   amountMax?: number;
   onAmountMaxChange: (value: number | undefined) => void;
-  paidFrom?: Date;
-  onPaidFromChange: (date: Date | undefined) => void;
-  paidTo?: Date;
-  onPaidToChange: (date: Date | undefined) => void;
+  periodFrom?: Date;
+  onPeriodFromChange: (date: Date | undefined) => void;
+  periodTo?: Date;
+  onPeriodToChange: (date: Date | undefined) => void;
   onlyWithMandate: boolean;
   onOnlyWithMandateChange: (value: boolean) => void;
   onlyOverdue: boolean;
@@ -62,10 +62,10 @@ export function Toolbar({
   onAmountMinChange,
   amountMax,
   onAmountMaxChange,
-  paidFrom,
-  onPaidFromChange,
-  paidTo,
-  onPaidToChange,
+  periodFrom,
+  onPeriodFromChange,
+  periodTo,
+  onPeriodToChange,
   onlyWithMandate,
   onOnlyWithMandateChange,
   onlyOverdue,
@@ -122,7 +122,7 @@ export function Toolbar({
     
     const parsedDate = parseDate(formatted);
     if (parsedDate) {
-      onPaidFromChange(parsedDate);
+      onPeriodFromChange(parsedDate);
     }
   };
 
@@ -132,7 +132,7 @@ export function Toolbar({
     
     const parsedDate = parseDate(formatted);
     if (parsedDate) {
-      onPaidToChange(parsedDate);
+      onPeriodToChange(parsedDate);
     }
   };
 
@@ -255,11 +255,11 @@ export function Toolbar({
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-600">Betaald op:</span>
+                <span className="text-sm text-gray-600">Periode:</span>
                 
                 <div className="relative">
                   <Input
-                    value={fromDateInput || (paidFrom ? format(paidFrom, "dd/MM/yyyy", { locale: nl }) : "")}
+                    value={fromDateInput || (periodFrom ? format(periodFrom, "dd/MM/yyyy", { locale: nl }) : "")}
                     onChange={(e) => handleFromDateInput(e.target.value)}
                     placeholder="DD/MM/YYYY"
                     className="w-[160px] h-9 border-gray-200 pr-10"
@@ -281,11 +281,11 @@ export function Toolbar({
                       <div className="p-3 border-b">
                         <div className="flex items-center justify-between space-x-2">
                           <Select
-                            value={paidFrom ? paidFrom.getMonth().toString() : ""}
+                            value={periodFrom ? periodFrom.getMonth().toString() : ""}
                             onValueChange={(month) => {
-                              const currentDate = paidFrom || new Date();
+                              const currentDate = periodFrom || new Date();
                               const newDate = new Date(currentDate.getFullYear(), parseInt(month), currentDate.getDate());
-                              onPaidFromChange(newDate);
+                              onPeriodFromChange(newDate);
                               setFromDateInput("");
                             }}
                           >
@@ -301,11 +301,11 @@ export function Toolbar({
                             </SelectContent>
                           </Select>
                           <Select
-                            value={paidFrom ? paidFrom.getFullYear().toString() : ""}
+                            value={periodFrom ? periodFrom.getFullYear().toString() : ""}
                             onValueChange={(year) => {
-                              const currentDate = paidFrom || new Date();
+                              const currentDate = periodFrom || new Date();
                               const newDate = new Date(parseInt(year), currentDate.getMonth(), currentDate.getDate());
-                              onPaidFromChange(newDate);
+                              onPeriodFromChange(newDate);
                               setFromDateInput("");
                             }}
                           >
@@ -327,15 +327,15 @@ export function Toolbar({
                       </div>
                       <Calendar
                         mode="single"
-                        selected={paidFrom}
+                        selected={periodFrom}
                         onSelect={(date) => {
-                          onPaidFromChange(date);
+                          onPeriodFromChange(date);
                           setFromDateInput("");
                           setFromPopoverOpen(false);
                         }}
                         locale={nl}
-                        month={paidFrom || new Date()}
-                        onMonthChange={(month) => onPaidFromChange(month)}
+                        month={periodFrom || new Date()}
+                        onMonthChange={(month) => onPeriodFromChange(month)}
                         showOutsideDays={false}
                         className="p-3"
                         defaultMonth={new Date()}
@@ -348,7 +348,7 @@ export function Toolbar({
                 
                 <div className="relative">
                   <Input
-                    value={toDateInput || (paidTo ? format(paidTo, "dd/MM/yyyy", { locale: nl }) : "")}
+                    value={toDateInput || (periodTo ? format(periodTo, "dd/MM/yyyy", { locale: nl }) : "")}
                     onChange={(e) => handleToDateInput(e.target.value)}
                     placeholder="DD/MM/YYYY"
                     className="w-[160px] h-9 border-gray-200 pr-10"
@@ -370,11 +370,11 @@ export function Toolbar({
                       <div className="p-3 border-b">
                         <div className="flex items-center justify-between space-x-2">
                           <Select
-                            value={paidTo ? paidTo.getMonth().toString() : ""}
+                            value={periodTo ? periodTo.getMonth().toString() : ""}
                             onValueChange={(month) => {
-                              const currentDate = paidTo || new Date();
+                              const currentDate = periodTo || new Date();
                               const newDate = new Date(currentDate.getFullYear(), parseInt(month), currentDate.getDate());
-                              onPaidToChange(newDate);
+                              onPeriodToChange(newDate);
                               setToDateInput("");
                             }}
                           >
@@ -390,11 +390,11 @@ export function Toolbar({
                             </SelectContent>
                           </Select>
                           <Select
-                            value={paidTo ? paidTo.getFullYear().toString() : ""}
+                            value={periodTo ? periodTo.getFullYear().toString() : ""}
                             onValueChange={(year) => {
-                              const currentDate = paidTo || new Date();
+                              const currentDate = periodTo || new Date();
                               const newDate = new Date(parseInt(year), currentDate.getMonth(), currentDate.getDate());
-                              onPaidToChange(newDate);
+                              onPeriodToChange(newDate);
                               setToDateInput("");
                             }}
                           >
@@ -416,16 +416,16 @@ export function Toolbar({
                       </div>
                       <Calendar
                         mode="single"
-                        selected={paidTo}
+                        selected={periodTo}
                         onSelect={(date) => {
-                          onPaidToChange(date);
+                          onPeriodToChange(date);
                           setToDateInput("");
                           setToPopoverOpen(false);
                         }}
                         locale={nl}
-                        month={paidTo || new Date()}
-                        onMonthChange={(month) => onPaidToChange(month)}
-                        disabled={(date) => paidFrom ? date < paidFrom : false}
+                        month={periodTo || new Date()}
+                        onMonthChange={(month) => onPeriodToChange(month)}
+                        disabled={(date) => periodFrom ? date < periodFrom : false}
                         showOutsideDays={false}
                         className="p-3"
                         defaultMonth={new Date()}

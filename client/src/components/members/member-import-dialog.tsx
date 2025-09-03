@@ -23,7 +23,7 @@ interface MemberImportDialogProps {
   onImport: (members: any[]) => void;
 }
 
-type ImportStep = 'upload' | 'mapping' | 'validation' | 'importing' | 'complete';
+type ImportStep = 'upload' | 'validation' | 'importing' | 'complete';
 
 interface CSVRow {
   [key: string]: string;
@@ -255,14 +255,14 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
       setStep('validation');
       
       // Start validatie direct
-      await validateData(rows);
+      validateData(rows);
     } catch (error) {
       console.error('Error parsing file:', error);
       alert('Fout bij het lezen van het bestand: ' + (error as Error).message);
     }
   };
 
-  const validateData = async (rows: CSVRow[]) => {
+  const validateData = (rows: CSVRow[]) => {
     const errors: ValidationError[] = [];
     const validMembers: any[] = [];
 
@@ -481,35 +481,8 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
       }
     });
 
-    // Check for duplicates after basic validation
-    const finalValidMembers = [];
-    for (let i = 0; i < validMembers.length; i++) {
-      const member = validMembers[i];
-      const duplicateCheck = await checkForDuplicates(member);
-      
-      if (duplicateCheck.hasDuplicates) {
-        if (duplicateCheck.duplicateNumber) {
-          errors.push({
-            row: i + 1,
-            field: 'Lidnummer*',
-            message: `Lidnummer ${member.memberNumber} bestaat al. Voorgesteld nummer: ${duplicateCheck.suggestedNumber}`
-          });
-        }
-        if (duplicateCheck.duplicateNameAddress) {
-          const existing = duplicateCheck.duplicateNameAddress;
-          errors.push({
-            row: i + 1,
-            field: 'Naam/Adres',
-            message: `Er bestaat al een lid met deze naam/adres combinatie (lidnummer ${existing.memberNumber})`
-          });
-        }
-      } else {
-        finalValidMembers.push(member);
-      }
-    }
-
     setValidationErrors(errors);
-    setValidMembers(finalValidMembers);
+    setValidMembers(validMembers);
   };
 
   const checkForDuplicates = async (memberData: any) => {
@@ -525,26 +498,53 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
   const handleImport = async () => {
     if (validMembers.length === 0) return;
 
-    setStep('importing');
     setImportProgress(0);
     setImportedCount(0);
 
     try {
-      // Import all validated members (duplicates already filtered out)
+      const membersToImport = [];
+      const duplicateErrors = [];
+      
+      // Check for duplicates during import
       for (let i = 0; i < validMembers.length; i++) {
-        await new Promise(resolve => setTimeout(resolve, 200));
+        const member = validMembers[i];
+        const duplicateCheck = await checkForDuplicates(member);
+        
+        if (duplicateCheck.hasDuplicates) {
+          if (duplicateCheck.duplicateNumber || duplicateCheck.duplicateNameAddress) {
+            const existing = duplicateCheck.duplicateNumber || duplicateCheck.duplicateNameAddress;
+            duplicateErrors.push({
+              member,
+              existing,
+              isDuplicateNumber: !!duplicateCheck.duplicateNumber,
+              suggestedNumber: duplicateCheck.suggestedNumber
+            });
+          }
+        } else {
+          membersToImport.push(member);
+        }
+        
         setImportProgress(((i + 1) / validMembers.length) * 100);
-        setImportedCount(i + 1);
       }
 
-      // Actually import the members
-      onImport(validMembers);
+      // Show duplicate warnings if any
+      if (duplicateErrors.length > 0) {
+        const errorMessage = `De volgende leden lijken reeds te bestaan:\\n\\n${duplicateErrors.map(error => 
+          `• ${error.member.firstName} ${error.member.lastName} (bestaand lidnummer: ${error.existing.memberNumber})`
+        ).join('\\n')}\\n\\nDeze worden niet geïmporteerd. Klik op een bestaand lid in de ledenlijst om het profiel te bekijken.`;
+        alert(errorMessage);
+      }
+
+      if (membersToImport.length > 0) {
+        // Actually import the non-duplicate members
+        onImport(membersToImport);
+        setImportedCount(membersToImport.length);
+      }
       
       setStep('complete');
     } catch (error) {
       console.error('Import error:', error);
       alert('Fout bij het importeren van leden');
-      setStep('validation');
     }
   };
 
@@ -559,9 +559,8 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
         </DialogHeader>
 
         <Tabs value={step} className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="upload" className="text-xs">Upload</TabsTrigger>
-            <TabsTrigger value="mapping" className="text-xs">Mapping</TabsTrigger>
             <TabsTrigger value="validation" className="text-xs">Validatie</TabsTrigger>
             <TabsTrigger value="importing" className="text-xs">Importeren</TabsTrigger>
             <TabsTrigger value="complete" className="text-xs">Voltooid</TabsTrigger>
@@ -633,12 +632,33 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-lg font-semibold">Validatie Resultaat</h3>
+                  <h3 className="text-lg font-semibold">Syntax Validatie</h3>
                   <p className="text-sm text-gray-600">
-                    {csvData.length} rijen gevonden, {validMembers.length} geldig, {validationErrors.length} fouten
+                    {csvData.length} rijen gevonden, {validMembers.length} geldig, {validationErrors.length} syntax fouten
                   </p>
                 </div>
               </div>
+
+              {/* Eerste rij preview */}
+              {csvData.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="font-medium">Voorbeeld van eerste rij data:</h4>
+                  <div className="bg-gray-50 p-3 rounded border text-sm">
+                    <div className="grid grid-cols-2 gap-2">
+                      {Object.entries(csvData[0]).slice(0, 8).map(([key, value]) => (
+                        <div key={key}>
+                          <span className="font-medium">{key}:</span> {value || '(leeg)'}
+                        </div>
+                      ))}
+                    </div>
+                    {Object.keys(csvData[0]).length > 8 && (
+                      <div className="mt-2 text-gray-500">
+                        ... en {Object.keys(csvData[0]).length - 8} andere velden
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {validationErrors.length > 0 && (
                 <Alert className="border-red-200 bg-red-50">
@@ -663,47 +683,14 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
                 </Alert>
               )}
 
-              {validMembers.length > 0 && (
+              {validationErrors.length === 0 && validMembers.length > 0 && (
                 <div className="space-y-2">
-                  <h4 className="font-medium text-green-800">
-                    {validMembers.length} geldige leden klaar voor import
-                  </h4>
-                  <div className="max-h-64 overflow-y-auto border rounded">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Lidnummer</TableHead>
-                          <TableHead>Naam</TableHead>
-                          <TableHead>Categorie</TableHead>
-                          <TableHead>E-mail</TableHead>
-                          <TableHead>Status</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {validMembers.slice(0, 10).map((member, index) => (
-                          <TableRow key={index}>
-                            <TableCell>{member.memberNumber}</TableCell>
-                            <TableCell>{member.firstName} {member.lastName}</TableCell>
-                            <TableCell>
-                              <Badge variant="outline">{member.category}</Badge>
-                            </TableCell>
-                            <TableCell>{member.email || 'Geen e-mail'}</TableCell>
-                            <TableCell>
-                              <Badge className="bg-green-100 text-green-800">
-                                <Check className="h-3 w-3 mr-1" />
-                                Geldig
-                              </Badge>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                    {validMembers.length > 10 && (
-                      <div className="p-2 text-center text-sm text-gray-500">
-                        ... en {validMembers.length - 10} andere geldige leden
-                      </div>
-                    )}
-                  </div>
+                  <Alert className="border-green-200 bg-green-50">
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                    <AlertDescription className="text-green-800">
+                      Alle {validMembers.length} rijen hebben geldige syntax. Klik op 'Volgende' om door te gaan naar de import stap.
+                    </AlertDescription>
+                  </Alert>
                 </div>
               )}
             </div>
@@ -713,32 +700,89 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
                 Annuleren
               </Button>
               <Button 
-                onClick={handleImport}
-                disabled={validMembers.length === 0}
+                onClick={() => setStep('importing')}
+                disabled={validationErrors.length > 0 || validMembers.length === 0}
                 className="gap-2"
               >
-                <CiImport className="h-4 w-4" />
-                {validMembers.length} leden importeren
+                Volgende: Importeren
               </Button>
             </DialogFooter>
           </TabsContent>
 
           <TabsContent value="importing" className="space-y-4">
-            <div className="text-center space-y-4">
-              <div>
-                <h3 className="text-lg font-semibold">Leden aan het importeren...</h3>
-                <p className="text-sm text-gray-600">
-                  {importedCount} van {validMembers.length} leden geïmporteerd
-                </p>
+            {importProgress === 0 ? (
+              // Preview before import
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold">Import Preview</h3>
+                  <p className="text-sm text-gray-600">
+                    {validMembers.length} leden klaar voor import. Controleer de lijst en klik op 'Importeren' om door te gaan.
+                  </p>
+                </div>
+
+                <div className="max-h-64 overflow-y-auto border rounded">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Lidnummer</TableHead>
+                        <TableHead>Naam</TableHead>
+                        <TableHead>Categorie</TableHead>
+                        <TableHead>E-mail</TableHead>
+                        <TableHead>Betaalwijze</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {validMembers.slice(0, 10).map((member, index) => (
+                        <TableRow key={index}>
+                          <TableCell>{member.memberNumber}</TableCell>
+                          <TableCell>{member.firstName} {member.lastName}</TableCell>
+                          <TableCell>
+                            <Badge variant="outline">{member.category}</Badge>
+                          </TableCell>
+                          <TableCell>{member.email || 'Geen e-mail'}</TableCell>
+                          <TableCell>{member.financialSettings?.paymentMethod || 'SEPA'}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                  {validMembers.length > 10 && (
+                    <div className="p-2 text-center text-sm text-gray-500">
+                      ... en {validMembers.length - 10} andere leden
+                    </div>
+                  )}
+                </div>
+
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setStep('validation')}>
+                    Terug
+                  </Button>
+                  <Button 
+                    onClick={handleImport}
+                    className="gap-2"
+                  >
+                    <CiImport className="h-4 w-4" />
+                    {validMembers.length} leden importeren
+                  </Button>
+                </DialogFooter>
               </div>
-              
-              <div className="space-y-2">
-                <Progress value={importProgress} className="w-full" />
-                <p className="text-sm text-gray-500">
-                  {Math.round(importProgress)}% voltooid
-                </p>
+            ) : (
+              // Progress during import
+              <div className="text-center space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold">Leden aan het importeren...</h3>
+                  <p className="text-sm text-gray-600">
+                    {importedCount} van {validMembers.length} leden geïmporteerd
+                  </p>
+                </div>
+                
+                <div className="space-y-2">
+                  <Progress value={importProgress} className="w-full" />
+                  <p className="text-sm text-gray-500">
+                    {Math.round(importProgress)}% voltooid
+                  </p>
+                </div>
               </div>
-            </div>
+            )}
           </TabsContent>
 
           <TabsContent value="complete" className="space-y-4">

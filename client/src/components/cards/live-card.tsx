@@ -346,7 +346,7 @@ export function LiveCard({
               />
             </div>
             <p className="text-center text-sm text-gray-600">
-              Scan deze QR code om de lidmaatschapsstatus te verifiëren
+              Scan deze QR code om lid te bekijken
             </p>
           </div>
         </DialogContent>

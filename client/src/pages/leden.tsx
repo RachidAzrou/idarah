@@ -47,7 +47,7 @@ export default function Leden() {
   const [showFiltersDrawer, setShowFiltersDrawer] = useState(false);
   const [showMemberDetail, setShowMemberDetail] = useState(false);
   const [showEditMember, setShowEditMember] = useState(false);
-  const [selectedMember, setSelectedMember] = useState<any | null>(null);
+  const [selectedMember, setSelectedMember] = useState<any>(null);
   const [advancedFilters, setAdvancedFilters] = useState<FilterValues>(initialFilters);
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(20);

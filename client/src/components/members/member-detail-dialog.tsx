@@ -4,15 +4,28 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Member } from "@shared/schema";
+import { Member, MemberFinancialSettings } from "@shared/schema";
 import { formatCurrencyBE, formatDateBE, getMemberCategoryLabel } from "@/lib/format";
 import { User, Calendar, CreditCard, Phone, Mail, MapPin, FileText, Edit, X, UserCircle, Contact, Shield, Settings, Home, Building2, CheckSquare } from "lucide-react";
 
+// Extended member type that includes related data
+interface MemberWithDetails extends Member {
+  financialSettings?: MemberFinancialSettings;
+  permissions?: {
+    privacyAgreement: boolean;
+    photoVideoConsent: boolean;
+    newsletterSubscription: boolean;
+    whatsappList: boolean;
+    interestedInActiveRole: boolean;
+    roleDescription?: string;
+  };
+}
+
 interface MemberDetailDialogProps {
-  member: Member | null;
+  member: MemberWithDetails | null;
   open: boolean;
   onClose: () => void;
-  onEdit?: (member: Member) => void;
+  onEdit?: (member: MemberWithDetails) => void;
 }
 
 export function MemberDetailDialog({ member, open, onClose, onEdit }: MemberDetailDialogProps) {
@@ -104,21 +117,6 @@ export function MemberDetailDialog({ member, open, onClose, onEdit }: MemberDeta
               </div>
             </div>
 
-            {/* Notes in Personal Tab */}
-            {member.notes && (
-              <>
-                <Separator />
-                <div className="space-y-4">
-                  <h4 className="font-medium flex items-center gap-2">
-                    <FileText className="h-4 w-4" />
-                    Opmerkingen
-                  </h4>
-                  <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
-                    <p className="text-sm">{member.notes}</p>
-                  </div>
-                </div>
-              </>
-            )}
           </TabsContent>
 
           <TabsContent value="address" className="space-y-3">
@@ -147,28 +145,6 @@ export function MemberDetailDialog({ member, open, onClose, onEdit }: MemberDeta
               </div>
             </div>
 
-            {/* Emergency Contact */}
-            {(member.emergencyContactName || member.emergencyContactPhone) && (
-              <>
-                <Separator />
-                <div className="space-y-4">
-                  <h4 className="font-medium flex items-center gap-2">
-                    <Phone className="h-4 w-4" />
-                    Noodcontact
-                  </h4>
-                  <div className="grid grid-cols-2 gap-6 text-sm">
-                    <div>
-                      <span className="text-gray-500">Naam</span>
-                      <p className="font-medium">{member.emergencyContactName || '-'}</p>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">Telefoon</span>
-                      <p className="font-medium">{member.emergencyContactPhone || '-'}</p>
-                    </div>
-                  </div>
-                </div>
-              </>
-            )}
           </TabsContent>
 
           <TabsContent value="financial" className="space-y-3">
@@ -248,14 +224,10 @@ export function MemberDetailDialog({ member, open, onClose, onEdit }: MemberDeta
                 <Calendar className="h-4 w-4" />
                 Systeem informatie
               </h4>
-              <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="grid grid-cols-1 gap-4 text-sm">
                 <div>
                   <span className="text-gray-500">Aangemaakt op</span>
                   <p className="font-medium">{formatDateBE(member.createdAt)}</p>
-                </div>
-                <div>
-                  <span className="text-gray-500">Laatst gewijzigd</span>
-                  <p className="font-medium">{member.updatedAt ? formatDateBE(member.updatedAt) : '-'}</p>
                 </div>
               </div>
             </div>

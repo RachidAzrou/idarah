@@ -25,7 +25,20 @@ import { IdCard } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Member } from "@shared/schema";
+import { Member, MemberFinancialSettings, MemberPermissions } from "@shared/schema";
+
+// Extended member type that includes related data
+interface MemberWithDetails extends Member {
+  financialSettings?: MemberFinancialSettings;
+  permissions?: {
+    privacyAgreement: boolean;
+    photoVideoConsent: boolean;
+    newsletterSubscription: boolean;
+    whatsappList: boolean;
+    interestedInActiveRole: boolean;
+    roleDescription?: string;
+  };
+}
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { AlertTriangle } from "lucide-react";
 
@@ -73,7 +86,7 @@ const memberSchema = z.object({
 type MemberFormData = z.infer<typeof memberSchema>;
 
 interface MemberFormProps {
-  member?: Member;
+  member?: MemberWithDetails;
   onSuccess?: () => void;
   onCancel?: () => void;
 }
@@ -90,9 +103,10 @@ export function MemberForm({ member, onSuccess, onCancel }: MemberFormProps) {
   // Build default values based on whether we're editing or creating
   const getDefaultValues = (): Partial<MemberFormData> => {
     if (member) {
-      // Parse member data for editing
+      // Parse member data for editing - use all actual member data
       const street = member.street || '';
       const number = member.number || '';
+      const bus = member.bus || '';
       
       return {
         firstName: member.firstName || '',
@@ -104,24 +118,24 @@ export function MemberForm({ member, onSuccess, onCancel }: MemberFormProps) {
         phone: member.phone || '',
         street: street,
         number: number,
-        bus: '',
+        bus: bus,
         postalCode: member.postalCode || '',
         city: member.city || '',
         country: member.country || 'België',
         financialSettings: {
-          paymentMethod: 'SEPA' as const,
-          iban: '',
-          paymentTerm: 'YEARLY' as const,
+          paymentMethod: member.financialSettings?.paymentMethod || 'SEPA' as const,
+          iban: member.financialSettings?.iban || '',
+          paymentTerm: member.financialSettings?.paymentTerm || 'YEARLY' as const,
         },
         organization: {
-          interestedInActiveRole: false,
-          roleDescription: '',
+          interestedInActiveRole: member.permissions?.interestedInActiveRole || false,
+          roleDescription: member.permissions?.roleDescription || '',
         },
         permissions: {
-          privacyAgreement: !member, // Only require for new members
-          photoVideoConsent: false,
-          newsletterSubscription: false,
-          whatsappList: false,
+          privacyAgreement: member.permissions?.privacyAgreement || false,
+          photoVideoConsent: member.permissions?.photoVideoConsent || false,
+          newsletterSubscription: member.permissions?.newsletterSubscription || false,
+          whatsappList: member.permissions?.whatsappList || false,
         },
       };
     }

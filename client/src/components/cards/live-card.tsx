@@ -125,7 +125,7 @@ export function LiveCard({
   const validUntil = cardMeta.validUntil || new Date(currentYear, 11, 31);
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4 sm:p-6 flex items-center justify-center">
+    <div className="min-h-screen bg-gray-900 p-4 sm:p-6 flex items-center justify-center">
       {/* PWA Install Banner */}
       {isInstallable && !standalone && (
         <div className="fixed top-4 left-4 right-4 bg-blue-600 text-white p-3 rounded-lg shadow-lg z-10">
@@ -140,9 +140,9 @@ export function LiveCard({
 
       {/* Live Card */}
       <div 
-        className="relative w-full max-w-md mx-auto aspect-[1.6/1] rounded-2xl shadow-2xl overflow-hidden"
+        className="relative w-full max-w-md mx-auto aspect-[1.6/1] rounded-2xl shadow-2xl overflow-hidden border border-gray-600"
         style={{
-          background: `linear-gradient(135deg, ${primaryColor} 0%, ${primaryColor}dd 100%)`,
+          background: 'linear-gradient(135deg, #1e40af 0%, #1d4ed8 50%, #2563eb 100%)',
         }}
         data-testid="live-card"
       >
@@ -161,99 +161,114 @@ export function LiveCard({
 
         {/* Card Content */}
         <div className="relative h-full p-6 flex flex-col">
-          {/* Header with logo and status */}
-          <div className="flex items-start justify-between mb-4">
+          {/* Top Section - Bank style header */}
+          <div className="flex items-start justify-between mb-6">
             <div className="flex-1">
               {tenant.logoUrl && (
                 <img 
                   src={tenant.logoUrl} 
                   alt={tenant.name}
-                  className="h-8 w-auto mb-2"
+                  className="h-6 w-auto mb-1"
                 />
               )}
-              <h1 className="text-white font-semibold text-lg leading-tight">
+              <h1 className="text-white/90 font-medium text-sm uppercase tracking-wider">
                 {tenant.name}
               </h1>
             </div>
             
-            <div className="flex flex-col items-end gap-2">
+            <div className="flex items-center gap-2">
               <StatusLED status={cardMeta.status} />
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 text-white/70 hover:text-white hover:bg-white/10"
+                className="h-6 w-6 text-white/60 hover:text-white hover:bg-white/10"
                 onClick={handleRefresh}
                 disabled={isRefreshing}
                 data-testid="button-refresh"
                 aria-label="Ververs kaart"
               >
-                <RefreshCw className={cn("h-4 w-4", isRefreshing && "animate-spin")} />
+                <RefreshCw className={cn("h-3 w-3", isRefreshing && "animate-spin")} />
               </Button>
             </div>
           </div>
 
-          {/* Main content area */}
-          <div className="flex-1 flex">
-            {/* Left: Member info */}
-            <div className="flex-1 flex flex-col justify-between">
-              {/* Member details */}
-              <div>
-                <h2 className="text-white text-xl font-bold leading-tight mb-1">
+          {/* Card Number - Bank style */}
+          <div className="mb-6">
+            <p className="text-white font-mono text-lg tracking-widest">
+              {member.memberNumber.padStart(16, '0').replace(/(.{4})/g, '$1 ').trim()}
+            </p>
+          </div>
+
+          {/* Main Content - Two columns like bank card */}
+          <div className="flex-1 flex justify-between items-end">
+            {/* Left: Member name and details */}
+            <div className="flex-1">
+              {/* Member name - prominent like credit card */}
+              <div className="mb-3">
+                <p className="text-white/70 text-xs uppercase tracking-wide mb-1">Kaarthouder</p>
+                <h2 className="text-white text-lg font-bold uppercase tracking-wide">
                   {member.firstName} {member.lastName}
                 </h2>
-                <p className="text-white/90 text-sm font-mono mb-2">
-                  #{member.memberNumber}
-                </p>
-                <Badge 
-                  variant="secondary" 
-                  className="bg-white/20 text-white border-white/30 text-xs"
-                >
-                  {getMemberCategoryLabel(member.category)}
-                </Badge>
+              </div>
+              
+              {/* Category and voting rights */}
+              <div className="mb-3">
+                <p className="text-white/70 text-xs uppercase tracking-wide mb-1">Type</p>
+                <div className="flex items-center gap-2">
+                  <span className="text-white text-sm">
+                    {getMemberCategoryLabel(member.category)}
+                  </span>
+                  {member.votingRights && (
+                    <span className="text-white/90 text-xs bg-white/20 px-2 py-1 rounded-full">
+                      STEMGERECHTIGD
+                    </span>
+                  )}
+                </div>
               </div>
 
-              {/* Status chips */}
-              <div className="flex flex-col gap-2">
-                <Badge 
-                  className={cn(
-                    "w-fit text-xs font-medium",
-                    currentYearPaid 
-                      ? "bg-green-500/80 text-white border-green-400/30" 
-                      : "bg-orange-500/80 text-white border-orange-400/30"
-                  )}
-                  data-testid={currentYearPaid ? "chip-paid" : "chip-unpaid"}
-                >
-                  {currentYearPaid ? `Betaald ${currentYear}` : 'Onbetaald'}
-                </Badge>
-                
-                <Badge 
-                  className="w-fit bg-blue-500/80 text-white border-blue-400/30 text-xs font-medium"
-                  data-testid="chip-valid-until"
-                >
-                  Geldig tot {format(validUntil, 'dd/MM/yyyy', { locale: nl })}
-                </Badge>
+              {/* Valid until - bank card style */}
+              <div>
+                <p className="text-white/70 text-xs uppercase tracking-wide mb-1">Geldig tot</p>
+                <p className="text-white text-sm font-mono">
+                  {format(validUntil, 'MM/yy', { locale: nl })}
+                </p>
               </div>
             </div>
 
-            {/* Right: QR Code */}
-            <div className="ml-4">
+            {/* Right: QR Code and status */}
+            <div className="flex flex-col items-end">
+              {/* Payment status chip */}
+              <div className="mb-3">
+                <Badge 
+                  className={cn(
+                    "text-xs font-medium px-3 py-1",
+                    currentYearPaid 
+                      ? "bg-green-500/20 text-green-300 border-green-400/30" 
+                      : "bg-red-500/20 text-red-300 border-red-400/30"
+                  )}
+                  data-testid={currentYearPaid ? "chip-paid" : "chip-unpaid"}
+                >
+                  {currentYearPaid ? `BETAALD ${currentYear}` : 'ONBETAALD'}
+                </Badge>
+              </div>
+
+              {/* QR Code */}
               <button
                 onClick={() => setShowQRModal(true)}
-                className="group bg-white rounded-xl p-3 shadow-lg hover:shadow-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/50"
+                className="group bg-white rounded-lg p-2 shadow-lg hover:shadow-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/50"
                 data-testid="qr-plate"
                 aria-label="Open grote QR code"
-                style={{ minWidth: '90px', minHeight: '90px' }}
               >
                 <QRCodeSVG
                   value={qrCodeUrl}
-                  size={66}
+                  size={60}
                   className="w-full h-full"
                   fgColor="#000000"
                   bgColor="#ffffff"
                 />
               </button>
-              <p className="text-white/80 text-xs text-center mt-2 leading-tight">
-                Scan voor<br />verificatie
+              <p className="text-white/60 text-xs text-center mt-1">
+                SCAN
               </p>
             </div>
           </div>

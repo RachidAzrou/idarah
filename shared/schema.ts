@@ -80,6 +80,7 @@ export const members = pgTable("members", {
   city: text("city"),
   country: text("country"),
   active: boolean("active").default(true).notNull(),
+  votingRights: boolean("voting_rights").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

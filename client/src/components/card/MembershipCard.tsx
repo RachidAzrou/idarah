@@ -218,7 +218,11 @@ export function MembershipCard({
               <h2 className="embossed-text text-[clamp(20px,2.4vmin,22px)] font-semibold uppercase tracking-wide leading-tight" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.9), -1px -1px 2px rgba(255,255,255,0.3), 0 0 8px rgba(255,255,255,0.1)', filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))'}}>
                 {cardData.firstName} {cardData.lastName}
               </h2>
-              <div className="mt-3">
+            </div>
+
+            {/* Lidnummer and Category - side by side */}
+            <div className="grid grid-cols-2 gap-4 mt-3">
+              <div>
                 <p className="embossed-text text-[clamp(16px,2.0vmin,18px)] uppercase tracking-wide opacity-80 mb-1 font-medium">
                   LIDNUMMER
                 </p>
@@ -226,16 +230,15 @@ export function MembershipCard({
                   {cardData.memberNumber}
                 </p>
               </div>
-            </div>
-
-            {/* Category */}
-            <div>
-              <p className="embossed-text text-[clamp(16px,2.0vmin,18px)] uppercase tracking-wide opacity-80 mb-1 font-medium">
-                CATEGORIE
-              </p>
-              <span className="embossed-text text-[clamp(20px,2.4vmin,22px)] font-medium uppercase" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.9), -1px -1px 2px rgba(255,255,255,0.3), 0 0 8px rgba(255,255,255,0.1)', filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))'}}>
-                {getMemberCategoryLabel(cardData.category)}
-              </span>
+              
+              <div>
+                <p className="embossed-text text-[clamp(16px,2.0vmin,18px)] uppercase tracking-wide opacity-80 mb-1 font-medium">
+                  CATEGORIE
+                </p>
+                <span className="embossed-text text-[clamp(20px,2.4vmin,22px)] font-medium uppercase" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.9), -1px -1px 2px rgba(255,255,255,0.3), 0 0 8px rgba(255,255,255,0.1)', filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))'}}>
+                  {getMemberCategoryLabel(cardData.category)}
+                </span>
+              </div>
             </div>
           </div>
 

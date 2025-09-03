@@ -603,6 +603,10 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
                     <FileSpreadsheet className="h-4 w-4" />
                     Excel Template
                   </Button>
+                  <Button onClick={() => downloadFieldGuide()} variant="outline" className="gap-2">
+                    <MdDownloading className="h-4 w-4" />
+                    Veld Handleiding
+                  </Button>
                 </div>
               </div>
 
@@ -615,7 +619,7 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
                   <CiImport className="mx-auto h-12 w-12 text-gray-400 mb-4" />
                   <div className="space-y-2">
-                    <p className="text-lg font-medium">Sleep een CSV of Excel bestand hierheen</p>
+                    <p className="text-lg font-medium">Sleep een Excel bestand hierheen</p>
                     <p className="text-gray-600">of klik om een bestand te selecteren</p>
                     <Input
                       ref={fileInputRef}

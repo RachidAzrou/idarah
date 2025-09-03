@@ -174,118 +174,114 @@ export function MembersTable({
         {members.length === 0 ? (
           <EmptyState />
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-[#f3f4f6]">
-                <tr>
-                  <th className="sticky top-0 w-12 px-6 py-3 text-left bg-[#f3f4f6] text-[#65758b] font-poppins">
-                    <Checkbox
-                      checked={selectedIds.length === members.length && members.length > 0}
-                      onCheckedChange={handleSelectAll}
-                      aria-label="Selecteer alle leden"
-                    />
-                  </th>
-                  <th 
-                    className="sticky top-0 px-6 py-3 text-left text-xs font-medium text-[#65758b] bg-[#f3f4f6] font-poppins uppercase tracking-wider cursor-pointer hover:bg-gray-200"
-                    onClick={() => handleSort('memberNumber')}
-                  >
-                    <div className="flex items-center gap-2">
-                      Lidnummer
-                      {getSortIcon('memberNumber')}
-                    </div>
-                  </th>
-                  <th 
-                    className="sticky top-0 px-6 py-3 text-left text-xs font-medium text-[#65758b] bg-[#f3f4f6] font-poppins uppercase tracking-wider cursor-pointer hover:bg-gray-200"
-                    onClick={() => handleSort('lastName')}
-                  >
-                    <div className="flex items-center gap-2">
-                      Naam
-                      {getSortIcon('lastName')}
-                    </div>
-                  </th>
-                  <th className="sticky top-0 px-6 py-3 text-left text-xs font-medium text-[#65758b] bg-[#f3f4f6] font-poppins uppercase tracking-wider hidden lg:table-cell">
-                    Voornaam
-                  </th>
-                  <th className="sticky top-0 px-6 py-3 text-left text-xs font-medium text-[#65758b] bg-[#f3f4f6] font-poppins uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="sticky top-0 px-6 py-3 text-left text-xs font-medium text-[#65758b] bg-[#f3f4f6] font-poppins uppercase tracking-wider">
-                    Categorie
-                  </th>
-                  <th 
-                    className="sticky top-0 px-6 py-3 text-left text-xs font-medium text-[#65758b] bg-[#f3f4f6] font-poppins uppercase tracking-wider cursor-pointer hover:bg-gray-200"
-                    onClick={() => handleSort('createdAt')}
-                  >
-                    <div className="flex items-center gap-2">
-                      Inschrijvingsdatum
-                      {getSortIcon('createdAt')}
-                    </div>
-                  </th>
-                  <th className="sticky top-0 px-6 py-3 text-right text-xs font-medium text-[#65758b] bg-[#f3f4f6] font-poppins uppercase tracking-wider">
-                    Acties
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {members.map((member) => (
-                  <tr 
-                    key={member.id} 
-                    className={cn(
-                      "hover:bg-gray-50 transition-colors",
-                      selectedIds.includes(member.id) && "bg-blue-50"
-                    )}
-                    data-testid={`member-row-${member.id}`}
-                  >
-                    <td className="px-6 py-4">
-                      <Checkbox
-                        checked={selectedIds.includes(member.id)}
-                        onCheckedChange={(checked) => handleSelectRow(member.id, !!checked)}
-                        aria-label={`Selecteer ${member.firstName} ${member.lastName}`}
-                      />
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm font-mono font-medium text-gray-900">
-                        {member.memberNumber}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
-                        {member.lastName}
-                      </div>
-                      <div className="text-sm text-gray-500 lg:hidden">
-                        {member.firstName}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 hidden lg:table-cell">
-                      {member.firstName}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <StatusBadge status={member.active ? 'ACTIEF' : 'INACTIEF'} />
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <Badge variant="secondary" className="text-xs">
-                        {getMemberCategoryLabel(member.category)}
-                      </Badge>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {formatDate(member.createdAt)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right">
-                      <RowActions
-                        memberId={member.id}
-                        memberName={`${member.firstName} ${member.lastName}`}
-                        isActive={member.active}
-                        onView={onView || ((id) => onRowAction('view', id))}
-                        onEdit={onEdit || ((id) => onRowAction('edit', id))}
-                        onToggleStatus={onToggleStatus || ((id, currentStatus) => onRowAction('toggleStatus', id))}
-                        onDelete={onDelete || ((id) => onRowAction('delete', id))}
-                      />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-12">
+                <Checkbox
+                  checked={selectedIds.length === members.length && members.length > 0}
+                  onCheckedChange={handleSelectAll}
+                  aria-label="Selecteer alle leden"
+                />
+              </TableHead>
+              <TableHead 
+                className="cursor-pointer hover:bg-gray-50"
+                onClick={() => handleSort('memberNumber')}
+              >
+                <div className="flex items-center gap-2">
+                  Lidnummer
+                  {getSortIcon('memberNumber')}
+                </div>
+              </TableHead>
+              <TableHead 
+                className="cursor-pointer hover:bg-gray-50"
+                onClick={() => handleSort('lastName')}
+              >
+                <div className="flex items-center gap-2">
+                  Naam
+                  {getSortIcon('lastName')}
+                </div>
+              </TableHead>
+              <TableHead className="hidden lg:table-cell">
+                Voornaam
+              </TableHead>
+              <TableHead>
+                Status
+              </TableHead>
+              <TableHead>
+                Categorie
+              </TableHead>
+              <TableHead 
+                className="cursor-pointer hover:bg-gray-50"
+                onClick={() => handleSort('createdAt')}
+              >
+                <div className="flex items-center gap-2">
+                  Inschrijvingsdatum
+                  {getSortIcon('createdAt')}
+                </div>
+              </TableHead>
+              <TableHead className="text-right">
+                Acties
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {members.map((member) => (
+              <TableRow 
+                key={member.id} 
+                className={cn(
+                  "hover:bg-gray-50 transition-colors",
+                  selectedIds.includes(member.id) && "bg-blue-50"
+                )}
+                data-testid={`member-row-${member.id}`}
+              >
+                <TableCell>
+                  <Checkbox
+                    checked={selectedIds.includes(member.id)}
+                    onCheckedChange={(checked) => handleSelectRow(member.id, !!checked)}
+                    aria-label={`Selecteer ${member.firstName} ${member.lastName}`}
+                  />
+                </TableCell>
+                <TableCell className="font-mono">
+                  {member.memberNumber}
+                </TableCell>
+                <TableCell>
+                  <div className="font-medium">
+                    {member.lastName}
+                  </div>
+                  <div className="text-sm text-gray-500 lg:hidden">
+                    {member.firstName}
+                  </div>
+                </TableCell>
+                <TableCell className="hidden lg:table-cell">
+                  {member.firstName}
+                </TableCell>
+                <TableCell>
+                  <StatusBadge status={member.active ? 'ACTIEF' : 'INACTIEF'} />
+                </TableCell>
+                <TableCell>
+                  <Badge variant="secondary" className="text-xs">
+                    {getMemberCategoryLabel(member.category)}
+                  </Badge>
+                </TableCell>
+                <TableCell className="text-gray-500">
+                  {formatDate(member.createdAt)}
+                </TableCell>
+                <TableCell className="text-right">
+                  <RowActions
+                    memberId={member.id}
+                    memberName={`${member.firstName} ${member.lastName}`}
+                    isActive={member.active}
+                    onView={onView || ((id) => onRowAction('view', id))}
+                    onEdit={onEdit || ((id) => onRowAction('edit', id))}
+                    onToggleStatus={onToggleStatus || ((id, currentStatus) => onRowAction('toggleStatus', id))}
+                    onDelete={onDelete || ((id) => onRowAction('delete', id))}
+                  />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
         )}
       </CardContent>
 

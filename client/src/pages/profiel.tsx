@@ -145,18 +145,19 @@ export default function Profiel() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="border-b border-gray-200 pb-5">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900" data-testid="page-title">Mijn Profiel</h1>
-            <p className="mt-1 text-sm text-gray-700">Beheer uw account gegevens en instellingen</p>
+    <main className="flex-1 py-4">
+      <div className="px-4 sm:px-6 lg:px-8 w-full">
+        {/* Page Header */}
+        <div className="border-b border-gray-200 pb-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900" data-testid="page-title">Mijn Profiel</h1>
+              <p className="mt-1 text-sm text-gray-700">Beheer uw account gegevens en instellingen</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-2 mt-6">
         {/* Profiel Gegevens */}
         <Card>
           <CardHeader>
@@ -314,10 +315,10 @@ export default function Profiel() {
             </Form>
           </CardContent>
         </Card>
-      </div>
+        </div>
 
-      {/* Account Info */}
-      <Card>
+        {/* Account Info */}
+        <Card className="mt-6">
         <CardHeader>
           <CardTitle>Account Informatie</CardTitle>
           <CardDescription>
@@ -339,6 +340,7 @@ export default function Profiel() {
           </div>
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </main>
   );
 }

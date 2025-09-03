@@ -218,32 +218,19 @@ export function MembershipCard({
               <h2 className="embossed-text text-[clamp(14px,1.8vmin,16px)] font-semibold uppercase tracking-wide leading-tight">
                 {cardData.firstName} {cardData.lastName}
               </h2>
+              <p className="embossed-text text-[clamp(10px,1.4vmin,12px)] uppercase tracking-wide opacity-60 mt-1">
+                LIDNUMMER: {cardData.memberNumber}
+              </p>
             </div>
 
-            {/* Category and Status */}
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <p className="embossed-text text-[clamp(10px,1.4vmin,12px)] uppercase tracking-wide opacity-80 mb-1">
-                  CATEGORIE
-                </p>
-                <span className="embossed-text text-[clamp(11px,1.6vmin,14px)] font-medium">
-                  {getMemberCategoryLabel(cardData.category)}
-                </span>
-              </div>
-              
-              <div>
-                <p className="embossed-text text-[clamp(10px,1.4vmin,12px)] uppercase tracking-wide opacity-80 mb-1">
-                  STATUS
-                </p>
-                <span className={cn(
-                  "text-[clamp(11px,1.6vmin,14px)] font-medium",
-                  cardData.badges.some(badge => badge.includes("Betaald"))
-                    ? "text-green-300" 
-                    : "text-red-300"
-                )}>
-                  {cardData.badges.find(badge => badge.includes("Betaald")) || 'ONBETAALD'}
-                </span>
-              </div>
+            {/* Category */}
+            <div>
+              <p className="embossed-text text-[clamp(10px,1.4vmin,12px)] uppercase tracking-wide opacity-80 mb-1">
+                CATEGORIE
+              </p>
+              <span className="embossed-text text-[clamp(11px,1.6vmin,14px)] font-medium">
+                {getMemberCategoryLabel(cardData.category)}
+              </span>
             </div>
           </div>
 

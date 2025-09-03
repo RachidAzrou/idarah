@@ -256,6 +256,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const updatedMember = await storage.updateMember(req.params.id, memberData);
       res.json(updatedMember);
     } catch (error) {
+      console.error("Error updating member:", error);
+      res.status(400).json({ message: "Invalid member data" });
+    }
+  });
+
+  app.patch("/api/members/:id", authMiddleware, tenantMiddleware, async (req, res) => {
+    try {
+      const memberData = insertMemberSchema.partial().parse(req.body);
+      const member = await storage.getMember(req.params.id);
+      
+      if (!member || member.tenantId !== req.tenantId) {
+        return res.status(404).json({ message: "Member not found" });
+      }
+
+      const updatedMember = await storage.updateMember(req.params.id, memberData);
+      res.json(updatedMember);
+    } catch (error) {
+      console.error("Error updating member:", error);
       res.status(400).json({ message: "Invalid member data" });
     }
   });

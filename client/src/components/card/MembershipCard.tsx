@@ -221,20 +221,20 @@ export function MembershipCard({
                   className={`${isConstrained ? 'w-12 h-12' : 'w-16 h-16'}`}
                   data-testid="voting-icon"
                   style={{
-                    color: '#DAA520',
+                    color: '#C0C0C0',
                     textShadow: `
-                      3px 3px 0 rgba(255,248,220,0.4),
+                      3px 3px 0 rgba(255,255,255,0.3),
                       -3px -3px 0 rgba(0,0,0,0.9),
                       -4px -4px 0 rgba(0,0,0,0.8),
                       -5px -5px 0 rgba(0,0,0,0.6),
                       -6px -6px 0 rgba(0,0,0,0.4),
                       -7px -7px 0 rgba(0,0,0,0.2),
                       inset 4px 4px 8px rgba(0,0,0,0.8),
-                      inset -2px -2px 4px rgba(255,215,0,0.2),
-                      0 0 12px rgba(218,165,32,0.4),
-                      0 0 20px rgba(218,165,32,0.2)
+                      inset -2px -2px 4px rgba(192,192,192,0.2),
+                      0 0 12px rgba(192,192,192,0.4),
+                      0 0 20px rgba(192,192,192,0.2)
                     `,
-                    filter: 'drop-shadow(3px 3px 8px rgba(0,0,0,0.6)) brightness(1.1)'
+                    filter: 'drop-shadow(3px 3px 8px rgba(0,0,0,0.6)) brightness(1.2)'
                   }}
                 />
                 
@@ -242,13 +242,13 @@ export function MembershipCard({
                 <span 
                   className={`${isConstrained ? 'text-xs' : 'text-sm'} uppercase tracking-[0.1em] font-bold mt-3`}
                   style={{
-                    color: '#DAA520',
+                    color: '#C0C0C0',
                     textShadow: `
-                      1px 1px 0 rgba(255,248,220,0.3),
+                      1px 1px 0 rgba(255,255,255,0.2),
                       -1px -1px 0 rgba(0,0,0,0.7),
                       -2px -2px 0 rgba(0,0,0,0.5),
                       inset 2px 2px 4px rgba(0,0,0,0.6),
-                      0 0 6px rgba(218,165,32,0.3)
+                      0 0 6px rgba(192,192,192,0.3)
                     `,
                     filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.4))'
                   }}

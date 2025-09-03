@@ -7,6 +7,7 @@ import { RefreshCw, Wifi, WifiOff, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
+import fadingBlueBackground from "@assets/fading-blue-background_1756897101831.jpg";
 
 interface CardData {
   firstName: string;
@@ -123,7 +124,10 @@ export function MembershipCard({
           className
         )}
         style={{
-          background: "linear-gradient(135deg, #0E3A6E 0%, #0B4E9C 100%)",
+          backgroundImage: `url(${fadingBlueBackground}), linear-gradient(135deg, rgba(14, 58, 110, 0.85) 0%, rgba(11, 78, 156, 0.9) 100%)`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundBlendMode: "overlay",
           boxShadow: "0 18px 40px rgba(0,0,0,0.35)",
           transform: isFlipping ? 'rotateY(360deg)' : 'rotateY(0deg)',
           transition: 'transform 800ms ease-in-out'

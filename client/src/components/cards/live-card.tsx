@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 import type { Member, CardMeta, Tenant } from "@shared/schema";
+import fadingBlueBackground from "@assets/fading-blue-background_1756897101831.jpg";
 
 interface LiveCardProps {
   member: Member;

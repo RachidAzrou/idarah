@@ -226,13 +226,41 @@ export class DatabaseStorage implements IStorage {
     // Normaliseer lidnummer naar 4-cijferige format (0007)
     const normalizedNumber = memberNumber.padStart(4, '0');
     
-    console.log("🔍 STORAGE - Looking for member in tenant:", tenantId, "original number:", memberNumber, "normalized:", normalizedNumber);
-    
-    const [member] = await db.select().from(members).where(
+    // Probeer eerst de genormaliseerde versie
+    let [member] = await db.select().from(members).where(
       and(eq(members.tenantId, tenantId), eq(members.memberNumber, normalizedNumber))
     );
     
-    console.log("🔍 STORAGE - Found member:", member ? `ID: ${member.id}, Number: ${member.memberNumber}` : "NONE");
+    // Als niet gevonden, probeer ook de originele versie (voor achterwaartse compatibiliteit)
+    if (!member && memberNumber !== normalizedNumber) {
+      [member] = await db.select().from(members).where(
+        and(eq(members.tenantId, tenantId), eq(members.memberNumber, memberNumber))
+      );
+    }
+    
+    // Probeer ook alle varianten (met en zonder leading zeros)
+    if (!member) {
+      const memberAsNumber = parseInt(memberNumber);
+      if (!isNaN(memberAsNumber)) {
+        // Probeer "7", "07", "007", "0007"
+        const variants = [
+          memberAsNumber.toString(),
+          memberAsNumber.toString().padStart(2, '0'),
+          memberAsNumber.toString().padStart(3, '0'),
+          memberAsNumber.toString().padStart(4, '0')
+        ];
+        
+        for (const variant of variants) {
+          if (variant !== normalizedNumber && variant !== memberNumber) {
+            [member] = await db.select().from(members).where(
+              and(eq(members.tenantId, tenantId), eq(members.memberNumber, variant))
+            );
+            if (member) break;
+          }
+        }
+      }
+    }
+    
     return member || undefined;
   }
 

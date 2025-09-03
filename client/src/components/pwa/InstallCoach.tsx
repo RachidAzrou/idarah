@@ -1,64 +1,44 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { X, Smartphone, Monitor, Share, Menu, MoreVertical } from 'lucide-react';
-import { usePlatform, type Platform } from '@/hooks/usePlatform';
+import { usePlatform } from '@/hooks/usePlatform';
 import { useA2HS } from '@/hooks/useA2HS';
 import { storage } from '@/lib/storage';
 
-interface InstallInstructions {
-  title: string;
-  steps: string[];
-  icon: React.ComponentType<{ className?: string }>;
-}
-
-const platformInstructions: Record<Platform, InstallInstructions> = {
-  'ios-safari': {
-    title: 'Op je iPhone/iPad',
-    steps: [
-      'Tik op het Deel-icoon onderaan',
-      'Scroll naar beneden en tik "Zet op beginscherm"',
-      'Tik "Toevoegen" om te bevestigen'
-    ],
-    icon: Share
+const installMessages = {
+  title: "Zet je lidkaart op je startscherm",
+  subtitle: "Zo open je ze snel en blijft ze altijd bij de hand.",
+  buttons: {
+    install: "App installeren",
+    later: "Later",
+    never: "Niet meer tonen",
   },
-  'android-chrome': {
-    title: 'Op je Android (Chrome)',
-    steps: [
-      'Tik op "App installeren" knop (verschijnt automatisch)',
-      'Of tik het menu (⋮) rechtsboven',
-      'Kies "App installeren" of "Toevoegen aan startscherm"'
-    ],
-    icon: Smartphone
-  },
-  'samsung-internet': {
-    title: 'Op je Samsung browser',
-    steps: [
-      'Tik het menu (☰) onderaan',
-      'Kies "Toevoegen aan startscherm"',
-      'Bevestig met "Toevoegen"'
-    ],
-    icon: Menu
-  },
-  'desktop-chromium': {
-    title: 'Op je computer',
-    steps: [
-      'Klik op het install-icoon in de adresbalk',
-      'Of klik het menu (⋮) rechtsboven',
-      'Kies "Ledenbeheer installeren..."'
-    ],
-    icon: Monitor
-  },
-  'other': {
-    title: 'Op je apparaat',
-    steps: [
-      'Zoek naar een "Installeren" optie in het browsermenu',
-      'Of "Toevoegen aan startscherm"',
-      'Volg de instructies van je browser'
-    ],
-    icon: MoreVertical
-  }
-};
+  ios: [
+    "Tik op Deel (het vierkantje met pijltje omhoog).",
+    "Kies 'Zet op beginscherm' in de lijst.",
+    "Bevestig met 'Toevoegen'.",
+  ],
+  android: [
+    "Als er een knop 'App installeren' verschijnt, tik daarop om meteen toe te voegen.",
+    "Of open het Menu ⋮ rechtsboven.",
+    "Kies 'App installeren' of 'Aan startscherm toevoegen'.",
+    "Bevestig.",
+  ],
+  samsung: [
+    "Open het Menu ☰ (linksonder of rechtsboven, afhankelijk van toestel).",
+    "Kies 'Toevoegen aan startscherm'.",
+    "Bevestig.",
+  ],
+  desktop: [
+    "Klik in de adresbalk op het installatie-icoon (⤓ of +).",
+    "Kies 'Installeren'.",
+    "Je lidkaart opent voortaan in een apart venster als app.",
+  ],
+  fallback: [
+    "Sla deze pagina op als snelkoppeling via het browsermenu.",
+    "Daarna vind je de lidkaart terug in je startscherm of favorieten.",
+  ],
+} as const;
 
 interface InstallCoachProps {
   isOpen: boolean;
@@ -68,8 +48,25 @@ interface InstallCoachProps {
 export function InstallCoach({ isOpen, onClose }: InstallCoachProps) {
   const platform = usePlatform();
   const { canPrompt, promptInstall } = useA2HS();
-  const instructions = platformInstructions[platform];
-  const Icon = instructions.icon;
+
+  // Select platform-specific instructions
+  let steps: string[] = [];
+  switch (platform) {
+    case "ios-safari":
+      steps = installMessages.ios;
+      break;
+    case "android-chrome":
+      steps = installMessages.android;
+      break;
+    case "samsung-internet":
+      steps = installMessages.samsung;
+      break;
+    case "desktop-chromium":
+      steps = installMessages.desktop;
+      break;
+    default:
+      steps = installMessages.fallback;
+  }
 
   const handleInstall = async () => {
     const success = await promptInstall();
@@ -85,60 +82,51 @@ export function InstallCoach({ isOpen, onClose }: InstallCoachProps) {
     onClose();
   };
 
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Escape') {
+      handleDismiss(false);
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={() => handleDismiss(false)}>
-      <DialogContent className="max-w-md">
-        <DialogHeader className="space-y-4">
-          <div className="flex items-center justify-between">
-            <DialogTitle className="text-lg font-semibold">
-              Zet je lidkaart op je startscherm
-            </DialogTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleDismiss(false)}
-              className="h-8 w-8 p-0"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
+      <DialogContent 
+        className="max-w-md focus:outline-none"
+        onKeyDown={handleKeyDown}
+        aria-labelledby="install-coach-title"
+        aria-describedby="install-coach-subtitle"
+      >
+        <DialogHeader className="space-y-3">
+          <DialogTitle id="install-coach-title" className="text-lg font-semibold">
+            {installMessages.title}
+          </DialogTitle>
           
-          <p className="text-sm text-muted-foreground">
-            Zo open je ze snel en blijft ze altijd bij de hand.
+          <p id="install-coach-subtitle" className="text-sm text-muted-foreground">
+            {installMessages.subtitle}
           </p>
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Platform specific instructions */}
+          {/* Platform-specific instructions */}
           <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                <Icon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-              </div>
-              <h3 className="font-medium">{instructions.title}</h3>
-            </div>
-            
-            <ol className="space-y-2 text-sm text-muted-foreground">
-              {instructions.steps.map((step, index) => (
-                <li key={index} className="flex gap-3">
-                  <span className="flex-shrink-0 w-5 h-5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full text-xs font-medium flex items-center justify-center">
-                    {index + 1}
-                  </span>
-                  <span>{step}</span>
+            <ol className="list-decimal ml-6 space-y-1 text-sm text-muted-foreground">
+              {steps.map((step, index) => (
+                <li key={index} className="leading-relaxed">
+                  {step}
                 </li>
               ))}
             </ol>
           </div>
 
           {/* Action buttons */}
-          <div className="flex flex-col gap-2">
-            {canPrompt && platform === 'android-chrome' && (
+          <div className="flex flex-col gap-3">
+            {canPrompt && (
               <Button 
                 onClick={handleInstall}
                 className="w-full"
                 data-testid="button-install-app"
               >
-                App installeren
+                {installMessages.buttons.install}
               </Button>
             )}
             
@@ -149,7 +137,7 @@ export function InstallCoach({ isOpen, onClose }: InstallCoachProps) {
                 className="flex-1"
                 data-testid="button-install-later"
               >
-                Later
+                {installMessages.buttons.later}
               </Button>
               <Button 
                 variant="ghost" 
@@ -157,7 +145,7 @@ export function InstallCoach({ isOpen, onClose }: InstallCoachProps) {
                 className="flex-1 text-muted-foreground"
                 data-testid="button-install-dismiss"
               >
-                Niet meer tonen
+                {installMessages.buttons.never}
               </Button>
             </div>
           </div>

@@ -343,9 +343,9 @@ export function FeeDetailDialog({
                   <Building2 className="h-4 w-4" />
                   Beschikbare acties
                 </h4>
-                <div className="space-y-3">
+                <div className="flex flex-wrap gap-3">
                   {canMarkAsPaid && (
-                    <Button onClick={handleMarkPaid} className="w-full flex items-center gap-2">
+                    <Button onClick={handleMarkPaid} className="flex items-center gap-2 bg-green-600 hover:bg-green-700">
                       <Check className="h-4 w-4" />
                       Markeer als betaald
                     </Button>
@@ -355,7 +355,7 @@ export function FeeDetailDialog({
                     <Button 
                       onClick={handleGenerateSepa} 
                       variant="outline"
-                      className="w-full flex items-center gap-2"
+                      className="flex items-center gap-2"
                     >
                       <Download className="h-4 w-4" />
                       Genereer SEPA-export
@@ -365,7 +365,7 @@ export function FeeDetailDialog({
                   <Button 
                     onClick={handleDelete}
                     variant="destructive"
-                    className="w-full flex items-center gap-2"
+                    className="flex items-center gap-2"
                   >
                     <Trash2 className="h-4 w-4" />
                     Verwijder lidgeld

@@ -216,25 +216,32 @@ export function MembershipCard({
                   className={`${isConstrained ? 'w-12 h-12' : 'w-16 h-16'}`}
                   data-testid="voting-icon"
                   style={{
-                    color: '#C0C0C0',
-                    background: 'linear-gradient(135deg, #808080 0%, #E0E0E0 30%, #F8F8F8 50%, #E0E0E0 70%, #A8A8A8 100%)',
+                    color: '#FFD700',
+                    background: `
+                      radial-gradient(circle at 20% 20%, #B8860B 2px, transparent 2px),
+                      radial-gradient(circle at 60% 40%, #8B6914 1.5px, transparent 1.5px),
+                      radial-gradient(circle at 80% 70%, #996515 2px, transparent 2px),
+                      radial-gradient(circle at 30% 80%, #A0751A 1px, transparent 1px),
+                      radial-gradient(circle at 70% 20%, #B8860B 1.5px, transparent 1.5px),
+                      linear-gradient(135deg, #B8860B 0%, #DAA520 25%, #FFD700 50%, #FFF8DC 75%, #DAA520 100%)
+                    `,
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
-                    backgroundSize: '300% 300%',
-                    animation: 'goldShimmer 3s ease-in-out infinite',
+                    backgroundSize: '25px 25px, 30px 30px, 20px 20px, 35px 35px, 28px 28px, 400% 400%',
+                    animation: 'goldShimmer 4s ease-in-out infinite',
                     textShadow: `
-                      3px 3px 0 rgba(255,255,255,0.4),
+                      3px 3px 0 rgba(255,248,220,0.4),
                       -3px -3px 0 rgba(0,0,0,0.9),
                       -4px -4px 0 rgba(0,0,0,0.8),
                       -5px -5px 0 rgba(0,0,0,0.6),
                       -6px -6px 0 rgba(0,0,0,0.4),
                       -7px -7px 0 rgba(0,0,0,0.2),
                       inset 4px 4px 8px rgba(0,0,0,0.8),
-                      inset -2px -2px 4px rgba(255,255,255,0.1),
-                      0 0 10px rgba(255,255,255,0.3),
-                      0 0 20px rgba(192,192,192,0.2)
+                      inset -2px -2px 4px rgba(255,215,0,0.2),
+                      0 0 15px rgba(255,215,0,0.4),
+                      0 0 25px rgba(255,215,0,0.2)
                     `,
-                    filter: 'drop-shadow(3px 3px 8px rgba(0,0,0,0.6)) brightness(1.1)'
+                    filter: 'drop-shadow(3px 3px 8px rgba(0,0,0,0.6)) brightness(1.2) contrast(1.1)'
                   }}
                 />
                 
@@ -242,13 +249,24 @@ export function MembershipCard({
                 <span 
                   className={`${isConstrained ? 'text-xs' : 'text-sm'} uppercase tracking-[0.1em] font-bold mt-3`}
                   style={{
-                    color: '#C0C0C0',
-                    textShadow: `
-                      1px 1px 0 rgba(255,255,255,0.4),
-                      -1px -1px 0 rgba(0,0,0,0.6),
-                      0 0 6px rgba(192,192,192,0.3)
+                    color: '#DAA520',
+                    background: `
+                      radial-gradient(circle at 25% 30%, #8B6914 1px, transparent 1px),
+                      radial-gradient(circle at 70% 60%, #996515 1.5px, transparent 1.5px),
+                      radial-gradient(circle at 40% 80%, #B8860B 1px, transparent 1px),
+                      linear-gradient(90deg, #B8860B 0%, #DAA520 50%, #FFD700 100%)
                     `,
-                    filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.3))'
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundSize: '20px 20px, 25px 25px, 30px 30px, 200% 200%',
+                    textShadow: `
+                      1px 1px 0 rgba(255,248,220,0.3),
+                      -1px -1px 0 rgba(0,0,0,0.7),
+                      -2px -2px 0 rgba(0,0,0,0.5),
+                      inset 2px 2px 4px rgba(0,0,0,0.6),
+                      0 0 8px rgba(218,165,32,0.4)
+                    `,
+                    filter: 'drop-shadow(1px 1px 3px rgba(0,0,0,0.4))'
                   }}
                 >
                   STEMGERECHTIGD

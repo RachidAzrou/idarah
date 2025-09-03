@@ -481,14 +481,14 @@ export default function LidkaartenPage() {
 
       {/* Preview Modal */}
       <Dialog open={!!previewCard} onOpenChange={() => setPreviewCard(null)}>
-        <DialogContent className="max-w-3xl max-h-[95vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[95vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Lidkaart Preview</DialogTitle>
           </DialogHeader>
           
           {previewCard && tenant && (
             <div className="space-y-4">
-              <div className="relative aspect-[16/10] rounded-lg overflow-hidden border border-gray-200">
+              <div className="relative aspect-[16/10] rounded-lg overflow-hidden border border-gray-200 max-w-lg mx-auto">
                 <CardCanvas className="rounded-lg">
                   <LiveCard
                     member={previewCard.member}

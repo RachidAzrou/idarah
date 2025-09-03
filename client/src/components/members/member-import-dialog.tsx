@@ -832,9 +832,16 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
                       });
                       proceedWithImport(membersToImport);
                     }}
-                    className="gap-2 bg-red-600 hover:bg-red-700"
+                    disabled={validMembers.filter(member => {
+                      const result = duplicateCheckResults.find(r => r.member === member);
+                      return !result || !(result.duplicateCheck.duplicateNumber && result.duplicateCheck.duplicateNameAddress) && !result.duplicateCheck.duplicateNameAddress;
+                    }).length === 0}
+                    className="gap-2 bg-red-600 hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
                   >
-                    Toch Importeren
+                    {validMembers.filter(member => {
+                      const result = duplicateCheckResults.find(r => r.member === member);
+                      return !result || !(result.duplicateCheck.duplicateNumber && result.duplicateCheck.duplicateNameAddress) && !result.duplicateCheck.duplicateNameAddress;
+                    }).length === 0 ? 'Geen leden om te importeren' : 'Toch Importeren'}
                   </Button>
                 </DialogFooter>
               </div>

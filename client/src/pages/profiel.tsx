@@ -69,12 +69,10 @@ export default function Profiel() {
 
   // Initialiseer formulier met gebruikersgegevens
   useEffect(() => {
-    console.log("Profiel useEffect - user data:", user);
-    if (user) {
-      console.log("Setting form values:", { name: user.name, email: user.email });
+    if (user && user.user) {
       profileForm.reset({
-        name: user.name || "",
-        email: user.email || "",
+        name: user.user.name || "",
+        email: user.user.email || "",
       });
       setProfileSaved(false);
     }
@@ -89,8 +87,11 @@ export default function Profiel() {
     onSuccess: async (result, variables) => {
       // Update de auth cache met nieuwe gebruikersgegevens
       queryClient.setQueryData(["/api/auth/me"], (oldData: any) => {
-        if (!oldData) return oldData;
-        return { ...oldData, ...variables };
+        if (!oldData || !oldData.user) return oldData;
+        return { 
+          ...oldData, 
+          user: { ...oldData.user, ...variables }
+        };
       });
       
       setProfileSaved(true);
@@ -142,7 +143,7 @@ export default function Profiel() {
     changePasswordMutation.mutate(data);
   };
 
-  if (!user) {
+  if (!user || !user.user) {
     return null;
   }
 
@@ -331,12 +332,12 @@ export default function Profiel() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label className="text-sm font-medium text-muted-foreground">Rol</Label>
-              <p className="text-sm" data-testid="text-user-role">{user.role}</p>
+              <p className="text-sm" data-testid="text-user-role">{user?.user?.role}</p>
             </div>
             <div>
               <Label className="text-sm font-medium text-muted-foreground">Account aangemaakt</Label>
               <p className="text-sm" data-testid="text-created-at">
-                {user.createdAt ? new Date(user.createdAt).toLocaleDateString('nl-BE') : 'Onbekend'}
+                {user?.user?.createdAt ? new Date(user.user.createdAt).toLocaleDateString('nl-BE') : 'Onbekend'}
               </p>
             </div>
           </div>

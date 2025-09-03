@@ -250,23 +250,14 @@ export function MembershipCard({
                   className={`${isConstrained ? 'text-xs' : 'text-sm'} uppercase tracking-[0.1em] font-bold mt-3`}
                   style={{
                     color: '#DAA520',
-                    background: `
-                      radial-gradient(circle at 25% 30%, #8B6914 1px, transparent 1px),
-                      radial-gradient(circle at 70% 60%, #996515 1.5px, transparent 1.5px),
-                      radial-gradient(circle at 40% 80%, #B8860B 1px, transparent 1px),
-                      linear-gradient(90deg, #B8860B 0%, #DAA520 50%, #FFD700 100%)
-                    `,
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundSize: '20px 20px, 25px 25px, 30px 30px, 200% 200%',
                     textShadow: `
                       1px 1px 0 rgba(255,248,220,0.3),
                       -1px -1px 0 rgba(0,0,0,0.7),
                       -2px -2px 0 rgba(0,0,0,0.5),
                       inset 2px 2px 4px rgba(0,0,0,0.6),
-                      0 0 8px rgba(218,165,32,0.4)
+                      0 0 6px rgba(218,165,32,0.3)
                     `,
-                    filter: 'drop-shadow(1px 1px 3px rgba(0,0,0,0.4))'
+                    filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.4))'
                   }}
                 >
                   STEMGERECHTIGD

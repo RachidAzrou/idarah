@@ -31,7 +31,7 @@ export function MemberDetailDialog({ member, open, onClose, onEdit }: MemberDeta
         </DialogHeader>
 
         {/* Header Info */}
-        <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 mb-6">
+        <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3 mb-4">
           <div className="flex items-center justify-between mb-2">
             <span className="font-mono text-sm text-gray-600">#{member.memberNumber}</span>
             <Badge variant={member.active ? "default" : "secondary"}>
@@ -46,7 +46,7 @@ export function MemberDetailDialog({ member, open, onClose, onEdit }: MemberDeta
           </p>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
           <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="personal" className="flex items-center gap-2">
               <UserCircle className="h-4 w-4" />
@@ -70,13 +70,13 @@ export function MemberDetailDialog({ member, open, onClose, onEdit }: MemberDeta
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="personal" className="space-y-6">
-            <div className="space-y-4">
-              <h4 className="font-medium flex items-center gap-2">
+          <TabsContent value="personal" className="space-y-3">
+            <div className="space-y-3">
+              <h4 className="font-medium flex items-center gap-2 text-sm">
                 <User className="h-4 w-4" />
                 Persoonlijke gegevens
               </h4>
-              <div className="grid grid-cols-2 gap-6 text-sm">
+              <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <span className="text-gray-500">Naam</span>
                   <p className="font-medium">{member.firstName} {member.lastName}</p>
@@ -121,13 +121,13 @@ export function MemberDetailDialog({ member, open, onClose, onEdit }: MemberDeta
             )}
           </TabsContent>
 
-          <TabsContent value="address" className="space-y-6">
-            <div className="space-y-4">
-              <h4 className="font-medium flex items-center gap-2">
+          <TabsContent value="address" className="space-y-3">
+            <div className="space-y-3">
+              <h4 className="font-medium flex items-center gap-2 text-sm">
                 <Home className="h-4 w-4" />
                 Adresgegevens
               </h4>
-              <div className="grid grid-cols-1 gap-6 text-sm">
+              <div className="grid grid-cols-1 gap-4 text-sm">
                 <div>
                   <span className="text-gray-500">Adres</span>
                   <div className="font-medium">
@@ -171,13 +171,13 @@ export function MemberDetailDialog({ member, open, onClose, onEdit }: MemberDeta
             )}
           </TabsContent>
 
-          <TabsContent value="financial" className="space-y-6">
-            <div className="space-y-4">
-              <h4 className="font-medium flex items-center gap-2">
+          <TabsContent value="financial" className="space-y-3">
+            <div className="space-y-3">
+              <h4 className="font-medium flex items-center gap-2 text-sm">
                 <CreditCard className="h-4 w-4" />
                 Financiële gegevens
               </h4>
-              <div className="grid grid-cols-2 gap-6 text-sm">
+              <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <span className="text-gray-500">Betaalmethode</span>
                   <p className="font-medium">{member.financialSettings?.paymentMethod || 'SEPA'}</p>
@@ -194,13 +194,13 @@ export function MemberDetailDialog({ member, open, onClose, onEdit }: MemberDeta
             </div>
           </TabsContent>
 
-          <TabsContent value="organization" className="space-y-6">
-            <div className="space-y-4">
-              <h4 className="font-medium flex items-center gap-2">
+          <TabsContent value="organization" className="space-y-3">
+            <div className="space-y-3">
+              <h4 className="font-medium flex items-center gap-2 text-sm">
                 <Building2 className="h-4 w-4" />
                 Organisatie gegevens
               </h4>
-              <div className="grid grid-cols-1 gap-6 text-sm">
+              <div className="grid grid-cols-1 gap-4 text-sm">
                 <div>
                   <span className="text-gray-500">Interesse in actieve rol</span>
                   <p className="font-medium">{member.permissions?.interestedInActiveRole ? 'Ja' : 'Nee'}</p>
@@ -215,13 +215,13 @@ export function MemberDetailDialog({ member, open, onClose, onEdit }: MemberDeta
             </div>
           </TabsContent>
 
-          <TabsContent value="permissions" className="space-y-6">
-            <div className="space-y-4">
-              <h4 className="font-medium flex items-center gap-2">
+          <TabsContent value="permissions" className="space-y-3">
+            <div className="space-y-3">
+              <h4 className="font-medium flex items-center gap-2 text-sm">
                 <CheckSquare className="h-4 w-4" />
                 Toestemmingen
               </h4>
-              <div className="grid grid-cols-1 gap-4 text-sm">
+              <div className="grid grid-cols-2 gap-3 text-sm">
                 <div>
                   <span className="text-gray-500">Privacy verklaring</span>
                   <p className="font-medium">{member.permissions?.privacyAgreement ? 'Akkoord gegeven' : 'Niet gegeven'}</p>
@@ -243,12 +243,12 @@ export function MemberDetailDialog({ member, open, onClose, onEdit }: MemberDeta
 
             {/* System Info moved here */}
             <Separator />
-            <div className="space-y-4">
-              <h4 className="font-medium flex items-center gap-2">
+            <div className="space-y-3">
+              <h4 className="font-medium flex items-center gap-2 text-sm">
                 <Calendar className="h-4 w-4" />
                 Systeem informatie
               </h4>
-              <div className="grid grid-cols-2 gap-6 text-sm">
+              <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <span className="text-gray-500">Aangemaakt op</span>
                   <p className="font-medium">{formatDateBE(member.createdAt)}</p>
@@ -263,7 +263,7 @@ export function MemberDetailDialog({ member, open, onClose, onEdit }: MemberDeta
         </Tabs>
 
         {/* Actions */}
-        <div className="pt-4 border-t">
+        <div className="pt-3 border-t mt-4">
           <div className="flex gap-3">
             {onEdit && (
               <Button 

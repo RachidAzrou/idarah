@@ -124,7 +124,7 @@ export function MembershipCard({
           className
         )}
         style={{
-          backgroundImage: `url(${fadingBlueBackground}), linear-gradient(135deg, rgba(14, 58, 110, 0.85) 0%, rgba(11, 78, 156, 0.9) 100%)`,
+          backgroundImage: `url(${fadingBlueBackground}), linear-gradient(135deg, rgba(8, 35, 66, 0.9) 0%, rgba(6, 47, 89, 0.95) 100%)`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundBlendMode: "overlay",

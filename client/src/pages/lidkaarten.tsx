@@ -488,16 +488,18 @@ export default function LidkaartenPage() {
           
           {previewCard && tenant && (
             <div className="space-y-4">
-              <div className="relative aspect-[16/10] rounded-lg overflow-hidden border border-gray-200">
-                <CardCanvas className="rounded-lg">
-                  <LiveCard
-                    member={previewCard.member}
-                    cardMeta={previewCard.cardMeta!}
-                    tenant={tenant}
-                    standalone={true}
-                    className="h-full w-full"
-                  />
-                </CardCanvas>
+              <div className="relative aspect-[16/10] rounded-lg overflow-hidden border border-gray-200 flex items-center justify-center p-8">
+                <div style={{ width: 'clamp(250px, 30vmin, 400px)', aspectRatio: '1586/1000' }}>
+                  <CardCanvas className="rounded-lg">
+                    <LiveCard
+                      member={previewCard.member}
+                      cardMeta={previewCard.cardMeta!}
+                      tenant={tenant}
+                      standalone={true}
+                      className="h-full w-full"
+                    />
+                  </CardCanvas>
+                </div>
               </div>
               
               <div className="flex items-center justify-end gap-2 pt-4 border-t">

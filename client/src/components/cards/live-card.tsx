@@ -223,7 +223,7 @@ export function LiveCard({
                     className="h-6 w-auto mb-2 opacity-90"
                   />
                 )}
-                <h1 className="embossed-text text-lg font-bold uppercase tracking-wider">
+                <h1 className="embossed-text text-2xl font-bold uppercase tracking-wider">
                   {tenant.name}
                 </h1>
               </div>
@@ -255,8 +255,8 @@ export function LiveCard({
               </div>
             </div>
 
-            {/* QR Code - Central position */}
-            <div className="flex justify-center mb-6">
+            {/* QR Code - Left aligned */}
+            <div className="flex justify-start mb-6">
               <button
                 onClick={() => setShowQRModal(true)}
                 className="debossed-qr-container transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/50 hover:scale-105"
@@ -283,13 +283,13 @@ export function LiveCard({
                 <p className="embossed-text text-[clamp(10px,1.4vmin,12px)] uppercase tracking-wide opacity-80 mb-1">
                   NAAM
                 </p>
-                <h2 className="embossed-text text-[clamp(16px,2.2vmin,20px)] font-semibold uppercase tracking-wide leading-tight">
+                <h2 className="embossed-text text-[clamp(14px,1.8vmin,16px)] font-semibold uppercase tracking-wide leading-tight">
                   {member.firstName} {member.lastName}
                 </h2>
               </div>
 
               {/* Category and Status */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-2">
                 <div>
                   <p className="embossed-text text-[clamp(10px,1.4vmin,12px)] uppercase tracking-wide opacity-80 mb-1">
                     CATEGORIE
@@ -317,16 +317,16 @@ export function LiveCard({
 
             {/* Bottom right: Valid until */}
             <div className="flex-1 flex justify-end items-end">
-              {(
-                <div className="text-right">
-                  <p className="embossed-text text-[clamp(8px,1.2vmin,10px)] uppercase tracking-wide opacity-70 mb-1">
+              (
+                <div className="text-right flex items-center gap-2">
+                  <span className="embossed-text text-[clamp(8px,1.2vmin,10px)] uppercase tracking-wide opacity-70">
                     GELDIG TOT
-                  </p>
-                  <p className="embossed-text text-[clamp(10px,1.4vmin,12px)] font-medium font-mono tabular-nums">
+                  </span>
+                  <span className="embossed-text text-[clamp(10px,1.4vmin,12px)] font-medium font-mono tabular-nums">
                     {format(validUntil, 'dd-MM-yyyy', { locale: nl })}
-                  </p>
+                  </span>
                 </div>
-              )}
+              )
             </div>
           </div>
       </div>

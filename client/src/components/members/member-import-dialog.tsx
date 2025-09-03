@@ -566,7 +566,7 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-6xl max-h-[90vh]">
+      <DialogContent className="max-w-6xl max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Leden Importeren</DialogTitle>
           <DialogDescription>
@@ -574,7 +574,7 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs value={step} className="w-full">
+        <Tabs value={step} className="w-full flex-1 flex flex-col">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="upload" className="text-xs">Upload</TabsTrigger>
             <TabsTrigger value="validation" className="text-xs">Validatie</TabsTrigger>
@@ -725,7 +725,7 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
             </DialogFooter>
           </TabsContent>
 
-          <TabsContent value="importing" className="space-y-4">
+          <TabsContent value="importing" className="space-y-4 flex-1 flex flex-col">
             {showDuplicateConfirmation ? (
               // Show duplicate confirmation
               <div className="space-y-4">
@@ -818,7 +818,7 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
               </div>
             ) : importProgress === 0 ? (
               // Preview before import
-              <div className="space-y-4">
+              <div className="space-y-4 flex-1 flex flex-col">
                 <div>
                   <h3 className="text-lg font-semibold">Import Preview</h3>
                   <p className="text-sm text-gray-600">
@@ -826,7 +826,7 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
                   </p>
                 </div>
 
-                <div className="max-h-64 overflow-y-auto overflow-x-auto border rounded">
+                <div className="flex-1 overflow-auto border rounded">
                   <div className="min-w-max">
                     <Table>
                       <TableHeader>

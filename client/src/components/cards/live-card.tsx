@@ -129,9 +129,7 @@ export function LiveCard({
   const validUntil = cardMeta.validUntil || new Date(currentYear, 11, 31);
 
   return (
-    <div className={cn("w-full h-full relative overflow-hidden flex items-center justify-center", standalone ? "" : "min-h-screen p-4 sm:p-6", className)} style={!standalone ? {
-      background: `radial-gradient(circle at 50% 40%, #0B2440 0%, #0E3A6E 45%, #0B2440 100%), radial-gradient(circle at 50% 50%, transparent 40%, rgba(0,0,0,0.3) 100%), linear-gradient(135deg, rgba(255,255,255,0.02) 0%, transparent 50%, rgba(0,0,0,0.05) 100%)`
-    } : {}}>
+    <div className={cn("w-full h-full relative overflow-hidden flex items-center justify-center", className)}>
       {/* PWA Install Banner */}
       {isInstallable && !standalone && (
         <div className="fixed top-4 left-4 right-4 bg-blue-600 text-white p-3 rounded-lg shadow-lg z-10">
@@ -145,7 +143,7 @@ export function LiveCard({
       )}
 
       {/* Live Card - Credit card aspect ratio */}
-      <div className="w-[min(92vw,70vh*1.586)] sm:w-[min(94vw,94vh*1.586)] lg:w-[clamp(540px,70vmin,860px)] aspect-[1586/1000]">
+      <div className="w-full h-full aspect-[1586/1000]">
         <div 
           className="card-gradient relative w-full h-full rounded-3xl overflow-hidden border border-white/10 card-font"
           style={{

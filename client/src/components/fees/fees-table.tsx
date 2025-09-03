@@ -63,7 +63,7 @@ export function FeesTable({
 
   const SortableHeader = ({ field, children }: { field: string; children: React.ReactNode }) => (
     <TableHead 
-      className="cursor-pointer hover:bg-gray-50 select-none"
+      className="sticky top-0 px-6 py-3 text-left text-xs font-medium text-[#65758b] bg-[#f3f4f6] font-poppins uppercase tracking-wider cursor-pointer hover:bg-gray-200 select-none"
       onClick={() => onSort?.(field)}
     >
       <div className="flex items-center gap-2">
@@ -93,7 +93,7 @@ export function FeesTable({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-12">
+              <TableHead className="sticky top-0 w-12 px-6 py-3 text-left text-xs font-medium text-[#65758b] bg-[#f3f4f6] font-poppins uppercase tracking-wider">
                 <Checkbox
                   checked={isAllSelected}
                   ref={(el) => {
@@ -110,7 +110,7 @@ export function FeesTable({
               <SortableHeader field="method">Methode</SortableHeader>
               <SortableHeader field="status">Status</SortableHeader>
               <SortableHeader field="paidAt">Betaald op</SortableHeader>
-              <TableHead className="w-16">Acties</TableHead>
+              <TableHead className="sticky top-0 w-16 px-6 py-3 text-right text-xs font-medium text-[#65758b] bg-[#f3f4f6] font-poppins uppercase tracking-wider">Acties</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

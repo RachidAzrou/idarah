@@ -83,6 +83,7 @@ export function MemberDetailDialog({ member, open, onClose, onEdit }: MemberDeta
             </TabsTrigger>
           </TabsList>
 
+          <div className="min-h-[400px]">
           <TabsContent value="personal" className="space-y-3">
             <div className="space-y-3">
               <h4 className="font-medium flex items-center gap-2 text-sm">
@@ -236,6 +237,7 @@ export function MemberDetailDialog({ member, open, onClose, onEdit }: MemberDeta
               </div>
             </div>
           </TabsContent>
+          </div>
         </Tabs>
 
       </DialogContent>

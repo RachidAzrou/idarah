@@ -53,9 +53,9 @@
 
 /* Debossed QR code effect - looks pressed into the card */
 .debossed-qr-container {
-  width: 80px;
-  height: 80px;
-  padding: 8px;
+  width: 100px;
+  height: 100px;
+  padding: 10px;
   border-radius: 12px;
   background: rgba(0, 0, 0, 0.1);
   box-shadow: 

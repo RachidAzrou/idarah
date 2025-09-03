@@ -297,12 +297,12 @@ export function LiveCard({
                   className="debossed-qr-container transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/50 hover:scale-105"
                   data-testid="qr-plate"
                   aria-label="Toon scanbare QR code"
-                  style={{ minWidth: '80px', minHeight: '80px' }}
+                  style={{ minWidth: '100px', minHeight: '100px' }}
                 >
                   <div className="debossed-qr-frame">
                     <QRCodeSVG
                       value={qrCodeUrl}
-                      size={56}
+                      size={70}
                       className="debossed-qr"
                       fgColor="rgba(255,255,255,0.2)"
                       bgColor="transparent"

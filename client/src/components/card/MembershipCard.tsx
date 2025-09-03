@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { RefreshCw, Wifi, WifiOff, Clock } from "lucide-react";
+import { GoVerified } from "react-icons/go";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
@@ -154,64 +155,80 @@ export function MembershipCard({
         {/* Card Content */}
         <div className="relative h-full p-6 flex flex-col text-white">
           {/* Top row: Organization and Status */}
-          <div className="flex items-start justify-between mb-4">
+          <div className="flex items-start justify-between mb-6">
             <div className="flex-1">
               {cardData.tenant.logoUrl && (
                 <img 
                   src={cardData.tenant.logoUrl} 
                   alt={cardData.tenant.name}
-                  className="h-5 w-auto mb-1 opacity-90"
+                  className="h-6 w-auto mb-2 opacity-90"
                 />
               )}
-              <h1 className="embossed-text text-sm font-medium uppercase tracking-widest">
+              <h1 className="embossed-text text-lg font-bold uppercase tracking-wider">
                 {cardData.tenant.name}
               </h1>
             </div>
             
-            <div className="flex items-center gap-3">
+            <div className="flex items-start gap-3">
               <StatusLED status={displayStatus} />
+              {cardData.badges.includes("Stemgerechtigd") && (
+                <div className="flex flex-col items-center ml-4">
+                  <GoVerified 
+                    className="w-8 h-8 text-white/70 debossed-icon"
+                    data-testid="voting-icon"
+                  />
+                  <span className="embossed-text text-[10px] uppercase tracking-wide mt-1 opacity-80">
+                    STEMGERECHTIGD
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Member Name - Prominent */}
-          <div className="mb-6">
-            <h2 className="embossed-text text-[clamp(18px,2.6vmin,28px)] font-semibold uppercase tracking-wide leading-tight">
-              {cardData.firstName} {cardData.lastName}
-            </h2>
+          {/* QR Code - Central position */}
+          <div className="flex justify-center mb-6">
+            <button
+              onClick={() => setShowQRModal(true)}
+              className="debossed-qr-container transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/50 hover:scale-105"
+              data-testid="qr-plate"
+              aria-label="Toon scanbare QR code"
+              style={{ minWidth: '100px', minHeight: '100px' }}
+            >
+              <div className="debossed-qr-frame">
+                <QRCodeSVG
+                  value={qrCodeUrl}
+                  size={70}
+                  className="debossed-qr"
+                  fgColor="rgba(255,255,255,0.2)"
+                  bgColor="transparent"
+                />
+              </div>
+            </button>
           </div>
 
-          {/* Member Number */}
-          <div className="mb-6">
-            <p className="embossed-text text-[clamp(10px,1.4vmin,12px)] uppercase tracking-wide opacity-80 mb-1">
-              LIDNUMMER
-            </p>
-            <p className="embossed-text text-[clamp(12px,1.8vmin,16px)] font-medium font-mono tabular-nums">
-              {cardData.memberNumber}
-            </p>
-          </div>
+          {/* Member Information */}
+          <div className="mb-6 space-y-4">
+            {/* Member Name */}
+            <div>
+              <p className="embossed-text text-[clamp(10px,1.4vmin,12px)] uppercase tracking-wide opacity-80 mb-1">
+                NAAM
+              </p>
+              <h2 className="embossed-text text-[clamp(16px,2.2vmin,20px)] font-semibold uppercase tracking-wide leading-tight">
+                {cardData.firstName} {cardData.lastName}
+              </h2>
+            </div>
 
-          {/* Bottom row: Details and QR */}
-          <div className="flex-1 flex justify-between items-end">
-            {/* Left: Member details */}
-            <div className="flex-1 space-y-3">
-              {/* Category */}
+            {/* Category and Status */}
+            <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="embossed-text text-[clamp(10px,1.4vmin,12px)] uppercase tracking-wide opacity-80 mb-1">
                   CATEGORIE
                 </p>
-                <div className="flex items-center gap-2">
-                  <span className="embossed-text text-[clamp(11px,1.6vmin,14px)] font-medium">
-                    {getMemberCategoryLabel(cardData.category)}
-                  </span>
-                  {cardData.badges.includes("Stemgerechtigd") && (
-                    <span className="bg-white/15 text-white text-[10px] font-medium px-2 py-0.5 rounded-full uppercase tracking-wide">
-                      STEMGERECHTIGD
-                    </span>
-                  )}
-                </div>
+                <span className="embossed-text text-[clamp(11px,1.6vmin,14px)] font-medium">
+                  {getMemberCategoryLabel(cardData.category)}
+                </span>
               </div>
-
-              {/* Payment Status */}
+              
               <div>
                 <p className="embossed-text text-[clamp(10px,1.4vmin,12px)] uppercase tracking-wide opacity-80 mb-1">
                   STATUS
@@ -225,40 +242,21 @@ export function MembershipCard({
                   {cardData.badges.find(badge => badge.includes("Betaald")) || 'ONBETAALD'}
                 </span>
               </div>
-
-              {/* Valid until */}
-              {cardData.validUntil && (
-                <div>
-                  <p className="embossed-text text-[clamp(10px,1.4vmin,12px)] uppercase tracking-wide opacity-80 mb-1">
-                    GELDIG TOT
-                  </p>
-                  <p className="embossed-text text-[clamp(12px,1.8vmin,16px)] font-medium font-mono tabular-nums">
-                    {format(cardData.validUntil, 'dd-MM-yyyy', { locale: nl })}
-                  </p>
-                </div>
-              )}
             </div>
+          </div>
 
-            {/* Right: Debossed QR Code */}
-            <div className="flex flex-col items-center">
-              <button
-                onClick={() => setShowQRModal(true)}
-                className="debossed-qr-container transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/50 hover:scale-105"
-                data-testid="qr-plate"
-                aria-label="Toon scanbare QR code"
-                style={{ minWidth: '100px', minHeight: '100px' }}
-              >
-                <div className="debossed-qr-frame">
-                  <QRCodeSVG
-                    value={qrCodeUrl}
-                    size={70}
-                    className="debossed-qr"
-                    fgColor="rgba(255,255,255,0.2)"
-                    bgColor="transparent"
-                  />
-                </div>
-              </button>
-            </div>
+          {/* Bottom right: Valid until */}
+          <div className="flex-1 flex justify-end items-end">
+            {cardData.validUntil && (
+              <div className="text-right">
+                <p className="embossed-text text-[clamp(8px,1.2vmin,10px)] uppercase tracking-wide opacity-70 mb-1">
+                  GELDIG TOT
+                </p>
+                <p className="embossed-text text-[clamp(10px,1.4vmin,12px)] font-medium font-mono tabular-nums">
+                  {format(cardData.validUntil, 'dd-MM-yyyy', { locale: nl })}
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -211,20 +211,28 @@ export function MembershipCard({
             {/* Voting Rights Badge - Right side */}
             {(cardData.badges.includes("Stemgerechtigd") || true) && (
               <div className="flex flex-col items-center mr-8">
-                {/* Bold Gold Outline Icon */}
+                {/* Realistic Gold Icon */}
                 <GoVerified 
                   className={`${isConstrained ? 'w-12 h-12' : 'w-16 h-16'}`}
                   data-testid="voting-icon"
                   style={{
-                    color: 'transparent',
-                    WebkitTextStroke: '3px #D4AF37',
-                    textShadow: `
-                      0 0 5px rgba(212,175,55,0.8),
-                      0 0 10px rgba(212,175,55,0.5),
-                      0 0 15px rgba(212,175,55,0.3),
-                      2px 2px 6px rgba(0,0,0,0.5)
+                    color: '#B8860B',
+                    background: `
+                      radial-gradient(ellipse at 30% 20%, #DAA520 0%, transparent 50%),
+                      radial-gradient(ellipse at 70% 80%, #D4AF37 0%, transparent 50%),
+                      linear-gradient(135deg, #996515 0%, #B8860B 20%, #D4AF37 40%, #DAA520 60%, #B8860B 80%, #8B6914 100%)
                     `,
-                    filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.4)) brightness(1.2)'
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundSize: '150% 150%, 150% 150%, 300% 300%',
+                    textShadow: `
+                      1px 1px 0 #B8860B,
+                      2px 2px 0 #A0751A,
+                      3px 3px 0 #8B6914,
+                      4px 4px 8px rgba(0,0,0,0.6),
+                      0 0 15px rgba(255,215,0,0.4)
+                    `,
+                    filter: 'drop-shadow(2px 2px 6px rgba(0,0,0,0.4)) contrast(1.1) saturate(1.2)'
                   }}
                 />
                 

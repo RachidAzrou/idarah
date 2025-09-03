@@ -87,59 +87,67 @@ export function CardPage() {
 
   if (!params?.memberId) {
     return (
-      <CardCanvas>
-        <div className="h-full w-full flex items-center justify-center text-center text-white/80">
-          <div>
-            <h1 className="text-2xl font-bold mb-2">Geen lid geselecteerd</h1>
-            <p>Selecteer een lid om de digitale kaart te bekijken.</p>
-          </div>
+      <div className="min-h-screen w-full relative overflow-hidden flex items-center justify-center p-4 sm:p-6" style={{
+        background: `radial-gradient(circle at 50% 40%, #0B2440 0%, #0E3A6E 45%, #0B2440 100%), radial-gradient(circle at 50% 50%, transparent 40%, rgba(0,0,0,0.3) 100%), linear-gradient(135deg, rgba(255,255,255,0.02) 0%, transparent 50%, rgba(0,0,0,0.05) 100%)`
+      }}>
+        <div className="text-center text-white/80">
+          <h1 className="text-2xl font-bold mb-2">Geen lid geselecteerd</h1>
+          <p>Selecteer een lid om de digitale kaart te bekijken.</p>
         </div>
-      </CardCanvas>
+      </div>
     );
   }
 
   if (isLoading) {
     return (
-      <CardCanvas>
-        <div className="h-full w-full flex items-center justify-center text-center text-white/80">
-          <div>
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400 mx-auto mb-4"></div>
-            <p>Lidkaart laden...</p>
-          </div>
+      <div className="min-h-screen w-full relative overflow-hidden flex items-center justify-center p-4 sm:p-6" style={{
+        background: `radial-gradient(circle at 50% 40%, #0B2440 0%, #0E3A6E 45%, #0B2440 100%), radial-gradient(circle at 50% 50%, transparent 40%, rgba(0,0,0,0.3) 100%), linear-gradient(135deg, rgba(255,255,255,0.02) 0%, transparent 50%, rgba(0,0,0,0.05) 100%)`
+      }}>
+        <div className="text-center text-white/80">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400 mx-auto mb-4"></div>
+          <p>Lidkaart laden...</p>
         </div>
-      </CardCanvas>
+      </div>
     );
   }
 
   if (error || !data) {
     return (
-      <CardCanvas>
-        <div className="h-full w-full flex items-center justify-center text-center text-white/80">
-          <div>
-            <h1 className="text-2xl font-bold mb-2">Lidkaart niet gevonden</h1>
-            <p>De opgevraagde lidkaart bestaat niet of is niet beschikbaar.</p>
-          </div>
+      <div className="min-h-screen w-full relative overflow-hidden flex items-center justify-center p-4 sm:p-6" style={{
+        background: `radial-gradient(circle at 50% 40%, #0B2440 0%, #0E3A6E 45%, #0B2440 100%), radial-gradient(circle at 50% 50%, transparent 40%, rgba(0,0,0,0.3) 100%), linear-gradient(135deg, rgba(255,255,255,0.02) 0%, transparent 50%, rgba(0,0,0,0.05) 100%)`
+      }}>
+        <div className="text-center text-white/80">
+          <h1 className="text-2xl font-bold mb-2">Lidkaart niet gevonden</h1>
+          <p>De opgevraagde lidkaart bestaat niet of is niet beschikbaar.</p>
         </div>
-      </CardCanvas>
+      </div>
     );
   }
 
   return (
-    <CardCanvas>
+    <div className="min-h-screen w-full relative overflow-hidden flex items-center justify-center p-4 sm:p-6" style={{
+      background: `radial-gradient(circle at 50% 40%, #0B2440 0%, #0E3A6E 45%, #0B2440 100%), radial-gradient(circle at 50% 50%, transparent 40%, rgba(0,0,0,0.3) 100%), linear-gradient(135deg, rgba(255,255,255,0.02) 0%, transparent 50%, rgba(0,0,0,0.05) 100%)`
+    }}>
       <FullScreenButton />
-      <LiveCard
-        member={data.member}
-        cardMeta={data.cardMeta}
-        tenant={data.tenant}
-        onRefresh={handleRefresh}
-        isRefreshing={isLoading}
-        standalone={true}
-        className="h-full w-full"
-      />
+      <div className="relative aspect-[16/10] rounded-lg overflow-hidden border border-gray-200 w-[min(92vw,70vh*1.586)] sm:w-[min(94vw,94vh*1.586)] lg:w-[clamp(540px,70vmin,860px)]">
+        <div className="relative min-h-screen w-full overflow-hidden grid place-items-center bg-spotlight bg-vignette bg-sheen bg-grain bg-rimlight h-full p-4">
+          <div className="mx-auto aspect-[1586/1000] w-full h-auto relative z-10">
+            <LiveCard
+              member={data.member}
+              cardMeta={data.cardMeta}
+              tenant={data.tenant}
+              onRefresh={handleRefresh}
+              isRefreshing={isLoading}
+              standalone={true}
+              className="h-full w-full"
+            />
+          </div>
+        </div>
+      </div>
       <InstallCoach 
         isOpen={installCoach.isOpen} 
         onClose={installCoach.close} 
       />
-    </CardCanvas>
+    </div>
   );
 }

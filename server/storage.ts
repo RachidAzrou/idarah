@@ -273,6 +273,45 @@ export class DatabaseStorage implements IStorage {
     return permissions || undefined;
   }
 
+  // Duplicate detection methods
+  async getMemberByNumber(tenantId: string, memberNumber: string): Promise<Member | undefined> {
+    const [member] = await db.select().from(members).where(
+      and(eq(members.tenantId, tenantId), eq(members.memberNumber, memberNumber))
+    );
+    return member || undefined;
+  }
+
+  async getMemberByNameAndAddress(tenantId: string, firstName: string, lastName: string, street: string, number: string): Promise<Member | undefined> {
+    const [member] = await db.select().from(members).where(
+      and(
+        eq(members.tenantId, tenantId),
+        eq(members.firstName, firstName),
+        eq(members.lastName, lastName),
+        eq(members.street, street),
+        eq(members.number, number)
+      )
+    );
+    return member || undefined;
+  }
+
+  async getNextAvailableMemberNumber(tenantId: string, startFrom?: string): Promise<string> {
+    const existingNumbers = await db.select({ memberNumber: members.memberNumber })
+      .from(members)
+      .where(eq(members.tenantId, tenantId));
+    
+    const numberSet = new Set(existingNumbers.map(m => m.memberNumber));
+    
+    // Start from the suggested number or 1
+    let baseNumber = startFrom ? parseInt(startFrom) : 1;
+    
+    // Find next available number
+    while (numberSet.has(baseNumber.toString().padStart(4, '0'))) {
+      baseNumber++;
+    }
+    
+    return baseNumber.toString().padStart(4, '0');
+  }
+
   async createMemberPermissions(permissions: InsertMemberPermissions): Promise<MemberPermissions> {
     const [newPermissions] = await db.insert(memberPermissions).values(permissions).returning();
     return newPermissions;

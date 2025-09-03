@@ -26,7 +26,45 @@ interface CreateMemberResult {
   member?: Member;
 }
 
+interface DuplicateCheckResult {
+  hasDuplicates: boolean;
+  duplicateNumber?: Member;
+  duplicateNameAddress?: Member;
+  suggestedNumber?: string;
+}
+
 class MemberService {
+  async checkForDuplicates(tenantId: string, memberData: CreateMemberData & { memberNumber?: string }): Promise<DuplicateCheckResult> {
+    const result: DuplicateCheckResult = { hasDuplicates: false };
+
+    // Check for duplicate member number if provided
+    if (memberData.memberNumber) {
+      const existingByNumber = await storage.getMemberByNumber(tenantId, memberData.memberNumber);
+      if (existingByNumber) {
+        result.hasDuplicates = true;
+        result.duplicateNumber = existingByNumber;
+        result.suggestedNumber = await storage.getNextAvailableMemberNumber(tenantId, memberData.memberNumber);
+      }
+    }
+
+    // Check for duplicate name and address combination
+    if (memberData.street && memberData.number) {
+      const existingByNameAddress = await storage.getMemberByNameAndAddress(
+        tenantId,
+        memberData.firstName,
+        memberData.lastName,
+        memberData.street,
+        memberData.number
+      );
+      if (existingByNameAddress) {
+        result.hasDuplicates = true;
+        result.duplicateNameAddress = existingByNameAddress;
+      }
+    }
+
+    return result;
+  }
+
   async createMember(tenantId: string, memberData: CreateMemberData): Promise<CreateMemberResult> {
     try {
       // Generate unique member number

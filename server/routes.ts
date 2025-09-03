@@ -190,6 +190,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Check for duplicates endpoint
+  app.post("/api/members/check-duplicates", authMiddleware, tenantMiddleware, async (req, res) => {
+    try {
+      const memberData = req.body;
+      const duplicateCheck = await memberService.checkForDuplicates(req.tenantId!, memberData);
+      res.json(duplicateCheck);
+    } catch (error) {
+      console.error("Error checking duplicates:", error);
+      res.status(500).json({ message: "Failed to check for duplicates" });
+    }
+  });
+
   app.post("/api/members", authMiddleware, tenantMiddleware, async (req, res) => {
     try {
       // Transform the data to match expected format

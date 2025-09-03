@@ -132,11 +132,16 @@ export function LiveCard({
     <>
       <style dangerouslySetInnerHTML={{
         __html: `
-          .force-blue-gradient {
+          .live-card-container {
             background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 25%, #1d4ed8 50%, #2563eb 75%, #1e40af 100%) !important;
             font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif !important;
+            color: #EAF2FF !important;
           }
-          .force-blue-gradient .embossed-text {
+          .live-card-container * {
+            color: #EAF2FF !important;
+            font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif !important;
+          }
+          .live-card-container .embossed-text {
             color: #EAF2FF !important;
             text-shadow: 0 1px 0 rgba(255, 255, 255, 0.1), 0 -1px 0 rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.5) !important;
           }
@@ -147,9 +152,12 @@ export function LiveCard({
         {/* Live Card - Credit card aspect ratio */}
         <div className="w-full h-full aspect-[1586/1000]">
         <div 
-          className="force-blue-gradient relative w-full h-full rounded-3xl overflow-hidden border border-white/10 card-font"
+          className="live-card-container relative w-full h-full rounded-3xl overflow-hidden border border-white/10 card-font"
           style={{
-            boxShadow: `0 0 0 1px rgba(255,255,255,0.1) inset, 0 18px 40px rgba(0,0,0,0.35), 0 8px 20px rgba(0,0,0,0.25)`
+            background: `linear-gradient(135deg, #1e3a8a 0%, #3b82f6 25%, #1d4ed8 50%, #2563eb 75%, #1e40af 100%) !important`,
+            boxShadow: `0 0 0 1px rgba(255,255,255,0.1) inset, 0 18px 40px rgba(0,0,0,0.35), 0 8px 20px rgba(0,0,0,0.25)`,
+            fontFamily: `'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif !important`,
+            color: '#EAF2FF !important'
           }}
           data-testid="live-card"
         >

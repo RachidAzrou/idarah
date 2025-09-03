@@ -13,22 +13,22 @@ export default function RevenueChart() {
   
   const data = useMemo(() => {
     if (!Array.isArray(transactions)) {
-      // Toon 4 maanden voor huidig kwartaal
+      // Toon 3 maanden voor huidig trimester
       const result = [];
-      for (let i = 3; i >= 0; i--) {
+      for (let i = 2; i >= 0; i--) {
         const date = new Date();
-        date.setMonth(date.getMonth() - i + (quarterOffset * 4));
+        date.setMonth(date.getMonth() - i + (quarterOffset * 3));
         const monthName = date.toLocaleDateString('nl-BE', { month: 'short' });
         result.push({ month: monthName, revenue: 0 });
       }
       return result;
     }
     
-    // Bereken inkomsten voor 4 maanden van geselecteerd kwartaal
+    // Bereken inkomsten voor 3 maanden van geselecteerd trimester
     const monthlyRevenue = [];
-    for (let i = 3; i >= 0; i--) {
+    for (let i = 2; i >= 0; i--) {
       const date = new Date();
-      date.setMonth(date.getMonth() - i + (quarterOffset * 4));
+      date.setMonth(date.getMonth() - i + (quarterOffset * 3));
       const year = date.getFullYear();
       const month = date.getMonth();
       const monthName = date.toLocaleDateString('nl-BE', { month: 'short' });
@@ -59,7 +59,7 @@ export default function RevenueChart() {
   
   // Bepaal kwartaal label
   const currentQuarterDate = new Date();
-  currentQuarterDate.setMonth(currentQuarterDate.getMonth() + (quarterOffset * 4));
+  currentQuarterDate.setMonth(currentQuarterDate.getMonth() + (quarterOffset * 3));
   const year = currentQuarterDate.getFullYear();
   const month = currentQuarterDate.getMonth();
   const quarter = Math.floor(month / 3) + 1;

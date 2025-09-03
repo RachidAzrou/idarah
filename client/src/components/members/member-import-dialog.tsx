@@ -61,6 +61,7 @@ const MEMBER_TEMPLATE_HEADERS = [
   'Betalingsperiode*', // MONTHLY, YEARLY
   'Actief rol interesse', // JA, NEE
   'Rol beschrijving',
+  'Stemgerechtigd', // JA, NEE
   'Privacy akkoord*', // JA
   'Foto/video toestemming', // JA, NEE
   'Nieuwsbrief', // JA, NEE
@@ -86,6 +87,7 @@ const FIELD_MAPPING = {
   'Betalingsperiode*': 'paymentTerm',
   'Actief rol interesse': 'interestedInActiveRole',
   'Rol beschrijving': 'roleDescription',
+  'Stemgerechtigd': 'votingEligible',
   'Privacy akkoord*': 'privacyAgreement',
   'Foto/video toestemming': 'photoVideoConsent',
   'Nieuwsbrief': 'newsletterSubscription',
@@ -426,6 +428,9 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
       member.permissions.interestedInActiveRole = roleInterest === 'JA';
       member.permissions.roleDescription = row['Rol beschrijving'] || '';
 
+      const votingEligible = row['Stemgerechtigd']?.toUpperCase();
+      member.permissions.votingEligible = votingEligible === 'JA';
+
       // Permissions
       const privacyAgreement = row['Privacy akkoord*']?.toUpperCase();
       if (privacyAgreement !== 'JA') {
@@ -473,6 +478,7 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
           organization: {
             interestedInActiveRole: member.permissions.interestedInActiveRole,
             roleDescription: member.permissions.roleDescription || "",
+            votingEligible: member.permissions.votingEligible || false,
           },
           permissions: {
             privacyAgreement: member.permissions.privacyAgreement,

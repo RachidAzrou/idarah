@@ -214,42 +214,10 @@ export default function LidkaartenPage() {
   };
 
 
-  const handleShareCard = async (member: Member, cardMeta: CardMeta) => {
-    const cardUrl = `${window.location.origin}/card/${member.id}`;
-    
-    try {
-      // Try to use native share API if available
-      if (navigator.share) {
-        await navigator.share({
-          title: `Digitale Lidkaart - ${member.firstName} ${member.lastName}`,
-          text: 'Bekijk mijn digitale lidkaart. Je kunt deze als app installeren op je startscherm!',
-          url: cardUrl
-        });
-        
-        toast({ 
-          title: "Gedeeld", 
-          description: `Lidkaart URL is gedeeld.` 
-        });
-      } else {
-        // Fallback: copy to clipboard
-        await navigator.clipboard.writeText(cardUrl);
-        
-        toast({ 
-          title: "URL gekopieerd", 
-          description: `De lidkaart URL is gekopieerd naar je klembord. Deel deze om de kaart als PWA te installeren.` 
-        });
-      }
-    } catch (error) {
-      console.error('Delen mislukt:', error);
-      
-      // Ultimate fallback: show URL in alert
-      alert(`Lidkaart URL (kopieer en deel deze):\n${cardUrl}`);
-      
-      toast({ 
-        title: "URL beschikbaar", 
-        description: "De lidkaart URL is weergegeven. Kopieer en deel deze." 
-      });
-    }
+  const handleViewCard = (member: Member) => {
+    const cardUrl = `/card/${member.id}`;
+    // Open in new tab/window for PWA installation
+    window.open(cardUrl, '_blank');
   };
 
   const handleExport = () => {
@@ -526,12 +494,12 @@ export default function LidkaartenPage() {
                 </Button>
                 
                 <Button
-                  onClick={() => handleShareCard(previewCard.member, previewCard.cardMeta!)}
+                  onClick={() => handleViewCard(previewCard.member)}
                   variant="outline"
                   className="gap-2"
                 >
                   <Share className="h-4 w-4" />
-                  Delen
+                  PWA Bekijken
                 </Button>
                 
                 <Button

@@ -69,10 +69,10 @@
   width: 100%;
   height: 100%;
   border-radius: 6px;
-  background: linear-gradient(135deg, #B8860B 0%, #DAA520 25%, #CD853F 50%, #B8860B 100%);
+  background: rgba(0, 0, 0, 0.05);
   box-shadow: 
     inset 0 1px 2px rgba(0, 0, 0, 0.4),
-    0 0 0 1px rgba(255, 215, 0, 0.2);
+    0 0 0 1px rgba(255, 255, 255, 0.05);
   display: flex;
   align-items: center;
   justify-content: center;

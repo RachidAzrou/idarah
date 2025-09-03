@@ -564,7 +564,10 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
     }
   };
 
-  const handleImport = checkDuplicatesBeforeImport;
+  const handleImport = () => {
+    // Start duplicaat controle wanneer gebruiker expliciet op Importeren klikt
+    checkDuplicatesBeforeImport();
+  };
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
@@ -718,11 +721,7 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
                 Annuleren
               </Button>
               <Button 
-                onClick={() => {
-                  setStep('importing');
-                  // Start direct met duplicaat controle
-                  checkDuplicatesBeforeImport();
-                }}
+                onClick={() => setStep('importing')}
                 disabled={validationErrors.length > 0 || validMembers.length === 0}
                 className="gap-2"
               >

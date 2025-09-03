@@ -417,7 +417,7 @@ export function MemberForm({ member, onSuccess, onCancel }: MemberFormProps) {
                   disabled={isScanning}
                   variant="outline"
                   size="sm"
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 bg-[#b6d1fc] text-[#0053a6]"
                   data-testid="button-eid-scan"
                 >
                   <IdCard className="h-4 w-4" />
@@ -514,12 +514,100 @@ export function MemberForm({ member, onSuccess, onCancel }: MemberFormProps) {
                       <FormItem>
                         <FormLabel>Geboortedatum *</FormLabel>
                         <FormControl>
-                          <Input
-                            type="date"
-                            value={field.value ? new Date(field.value).toISOString().split('T')[0] : ""}
-                            onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : null)}
-                            data-testid="input-birthdate"
-                          />
+                          <div className="relative">
+                            <Input
+                              value={field.value ? format(field.value, "dd/MM/yyyy", { locale: nl }) : ""}
+                              onChange={(e) => {
+                                // Handle manual date input
+                                const inputValue = e.target.value;
+                                if (inputValue.length === 10) {
+                                  const [day, month, year] = inputValue.split('/');
+                                  if (day && month && year) {
+                                    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+                                    if (!isNaN(date.getTime())) {
+                                      field.onChange(date);
+                                    }
+                                  }
+                                }
+                              }}
+                              placeholder="DD/MM/YYYY"
+                              className="pr-10 border-gray-200"
+                              data-testid="input-birthdate"
+                              maxLength={10}
+                            />
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  type="button"
+                                  className="absolute right-2 top-2 h-6 w-6 p-1 hover:bg-transparent hover:scale-100 focus:bg-transparent active:bg-transparent transition-none transform-none"
+                                >
+                                  <CalendarIcon className="h-4 w-4" />
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-auto p-0" align="start" side="bottom">
+                                <div className="p-3 border-b">
+                                  <div className="flex items-center justify-between space-x-2">
+                                    <Select
+                                      value={field.value ? field.value.getMonth().toString() : ""}
+                                      onValueChange={(month) => {
+                                        const currentDate = field.value || new Date();
+                                        const newDate = new Date(currentDate.getFullYear(), parseInt(month), currentDate.getDate());
+                                        field.onChange(newDate);
+                                      }}
+                                    >
+                                      <SelectTrigger className="w-[120px] h-8">
+                                        <SelectValue placeholder="Maand" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        {Array.from({ length: 12 }, (_, i) => (
+                                          <SelectItem key={i} value={i.toString()}>
+                                            {format(new Date(2000, i, 1), "MMMM", { locale: nl })}
+                                          </SelectItem>
+                                        ))}
+                                      </SelectContent>
+                                    </Select>
+                                    <Select
+                                      value={field.value ? field.value.getFullYear().toString() : ""}
+                                      onValueChange={(year) => {
+                                        const currentDate = field.value || new Date();
+                                        const newDate = new Date(parseInt(year), currentDate.getMonth(), currentDate.getDate());
+                                        field.onChange(newDate);
+                                      }}
+                                    >
+                                      <SelectTrigger className="w-[80px] h-8">
+                                        <SelectValue placeholder="Jaar" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        {Array.from({ length: 100 }, (_, i) => {
+                                          const year = new Date().getFullYear() - i;
+                                          return (
+                                            <SelectItem key={year} value={year.toString()}>
+                                              {year}
+                                            </SelectItem>
+                                          );
+                                        })}
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                </div>
+                                <Calendar
+                                  mode="single"
+                                  selected={field.value}
+                                  onSelect={(date) => {
+                                    field.onChange(date);
+                                  }}
+                                  locale={nl}
+                                  month={field.value || new Date()}
+                                  onMonthChange={(month) => field.onChange(month)}
+                                  showOutsideDays={false}
+                                  className="p-3"
+                                  defaultMonth={new Date()}
+                                />
+                              </PopoverContent>
+                            </Popover>
+                          </div>
                         </FormControl>
                         <FormMessage />
                       </FormItem>

@@ -78,20 +78,28 @@ export function MemberDetailDialog({ member, open, onClose, onEdit }: MemberDeta
               </h4>
               <div className="grid grid-cols-2 gap-6 text-sm">
                 <div>
-                  <span className="text-gray-500">Voornaam</span>
-                  <p className="font-medium">{member.firstName}</p>
+                  <span className="text-gray-500">Naam</span>
+                  <p className="font-medium">{member.firstName} {member.lastName}</p>
                 </div>
                 <div>
-                  <span className="text-gray-500">Achternaam</span>
-                  <p className="font-medium">{member.lastName}</p>
+                  <span className="text-gray-500">Geslacht</span>
+                  <p className="font-medium">{member.gender || '-'}</p>
                 </div>
                 <div>
                   <span className="text-gray-500">Geboortedatum</span>
                   <p className="font-medium">{member.birthDate ? formatDateBE(member.birthDate) : '-'}</p>
                 </div>
                 <div>
-                  <span className="text-gray-500">Geslacht</span>
-                  <p className="font-medium">{member.gender || '-'}</p>
+                  <span className="text-gray-500">Categorie</span>
+                  <p className="font-medium">{getMemberCategoryLabel(member.category)}</p>
+                </div>
+                <div>
+                  <span className="text-gray-500">E-mail adres</span>
+                  <p className="font-medium">{member.email}</p>
+                </div>
+                <div>
+                  <span className="text-gray-500">Telefoon</span>
+                  <p className="font-medium">{member.phone || '-'}</p>
                 </div>
               </div>
             </div>
@@ -119,16 +127,8 @@ export function MemberDetailDialog({ member, open, onClose, onEdit }: MemberDeta
                 <Home className="h-4 w-4" />
                 Adresgegevens
               </h4>
-              <div className="grid grid-cols-2 gap-6 text-sm">
+              <div className="grid grid-cols-1 gap-6 text-sm">
                 <div>
-                  <span className="text-gray-500">E-mail</span>
-                  <p className="font-medium">{member.email}</p>
-                </div>
-                <div>
-                  <span className="text-gray-500">Telefoon</span>
-                  <p className="font-medium">{member.phone || '-'}</p>
-                </div>
-                <div className="col-span-2">
                   <span className="text-gray-500">Adres</span>
                   <div className="font-medium">
                     {(member.street || member.number) ? (
@@ -177,7 +177,7 @@ export function MemberDetailDialog({ member, open, onClose, onEdit }: MemberDeta
                 <CreditCard className="h-4 w-4" />
                 Financiële gegevens
               </h4>
-              <div className="grid grid-cols-3 gap-6 text-sm">
+              <div className="grid grid-cols-2 gap-6 text-sm">
                 <div>
                   <span className="text-gray-500">Betaalmethode</span>
                   <p className="font-medium">{member.financialSettings?.paymentMethod || 'SEPA'}</p>
@@ -187,20 +187,8 @@ export function MemberDetailDialog({ member, open, onClose, onEdit }: MemberDeta
                   <p className="font-medium font-mono">{member.financialSettings?.iban || '-'}</p>
                 </div>
                 <div>
-                  <span className="text-gray-500">Lidgeld</span>
-                  <p className="font-medium">{member.membershipFee ? formatCurrencyBE(member.membershipFee) : '-'}</p>
-                </div>
-                <div>
-                  <span className="text-gray-500">SEPA mandaat</span>
-                  <p className="font-medium">{member.hasSepaMandate ? 'Actief' : 'Niet actief'}</p>
-                </div>
-                <div>
-                  <span className="text-gray-500">Categorie</span>
-                  <p className="font-medium">{getMemberCategoryLabel(member.category)}</p>
-                </div>
-                <div>
-                  <span className="text-gray-500">Status</span>
-                  <p className="font-medium">{member.active ? 'Actief' : 'Inactief'}</p>
+                  <span className="text-gray-500">Betalingstermijn</span>
+                  <p className="font-medium">{member.financialSettings?.paymentTerm === 'MONTHLY' ? 'Maandelijks' : member.financialSettings?.paymentTerm === 'YEARLY' ? 'Jaarlijks' : '-'}</p>
                 </div>
               </div>
             </div>
@@ -212,20 +200,15 @@ export function MemberDetailDialog({ member, open, onClose, onEdit }: MemberDeta
                 <Building2 className="h-4 w-4" />
                 Organisatie gegevens
               </h4>
-              <div className="grid grid-cols-2 gap-6 text-sm">
+              <div className="grid grid-cols-1 gap-6 text-sm">
                 <div>
-                  <span className="text-gray-500">Lidnummer</span>
-                  <p className="font-mono font-medium">{member.memberNumber}</p>
-                </div>
-                <div>
-                  <span className="text-gray-500">Lid sinds</span>
-                  <p className="font-medium">{member.joinDate ? formatDateBE(member.joinDate) : '-'}</p>
-                </div>
-                <div className="col-span-2">
                   <span className="text-gray-500">Interesse in actieve rol</span>
                   <p className="font-medium">{member.permissions?.interestedInActiveRole ? 'Ja' : 'Nee'}</p>
-                  {member.permissions?.roleDescription && (
-                    <p className="text-sm text-gray-600 mt-1">{member.permissions.roleDescription}</p>
+                  {member.permissions?.interestedInActiveRole && member.permissions?.roleDescription && (
+                    <div className="mt-2">
+                      <span className="text-gray-500">Beschrijving</span>
+                      <p className="font-medium text-sm">{member.permissions.roleDescription}</p>
+                    </div>
                   )}
                 </div>
               </div>

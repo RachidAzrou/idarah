@@ -5,19 +5,43 @@ import { isDateInPeriod, isPeriodActive, isPeriodExpired } from '../fees/periods
 export type CardStatus = 'ACTUEEL' | 'NIET_ACTUEEL' | 'VERLOPEN';
 
 /**
- * Check if membership is expired based on validUntil date
- * VERLOPEN = validUntil date has passed
+ * Check if membership is expired based on validUntil date and payment timing rules
+ * VERLOPEN = validUntil date has passed OR yearly member failed to pay within 1 month
  */
 export async function isMembershipExpired(memberId: string): Promise<boolean> {
   try {
     const fees = await storage.getMembershipFeesByMember(memberId);
-    if (fees.length === 0) {
-      return false; // No fees = not expired, just no data
+    const member = await storage.getMember(memberId);
+    const memberFinancial = await storage.getMemberFinancialSettings(memberId);
+    
+    if (fees.length === 0 || !member || !memberFinancial) {
+      return false; // No data = not expired
     }
     
     const now = nowBE();
     
-    // Find the latest PAID period to determine validUntil
+    // Check yearly payment timing rules
+    if (memberFinancial.paymentTerm === 'YEARLY') {
+      // For yearly members: check if current period payment is overdue by more than 1 month
+      const currentPeriod = fees.find(fee => {
+        const periodStart = toBEDate(fee.periodStart);
+        const periodEnd = toBEDate(fee.periodEnd);
+        return now >= periodStart && now <= periodEnd;
+      });
+      
+      if (currentPeriod && currentPeriod.status !== 'PAID') {
+        const periodStart = toBEDate(currentPeriod.periodStart);
+        const paymentDeadline = new Date(periodStart);
+        paymentDeadline.setMonth(paymentDeadline.getMonth() + 1); // 1 month to pay
+        
+        // If payment deadline passed and still not paid, membership is expired
+        if (now > paymentDeadline) {
+          return true;
+        }
+      }
+    }
+    
+    // Standard rule: check if validUntil date has passed
     const paidFees = fees.filter(fee => fee.status === 'PAID');
     
     if (paidFees.length === 0) {

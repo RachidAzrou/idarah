@@ -180,9 +180,18 @@ export function MemberForm({ member, onSuccess, onCancel }: MemberFormProps) {
 
   const createMemberMutation = useMutation({
     mutationFn: async (data: MemberFormData) => {
+      // Transform data for backend compatibility
+      const transformedData = {
+        ...data,
+        // Convert Date object to ISO string for backend
+        birthDate: data.dateOfBirth ? data.dateOfBirth.toISOString() : undefined,
+        // Remove the frontend-only dateOfBirth field
+        dateOfBirth: undefined,
+      };
+      
       const method = member ? "PATCH" : "POST";
       const url = member ? `/api/members/${member.id}` : "/api/members";
-      const response = await apiRequest(method, url, data);
+      const response = await apiRequest(method, url, transformedData);
       return response.json();
     },
     onSuccess: async (newMember, variables) => {

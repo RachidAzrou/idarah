@@ -1,7 +1,10 @@
-/* Premium light stage background for digital membership cards - Apple Wallet style */
+/* Premium studio background for digital membership cards */
 
 .bg-spotlight {
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%);
+  background-image: url('@assets/studio-background-concept-dark-gradient-purple-studio-room-background-product_1756899349692.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .bg-vignette {
@@ -12,7 +15,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 50% 50%, transparent 60%, rgba(148, 163, 184, 0.1) 100%);
+  background: radial-gradient(circle at 50% 50%, transparent 40%, rgba(0, 0, 0, 0.1) 100%);
   pointer-events: none;
   z-index: 1;
 }
@@ -25,7 +28,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, transparent 50%, rgba(255, 255, 255, 0.2) 100%);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, transparent 50%, rgba(255, 255, 255, 0.03) 100%);
   pointer-events: none;
   z-index: 2;
 }
@@ -57,9 +60,9 @@
   left: 50%;
   width: 120%;
   height: 80%;
-  background: radial-gradient(ellipse, rgba(59, 130, 246, 0.08) 0%, transparent 70%);
+  background: radial-gradient(ellipse, rgba(139, 92, 246, 0.12) 0%, transparent 70%);
   transform: translate(-50%, -50%);
-  filter: blur(60px);
+  filter: blur(50px);
   pointer-events: none;
   z-index: 0;
 }

@@ -186,7 +186,7 @@ export function MembersTable({
                 />
               </TableHead>
               <TableHead 
-                className="cursor-pointer hover:bg-gray-50"
+                className="cursor-pointer hover:bg-[#f9fafb]"
                 onClick={() => handleSort('memberNumber')}
               >
                 <div className="flex items-center gap-2">
@@ -195,7 +195,7 @@ export function MembersTable({
                 </div>
               </TableHead>
               <TableHead 
-                className="cursor-pointer hover:bg-gray-50"
+                className="cursor-pointer hover:bg-[#f9fafb]"
                 onClick={() => handleSort('lastName')}
               >
                 <div className="flex items-center gap-2">
@@ -213,7 +213,7 @@ export function MembersTable({
                 Categorie
               </TableHead>
               <TableHead 
-                className="cursor-pointer hover:bg-gray-50"
+                className="cursor-pointer hover:bg-[#f9fafb]"
                 onClick={() => handleSort('createdAt')}
               >
                 <div className="flex items-center gap-2">

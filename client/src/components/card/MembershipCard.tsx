@@ -212,14 +212,14 @@ export function MembershipCard({
           <div className="mb-6 space-y-4">
             {/* Member Name */}
             <div>
-              <p className="embossed-text text-[clamp(10px,1.4vmin,12px)] uppercase tracking-wide opacity-80 mb-1">
+              <p className="embossed-text text-[clamp(12px,1.6vmin,14px)] uppercase tracking-wide opacity-80 mb-1 font-medium">
                 NAAM
               </p>
               <h2 className="embossed-text text-[clamp(14px,1.8vmin,16px)] font-semibold uppercase tracking-wide leading-tight">
                 {cardData.firstName} {cardData.lastName}
               </h2>
               <div className="mt-3">
-                <p className="embossed-text text-[clamp(8px,1.2vmin,10px)] uppercase tracking-wide opacity-60 mb-1">
+                <p className="embossed-text text-[clamp(12px,1.6vmin,14px)] uppercase tracking-wide opacity-80 mb-1 font-medium">
                   LIDNUMMER
                 </p>
                 <p className="embossed-text text-[clamp(14px,1.8vmin,16px)] font-mono font-bold tracking-[0.2em] leading-tight">
@@ -230,10 +230,10 @@ export function MembershipCard({
 
             {/* Category */}
             <div>
-              <p className="embossed-text text-[clamp(10px,1.4vmin,12px)] uppercase tracking-wide opacity-80 mb-1">
+              <p className="embossed-text text-[clamp(12px,1.6vmin,14px)] uppercase tracking-wide opacity-80 mb-1 font-medium">
                 CATEGORIE
               </p>
-              <span className="embossed-text text-[clamp(14px,1.8vmin,16px)] font-medium">
+              <span className="embossed-text text-[clamp(14px,1.8vmin,16px)] font-medium uppercase">
                 {getMemberCategoryLabel(cardData.category)}
               </span>
             </div>

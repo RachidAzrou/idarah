@@ -25,7 +25,7 @@ import {
   Clock,
   MoreHorizontal,
   Plus,
-  Download
+  Share
 } from "lucide-react";
 import { CiExport } from "react-icons/ci";
 import { format } from "date-fns";
@@ -214,55 +214,40 @@ export default function LidkaartenPage() {
   };
 
 
-  const handleDownloadCard = async (member: Member, cardMeta: CardMeta) => {
+  const handleShareCard = async (member: Member, cardMeta: CardMeta) => {
+    const cardUrl = `${window.location.origin}/card/${member.id}`;
+    
     try {
-      // Create a temporary container for the card
-      const cardContainer = document.createElement('div');
-      cardContainer.style.position = 'fixed';
-      cardContainer.style.top = '-9999px';
-      cardContainer.style.left = '-9999px';
-      cardContainer.style.width = '800px';
-      cardContainer.style.height = '500px';
-      document.body.appendChild(cardContainer);
-
-      // Import html2canvas dynamically
-      const html2canvas = (await import('html2canvas')).default;
-      
-      // Find the actual card element
-      const cardElement = document.querySelector('[data-testid="live-card"]') as HTMLElement;
-      if (!cardElement) {
-        throw new Error('Kaart element niet gevonden');
+      // Try to use native share API if available
+      if (navigator.share) {
+        await navigator.share({
+          title: `Digitale Lidkaart - ${member.firstName} ${member.lastName}`,
+          text: 'Bekijk mijn digitale lidkaart. Je kunt deze als app installeren op je startscherm!',
+          url: cardUrl
+        });
+        
+        toast({ 
+          title: "Gedeeld", 
+          description: `Lidkaart URL is gedeeld.` 
+        });
+      } else {
+        // Fallback: copy to clipboard
+        await navigator.clipboard.writeText(cardUrl);
+        
+        toast({ 
+          title: "URL gekopieerd", 
+          description: `De lidkaart URL is gekopieerd naar je klembord. Deel deze om de kaart als PWA te installeren.` 
+        });
       }
-
-      // Take screenshot of the card
-      const canvas = await html2canvas(cardElement, {
-        backgroundColor: null,
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-      });
-
-      // Clean up
-      document.body.removeChild(cardContainer);
-
-      // Create download link
-      const link = document.createElement('a');
-      link.download = `lidkaart-${member.firstName}-${member.lastName}-${member.memberNumber}.png`;
-      link.href = canvas.toDataURL('image/png');
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      toast({ 
-        title: "Download voltooid", 
-        description: `Lidkaart van ${member.firstName} ${member.lastName} is gedownload.` 
-      });
     } catch (error) {
-      console.error('Download fout:', error);
+      console.error('Delen mislukt:', error);
+      
+      // Ultimate fallback: show URL in alert
+      alert(`Lidkaart URL (kopieer en deel deze):\n${cardUrl}`);
+      
       toast({ 
-        title: "Download mislukt", 
-        description: "Er ging iets fout bij het downloaden van de kaart.", 
-        variant: "destructive" 
+        title: "URL beschikbaar", 
+        description: "De lidkaart URL is weergegeven. Kopieer en deel deze." 
       });
     }
   };
@@ -541,12 +526,12 @@ export default function LidkaartenPage() {
                 </Button>
                 
                 <Button
-                  onClick={() => handleDownloadCard(previewCard.member, previewCard.cardMeta!)}
+                  onClick={() => handleShareCard(previewCard.member, previewCard.cardMeta!)}
                   variant="outline"
                   className="gap-2"
                 >
-                  <Download className="h-4 w-4" />
-                  Downloaden
+                  <Share className="h-4 w-4" />
+                  Delen
                 </Button>
                 
                 <Button

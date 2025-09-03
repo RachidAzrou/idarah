@@ -50,7 +50,7 @@ export function InstallCoach({ isOpen, onClose }: InstallCoachProps) {
   const { canPrompt, promptInstall } = useA2HS();
 
   // Select platform-specific instructions
-  let steps: string[] = [];
+  let steps: readonly string[] = [];
   switch (platform) {
     case "ios-safari":
       steps = installMessages.ios;

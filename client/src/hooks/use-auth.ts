@@ -82,7 +82,7 @@ export function useAuth(): AuthState {
       await loginMutation.mutateAsync({ email, password });
       return { success: true };
     } catch (error: any) {
-      return { success: false, message: error.message || "Login mislukt" };
+      return { success: false, message: error.message || "Inloggen mislukt. Controleer uw gegevens." };
     }
   };
 

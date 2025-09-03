@@ -23,14 +23,14 @@ export const quickAuthMiddleware = (req: Request, res: Response, next: NextFunct
     const authHeader = req.headers.authorization;
     
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ error: 'Authenticatie vereist' });
+      return res.status(401).json({ error: 'Inloggen vereist. Log eerst in.' });
     }
 
     const token = authHeader.substring(7); // Remove 'Bearer ' prefix
     const tokenData = verifyTokens.get(token);
 
     if (!tokenData) {
-      return res.status(401).json({ error: 'Ongeldig of verlopen authenticatie token' });
+      return res.status(401).json({ error: 'Uw sessie is verlopen. Log opnieuw in.' });
     }
 
     // Check token age (2 hours max)
@@ -39,7 +39,7 @@ export const quickAuthMiddleware = (req: Request, res: Response, next: NextFunct
     
     if (hoursPassed > 2) {
       verifyTokens.delete(token);
-      return res.status(401).json({ error: 'Authenticatie token verlopen' });
+      return res.status(401).json({ error: 'Inlogtijd verlopen. Log opnieuw in.' });
     }
 
     // Check role permissions
@@ -55,7 +55,7 @@ export const quickAuthMiddleware = (req: Request, res: Response, next: NextFunct
 
     next();
   } catch (error) {
-    res.status(401).json({ error: 'Ongeldige authenticatie' });
+    res.status(401).json({ error: 'Inloggen mislukt. Probeer opnieuw.' });
   }
 };
 

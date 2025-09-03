@@ -17,16 +17,16 @@ class AuthService {
     try {
       const user = await storage.getUserByEmail(email);
       if (!user) {
-        return { success: false, message: "Ongeldig e-mailadres of wachtwoord" };
+        return { success: false, message: "E-mailadres niet gevonden. Controleer uw inloggegevens." };
       }
 
       if (!user.active) {
-        return { success: false, message: "Account is gedeactiveerd" };
+        return { success: false, message: "Dit account is uitgeschakeld. Neem contact op met de beheerder." };
       }
 
       const isValidPassword = await bcrypt.compare(password, user.passwordHash);
       if (!isValidPassword) {
-        return { success: false, message: "Ongeldig e-mailadres of wachtwoord" };
+        return { success: false, message: "Wachtwoord is niet correct. Probeer opnieuw." };
       }
 
       const token = this.generateToken(user.id);
@@ -39,7 +39,7 @@ class AuthService {
       };
     } catch (error) {
       console.error("Login error:", error);
-      return { success: false, message: "Er is een fout opgetreden tijdens het inloggen" };
+      return { success: false, message: "Inloggen mislukt. Probeer het later opnieuw." };
     }
   }
 

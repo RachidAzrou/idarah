@@ -32,7 +32,7 @@ export default function Login() {
       });
       setLocation("/dashboard");
     } else {
-      setError(result.message || "Login mislukt");
+      setError(result.message || "Inloggen mislukt. Controleer uw gegevens.");
     }
     
     setIsLoading(false);

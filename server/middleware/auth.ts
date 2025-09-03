@@ -15,19 +15,19 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ message: "Geen geldige authenticatie" });
+      return res.status(401).json({ message: "Inloggen vereist. Log eerst in." });
     }
 
     const token = authHeader.substring(7);
     const decoded = authService.verifyToken(token);
     
     if (!decoded) {
-      return res.status(401).json({ message: "Ongeldig token" });
+      return res.status(401).json({ message: "Uw sessie is verlopen. Log opnieuw in." });
     }
 
     const user = await storage.getUser(decoded.userId);
     if (!user || !user.active) {
-      return res.status(401).json({ message: "Gebruiker niet gevonden of inactief" });
+      return res.status(401).json({ message: "Account niet gevonden. Neem contact op met de beheerder." });
     }
 
     req.user = user;
@@ -35,6 +35,6 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
     next();
   } catch (error) {
     console.error('Auth middleware error:', error);
-    res.status(401).json({ message: "Authenticatie mislukt" });
+    res.status(401).json({ message: "Inloggen mislukt. Probeer opnieuw." });
   }
 }

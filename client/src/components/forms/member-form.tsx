@@ -65,6 +65,7 @@ const memberSchema = z.object({
   organization: z.object({
     interestedInActiveRole: z.boolean().default(false),
     roleDescription: z.string().optional(),
+    votingEligible: z.boolean().default(false),
   }),
   permissions: z.object({
     privacyAgreement: z.boolean().refine(val => val === true, "Akkoord met privacyverklaring is verplicht"),
@@ -130,6 +131,7 @@ export function MemberForm({ member, onSuccess, onCancel }: MemberFormProps) {
         organization: {
           interestedInActiveRole: member.permissions?.interestedInActiveRole || false,
           roleDescription: member.permissions?.roleDescription || '',
+          votingEligible: false,
         },
         permissions: {
           privacyAgreement: member.permissions?.privacyAgreement || false,
@@ -162,6 +164,7 @@ export function MemberForm({ member, onSuccess, onCancel }: MemberFormProps) {
       organization: {
         interestedInActiveRole: false,
         roleDescription: '',
+        votingEligible: false,
       },
       permissions: {
         privacyAgreement: false,
@@ -774,6 +777,34 @@ export function MemberForm({ member, onSuccess, onCancel }: MemberFormProps) {
                             className={!form.watch("organization.interestedInActiveRole") ? "bg-gray-100 text-gray-400" : ""}
                             data-testid="input-role-description" 
                           />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="organization.votingEligible"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Stemgerechtigd?</FormLabel>
+                        <FormControl>
+                          <RadioGroup
+                            onValueChange={(value) => field.onChange(value === "true")}
+                            value={field.value ? "true" : "false"}
+                            className="flex gap-6"
+                            data-testid="radio-voting-eligible"
+                          >
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="true" id="voting-yes" />
+                              <Label htmlFor="voting-yes">Ja</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="false" id="voting-no" />
+                              <Label htmlFor="voting-no">Nee</Label>
+                            </div>
+                          </RadioGroup>
                         </FormControl>
                         <FormMessage />
                       </FormItem>

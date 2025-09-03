@@ -14,7 +14,8 @@ import {
   HelpCircle,
   Menu,
   ChevronDown,
-  IdCard
+  IdCard,
+  User
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -119,7 +120,13 @@ export default function Navbar() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuItem onClick={logout}>
+                <DropdownMenuItem asChild>
+                  <Link href="/profiel" className="flex items-center gap-x-2" data-testid="profile-link">
+                    <User className="h-4 w-4" />
+                    Mijn Profiel
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={logout} data-testid="logout-button">
                   Uitloggen
                 </DropdownMenuItem>
               </DropdownMenuContent>

@@ -78,6 +78,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ user: req.user });
   });
 
+  // Profile routes
+  app.put("/api/profile", authMiddleware, async (req, res) => {
+    try {
+      const { name, email } = req.body;
+      
+      if (!name || !email) {
+        return res.status(400).json({ message: "Naam en email zijn verplicht" });
+      }
+
+      // Check if email is already taken by another user
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser && existingUser.id !== req.user!.id) {
+        return res.status(409).json({ message: "Dit email adres is al in gebruik" });
+      }
+
+      const updatedUser = await storage.updateUser(req.user!.id, { name, email });
+      res.json(updatedUser);
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      res.status(500).json({ message: "Er is een fout opgetreden bij het bijwerken van uw profiel" });
+    }
+  });
+
+  app.put("/api/profile/password", authMiddleware, async (req, res) => {
+    try {
+      const { currentPassword, newPassword } = req.body;
+      
+      if (!currentPassword || !newPassword) {
+        return res.status(400).json({ message: "Huidig en nieuw wachtwoord zijn verplicht" });
+      }
+
+      if (newPassword.length < 6) {
+        return res.status(400).json({ message: "Nieuw wachtwoord moet minimaal 6 karakters zijn" });
+      }
+
+      // Verify current password using auth service
+      const loginResult = await authService.login(req.user!.email, currentPassword);
+      if (!loginResult.success) {
+        return res.status(400).json({ message: "Huidig wachtwoord is incorrect" });
+      }
+
+      // Update password hash using auth service
+      const hashedPassword = await authService.hashPassword(newPassword);
+      await storage.updateUser(req.user!.id, { passwordHash: hashedPassword });
+      res.json({ message: "Wachtwoord succesvol gewijzigd" });
+    } catch (error) {
+      console.error("Error changing password:", error);
+      res.status(500).json({ message: "Er is een fout opgetreden bij het wijzigen van het wachtwoord" });
+    }
+  });
+
   // Dashboard stats
   app.get("/api/dashboard/stats", authMiddleware, tenantMiddleware, async (req, res) => {
     try {
@@ -442,7 +493,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // Generate a new temporary password
       const newPassword = Math.random().toString(36).slice(-8);
-      await storage.updateUser(req.params.id, { password: newPassword });
+      const hashedPassword = await authService.hashPassword(newPassword);
+      await storage.updateUser(req.params.id, { passwordHash: hashedPassword });
       
       // In a real app, you would send this via email
       res.json({ 

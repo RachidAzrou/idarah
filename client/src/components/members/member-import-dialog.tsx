@@ -15,6 +15,7 @@ import { CiImport } from "react-icons/ci";
 import { MdDownloading } from "react-icons/md";
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+import { apiRequest } from '@/lib/queryClient';
 
 interface MemberImportDialogProps {
   open: boolean;
@@ -486,11 +487,7 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
 
   const checkForDuplicates = async (memberData: any) => {
     try {
-      const response = await fetch('/api/members/check-duplicates', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(memberData)
-      });
+      const response = await apiRequest('POST', '/api/members/check-duplicates', memberData);
       return await response.json();
     } catch (error) {
       console.error('Error checking duplicates:', error);

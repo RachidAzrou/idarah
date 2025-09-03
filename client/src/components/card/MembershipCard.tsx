@@ -217,22 +217,16 @@ export function MembershipCard({
                   data-testid="voting-icon"
                   style={{
                     color: '#C0C0C0',
-                    background: 'linear-gradient(135deg, #A8A8A8 0%, #E0E0E0 25%, #F5F5F5 50%, #E0E0E0 75%, #808080 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundSize: '200% 200%',
-                    animation: 'goldShimmer 3s ease-in-out infinite',
                     textShadow: `
-                      2px 2px 0 rgba(255,255,255,0.6),
+                      2px 2px 0 rgba(255,255,255,0.5),
                       -2px -2px 0 rgba(0,0,0,0.8),
                       -3px -3px 0 rgba(0,0,0,0.6),
                       -4px -4px 0 rgba(0,0,0,0.4),
                       -5px -5px 0 rgba(0,0,0,0.2),
                       inset 3px 3px 6px rgba(0,0,0,0.7),
-                      0 0 15px rgba(192,192,192,0.5),
-                      0 0 25px rgba(255,255,255,0.3)
+                      0 0 8px rgba(192,192,192,0.4)
                     `,
-                    filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.4)) brightness(1.2) contrast(1.1)'
+                    filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.4))'
                   }}
                 />
                 
@@ -240,9 +234,13 @@ export function MembershipCard({
                 <span 
                   className={`${isConstrained ? 'text-xs' : 'text-sm'} uppercase tracking-[0.1em] font-bold mt-3`}
                   style={{
-                    color: '#D4AF37',
-                    textShadow: `1px 1px 1px rgba(0,0,0,0.4)`,
-                    filter: 'drop-shadow(0.5px 0.5px 0.5px rgba(0,0,0,0.3))'
+                    color: '#C0C0C0',
+                    textShadow: `
+                      1px 1px 0 rgba(255,255,255,0.4),
+                      -1px -1px 0 rgba(0,0,0,0.6),
+                      0 0 6px rgba(192,192,192,0.3)
+                    `,
+                    filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.3))'
                   }}
                 >
                   STEMGERECHTIGD

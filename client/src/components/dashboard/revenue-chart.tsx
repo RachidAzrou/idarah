@@ -105,7 +105,7 @@ export default function RevenueChart() {
         </div>
       </div>
       <div className="relative">
-        <h4 className="text-lg font-semibold text-gray-900 mb-4 text-center">{periodLabel}</h4>
+        <h4 className="text-lg font-semibold mb-4 text-center text-[#2463eb]">{periodLabel}</h4>
         <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={data}>

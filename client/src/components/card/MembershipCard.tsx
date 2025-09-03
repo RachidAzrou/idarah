@@ -248,13 +248,13 @@ export function MembershipCard({
           {/* Bottom right: Valid until */}
           <div className="flex-1 flex justify-end items-end">
             {cardData.validUntil && (
-              <div className="text-right">
-                <p className="embossed-text text-[clamp(8px,1.2vmin,10px)] uppercase tracking-wide opacity-70 mb-1">
+              <div className="text-right flex items-center gap-2">
+                <span className="embossed-text text-[clamp(8px,1.2vmin,10px)] uppercase tracking-wide opacity-70">
                   GELDIG TOT
-                </p>
-                <p className="embossed-text text-[clamp(10px,1.4vmin,12px)] font-medium font-mono tabular-nums">
+                </span>
+                <span className="embossed-text text-[clamp(10px,1.4vmin,12px)] font-medium font-mono tabular-nums">
                   {format(cardData.validUntil, 'dd-MM-yyyy', { locale: nl })}
-                </p>
+                </span>
               </div>
             )}
           </div>

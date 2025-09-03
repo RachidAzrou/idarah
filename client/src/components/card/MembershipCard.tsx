@@ -215,12 +215,17 @@ export function MembershipCard({
               <p className="embossed-text text-[clamp(10px,1.4vmin,12px)] uppercase tracking-wide opacity-80 mb-1">
                 NAAM
               </p>
-              <h2 className="embossed-text text-[clamp(14px,1.8vmin,16px)] font-semibold uppercase tracking-wide leading-tight">
+              <h2 className="embossed-text text-[clamp(18px,2.2vmin,20px)] font-semibold uppercase tracking-wide leading-tight">
                 {cardData.firstName} {cardData.lastName}
               </h2>
-              <p className="embossed-text text-[clamp(10px,1.4vmin,12px)] uppercase tracking-wide opacity-60 mt-1">
-                LIDNUMMER: {cardData.memberNumber}
-              </p>
+              <div className="mt-3">
+                <p className="embossed-text text-[clamp(8px,1.2vmin,10px)] uppercase tracking-wide opacity-60 mb-1">
+                  LIDNUMMER
+                </p>
+                <p className="embossed-text text-[clamp(14px,1.8vmin,16px)] font-mono font-bold tracking-[0.2em] leading-tight">
+                  {cardData.memberNumber}
+                </p>
+              </div>
             </div>
 
             {/* Category */}

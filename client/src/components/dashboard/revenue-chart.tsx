@@ -76,7 +76,7 @@ export default function RevenueChart() {
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-lg font-semibold text-gray-900">Evolutie Inkomsten</h3>
-            <p className="text-sm text-gray-500">Lidgelden per maand - {periodLabel}</p>
+            <p className="text-sm text-gray-500">Lidgelden per maand</p>
           </div>
           <div className="flex items-center gap-2">
             <Button 
@@ -107,7 +107,9 @@ export default function RevenueChart() {
           </div>
         </div>
       </div>
-      <div className="h-64">
+      <div className="relative">
+        <h4 className="text-lg font-semibold text-gray-900 mb-4 text-center">{periodLabel}</h4>
+        <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={data}>
             <defs>
@@ -155,6 +157,7 @@ export default function RevenueChart() {
             />
           </AreaChart>
         </ResponsiveContainer>
+        </div>
       </div>
     </div>
   );

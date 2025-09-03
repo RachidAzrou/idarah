@@ -34,8 +34,8 @@ export function MemberDetailDialog({ member, open, onClose, onEdit }: MemberDeta
         <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 mb-6">
           <div className="flex items-center justify-between mb-2">
             <span className="font-mono text-sm text-gray-600">#{member.memberNumber}</span>
-            <Badge variant={member.status === 'ACTIVE' ? "default" : "secondary"}>
-              {member.status === 'ACTIVE' ? 'Actief' : 'Inactief'}
+            <Badge variant={member.active ? "default" : "secondary"}>
+              {member.active ? 'Actief' : 'Inactief'}
             </Badge>
           </div>
           <h3 className="font-semibold text-lg">
@@ -87,7 +87,7 @@ export function MemberDetailDialog({ member, open, onClose, onEdit }: MemberDeta
                 </div>
                 <div>
                   <span className="text-gray-500">Geboortedatum</span>
-                  <p className="font-medium">{member.dateOfBirth ? formatDateBE(member.dateOfBirth) : '-'}</p>
+                  <p className="font-medium">{member.birthDate ? formatDateBE(member.birthDate) : '-'}</p>
                 </div>
                 <div>
                   <span className="text-gray-500">Geslacht</span>
@@ -131,9 +131,9 @@ export function MemberDetailDialog({ member, open, onClose, onEdit }: MemberDeta
                 <div className="col-span-2">
                   <span className="text-gray-500">Adres</span>
                   <div className="font-medium">
-                    {member.address ? (
+                    {(member.street || member.number) ? (
                       <>
-                        <p>{member.address}</p>
+                        <p>{member.street} {member.number}{member.bus ? ` bus ${member.bus}` : ''}</p>
                         {(member.city || member.postalCode) && (
                           <p>{member.postalCode} {member.city}</p>
                         )}
@@ -180,11 +180,11 @@ export function MemberDetailDialog({ member, open, onClose, onEdit }: MemberDeta
               <div className="grid grid-cols-3 gap-6 text-sm">
                 <div>
                   <span className="text-gray-500">Betaalmethode</span>
-                  <p className="font-medium">{member.paymentMethod || 'SEPA'}</p>
+                  <p className="font-medium">{member.financialSettings?.paymentMethod || 'SEPA'}</p>
                 </div>
                 <div>
                   <span className="text-gray-500">IBAN</span>
-                  <p className="font-medium font-mono">{member.iban || '-'}</p>
+                  <p className="font-medium font-mono">{member.financialSettings?.iban || '-'}</p>
                 </div>
                 <div>
                   <span className="text-gray-500">Lidgeld</span>
@@ -200,7 +200,7 @@ export function MemberDetailDialog({ member, open, onClose, onEdit }: MemberDeta
                 </div>
                 <div>
                   <span className="text-gray-500">Status</span>
-                  <p className="font-medium">{member.status === 'ACTIVE' ? 'Actief' : 'Inactief'}</p>
+                  <p className="font-medium">{member.active ? 'Actief' : 'Inactief'}</p>
                 </div>
               </div>
             </div>
@@ -223,7 +223,10 @@ export function MemberDetailDialog({ member, open, onClose, onEdit }: MemberDeta
                 </div>
                 <div className="col-span-2">
                   <span className="text-gray-500">Interesse in actieve rol</span>
-                  <p className="font-medium">Niet opgegeven</p>
+                  <p className="font-medium">{member.permissions?.interestedInActiveRole ? 'Ja' : 'Nee'}</p>
+                  {member.permissions?.roleDescription && (
+                    <p className="text-sm text-gray-600 mt-1">{member.permissions.roleDescription}</p>
+                  )}
                 </div>
               </div>
             </div>
@@ -238,19 +241,19 @@ export function MemberDetailDialog({ member, open, onClose, onEdit }: MemberDeta
               <div className="grid grid-cols-1 gap-4 text-sm">
                 <div>
                   <span className="text-gray-500">Privacy verklaring</span>
-                  <p className="font-medium">Akkoord gegeven</p>
+                  <p className="font-medium">{member.permissions?.privacyAgreement ? 'Akkoord gegeven' : 'Niet gegeven'}</p>
                 </div>
                 <div>
                   <span className="text-gray-500">Foto/video toestemming</span>
-                  <p className="font-medium">Niet opgegeven</p>
+                  <p className="font-medium">{member.permissions?.photoVideoConsent ? 'Ja' : 'Nee'}</p>
                 </div>
                 <div>
                   <span className="text-gray-500">Nieuwsbrief</span>
-                  <p className="font-medium">Niet opgegeven</p>
+                  <p className="font-medium">{member.permissions?.newsletterSubscription ? 'Ja' : 'Nee'}</p>
                 </div>
                 <div>
                   <span className="text-gray-500">WhatsApp lijst</span>
-                  <p className="font-medium">Niet opgegeven</p>
+                  <p className="font-medium">{member.permissions?.whatsappList ? 'Ja' : 'Nee'}</p>
                 </div>
               </div>
             </div>

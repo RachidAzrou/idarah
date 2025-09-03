@@ -27,6 +27,11 @@ function KpiCard({ title, value, delta, icon, iconBgColor }: KpiCardProps) {
         iconClass: "text-red-500",
         textClass: "text-red-500"
       };
+    } else if (title === "Openstaand") {
+      return {
+        iconClass: "text-orange-600",
+        textClass: "text-orange-600"
+      };
     } else {
       // Voor andere kaarten gebruik de bestaande logica
       return {

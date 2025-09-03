@@ -7,11 +7,12 @@ interface AspectBoxProps {
 export function AspectBox({ children }: AspectBoxProps) {
   return (
     <div
-      className="
-        relative mx-auto aspect-[1586/1000]
-        w-[clamp(400px,50vmin,600px)]
-        max-w-[80vw] max-h-[70vh]
-      "
+      className="relative mx-auto aspect-[1586/1000]"
+      style={{
+        width: 'clamp(300px, 40vmin, 500px)',
+        maxWidth: '70vw',
+        maxHeight: '60vh'
+      }}
     >
       <div className="absolute inset-0">{children}</div>
     </div>

@@ -8,8 +8,10 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Progress } from '@/components/ui/progress';
 import { CiExport } from 'react-icons/ci';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Check, FileSpreadsheet } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 
@@ -63,8 +65,10 @@ const EXPORT_FIELDS: ExportField[] = [
 const CATEGORIES = ['Basis', 'Contact', 'Lidmaatschap', 'Financieel', 'Overig'];
 
 export function ExportDialog({ open, onOpenChange, filteredMembers }: ExportDialogProps) {
+  const [currentStep, setCurrentStep] = useState<'selection' | 'exporting' | 'complete'>('selection');
   const [selectedFields, setSelectedFields] = useState<string[]>(['memberNumber', 'firstName', 'lastName', 'email', 'phone']);
-  const [isExporting, setIsExporting] = useState(false);
+  const [exportProgress, setExportProgress] = useState(0);
+  const [exportedFile, setExportedFile] = useState<string | null>(null);
   const { toast } = useToast();
 
   const handleFieldToggle = (fieldKey: string) => {
@@ -116,10 +120,17 @@ export function ExportDialog({ open, onOpenChange, filteredMembers }: ExportDial
       return;
     }
 
-    setIsExporting(true);
+    setCurrentStep('exporting');
+    setExportProgress(0);
+
     try {
+      // Simulate progress steps
+      setExportProgress(25);
+      
       // Get member IDs from filtered members
       const memberIds = filteredMembers.map(member => member.id);
+      
+      setExportProgress(50);
       
       const response = await apiRequest('POST', '/api/members/export', {
         memberIds,
@@ -130,119 +141,198 @@ export function ExportDialog({ open, onOpenChange, filteredMembers }: ExportDial
         throw new Error('Export failed');
       }
 
+      setExportProgress(75);
+
       // Download the file
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.style.display = 'none';
       a.href = url;
-      a.download = `leden_export_${new Date().toISOString().split('T')[0]}.xlsx`;
+      const fileName = `leden_export_${new Date().toISOString().split('T')[0]}.xlsx`;
+      a.download = fileName;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
 
+      setExportProgress(100);
+      setExportedFile(fileName);
+      setCurrentStep('complete');
+
       toast({
         title: "Export succesvol",
         description: `${filteredMembers.length} leden geëxporteerd naar Excel bestand.`
       });
-
-      onOpenChange(false);
     } catch (error) {
       console.error('Export error:', error);
+      setCurrentStep('selection');
       toast({
         title: "Export mislukt",
         description: "Er is een fout opgetreden bij het exporteren van de leden.",
         variant: "destructive"
       });
-    } finally {
-      setIsExporting(false);
     }
   };
 
+  const handleClose = () => {
+    setCurrentStep('selection');
+    setExportProgress(0);
+    setExportedFile(null);
+    onOpenChange(false);
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] max-h-[80vh]">
+    <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh]">
         <DialogHeader>
-          <DialogTitle>Leden Exporteren</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            <FileSpreadsheet className="h-5 w-5" />
+            Leden Export Wizard
+          </DialogTitle>
           <p className="text-sm text-gray-600">
-            {filteredMembers.length} leden worden geëxporteerd. Selecteer de velden die u wilt exporteren.
+            {filteredMembers.length} leden klaar voor export
           </p>
         </DialogHeader>
 
-        <div className="space-y-4 flex-1 overflow-auto">
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={handleSelectAll}>
-              Alles selecteren
-            </Button>
-            <Button variant="outline" size="sm" onClick={handleSelectNone}>
-              Niets selecteren
-            </Button>
-          </div>
+        <Tabs value={currentStep} className="flex-1 flex flex-col">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="selection" disabled={currentStep === 'exporting'}>
+              1. Velden Selecteren
+            </TabsTrigger>
+            <TabsTrigger value="exporting" disabled={currentStep !== 'exporting'}>
+              2. Exporteren
+            </TabsTrigger>
+            <TabsTrigger value="complete" disabled={currentStep !== 'complete'}>
+              3. Voltooid
+            </TabsTrigger>
+          </TabsList>
 
-          <div className="space-y-4">
-            {CATEGORIES.map(category => {
-              const categoryFields = EXPORT_FIELDS.filter(field => field.category === category);
-              const isSelected = isCategorySelected(category);
-              const isPartiallySelected = isCategoryPartiallySelected(category);
+          <div className="flex-1 overflow-hidden">
+            <TabsContent value="selection" className="space-y-4 flex-1 flex flex-col mt-4">
+              <div>
+                <h3 className="text-lg font-semibold">Selecteer Export Velden</h3>
+                <p className="text-sm text-gray-600">
+                  Kies welke velden u wilt exporteren naar het Excel bestand.
+                </p>
+              </div>
 
-              return (
-                <div key={category} className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`category-${category}`}
-                      checked={isSelected}
-                      data-state={isPartiallySelected ? "indeterminate" : undefined}
-                      onCheckedChange={(checked) => handleCategoryToggle(category, checked as boolean)}
-                    />
-                    <label 
-                      htmlFor={`category-${category}`}
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
-                      {category}
-                    </label>
-                  </div>
-                  
-                  <div className="ml-6 space-y-2">
-                    {categoryFields.map(field => (
-                      <div key={field.key} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={field.key}
-                          checked={selectedFields.includes(field.key)}
-                          onCheckedChange={() => handleFieldToggle(field.key)}
-                        />
-                        <label 
-                          htmlFor={field.key}
-                          className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          {field.label}
-                        </label>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" onClick={handleSelectAll}>
+                  Alles selecteren
+                </Button>
+                <Button variant="outline" size="sm" onClick={handleSelectNone}>
+                  Niets selecteren
+                </Button>
+              </div>
+
+              <div className="flex-1 overflow-auto border rounded-lg p-4">
+                <div className="space-y-4">
+                  {CATEGORIES.map(category => {
+                    const categoryFields = EXPORT_FIELDS.filter(field => field.category === category);
+                    const isSelected = isCategorySelected(category);
+                    const isPartiallySelected = isCategoryPartiallySelected(category);
+
+                    return (
+                      <div key={category} className="space-y-2">
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id={`category-${category}`}
+                            checked={isSelected}
+                            data-state={isPartiallySelected ? "indeterminate" : undefined}
+                            onCheckedChange={(checked) => handleCategoryToggle(category, checked as boolean)}
+                          />
+                          <label 
+                            htmlFor={`category-${category}`}
+                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                          >
+                            {category}
+                          </label>
+                        </div>
+                        
+                        <div className="ml-6 space-y-2">
+                          {categoryFields.map(field => (
+                            <div key={field.key} className="flex items-center space-x-2">
+                              <Checkbox
+                                id={field.key}
+                                checked={selectedFields.includes(field.key)}
+                                onCheckedChange={() => handleFieldToggle(field.key)}
+                              />
+                              <label 
+                                htmlFor={field.key}
+                                className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                              >
+                                {field.label}
+                              </label>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    ))}
-                  </div>
+                    );
+                  })}
                 </div>
-              );
-            })}
-          </div>
-        </div>
+              </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Annuleren
-          </Button>
-          <Button 
-            onClick={handleExport}
-            disabled={isExporting || selectedFields.length === 0}
-            className="gap-2"
-          >
-            {isExporting ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <CiExport className="h-4 w-4" />
-            )}
-            {isExporting ? 'Exporteren...' : `Exporteren (${selectedFields.length} velden)`}
-          </Button>
-        </DialogFooter>
+              <DialogFooter>
+                <Button variant="outline" onClick={handleClose}>
+                  Annuleren
+                </Button>
+                <Button 
+                  onClick={handleExport}
+                  disabled={selectedFields.length === 0}
+                  className="gap-2"
+                >
+                  <CiExport className="h-4 w-4" />
+                  Exporteren ({selectedFields.length} velden)
+                </Button>
+              </DialogFooter>
+            </TabsContent>
+
+            <TabsContent value="exporting" className="space-y-4 flex-1 flex flex-col mt-4">
+              <div className="text-center space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold">Export wordt uitgevoerd...</h3>
+                  <p className="text-sm text-gray-600">
+                    {filteredMembers.length} leden met {selectedFields.length} velden worden geëxporteerd
+                  </p>
+                </div>
+                
+                <div className="space-y-2">
+                  <Progress value={exportProgress} className="w-full" />
+                  <p className="text-sm text-gray-500">
+                    {Math.round(exportProgress)}% voltooid
+                  </p>
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="complete" className="space-y-4 flex-1 flex flex-col mt-4">
+              <div className="text-center space-y-4">
+                <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                  <Check className="h-8 w-8 text-green-600" />
+                </div>
+                
+                <div>
+                  <h3 className="text-lg font-semibold text-green-800">Export Voltooid!</h3>
+                  <p className="text-sm text-gray-600">
+                    {filteredMembers.length} leden succesvol geëxporteerd
+                  </p>
+                  {exportedFile && (
+                    <p className="text-sm text-gray-500 mt-2">
+                      Bestand: {exportedFile}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <DialogFooter>
+                <Button onClick={handleClose} className="w-full">
+                  Sluiten
+                </Button>
+              </DialogFooter>
+            </TabsContent>
+          </div>
+        </Tabs>
       </DialogContent>
     </Dialog>
   );

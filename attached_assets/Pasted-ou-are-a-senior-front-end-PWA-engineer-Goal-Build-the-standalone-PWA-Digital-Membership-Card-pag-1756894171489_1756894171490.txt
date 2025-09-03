@@ -1,0 +1,161 @@
+ou are a senior front-end + PWA engineer.
+Goal: Build the standalone PWA Digital Membership Card page that members will use as their official digital card.
+
+Requirements
+1) Page route
+
+Route: /card/[memberId]
+
+Must render full screen with dark premium background.
+
+Uses components:
+
+CardCanvas → background
+
+AspectBox → aspect ratio scaling
+
+MembershipCard → card UI
+
+2) Card data
+
+Fetch from API endpoint /api/card/:memberId.
+Fields:
+
+firstName, lastName
+
+memberNumber
+
+category (Student, Standaard, Senior)
+
+status (ACTUEEL, NIET_ACTUEEL, VERLOPEN)
+
+validUntil
+
+badges[] (e.g. “Betaald 2025”, “Stemgerechtigd”)
+
+qrToken (for QR verify)
+
+tenant (name, logoUrl, primaryColor)
+
+etag (for versioning)
+
+3) Refresh behaviour
+
+A refresh button (top-right) triggers:
+
+360° horizontal flip animation of the card (~800ms).
+
+Refetch data from /api/card/:memberId.
+
+If navigator.onLine === false or fetch fails → status set to NIET ACTUEEL, show orange banner:
+
+Text: “Offline – status niet bevestigd”.
+
+4) PWA integration
+
+Manifest: public/manifest.webmanifest
+
+{
+  "name": "Digitale Lidkaart",
+  "short_name": "Lidkaart",
+  "start_url": "/card/[memberId]?standalone=1",
+  "display": "standalone",
+  "background_color": "#0B1220",
+  "theme_color": "#0B1220",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icons/maskable-icon.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
+
+
+Service Worker:
+
+NetworkFirst for /api/card/verify/*
+
+StaleWhileRevalidate for static assets
+
+On offline, ensure card status → NIET ACTUEEL
+
+InstallCoach component:
+
+Shows first-time instructions (iOS Safari, Android Chrome, Samsung Internet, Desktop Chromium, fallback).
+
+NL-BE copy: “Zet je lidkaart op je startscherm”.
+
+Dismiss option remembered in localStorage.
+
+5) QR-code
+
+On the card: QR generated with /card/verify/${qrToken}.
+
+Click/tap QR → modal with enlarged QR (min 320px).
+
+API /api/card/verify/:qrToken returns JSON with active status.
+
+6) UI details
+
+Card design: bankcard-style, rounded corners, glossy overlay, status LED (groen/oranje/rood).
+
+Typography: Space Grotesk (via Google Fonts).
+
+Background: CardCanvas (spotlight gradient, vignette, sheen, grain, rimlight).
+
+Fullscreen scaling:
+
+Portrait: w-[min(92vw,70vh*1.586)]
+
+Landscape: h-[min(94vh,94vw/1.586)]
+
+Desktop: w-[clamp(560px,70vmin,880px)]
+
+Deliverables
+
+app/card/[memberId]/page.tsx
+
+Uses CardCanvas + AspectBox + MembershipCard.
+
+Fetches card data from /api/card/:memberId.
+
+Handles refresh with flip animation.
+
+Handles offline fallback + banner.
+
+components/card/MembershipCard.tsx
+
+Bankcard UI with: name, member number, category, status LED, validUntil, badges, QR zone, logo.
+
+Clickable QR → modal with enlarged QR.
+
+className="w-full h-full rounded-3xl shadow-card"
+
+public/manifest.webmanifest
+
+As above.
+
+public/sw.js
+
+Service worker with NetworkFirst for verify API, StaleWhileRevalidate for assets.
+
+Offline = status NIET ACTUEEL.
+
+components/pwa/InstallCoach.tsx
+
+First-time onboarding with NL-BE install steps per platform.
+
+Acceptance
+
+/card/[memberId] is installable as PWA.
+
+Card shows correct styling (premium background, fullscreen scaling).
+
+Refresh button → flip animation + data refetch.
+
+Offline → status NIET ACTUEEL + banner.
+
+QR works and links to /card/verify/:qrToken.
+
+InstallCoach appears on first visit with NL-BE instructions.
+
+Generate all code now in TypeScript + Tailwind (no placeholder styles, production-ready).

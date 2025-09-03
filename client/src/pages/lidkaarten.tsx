@@ -25,7 +25,7 @@ import {
   Clock,
   MoreHorizontal,
   Plus,
-  Share
+  ExternalLink
 } from "lucide-react";
 import { CiExport } from "react-icons/ci";
 import { format } from "date-fns";
@@ -498,8 +498,8 @@ export default function LidkaartenPage() {
                   variant="outline"
                   className="gap-2"
                 >
-                  <Share className="h-4 w-4" />
-                  PWA Bekijken
+                  <ExternalLink className="h-4 w-4" />
+                  Kaart openen
                 </Button>
                 
                 <Button

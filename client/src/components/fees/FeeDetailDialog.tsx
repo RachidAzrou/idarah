@@ -193,11 +193,14 @@ export function FeeDetailDialog({
   return (
     <TooltipProvider>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-2xl max-h-[85vh]">
+        <DialogContent className="max-w-4xl max-h-[95vh] overflow-y-auto">
           <DialogHeader>
             <div className="flex justify-between items-start">
               <div>
-                <DialogTitle>Lidgeld detail</DialogTitle>
+                <DialogTitle className="flex items-center gap-2">
+                  <Euro className="h-5 w-5" />
+                  Lidgeld Detail
+                </DialogTitle>
                 <DialogDescription>
                   #{fee.member.memberNumber} – {fee.member.firstName} {fee.member.lastName}
                 </DialogDescription>
@@ -211,16 +214,40 @@ export function FeeDetailDialog({
             </div>
           </DialogHeader>
 
-          <ScrollArea className="max-h-[60vh]">
+          <div className="space-y-8">
             <div className="space-y-6">
+              {/* Header Card */}
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                      <User className="h-6 w-6 text-blue-600" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        {fee.member.firstName} {fee.member.lastName}
+                      </h3>
+                      <p className="text-sm text-gray-600">Lidnummer #{fee.member.memberNumber}</p>
+                    </div>
+                  </div>
+                  <Badge className={getStatusBadgeVariant(fee.status)}>
+                    {statusLabel(fee.status)}
+                  </Badge>
+                </div>
+                <div className="text-center py-2">
+                  <p className="text-2xl font-bold text-gray-900">{formatEUR(fee.amountCents)}</p>
+                  <p className="text-sm text-gray-600">{formatDateBE(fee.periodStart)} – {formatDateBE(fee.periodEnd)}</p>
+                </div>
+              </div>
+
               {/* Kerninfo in 2 kolommen */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <h4 className="font-medium flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="bg-white border rounded-lg p-6 shadow-sm">
+                  <h4 className="font-semibold text-gray-900 flex items-center gap-2 mb-4">
+                    <Calendar className="h-5 w-5 text-blue-600" />
                     Periode & Timing
                   </h4>
-                  <dl className="space-y-3">
+                  <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <dt className="text-sm text-muted-foreground">Periode van</dt>
                       <dd className="font-medium">{formatDateBE(fee.periodStart)}</dd>
@@ -252,12 +279,12 @@ export function FeeDetailDialog({
                   </dl>
                 </div>
 
-                <div className="space-y-4">
-                  <h4 className="font-medium flex items-center gap-2">
-                    <Euro className="h-4 w-4" />
+                <div className="bg-white border rounded-lg p-6 shadow-sm">
+                  <h4 className="font-semibold text-gray-900 flex items-center gap-2 mb-4">
+                    <CreditCard className="h-5 w-5 text-green-600" />
                     Financiële Details
                   </h4>
-                  <dl className="space-y-3">
+                  <dl className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
                       <dt className="text-sm text-muted-foreground">Bedrag</dt>
                       <dd className="font-semibold text-lg">{formatEUR(fee.amountCents)}</dd>
@@ -280,12 +307,10 @@ export function FeeDetailDialog({
                 </div>
               </div>
 
-              <Separator />
-
               {/* Lid informatie */}
-              <div className="space-y-4">
-                <h4 className="font-medium flex items-center gap-2">
-                  <User className="h-4 w-4" />
+              <div className="bg-white border rounded-lg p-6 shadow-sm">
+                <h4 className="font-semibold text-gray-900 flex items-center gap-2 mb-4">
+                  <User className="h-5 w-5 text-purple-600" />
                   Lid informatie
                 </h4>
                 <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -328,11 +353,11 @@ export function FeeDetailDialog({
                 </dl>
               </div>
             </div>
-          </ScrollArea>
+          </div>
 
           {/* Acties */}
           {canManage && (
-            <DialogFooter className="gap-2">
+            <DialogFooter className="gap-3 pt-6 border-t bg-gray-50 rounded-lg p-4 mt-6">
               {canMarkAsPaid && (
                 <Button onClick={handleMarkPaid} className="flex items-center gap-2">
                   <Check className="h-4 w-4" />
@@ -368,7 +393,7 @@ export function FeeDetailDialog({
           )}
           
           {!canManage && (
-            <DialogFooter>
+            <DialogFooter className="pt-6 border-t bg-gray-50 rounded-lg p-4 mt-6">
               <Button onClick={() => onOpenChange(false)} variant="outline">
                 <X className="h-4 w-4 mr-2" />
                 Sluiten

@@ -209,20 +209,20 @@ export function MembershipCard({
           </div>
 
           {/* Member Information */}
-          <div className="mb-6 space-y-4">
+          <div className="mb-6 space-y-4 ml-8">
             {/* Member Name */}
             <div>
-              <p className="embossed-text text-[clamp(12px,1.6vmin,14px)] uppercase tracking-wide opacity-80 mb-1 font-medium">
+              <p className="embossed-text text-[clamp(14px,1.8vmin,16px)] uppercase tracking-wide opacity-80 mb-1 font-medium">
                 NAAM
               </p>
-              <h2 className="embossed-text text-[clamp(14px,1.8vmin,16px)] font-semibold uppercase tracking-wide leading-tight">
+              <h2 className="embossed-text text-[clamp(16px,2.0vmin,18px)] font-semibold uppercase tracking-wide leading-tight">
                 {cardData.firstName} {cardData.lastName}
               </h2>
               <div className="mt-3">
-                <p className="embossed-text text-[clamp(12px,1.6vmin,14px)] uppercase tracking-wide opacity-80 mb-1 font-medium">
+                <p className="embossed-text text-[clamp(14px,1.8vmin,16px)] uppercase tracking-wide opacity-80 mb-1 font-medium">
                   LIDNUMMER
                 </p>
-                <p className="embossed-text text-[clamp(14px,1.8vmin,16px)] font-mono font-bold tracking-[0.2em] leading-tight">
+                <p className="embossed-text text-[clamp(16px,2.0vmin,18px)] font-mono font-bold tracking-[0.2em] leading-tight">
                   {cardData.memberNumber}
                 </p>
               </div>
@@ -230,10 +230,10 @@ export function MembershipCard({
 
             {/* Category */}
             <div>
-              <p className="embossed-text text-[clamp(12px,1.6vmin,14px)] uppercase tracking-wide opacity-80 mb-1 font-medium">
+              <p className="embossed-text text-[clamp(14px,1.8vmin,16px)] uppercase tracking-wide opacity-80 mb-1 font-medium">
                 CATEGORIE
               </p>
-              <span className="embossed-text text-[clamp(14px,1.8vmin,16px)] font-medium uppercase">
+              <span className="embossed-text text-[clamp(16px,2.0vmin,18px)] font-medium uppercase">
                 {getMemberCategoryLabel(cardData.category)}
               </span>
             </div>

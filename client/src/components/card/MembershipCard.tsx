@@ -211,31 +211,45 @@ export function MembershipCard({
             {/* Voting Rights Badge - Right side */}
             {(cardData.badges.includes("Stemgerechtigd") || true) && (
               <div className="flex flex-col items-center mr-8">
-                {/* Embossed Gold Icon */}
+                {/* Glass Effect Gold Icon with Deep Relief */}
                 <GoVerified 
                   className={`${isConstrained ? 'w-12 h-12' : 'w-16 h-16'}`}
                   data-testid="voting-icon"
                   style={{
-                    color: '#FFD700',
+                    color: '#D4AF37',
                     textShadow: `
-                      1px 1px 0 #FFF8DC,
-                      2px 2px 0 #F0E68C,
-                      3px 3px 0 #DAA520,
-                      4px 4px 6px rgba(0,0,0,0.5),
-                      0 0 15px rgba(255,215,0,0.4)
+                      1px 1px 0 #F4E4BC,
+                      2px 2px 0 #E6C547,
+                      3px 3px 0 #C8941F,
+                      4px 4px 0 #B8860B,
+                      5px 5px 0 #996515,
+                      6px 6px 12px rgba(0,0,0,0.6),
+                      0 0 20px rgba(212,175,55,0.5)
                     `,
-                    filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.4)) brightness(1.1)'
+                    filter: `
+                      drop-shadow(3px 3px 6px rgba(0,0,0,0.5)) 
+                      brightness(1.2) 
+                      contrast(1.1)
+                    `,
+                    background: 'linear-gradient(145deg, rgba(212,175,55,0.2), rgba(255,255,255,0.1))',
+                    borderRadius: '50%',
+                    padding: '4px',
+                    boxShadow: `
+                      inset 1px 1px 2px rgba(255,255,255,0.3),
+                      inset -1px -1px 2px rgba(0,0,0,0.2),
+                      0 0 15px rgba(212,175,55,0.3)
+                    `
                   }}
                 />
                 
-                {/* Embossed Gold Text */}
+                {/* Simple Gold Text */}
                 <span 
                   className={`${isConstrained ? 'text-xs' : 'text-sm'} uppercase tracking-[0.1em] font-bold mt-3`}
                   style={{
-                    color: '#FFD700',
+                    color: '#D4AF37',
                     textShadow: `
-                      1px 1px 0 #FFF8DC,
-                      2px 2px 3px rgba(0,0,0,0.3)
+                      1px 1px 0 #F4E4BC,
+                      2px 2px 2px rgba(0,0,0,0.3)
                     `,
                     filter: 'drop-shadow(1px 1px 1px rgba(0,0,0,0.2))'
                   }}

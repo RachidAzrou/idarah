@@ -64,25 +64,6 @@
   }
 }
 
-/* Premium gold foil stamping animation */
-@keyframes goldFoilShimmer {
-  0% {
-    background-position: -300% -300%;
-  }
-  25% {
-    background-position: 0% 0%;
-  }
-  50% {
-    background-position: 150% 150%;
-  }
-  75% {
-    background-position: 300% 300%;
-  }
-  100% {
-    background-position: -300% -300%;
-  }
-}
-
 /* Debossed QR code effect - transparent button with gold QR */
 .debossed-qr-container {
   width: 100px;

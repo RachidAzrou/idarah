@@ -211,75 +211,30 @@ export function MembershipCard({
             {/* Voting Rights Badge - Right side */}
             {(cardData.badges.includes("Stemgerechtigd") || true) && (
               <div className="flex flex-col items-center mr-8">
-                {/* Gold Foil Stamped Icon */}
+                {/* Bold Gold Outline Icon */}
                 <GoVerified 
                   className={`${isConstrained ? 'w-12 h-12' : 'w-16 h-16'}`}
                   data-testid="voting-icon"
                   style={{
-                    background: `
-                      linear-gradient(135deg, 
-                        #FFD700 0%, 
-                        #FFF8DC 15%, 
-                        #DAA520 30%, 
-                        #FFE55C 45%, 
-                        #B8860B 60%, 
-                        #F4E4BC 75%, 
-                        #D4AF37 90%, 
-                        #FFD700 100%
-                      )
-                    `,
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundSize: '300% 300%',
-                    animation: 'goldFoilShimmer 4s ease-in-out infinite',
+                    color: 'transparent',
+                    WebkitTextStroke: '3px #D4AF37',
                     textShadow: `
-                      0 1px 0 rgba(255,255,255,0.6),
-                      0 2px 0 rgba(212,175,55,0.8),
-                      0 3px 0 rgba(184,134,11,0.6),
-                      0 4px 0 rgba(153,101,21,0.4),
-                      0 5px 8px rgba(0,0,0,0.4),
-                      0 0 15px rgba(255,215,0,0.5)
+                      0 0 5px rgba(212,175,55,0.8),
+                      0 0 10px rgba(212,175,55,0.5),
+                      0 0 15px rgba(212,175,55,0.3),
+                      2px 2px 6px rgba(0,0,0,0.5)
                     `,
-                    filter: `
-                      drop-shadow(0 2px 4px rgba(0,0,0,0.3)) 
-                      drop-shadow(0 0 12px rgba(255,215,0,0.4))
-                      brightness(1.2) 
-                      contrast(1.15)
-                    `
+                    filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.4)) brightness(1.2)'
                   }}
                 />
                 
-                {/* Gold Foil Embossed Text */}
+                {/* Minimal Gold Text */}
                 <span 
-                  className={`${isConstrained ? 'text-xs' : 'text-sm'} uppercase tracking-[0.15em] font-black mt-3`}
+                  className={`${isConstrained ? 'text-xs' : 'text-sm'} uppercase tracking-[0.1em] font-bold mt-3`}
                   style={{
-                    background: `
-                      linear-gradient(135deg, 
-                        #FFD700 0%, 
-                        #FFF8DC 20%, 
-                        #DAA520 40%, 
-                        #FFE55C 50%, 
-                        #B8860B 70%, 
-                        #F4E4BC 85%, 
-                        #D4AF37 100%
-                      )
-                    `,
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundSize: '250% 250%',
-                    animation: 'goldFoilShimmer 4s ease-in-out infinite 0.5s',
-                    textShadow: `
-                      0 1px 0 rgba(255,255,255,0.5),
-                      0 2px 0 rgba(212,175,55,0.7),
-                      0 3px 0 rgba(184,134,11,0.5),
-                      0 4px 6px rgba(0,0,0,0.3),
-                      0 0 10px rgba(255,215,0,0.3)
-                    `,
-                    filter: `
-                      drop-shadow(0 1px 2px rgba(0,0,0,0.25)) 
-                      drop-shadow(0 0 8px rgba(255,215,0,0.3))
-                      brightness(1.1)
-                    `
+                    color: '#D4AF37',
+                    textShadow: `1px 1px 1px rgba(0,0,0,0.4)`,
+                    filter: 'drop-shadow(0.5px 0.5px 0.5px rgba(0,0,0,0.3))'
                   }}
                 >
                   STEMGERECHTIGD

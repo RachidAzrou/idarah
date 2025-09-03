@@ -15,7 +15,7 @@ interface KpiCardProps {
 }
 
 function KpiCard({ title, value, delta, icon, iconBgColor }: KpiCardProps) {
-  // Bepaal kleuren op basis van kaarttype
+  // Bepaal kleuren op basis van kaarttype 
   const getColorClasses = () => {
     if (title === "Betaald") {
       return {

@@ -261,8 +261,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Handle voting rights field mapping
-      if (transformedData.organization?.votingEligible !== undefined) {
-        transformedData.votingRights = transformedData.organization.votingEligible;
+      if (req.body.organization?.votingEligible !== undefined) {
+        transformedData.votingRights = req.body.organization.votingEligible;
+        console.log("PUT mapped voting rights:", transformedData.votingRights);
       }
       
       console.log("PUT transformed data:", JSON.stringify(transformedData, null, 2));
@@ -309,8 +310,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Handle voting rights field mapping
-      if (transformedData.organization?.votingEligible !== undefined) {
-        transformedData.votingRights = transformedData.organization.votingEligible;
+      if (req.body.organization?.votingEligible !== undefined) {
+        transformedData.votingRights = req.body.organization.votingEligible;
         console.log("PATCH mapped voting rights:", transformedData.votingRights);
       }
       

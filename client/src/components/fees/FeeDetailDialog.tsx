@@ -343,7 +343,7 @@ export function FeeDetailDialog({
                   <Building2 className="h-4 w-4" />
                   Beschikbare acties
                 </h4>
-                <div className="flex flex-wrap gap-3">
+                <div className="flex flex-wrap gap-3 justify-end">
                   {canMarkAsPaid && (
                     <Button onClick={handleMarkPaid} className="flex items-center gap-2 bg-green-600 hover:bg-green-700">
                       <Check className="h-4 w-4" />

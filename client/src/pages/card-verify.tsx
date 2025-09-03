@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle2, XCircle, AlertTriangle, Wifi, WifiOff, Clock, RefreshCw, Check, Euro } from "lucide-react";
+import { CheckCircle2, XCircle, AlertTriangle, Wifi, WifiOff, Clock, RefreshCw, Check, Euro, LogOut, User } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { QuickAuthModal } from "@/components/auth/quick-auth-modal";
 
 interface CardVerificationData {
   status: 'ACTUEEL' | 'NIET_ACTUEEL' | 'VERLOPEN';
@@ -71,13 +72,30 @@ function VerificationView({ qrToken }: { qrToken: string }) {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authUser, setAuthUser] = useState<any>(null);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   const fetchData = async (isRefresh = false) => {
     try {
       if (isRefresh) setRefreshing(true);
       else setLoading(true);
       
-      const response = await fetch(`/api/card/verify/${qrToken}`);
+      const verifyToken = sessionStorage.getItem('qr_verify_token');
+      const response = await fetch(`/api/card/verify/${qrToken}`, {
+        headers: {
+          'Authorization': `Bearer ${verifyToken}`,
+        },
+      });
+      
+      if (response.status === 401) {
+        // Niet geautoriseerd - toon login modal
+        setIsAuthenticated(false);
+        setShowAuthModal(true);
+        setLoading(false);
+        setRefreshing(false);
+        return;
+      }
       
       if (!response.ok) {
         const errorData = await response.json();
@@ -96,30 +114,90 @@ function VerificationView({ qrToken }: { qrToken: string }) {
     }
   };
 
+  // Check authentication on load
   useEffect(() => {
-    fetchData();
+    const verifyToken = sessionStorage.getItem('qr_verify_token');
+    const userJson = sessionStorage.getItem('qr_verify_user');
     
-    // Refetch on window focus
-    const handleFocus = () => {
-      if (!loading && !refreshing) {
-        fetchData(true);
+    if (verifyToken && userJson) {
+      try {
+        const user = JSON.parse(userJson);
+        const authenticatedAt = new Date(user.authenticatedAt);
+        const now = new Date();
+        const hoursPassed = (now.getTime() - authenticatedAt.getTime()) / (1000 * 60 * 60);
+        
+        // Token is valid for 2 hours
+        if (hoursPassed < 2) {
+          setIsAuthenticated(true);
+          setAuthUser(user);
+        } else {
+          // Token expired
+          sessionStorage.removeItem('qr_verify_token');
+          sessionStorage.removeItem('qr_verify_user');
+          setShowAuthModal(true);
+        }
+      } catch {
+        setShowAuthModal(true);
       }
-    };
-    
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible' && !loading && !refreshing) {
-        fetchData(true);
-      }
-    };
+    } else {
+      setShowAuthModal(true);
+    }
+  }, []);
 
-    window.addEventListener('focus', handleFocus);
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchData();
+      
+      // Refetch on window focus
+      const handleFocus = () => {
+        if (!loading && !refreshing) {
+          fetchData(true);
+        }
+      };
+      
+      const handleVisibilityChange = () => {
+        if (document.visibilityState === 'visible' && !loading && !refreshing) {
+          fetchData(true);
+        }
+      };
+
+      window.addEventListener('focus', handleFocus);
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+      
+      return () => {
+        window.removeEventListener('focus', handleFocus);
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+      };
+    }
+  }, [qrToken, isAuthenticated]);
+
+  const handleAuthenticated = (token: string) => {
+    setIsAuthenticated(true);
+    setShowAuthModal(false);
     
-    return () => {
-      window.removeEventListener('focus', handleFocus);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [qrToken]);
+    const userJson = sessionStorage.getItem('qr_verify_user');
+    if (userJson) {
+      setAuthUser(JSON.parse(userJson));
+    }
+  };
+
+  const handleLogout = () => {
+    sessionStorage.removeItem('qr_verify_token');
+    sessionStorage.removeItem('qr_verify_user');
+    setIsAuthenticated(false);
+    setAuthUser(null);
+    setData(null);
+    setShowAuthModal(true);
+  };
+
+  if (!isAuthenticated) {
+    return (
+      <QuickAuthModal
+        isOpen={showAuthModal}
+        onAuthenticated={handleAuthenticated}
+      />
+    );
+  }
 
   if (loading && !data) {
     return (
@@ -165,27 +243,48 @@ function VerificationView({ qrToken }: { qrToken: string }) {
   });
 
   return (
-    <Card className="max-w-lg mx-auto">
-      <CardHeader className="pb-4">
-        <div className="flex flex-col sm:flex-row items-start sm:justify-between gap-4">
-          <div className="space-y-2 flex-1">
-            <CardTitle className="text-xl sm:text-2xl">Lidkaart verificatie</CardTitle>
-            <div className="flex items-center gap-2">
-              <StatusBadge status={data.status} />
-              {data.tenant.name && (
-                <span className="text-sm text-gray-600">{data.tenant.name}</span>
+    <>
+      <Card className="max-w-lg mx-auto">
+        <CardHeader className="pb-4">
+          <div className="flex flex-col sm:flex-row items-start sm:justify-between gap-4">
+            <div className="space-y-2 flex-1">
+              <div className="flex items-start justify-between">
+                <CardTitle className="text-xl sm:text-2xl">Lidkaart verificatie</CardTitle>
+                {authUser && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleLogout}
+                    className="text-xs gap-1 h-8"
+                    data-testid="button-logout"
+                  >
+                    <LogOut className="h-3 w-3" />
+                    Uitloggen
+                  </Button>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                <StatusBadge status={data.status} />
+                {data.tenant.name && (
+                  <span className="text-sm text-gray-600">{data.tenant.name}</span>
+                )}
+              </div>
+              {authUser && (
+                <div className="flex items-center gap-2 text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">
+                  <User className="h-3 w-3" />
+                  <span>{authUser.name} ({authUser.role})</span>
+                </div>
               )}
             </div>
+            {data.tenant.logoUrl && (
+              <img 
+                src={data.tenant.logoUrl} 
+                alt={data.tenant.name}
+                className="h-12 sm:h-16 w-auto opacity-90"
+              />
+            )}
           </div>
-          {data.tenant.logoUrl && (
-            <img 
-              src={data.tenant.logoUrl} 
-              alt={data.tenant.name}
-              className="h-12 sm:h-16 w-auto opacity-90"
-            />
-          )}
-        </div>
-      </CardHeader>
+        </CardHeader>
       
       <CardContent className="space-y-6">
         {/* Member Details */}
@@ -298,6 +397,7 @@ function VerificationView({ qrToken }: { qrToken: string }) {
         </Button>
       </CardContent>
     </Card>
+    </>
   );
 }
 

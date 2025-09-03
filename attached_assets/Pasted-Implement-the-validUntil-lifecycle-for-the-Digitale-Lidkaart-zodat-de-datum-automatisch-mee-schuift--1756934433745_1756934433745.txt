@@ -1,0 +1,125 @@
+Implement the validUntil lifecycle for the Digitale Lidkaart zodat de datum automatisch mee schuift met de betaalperioden (maandelijks/jaarlijks, zonder prorata) en de status-LED correct is. Taal nl-BE, tijdzone Europe/Brussels, datumweergave dd-mm-jjjj. Stack: Next.js 14 (app router), TypeScript strict, Prisma + PostgreSQL, Zod, date-fns/date-fns-tz.
+
+We genereren code voor services, hooks en API-routes. UI mag minimaal (alleen waar nodig). Focus op correcte domeinlogica.
+
+1) Domeinregels (bron van waarheid)
+
+Termijnberekening (zonder prorata)
+
+Maandelijks: periode = [start, addMonths(start, 1))
+
+Jaarlijks: periode = [start, addYears(start, 1))
+
+Volgende periode start exact op vorige periodEnd.
+
+validUntil op kaart = periodEnd van de huidige lopende/vooruitbetaalde periode.
+
+Bij nieuwe (volgende) periode aangemaakt → update CardMeta.validUntil naar die nieuwe periodEnd.
+
+Status-LED (afgeleid, niet hard-coden):
+
+ACTUEEL: er bestaat een lopende periode (nu in BE-tijd ∈ [start,end)) en die periode is Betaald.
+
+VERLOPEN: nu > periodEnd van laatste periode en er is geen betaald record dat de nieuwe/lopende periode dekt.
+
+NIET ACTUEEL: offline/verify niet bereikbaar → UI toont oranje tijdelijk; server-bron blijft leidend.
+
+Status lidgeld: Openstaand / Betaald / Vervallen (nl-BE).
+
+Vervallen: dag na periodEnd (Europe/Brussels) als nog Openstaand.
+
+2) Prisma & helpers
+
+Zorg dat CardMeta velden bevat: validUntil: Date?, etag: String, version: Int, secureToken, qrToken, status: CardStatus.
+
+Maak util: lib/time/beTime.ts
+
+nowBE(): Date (BE-tijd)
+
+toBEDate(d: Date): Date
+
+formatDateBE(d: Date): string (dd-MM-yyyy)
+
+Maak util: lib/fees/periods.ts
+
+monthlyFrom(start: Date): { start: Date; end: Date }
+
+yearlyFrom(start: Date): { start: Date; end: Date }
+
+nextFrom(end: Date, term: 'MONTHLY'|'YEARLY'): { start: Date; end: Date }
+
+3) Services (kernlogica)
+
+lib/card/status.ts
+
+computeCardStatus(memberId): Promise<'ACTUEEL'|'NIET_ACTUEEL'|'VERLOPEN'>
+
+Zoek laatste/actuele periode (op basis van periodStart/End).
+
+Check betaling van de lopende periode.
+
+Return status volgens regels hierboven.
+
+lib/card/validUntil.ts
+
+updateValidUntil(memberId): Promise<Date | null>
+
+Vind nieuwste periode die Betaald is (of lopende betaald).
+
+Neem diens periodEnd → schrijf naar CardMeta.validUntil.
+
+Bump version, regenereer etag (hash van zichtbare kaartdata), rotate tokens indien gewenst.
+
+Return nieuwe validUntil.
+
+lib/fees/rollover.ts
+
+rolloverDaily(tenantId?): Promise<Summary>
+
+Markeer Openstaand → Vervallen als todayBE > periodEnd.
+
+Genereer volgende periode (Openstaand) vanaf laatste periodEnd voor actieve leden.
+
+Call updateValidUntil(memberId) + computeCardStatus(memberId) → schrijf naar CardMeta.status.
+
+lib/card/etag.ts
+
+makeCardETag(member, tenantBranding, cardStatus, ruleBadges, validUntil): string (stabiele hash, bv. SHA256→short).
+
+4) Event-hooks (wanneer bijwerken)
+
+Bij nieuw lid
+
+Maak initiële periode (Openstaand) vanaf member.createdAt.
+
+Zet CardMeta.validUntil = periodEnd alleen als die periode Betaald is (meestal nog niet) → in dat geval null laten of periodEnd tonen zodra betaald.
+
+CardMeta.status initieel op basis van computeCardStatus.
+
+Bij betaling geregistreerd (mark paid / import)
+
+Herbereken lopende periode → markeer Betaald.
+
+Run updateValidUntil(memberId) en computeCardStatus(memberId).
+
+Notify SW (PWA) via message/channel → live kaart herlaadt.
+
+Bij perioderollover (dagelijks)
+
+Zie rolloverDaily.
+
+5) API-routes (tRPC/REST)
+
+POST /api/fees/mark-paid
+
+Input (Zod): { feeId: string, paidAt?: string }
+
+Effect: markeer Betaald → updateValidUntil + computeCardStatus + return nieuwe validUntil + status.
+
+POST /api/jobs/fees/rollover (RBAC: BEHEERDER+)
+
+Draait rolloverDaily.
+
+GET /api/card/[memberId]
+
+Return: naam, lidnummer, categorie, status, validUntil, badges (stemrecht), branding, etag.

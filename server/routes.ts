@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { authMiddleware } from "./middleware/auth";
 import { tenantMiddleware } from "./middleware/tenant";
+import { quickAuthMiddleware, storeVerifyToken } from "./middleware/quickAuth";
 import { authService } from "./services/auth";
 import { memberService } from "./services/member";
 import { feeService } from "./services/fee";
@@ -77,6 +78,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/auth/me", authMiddleware, async (req, res) => {
     res.json({ user: req.user });
+  });
+
+  // Quick authentication for QR verification
+  app.post("/api/auth/quick-verify", async (req, res) => {
+    try {
+      const { email, password } = loginSchema.parse(req.body);
+      const result = await authService.login(email, password);
+      
+      if (!result.success) {
+        return res.status(401).json({ error: "Ongeldige inloggegevens" });
+      }
+
+      // Check if user has staff/manager role
+      const user = result.user;
+      if (user.role !== 'BEHEERDER' && user.role !== 'MEDEWERKER') {
+        return res.status(403).json({ error: "Geen toegang - alleen medewerkers en beheerders" });
+      }
+
+      // Generate and store verification token
+      const verifyToken = `verify_${Date.now()}_${user.id}`;
+      storeVerifyToken(verifyToken, user.id, user.role);
+      
+      res.json({
+        user: {
+          id: user.id,
+          name: user.name,
+          role: user.role,
+        },
+        token: verifyToken,
+      });
+    } catch (error) {
+      res.status(400).json({ error: "Ongeldige aanvraag" });
+    }
   });
 
   // Profile routes
@@ -1112,8 +1146,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Public card verification API
-  app.get("/api/card/verify/:qrToken", async (req, res) => {
+  // Protected card verification API (requires staff authentication)
+  app.get("/api/card/verify/:qrToken", quickAuthMiddleware, async (req, res) => {
     try {
       const { qrToken } = req.params;
       const clientIp = req.ip || req.connection.remoteAddress || 'unknown';

@@ -216,32 +216,25 @@ export function MembershipCard({
                   className={`${isConstrained ? 'w-12 h-12' : 'w-16 h-16'}`}
                   data-testid="voting-icon"
                   style={{
-                    color: '#8B6914',
+                    color: '#B8860B',
                     textShadow: `
                       1px 1px 0 #D4AF37,
-                      2px 2px 0 #B8860B,
-                      3px 3px 0 #996515,
-                      4px 4px 8px rgba(0,0,0,0.6),
-                      0 0 10px rgba(212,175,55,0.3)
+                      2px 2px 3px rgba(0,0,0,0.4)
                     `,
-                    filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.4))'
+                    filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.3))'
                   }}
                 />
                 
                 {/* Embossed Dark Gold Text */}
                 <span 
-                  className={`${isConstrained ? 'text-xs' : 'text-sm'} uppercase tracking-[0.15em] font-black mt-3`}
+                  className={`${isConstrained ? 'text-xs' : 'text-sm'} uppercase tracking-[0.1em] font-bold mt-3`}
                   style={{
-                    color: '#8B6914',
+                    color: '#B8860B',
                     textShadow: `
                       1px 1px 0 #D4AF37,
-                      2px 2px 0 #B8860B,
-                      3px 3px 0 #996515,
-                      4px 4px 6px rgba(0,0,0,0.5),
-                      0 0 8px rgba(212,175,55,0.2)
+                      2px 2px 3px rgba(0,0,0,0.3)
                     `,
-                    WebkitTextStroke: '0.5px #6B5A0F',
-                    filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.3))'
+                    filter: 'drop-shadow(1px 1px 1px rgba(0,0,0,0.2))'
                   }}
                 >
                   STEMGERECHTIGD

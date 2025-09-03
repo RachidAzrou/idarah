@@ -129,25 +129,27 @@ export function LiveCard({
   const validUntil = cardMeta.validUntil || new Date(currentYear, 11, 31);
 
   return (
-    <div className={cn("w-full h-full relative overflow-hidden flex items-center justify-center", className)}>
+    <>
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          .force-blue-gradient {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 25%, #1d4ed8 50%, #2563eb 75%, #1e40af 100%) !important;
+            font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif !important;
+          }
+          .force-blue-gradient .embossed-text {
+            color: #EAF2FF !important;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.1), 0 -1px 0 rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.5) !important;
+          }
+        `
+      }} />
+      <div className={cn("w-full h-full relative overflow-hidden flex items-center justify-center", className)}>
 
-      {/* Live Card - Credit card aspect ratio */}
-      <div className="w-full h-full aspect-[1586/1000]">
+        {/* Live Card - Credit card aspect ratio */}
+        <div className="w-full h-full aspect-[1586/1000]">
         <div 
-          className="relative w-full h-full rounded-3xl overflow-hidden border border-white/10 card-font"
+          className="force-blue-gradient relative w-full h-full rounded-3xl overflow-hidden border border-white/10 card-font"
           style={{
-            background: `linear-gradient(135deg, 
-              #1e3a8a 0%,     /* Intense blue start */
-              #3b82f6 25%,    /* Mid blue */
-              #1d4ed8 50%,    /* Deeper blue middle */
-              #2563eb 75%,    /* Vibrant blue */
-              #1e40af 100%    /* Deep blue end */
-            )`,
-            boxShadow: `
-              0 0 0 1px rgba(255,255,255,0.1) inset,
-              0 18px 40px rgba(0,0,0,0.35),
-              0 8px 20px rgba(0,0,0,0.25)
-            `
+            boxShadow: `0 0 0 1px rgba(255,255,255,0.1) inset, 0 18px 40px rgba(0,0,0,0.35), 0 8px 20px rgba(0,0,0,0.25)`
           }}
           data-testid="live-card"
         >
@@ -284,6 +286,7 @@ export function LiveCard({
               </div>
             </div>
           </div>
+        </div>
       </div>
       </div>
 
@@ -315,6 +318,6 @@ export function LiveCard({
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

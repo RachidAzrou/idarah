@@ -531,11 +531,8 @@ export default function Instellingen() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      
-      <div className="lg:pl-60 flex flex-col flex-1">
-        <main className="flex-1 py-8">
-          <div className="px-4 sm:px-6 lg:px-8">
+    <main className="flex-1 py-4">
+      <div className="px-4 sm:px-6 lg:px-8 w-full">
             {/* Page Header */}
             <div className="border-b border-gray-200 pb-5 mb-6">
               <div>
@@ -1511,9 +1508,7 @@ export default function Instellingen() {
               </TabsContent>
 
             </Tabs>
-          </div>
-        </main>
       </div>
-    </div>
+    </main>
   );
 }

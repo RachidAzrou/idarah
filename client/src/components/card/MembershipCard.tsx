@@ -184,22 +184,12 @@ export function MembershipCard({
             
             <div className="flex items-start gap-3">
               <StatusLED status={displayStatus} />
-              {cardData.badges.includes("Stemgerechtigd") && (
-                <div className="flex flex-col items-center ml-4">
-                  <GoVerified 
-                    className="w-8 h-8 text-white/70 debossed-icon"
-                    data-testid="voting-icon"
-                  />
-                  <span className="embossed-text text-[10px] uppercase tracking-wide mt-1 opacity-80">
-                    STEMGERECHTIGD
-                  </span>
-                </div>
-              )}
             </div>
           </div>
 
-          {/* QR Code - Left aligned with margin */}
-          <div className={`flex justify-start mb-8 ml-4 mt-4 ${isConstrained ? 'scale-75 origin-left' : ''}`}>
+          {/* QR Code and Voting Rights Section */}
+          <div className={`flex justify-between items-center mb-8 ml-4 mt-4 ${isConstrained ? 'scale-75 origin-left' : ''}`}>
+            {/* QR Code - Left side */}
             <button
               onClick={() => setShowQRModal(true)}
               className="debossed-qr-container transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/50 hover:scale-105"
@@ -217,6 +207,29 @@ export function MembershipCard({
                 />
               </div>
             </button>
+
+            {/* Voting Rights Badge - Right side */}
+            {cardData.badges.includes("Stemgerechtigd") && (
+              <div className="flex flex-col items-center mr-8">
+                <GoVerified 
+                  className={`text-white/90 debossed-icon ${isConstrained ? 'w-12 h-12' : 'w-16 h-16'}`}
+                  data-testid="voting-icon"
+                  style={{
+                    textShadow: '3px 3px 6px rgba(0,0,0,0.9), -2px -2px 4px rgba(255,255,255,0.3), 0 0 12px rgba(255,255,255,0.1)',
+                    filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.6))'
+                  }}
+                />
+                <span 
+                  className={`embossed-text ${isConstrained ? 'text-sm' : 'text-lg'} uppercase tracking-wider mt-2 opacity-90 font-bold`}
+                  style={{
+                    textShadow: '2px 2px 4px rgba(0,0,0,0.9), -1px -1px 2px rgba(255,255,255,0.3), 0 0 8px rgba(255,255,255,0.1)',
+                    filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))'
+                  }}
+                >
+                  STEMGERECHTIGD
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Member Information */}

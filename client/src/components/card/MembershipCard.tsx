@@ -211,19 +211,20 @@ export function MembershipCard({
             {/* Voting Rights Badge - Right side */}
             {(cardData.badges.includes("Stemgerechtigd") || true) && (
               <div className="flex flex-col items-center mr-8">
-                {/* Gold Outline Icon */}
+                {/* Bold Gold Outline Icon */}
                 <GoVerified 
                   className={`${isConstrained ? 'w-12 h-12' : 'w-16 h-16'}`}
                   data-testid="voting-icon"
                   style={{
                     color: 'transparent',
-                    WebkitTextStroke: '2px #D4AF37',
+                    WebkitTextStroke: '3px #D4AF37',
                     textShadow: `
-                      0 0 3px rgba(212,175,55,0.6),
-                      0 0 6px rgba(212,175,55,0.3),
-                      2px 2px 4px rgba(0,0,0,0.4)
+                      0 0 5px rgba(212,175,55,0.8),
+                      0 0 10px rgba(212,175,55,0.5),
+                      0 0 15px rgba(212,175,55,0.3),
+                      2px 2px 6px rgba(0,0,0,0.5)
                     `,
-                    filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.3))'
+                    filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.4)) brightness(1.2)'
                   }}
                 />
                 

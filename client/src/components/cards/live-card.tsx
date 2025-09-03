@@ -123,10 +123,16 @@ export function LiveCard({
 
   // Handle refresh with animation
   const handleRefresh = () => {
+    console.log('Refresh clicked, starting flip animation');
+    console.log('Current isFlipping state:', isFlipping);
+    setIsFlipping(true);
+    setTimeout(() => {
+      setIsFlipping(false);
+      console.log('Flip animation ended');
+    }, 800);
+    
     if (onRefresh) {
-      setIsFlipping(true);
       onRefresh();
-      setTimeout(() => setIsFlipping(false), 800);
     }
   };
 
@@ -160,7 +166,9 @@ export function LiveCard({
             "card-gradient relative w-full h-full rounded-3xl overflow-hidden border border-white/10 card-font transition-transform duration-800",
             isFlipping && "animate-flip-horizontal"
           )}
-          style={{
+          style={{ 
+            transform: isFlipping ? 'rotateY(360deg)' : 'rotateY(0deg)',
+            transition: 'transform 800ms ease-in-out',
             boxShadow: `
               0 0 0 1px rgba(255,255,255,0.1) inset,
               0 18px 40px rgba(0,0,0,0.35),

@@ -119,27 +119,54 @@ export function CardPage() {
   }
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center p-4 bg-slate-50">
-      <FullScreenButton />
-      <div className="w-full max-w-3xl">
-        <div className="relative aspect-[16/10] rounded-lg overflow-hidden border border-gray-200">
-          <CardCanvas className="rounded-lg">
-            <LiveCard
-              member={data.member}
-              cardMeta={data.cardMeta}
-              tenant={data.tenant}
-              onRefresh={handleRefresh}
-              isRefreshing={isLoading}
-              standalone={true}
-              className="h-full w-full"
-            />
-          </CardCanvas>
+    <>
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          .standalone-card-background {
+            background: radial-gradient(120% 80% at 50% 40%, #0E264A 0%, #0B1220 60%, #0A1426 100%) !important;
+            position: relative;
+          }
+          .standalone-card-background::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(80% 60% at 50% 50%, transparent 0%, rgba(0,0,0,.35) 70%, rgba(0,0,0,.6) 100%);
+            pointer-events: none;
+          }
+          .standalone-card-background::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,.06) 0%, transparent 35%, transparent 65%, rgba(255,255,255,.03) 100%);
+            pointer-events: none;
+            mix-blend-mode: screen;
+          }
+        `
+      }} />
+      <div className="standalone-card-background min-h-screen w-full flex items-center justify-center p-4">
+        <FullScreenButton />
+        <div className="w-full max-w-3xl relative z-10">
+          <div className="relative aspect-[16/10] rounded-lg overflow-hidden border border-gray-200">
+            <div className="relative w-full h-full overflow-hidden grid place-items-center bg-spotlight bg-vignette bg-sheen bg-grain bg-rimlight p-4">
+              <div className="mx-auto aspect-[1586/1000] w-full h-auto relative z-10">
+                <LiveCard
+                  member={data.member}
+                  cardMeta={data.cardMeta}
+                  tenant={data.tenant}
+                  onRefresh={handleRefresh}
+                  isRefreshing={isLoading}
+                  standalone={true}
+                  className="h-full w-full"
+                />
+              </div>
+            </div>
+          </div>
         </div>
+        <InstallCoach 
+          isOpen={installCoach.isOpen} 
+          onClose={installCoach.close} 
+        />
       </div>
-      <InstallCoach 
-        isOpen={installCoach.isOpen} 
-        onClose={installCoach.close} 
-      />
-    </div>
+    </>
   );
 }

@@ -124,7 +124,7 @@ export default function PubliekeSchermen() {
         <main className="flex-1 py-8">
           <div className="px-4 sm:px-6 lg:px-8">
             {/* Page Header */}
-            <div className="mb-6">
+            <div className="border-b border-gray-200 pb-5 mb-6">
               <div className="flex items-center justify-between">
                 <div>
                   <h1 className="text-2xl font-bold text-gray-900" data-testid="page-title">Publieke Schermen</h1>

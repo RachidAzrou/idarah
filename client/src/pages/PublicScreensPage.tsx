@@ -73,7 +73,7 @@ export default function PublicScreensPage() {
     <main className="flex-1 py-4">
       <div className="px-4 sm:px-6 lg:px-8 w-full">
         {/* Page Header */}
-        <div className="mb-8">
+        <div className="border-b border-gray-200 pb-5 mb-8">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
               <h1 className="text-2xl font-bold text-gray-900" data-testid="page-title">

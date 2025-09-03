@@ -229,7 +229,7 @@ export default function LidkaartenPage() {
     <main className="flex-1 py-4">
       <div className="px-4 sm:px-6 lg:px-8 w-full">
         {/* Page Header */}
-        <div className="mb-6">
+        <div className="border-b border-gray-200 pb-5 mb-6">
           <div>
             <h1 className="text-2xl font-bold text-gray-900" data-testid="page-title">Lidkaarten</h1>
             <p className="mt-1 text-sm text-gray-700">Beheer alle digitale lidkaarten van uw leden</p>

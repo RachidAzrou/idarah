@@ -87,10 +87,8 @@ export function CardPage() {
 
   if (!params?.memberId) {
     return (
-      <div className="min-h-screen w-full relative overflow-hidden flex items-center justify-center p-4 sm:p-6" style={{
-        background: `radial-gradient(circle at 50% 40%, #0B2440 0%, #0E3A6E 45%, #0B2440 100%), radial-gradient(circle at 50% 50%, transparent 40%, rgba(0,0,0,0.3) 100%), linear-gradient(135deg, rgba(255,255,255,0.02) 0%, transparent 50%, rgba(0,0,0,0.05) 100%)`
-      }}>
-        <div className="text-center text-white/80">
+      <div className="min-h-screen w-full flex items-center justify-center p-4 bg-slate-50">
+        <div className="text-center">
           <h1 className="text-2xl font-bold mb-2">Geen lid geselecteerd</h1>
           <p>Selecteer een lid om de digitale kaart te bekijken.</p>
         </div>
@@ -100,11 +98,9 @@ export function CardPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen w-full relative overflow-hidden flex items-center justify-center p-4 sm:p-6" style={{
-        background: `radial-gradient(circle at 50% 40%, #0B2440 0%, #0E3A6E 45%, #0B2440 100%), radial-gradient(circle at 50% 50%, transparent 40%, rgba(0,0,0,0.3) 100%), linear-gradient(135deg, rgba(255,255,255,0.02) 0%, transparent 50%, rgba(0,0,0,0.05) 100%)`
-      }}>
-        <div className="text-center text-white/80">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400 mx-auto mb-4"></div>
+      <div className="min-h-screen w-full flex items-center justify-center p-4 bg-slate-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
           <p>Lidkaart laden...</p>
         </div>
       </div>
@@ -113,10 +109,8 @@ export function CardPage() {
 
   if (error || !data) {
     return (
-      <div className="min-h-screen w-full relative overflow-hidden flex items-center justify-center p-4 sm:p-6" style={{
-        background: `radial-gradient(circle at 50% 40%, #0B2440 0%, #0E3A6E 45%, #0B2440 100%), radial-gradient(circle at 50% 50%, transparent 40%, rgba(0,0,0,0.3) 100%), linear-gradient(135deg, rgba(255,255,255,0.02) 0%, transparent 50%, rgba(0,0,0,0.05) 100%)`
-      }}>
-        <div className="text-center text-white/80">
+      <div className="min-h-screen w-full flex items-center justify-center p-4 bg-slate-50">
+        <div className="text-center">
           <h1 className="text-2xl font-bold mb-2">Lidkaart niet gevonden</h1>
           <p>De opgevraagde lidkaart bestaat niet of is niet beschikbaar.</p>
         </div>
@@ -125,21 +119,21 @@ export function CardPage() {
   }
 
   return (
-    <div className="min-h-screen w-full relative overflow-hidden flex items-center justify-center p-4 sm:p-6" style={{
-      background: `radial-gradient(circle at 50% 40%, #0B2440 0%, #0E3A6E 45%, #0B2440 100%), radial-gradient(circle at 50% 50%, transparent 40%, rgba(0,0,0,0.3) 100%), linear-gradient(135deg, rgba(255,255,255,0.02) 0%, transparent 50%, rgba(0,0,0,0.05) 100%)`
-    }}>
+    <div className="min-h-screen w-full flex items-center justify-center p-4 bg-slate-50">
       <FullScreenButton />
-      <div className="relative w-[clamp(560px,70vmin,880px)] max-w-[94vw] max-h-[94vh] aspect-[1586/1000] mx-auto">
-        <div className="absolute inset-0 relative z-10">
-          <LiveCard
-            member={data.member}
-            cardMeta={data.cardMeta}
-            tenant={data.tenant}
-            onRefresh={handleRefresh}
-            isRefreshing={isLoading}
-            standalone={true}
-            className="h-full w-full"
-          />
+      <div className="w-full max-w-3xl">
+        <div className="relative aspect-[16/10] rounded-lg overflow-hidden border border-gray-200">
+          <CardCanvas className="rounded-lg">
+            <LiveCard
+              member={data.member}
+              cardMeta={data.cardMeta}
+              tenant={data.tenant}
+              onRefresh={handleRefresh}
+              isRefreshing={isLoading}
+              standalone={true}
+              className="h-full w-full"
+            />
+          </CardCanvas>
         </div>
       </div>
       <InstallCoach 

@@ -361,8 +361,13 @@ export class DatabaseStorage implements IStorage {
     return fee || undefined;
   }
 
-  async getMembershipFeesByTenant(tenantId: string): Promise<MembershipFee[]> {
-    return await db.select().from(membershipFees)
+  async getMembershipFeesByTenant(tenantId: string): Promise<any[]> {
+    return await db.select({
+      ...membershipFees,
+      memberFirstName: members.firstName,
+      memberLastName: members.lastName,
+    }).from(membershipFees)
+      .innerJoin(members, eq(membershipFees.memberId, members.id))
       .where(eq(membershipFees.tenantId, tenantId))
       .orderBy(desc(membershipFees.createdAt))
       .limit(2000); // Limit to prevent large data loads

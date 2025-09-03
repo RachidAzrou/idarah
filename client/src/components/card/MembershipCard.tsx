@@ -188,7 +188,7 @@ export function MembershipCard({
           </div>
 
           {/* QR Code - Left aligned with margin */}
-          <div className="flex justify-start mb-6 ml-4">
+          <div className="flex justify-start mb-8 ml-4 mt-4">
             <button
               onClick={() => setShowQRModal(true)}
               className="debossed-qr-container transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/50 hover:scale-105"
@@ -209,7 +209,7 @@ export function MembershipCard({
           </div>
 
           {/* Member Information */}
-          <div className="mb-6 space-y-4 ml-8">
+          <div className="mb-8 space-y-6 ml-8">
             {/* Member Name */}
             <div>
               <p className="embossed-text text-[clamp(16px,2.0vmin,18px)] uppercase tracking-wide opacity-80 mb-1 font-medium">

@@ -580,9 +580,7 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
       <DialogContent className="max-w-6xl max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Leden Importeren</DialogTitle>
-          <DialogDescription>
-            Import leden via CSV of Excel bestand. Download eerst een template om het juiste formaat te gebruiken.
-          </DialogDescription>
+          <DialogDescription>Import leden via Excel bestand. Download eerst een template om het juiste formaat te gebruiken.</DialogDescription>
         </DialogHeader>
 
         <Tabs value={step} className="w-full flex-1 flex flex-col">
@@ -735,7 +733,7 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
           <TabsContent value="importing" className="space-y-4 flex-1 flex flex-col">
             {showDuplicateConfirmation ? (
               // Show duplicate confirmation
-              <div className="space-y-4">
+              (<div className="space-y-4">
                 <div>
                   <p className="text-sm text-gray-600">
                     {duplicateCheckResults.filter(result => result.duplicateCheck.duplicateNumber).length > 0 && 
@@ -758,7 +756,6 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
                     )}
                   </p>
                 </div>
-
                 {/* Leden die NIET geïmporteerd worden */}
                 {duplicateCheckResults.filter(result => 
                   (result.duplicateCheck.duplicateNumber && result.duplicateCheck.duplicateNameAddress) || 
@@ -797,7 +794,6 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
                     </div>
                   </div>
                 )}
-
                 {/* Leden met dubbel lidnummer die WEL geïmporteerd worden */}
                 {duplicateCheckResults.filter(result => 
                   result.duplicateCheck.duplicateNumber && !result.duplicateCheck.duplicateNameAddress
@@ -821,8 +817,6 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
                     </div>
                   </div>
                 )}
-
-
                 <DialogFooter>
                   <Button variant="outline" onClick={() => setShowDuplicateConfirmation(false)}>
                     Annuleren
@@ -847,17 +841,16 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
                     }).length === 0 ? 'Geen leden om te importeren' : 'Toch Importeren'}
                   </Button>
                 </DialogFooter>
-              </div>
+              </div>)
             ) : importProgress === 0 ? (
               // Preview before import
-              <div className="space-y-4 flex-1 flex flex-col">
+              (<div className="space-y-4 flex-1 flex flex-col">
                 <div>
                   <h3 className="text-lg font-semibold">Import Preview</h3>
                   <p className="text-sm text-gray-600">
                     {validMembers.length} rijen klaar voor import. Controleer de gegevens en klik op 'Importeren' om door te gaan.
                   </p>
                 </div>
-
                 <div className="flex-1 overflow-auto border rounded">
                   <div className="min-w-max">
                     <Table>
@@ -882,13 +875,11 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
                     </Table>
                   </div>
                 </div>
-
                 {validMembers.length !== csvData.length && (
                   <div className="text-sm text-amber-600 bg-amber-50 p-3 rounded border">
                     Let op: {csvData.length - validMembers.length} rijen hebben validatiefouten en worden niet geïmporteerd.
                   </div>
                 )}
-
                 <DialogFooter>
                   <Button variant="outline" onClick={() => setStep('validation')}>
                     Terug
@@ -901,24 +892,23 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
                     {validMembers.length} leden importeren
                   </Button>
                 </DialogFooter>
-              </div>
+              </div>)
             ) : (
               // Progress during import
-              <div className="text-center space-y-4">
+              (<div className="text-center space-y-4">
                 <div>
                   <h3 className="text-lg font-semibold">Leden aan het importeren...</h3>
                   <p className="text-sm text-gray-600">
                     {importedCount} van {validMembers.length} leden geïmporteerd
                   </p>
                 </div>
-                
                 <div className="space-y-2">
                   <Progress value={importProgress} className="w-full" />
                   <p className="text-sm text-gray-500">
                     {Math.round(importProgress)}% voltooid
                   </p>
                 </div>
-              </div>
+              </div>)
             )}
           </TabsContent>
 

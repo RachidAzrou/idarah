@@ -101,6 +101,7 @@ export const memberPermissions = pgTable("member_permissions", {
   whatsappList: boolean("whatsapp_list").default(false).notNull(),
   interestedInActiveRole: boolean("interested_in_active_role").default(false).notNull(),
   roleDescription: text("role_description"),
+  votingEligible: boolean("voting_eligible").default(false).notNull(),
 });
 
 export const mandates = pgTable("mandates", {

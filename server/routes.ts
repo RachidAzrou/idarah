@@ -705,6 +705,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/cards/:memberId/create", authMiddleware, tenantMiddleware, async (req, res) => {
+    try {
+      const { memberId } = req.params;
+      const member = await storage.getMember(memberId);
+      
+      if (!member || member.tenantId !== req.tenantId) {
+        return res.status(404).json({ message: "Member not found" });
+      }
+
+      // Check if card already exists
+      const existingCard = await storage.getCardMetaByMember(memberId);
+      if (existingCard) {
+        return res.status(409).json({ message: "Card already exists for this member" });
+      }
+
+      const cardData = await cardService.getOrCreateCardMeta(memberId);
+      if (cardData) {
+        res.json({ success: true, message: "Card created", card: cardData });
+      } else {
+        res.status(500).json({ message: "Failed to create card" });
+      }
+    } catch (error) {
+      console.error('Error creating card:', error);
+      res.status(500).json({ message: "Failed to create card" });
+    }
+  });
+
   app.post("/api/cards/:memberId/regenerate", authMiddleware, tenantMiddleware, async (req, res) => {
     try {
       const { memberId } = req.params;

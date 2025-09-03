@@ -360,13 +360,7 @@ export default function LidkaartenPage() {
                   </TableCell>
                   <TableCell>{getMemberCategoryLabel(member.category)}</TableCell>
                   <TableCell>
-                    {cardMeta ? (
-                      <Badge variant={getStatusVariant(cardMeta.status)}>
-                        {getStatusLabel(cardMeta.status)}
-                      </Badge>
-                    ) : (
-                      <Badge variant="outline">Geen kaart</Badge>
-                    )}
+                    {cardMeta ? getStatusLabel(cardMeta.status) : 'Geen kaart'}
                   </TableCell>
                   <TableCell>
                     {cardMeta?.validUntil 

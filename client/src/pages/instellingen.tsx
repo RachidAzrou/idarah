@@ -1054,7 +1054,7 @@ export default function Instellingen() {
                     ) : (
                       <div className="space-y-4">
                         {Array.isArray(users) && users.map((currentUser: any) => {
-                          const isCurrentUser = currentUser.email === user?.user?.email;
+                          const isCurrentUser = currentUser.email === user?.email;
                           return (
                           <div key={currentUser.id} className={`flex items-center justify-between p-4 border border-gray-200 rounded-xl ${isCurrentUser ? 'opacity-50' : ''}`} data-testid={`user-item-${currentUser.id}`}>
                             <div className="flex items-center space-x-4">

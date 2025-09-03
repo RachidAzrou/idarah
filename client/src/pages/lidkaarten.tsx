@@ -443,15 +443,6 @@ export default function LidkaartenPage() {
                       </Button>
                     </div>
                   )}
-                  <Button 
-                    variant="outline" 
-                    onClick={handleExport}
-                    className="h-10 px-4 border-gray-200 hover:border-gray-300"
-                    data-testid="export-button"
-                  >
-                    <CiExport className="h-4 w-4 mr-2" />
-                    Export
-                  </Button>
                 </div>
               </div>
 

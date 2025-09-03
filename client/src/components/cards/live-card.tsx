@@ -316,16 +316,14 @@ export function LiveCard({
 
             {/* Bottom right: Valid until */}
             <div className="flex-1 flex justify-end items-end">
-              (
-                <div className="text-right flex items-center gap-2">
-                  <span className="embossed-text text-[clamp(8px,1.2vmin,10px)] uppercase tracking-wide opacity-70">
-                    GELDIG TOT
-                  </span>
-                  <span className="embossed-text text-[clamp(10px,1.4vmin,12px)] font-medium font-mono tabular-nums">
-                    {format(validUntil, 'dd-MM-yyyy', { locale: nl })}
-                  </span>
-                </div>
-              )
+              <div className="text-right flex items-center gap-2">
+                <span className="embossed-text text-[clamp(8px,1.2vmin,10px)] uppercase tracking-wide opacity-70">
+                  GELDIG TOT
+                </span>
+                <span className="embossed-text text-[clamp(10px,1.4vmin,12px)] font-medium font-mono tabular-nums">
+                  {format(validUntil, 'dd-MM-yyyy', { locale: nl })}
+                </span>
+              </div>
             </div>
           </div>
       </div>

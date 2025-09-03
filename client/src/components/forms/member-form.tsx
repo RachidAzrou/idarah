@@ -1063,7 +1063,7 @@ export function MemberForm({ member, onSuccess, onCancel }: MemberFormProps) {
                     disabled={createMemberMutation.isPending}
                     data-testid="button-submit"
                   >
-                    {createMemberMutation.isPending ? "Lid wordt aangemaakt..." : "Lid Aanmaken"}
+                    {createMemberMutation.isPending ? (member ? "Lid wordt opgeslagen..." : "Lid wordt aangemaakt...") : (member ? "Opslaan" : "Lid Aanmaken")}
                   </Button>
                 )}
               </div>

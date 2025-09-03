@@ -234,24 +234,6 @@ export function MemberDetailDialog({ member, open, onClose, onEdit }: MemberDeta
           </TabsContent>
         </Tabs>
 
-        {/* Actions */}
-        <div className="pt-3 border-t mt-4">
-          <div className="flex gap-3">
-            {onEdit && (
-              <Button 
-                onClick={() => {
-                  onEdit(member);
-                  onClose();
-                }}
-                className="flex-1"
-                data-testid="button-edit-member"
-              >
-                <Edit className="h-4 w-4 mr-2" />
-                Bewerken
-              </Button>
-            )}
-          </div>
-        </div>
       </DialogContent>
     </Dialog>
   );

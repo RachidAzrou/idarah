@@ -10,6 +10,7 @@ import {
   Building2,
   IdCard
 } from "lucide-react";
+import darahLogo from "@assets/DARAH_1756909309495.png";
 import { getUserInitials } from "@/lib/auth";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -34,7 +35,7 @@ export default function Sidebar() {
         <div className="flex h-16 shrink-0 items-center" data-testid="logo">
           <div className="flex items-center space-x-3">
             <img 
-              src="/attached_assets/DARAH_1756909309495.png" 
+              src={darahLogo} 
               alt="DARAH Logo" 
               className="w-32 h-8 object-contain"
             />

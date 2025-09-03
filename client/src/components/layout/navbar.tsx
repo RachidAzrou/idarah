@@ -17,6 +17,7 @@ import {
   IdCard,
   User
 } from "lucide-react";
+import darahLogo from "@assets/DARAH_1756909309495.png";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -45,7 +46,7 @@ export default function Navbar() {
         <div className="flex items-center">
           <Link href="/dashboard" className="flex items-center space-x-3">
             <img 
-              src="/attached_assets/DARAH_1756909309495.png" 
+              src={darahLogo} 
               alt="DARAH Logo" 
               className="w-24 h-6 object-contain"
             />

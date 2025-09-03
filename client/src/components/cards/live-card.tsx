@@ -271,7 +271,7 @@ export function LiveCard({
               {member.votingRights && (
                 <div className="flex flex-col items-center mr-8">
                   <PiUserCircleCheckLight 
-                    className="w-[clamp(48px, 6vmin, 64px)] h-[clamp(48px, 6vmin, 64px)]"
+                    className="w-[clamp(24px, 3.5vmin, 32px)] h-[clamp(24px, 3.5vmin, 32px)]"
                     data-testid="voting-icon"
                     style={{
                       color: '#DAA520',

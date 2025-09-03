@@ -80,8 +80,8 @@ export default function Lidgelden() {
       // Category filter
       const categoryMatch = categoryFilter === "all" || fee.type === categoryFilter;
       
-      // Amount filter
-      const amountValue = parseFloat(fee.amount || "0");
+      // Amount filter - handle both string and number amounts
+      const amountValue = typeof fee.amount === 'number' ? fee.amount : parseFloat(fee.amount || "0");
       const amountMinMatch = amountMin === undefined || amountValue >= amountMin;
       const amountMaxMatch = amountMax === undefined || amountValue <= amountMax;
       

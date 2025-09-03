@@ -34,6 +34,7 @@ interface MembershipCardProps {
   isOffline?: boolean;
   className?: string;
   triggerFlip?: boolean;
+  isConstrained?: boolean;
 }
 
 interface StatusLEDProps {
@@ -95,7 +96,8 @@ export function MembershipCard({
   isRefreshing = false,
   isOffline = false,
   className = "",
-  triggerFlip = false
+  triggerFlip = false,
+  isConstrained = false
 }: MembershipCardProps) {
   const [showQRModal, setShowQRModal] = useState(false);
   const [isFlipping, setIsFlipping] = useState(false);
@@ -117,6 +119,15 @@ export function MembershipCard({
 
   // Determine card status - force to NIET_ACTUEEL if offline
   const displayStatus = isOffline ? 'NIET_ACTUEEL' : cardData.status;
+  
+  // Scale text sizes based on constrained mode
+  const textScale = isConstrained ? 0.7 : 1;
+  const getScaledClamp = (minPx: number, vmin: number, maxPx: number) => {
+    const scaledMin = Math.round(minPx * textScale);
+    const scaledVmin = vmin * textScale;
+    const scaledMax = Math.round(maxPx * textScale);
+    return `clamp(${scaledMin}px,${scaledVmin}vmin,${scaledMax}px)`;
+  };
 
   return (
     <>
@@ -166,7 +177,7 @@ export function MembershipCard({
                   className="h-6 w-auto mb-2 opacity-90"
                 />
               )}
-              <h1 className="embossed-text text-3xl font-bold uppercase tracking-wider">
+              <h1 className={`embossed-text font-bold uppercase tracking-wider ${isConstrained ? 'text-xl' : 'text-3xl'}`}>
                 Lidkaart {cardData.tenant.name.toUpperCase()}
               </h1>
             </div>
@@ -188,18 +199,18 @@ export function MembershipCard({
           </div>
 
           {/* QR Code - Left aligned with margin */}
-          <div className="flex justify-start mb-8 ml-4 mt-4">
+          <div className={`flex justify-start mb-8 ml-4 mt-4 ${isConstrained ? 'scale-75 origin-left' : ''}`}>
             <button
               onClick={() => setShowQRModal(true)}
               className="debossed-qr-container transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/50 hover:scale-105"
               data-testid="qr-plate"
               aria-label="Toon scanbare QR code"
-              style={{ minWidth: '100px', minHeight: '100px' }}
+              style={{ minWidth: isConstrained ? '75px' : '100px', minHeight: isConstrained ? '75px' : '100px' }}
             >
               <div className="debossed-qr-frame">
                 <QRCodeSVG
                   value={qrCodeUrl}
-                  size={70}
+                  size={isConstrained ? 50 : 70}
                   className="debossed-qr"
                   fgColor="#D1D5DB"
                   bgColor="transparent"
@@ -209,7 +220,7 @@ export function MembershipCard({
           </div>
 
           {/* Member Information */}
-          <div className="mb-8 space-y-6 ml-8">
+          <div className={`mb-8 space-y-6 ml-8 ${isConstrained ? 'scale-75 origin-top-left' : ''}`}>
             {/* Member Name */}
             <div>
               <p className="embossed-text text-[clamp(16px,2.0vmin,18px)] uppercase tracking-wide opacity-80 mb-1 font-medium">

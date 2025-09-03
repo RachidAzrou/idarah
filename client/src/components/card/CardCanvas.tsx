@@ -34,7 +34,9 @@ export function CardCanvas({ children, className = '' }: CardCanvasProps) {
           relative z-10
         `}
       >
-        {children}
+        {React.isValidElement(children) && children.type && typeof children.type === 'function' && children.type.name === 'MembershipCard' 
+          ? React.cloneElement(children as React.ReactElement<any>, { isConstrained })
+          : children}
       </div>
     </div>
   );

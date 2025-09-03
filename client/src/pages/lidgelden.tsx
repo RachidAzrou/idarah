@@ -464,9 +464,9 @@ export default function Lidgelden() {
               <DialogTitle>Betaalmethode wijzigen</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
-              <p>Wijzig de betaalmethode voor {selectedFee?.memberName} ({selectedFee?.period})</p>
+              <p>Wijzig de betaalmethode voor {selectedFee?.memberName}</p>
               <Select 
-                defaultValue={selectedFee?.method}
+                value={selectedFee?.method}
                 onValueChange={(value) => {
                   if (selectedFee) {
                     changeMethodMutation.mutate({ feeId: selectedFee.id, method: value });

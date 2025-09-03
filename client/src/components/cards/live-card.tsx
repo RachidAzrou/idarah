@@ -268,7 +268,7 @@ export function LiveCard({
                     value={qrCodeUrl}
                     size={70}
                     className="debossed-qr"
-                    fgColor="#B8BCC8"
+                    fgColor="#D1D5DB"
                     bgColor="transparent"
                   />
                 </div>

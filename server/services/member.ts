@@ -38,6 +38,7 @@ class MemberService {
         ...memberFields,
         tenantId,
         memberNumber,
+        active: true, // Nieuwe leden zijn standaard actief
       });
 
       // Create financial settings if provided

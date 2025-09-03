@@ -27,16 +27,19 @@ function StatusLED({ status, className }: StatusLEDProps) {
   const statusConfig = {
     ACTUEEL: {
       color: 'bg-green-500',
+      glowClass: 'status-led-glow-green',
       label: 'Actueel',
       icon: Wifi,
     },
     MOMENTOPNAME: {
       color: 'bg-orange-500',
-      label: 'Momentopname',
+      glowClass: 'status-led-glow-orange',
+      label: 'Niet actueel',
       icon: WifiOff,
     },
     VERLOPEN: {
       color: 'bg-red-500',
+      glowClass: 'status-led-glow-red',
       label: 'Verlopen',
       icon: Clock,
     },
@@ -46,15 +49,14 @@ function StatusLED({ status, className }: StatusLEDProps) {
   const Icon = config.icon;
 
   return (
-    <div className={cn("flex items-center gap-2", className)}>
+    <div className={cn("flex items-center gap-1.5", className)}>
       <div 
-        className={cn("w-3 h-3 rounded-full", config.color)}
+        className={cn("w-2.5 h-2.5 rounded-full", config.color, config.glowClass)}
         aria-hidden="true"
       />
-      <span className="text-xs font-medium text-white/90">
+      <span className="text-xs font-medium embossed-text card-font">
         {config.label}
       </span>
-      <Icon className="h-3 w-3 text-white/70" />
     </div>
   );
 }
@@ -125,7 +127,9 @@ export function LiveCard({
   const validUntil = cardMeta.validUntil || new Date(currentYear, 11, 31);
 
   return (
-    <div className="min-h-screen bg-gray-900 p-4 sm:p-6 flex items-center justify-center">
+    <div className="min-h-screen w-full relative overflow-hidden flex items-center justify-center p-4 sm:p-6" style={{
+      background: `radial-gradient(circle at 50% 40%, #0B2440 0%, #0E3A6E 45%, #0B2440 100%), radial-gradient(circle at 50% 50%, transparent 40%, rgba(0,0,0,0.3) 100%), linear-gradient(135deg, rgba(255,255,255,0.02) 0%, transparent 50%, rgba(0,0,0,0.05) 100%)`
+    }}>
       {/* PWA Install Banner */}
       {isInstallable && !standalone && (
         <div className="fixed top-4 left-4 right-4 bg-blue-600 text-white p-3 rounded-lg shadow-lg z-10">
@@ -138,141 +142,153 @@ export function LiveCard({
         </div>
       )}
 
-      {/* Live Card */}
-      <div 
-        className="relative w-full max-w-md mx-auto aspect-[1.6/1] rounded-2xl shadow-2xl overflow-hidden border border-gray-600"
-        style={{
-          background: 'linear-gradient(135deg, #1e40af 0%, #1d4ed8 50%, #2563eb 100%)',
-        }}
-        data-testid="live-card"
-      >
-        {/* Gloss overlay */}
+      {/* Live Card - Credit card aspect ratio */}
+      <div className="w-[min(92vw,70vh*1.586)] sm:w-[min(94vw,94vh*1.586)] lg:w-[clamp(540px,70vmin,860px)] aspect-[1586/1000]">
         <div 
-          className={cn(
-            "absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent",
-            "transition-transform duration-800 ease-out",
-            showGloss ? "transform translate-x-full" : "transform -translate-x-full"
-          )}
+          className="card-gradient relative w-full h-full rounded-3xl overflow-hidden border border-white/10 card-font"
           style={{
-            background: "linear-gradient(45deg, transparent 0%, rgba(255,255,255,0.3) 40%, rgba(255,255,255,0.1) 60%, transparent 100%)",
+            boxShadow: `
+              0 0 0 1px rgba(255,255,255,0.1) inset,
+              0 18px 40px rgba(0,0,0,0.35),
+              0 8px 20px rgba(0,0,0,0.25)
+            `
           }}
-          aria-hidden="true"
-        />
+          data-testid="live-card"
+        >
+          {/* Shine overlay */}
+          <div 
+            className={cn(
+              "absolute inset-0 pointer-events-none",
+              "transition-transform duration-800 ease-out",
+              showGloss ? "card-shine" : ""
+            )}
+            style={{
+              background: "linear-gradient(35deg, transparent 40%, rgba(255,255,255,0.15) 50%, transparent 60%)",
+              width: "100px",
+              height: "200%",
+              transform: showGloss ? "translateX(-100%) rotate(35deg)" : "translateX(-200%) rotate(35deg)"
+            }}
+            aria-hidden="true"
+          />
 
-        {/* Card Content */}
-        <div className="relative h-full p-6 flex flex-col">
-          {/* Top Section - Bank style header */}
-          <div className="flex items-start justify-between mb-6">
-            <div className="flex-1">
-              {tenant.logoUrl && (
-                <img 
-                  src={tenant.logoUrl} 
-                  alt={tenant.name}
-                  className="h-6 w-auto mb-1"
-                />
-              )}
-              <h1 className="text-white/90 font-medium text-sm uppercase tracking-wider">
-                {tenant.name}
-              </h1>
-            </div>
-            
-            <div className="flex items-center gap-2">
-              <StatusLED status={cardMeta.status} />
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6 text-white/60 hover:text-white hover:bg-white/10"
-                onClick={handleRefresh}
-                disabled={isRefreshing}
-                data-testid="button-refresh"
-                aria-label="Ververs kaart"
-              >
-                <RefreshCw className={cn("h-3 w-3", isRefreshing && "animate-spin")} />
-              </Button>
-            </div>
-          </div>
-
-          {/* Card Number - Bank style */}
-          <div className="mb-6">
-            <p className="text-white font-mono text-lg tracking-widest">
-              {member.memberNumber.padStart(16, '0').replace(/(.{4})/g, '$1 ').trim()}
-            </p>
-          </div>
-
-          {/* Main Content - Two columns like bank card */}
-          <div className="flex-1 flex justify-between items-end">
-            {/* Left: Member name and details */}
-            <div className="flex-1">
-              {/* Member name - prominent like credit card */}
-              <div className="mb-3">
-                <p className="text-white/70 text-xs uppercase tracking-wide mb-1">Kaarthouder</p>
-                <h2 className="text-white text-lg font-bold uppercase tracking-wide">
-                  {member.firstName} {member.lastName}
-                </h2>
+          {/* Card Content */}
+          <div className="relative h-full p-6 flex flex-col card-font">
+            {/* Top row: Organization and Status */}
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex-1">
+                {tenant.logoUrl && (
+                  <img 
+                    src={tenant.logoUrl} 
+                    alt={tenant.name}
+                    className="h-5 w-auto mb-1 opacity-90"
+                  />
+                )}
+                <h1 className="embossed-text text-sm font-medium uppercase tracking-widest">
+                  {tenant.name}
+                </h1>
               </div>
               
-              {/* Category and voting rights */}
-              <div className="mb-3">
-                <p className="text-white/70 text-xs uppercase tracking-wide mb-1">Type</p>
-                <div className="flex items-center gap-2">
-                  <span className="text-white text-sm">
-                    {getMemberCategoryLabel(member.category)}
-                  </span>
-                  {member.votingRights && (
-                    <span className="text-white/90 text-xs bg-white/20 px-2 py-1 rounded-full">
-                      STEMGERECHTIGD
+              <div className="flex items-center gap-3">
+                <StatusLED status={cardMeta.status} />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-5 w-5 text-white/60 hover:text-white hover:bg-white/10 rounded-full"
+                  onClick={handleRefresh}
+                  disabled={isRefreshing}
+                  data-testid="button-refresh"
+                  aria-label="Ververs kaart"
+                >
+                  <RefreshCw className={cn("h-3 w-3", isRefreshing && "animate-spin")} />
+                </Button>
+              </div>
+            </div>
+
+            {/* Member Name - Prominent */}
+            <div className="mb-6">
+              <h2 className="embossed-text text-[clamp(18px,2.6vmin,28px)] font-semibold uppercase tracking-wide leading-tight">
+                {member.firstName} {member.lastName}
+              </h2>
+            </div>
+
+            {/* Card Number - Tabular style */}
+            <div className="mb-6">
+              <p className="embossed-text text-[clamp(12px,1.8vmin,16px)] font-medium tracking-[0.04em] font-mono tabular-nums">
+                {member.memberNumber.padStart(16, '0').replace(/(.{4})/g, '$1 ').trim()}
+              </p>
+            </div>
+
+            {/* Bottom row: Details and QR */}
+            <div className="flex-1 flex justify-between items-end">
+              {/* Left: Member details */}
+              <div className="flex-1 space-y-3">
+                {/* Category */}
+                <div>
+                  <p className="embossed-text text-[clamp(10px,1.4vmin,12px)] uppercase tracking-wide opacity-80 mb-1">
+                    CATEGORIE
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <span className="embossed-text text-[clamp(11px,1.6vmin,14px)] font-medium">
+                      {getMemberCategoryLabel(member.category)}
                     </span>
-                  )}
+                    {member.votingRights && (
+                      <span className="bg-white/15 text-white text-[10px] font-medium px-2 py-0.5 rounded-full uppercase tracking-wide">
+                        STEMGERECHTIGD
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Payment Status */}
+                <div>
+                  <p className="embossed-text text-[clamp(10px,1.4vmin,12px)] uppercase tracking-wide opacity-80 mb-1">
+                    STATUS
+                  </p>
+                  <span className={cn(
+                    "text-[clamp(11px,1.6vmin,14px)] font-medium",
+                    currentYearPaid 
+                      ? "text-green-300" 
+                      : "text-red-300"
+                  )}>
+                    {currentYearPaid ? `BETAALD ${currentYear}` : 'ONBETAALD'}
+                  </span>
+                </div>
+
+                {/* Valid until */}
+                <div>
+                  <p className="embossed-text text-[clamp(10px,1.4vmin,12px)] uppercase tracking-wide opacity-80 mb-1">
+                    GELDIG TOT
+                  </p>
+                  <p className="embossed-text text-[clamp(12px,1.8vmin,16px)] font-medium font-mono tabular-nums">
+                    {format(validUntil, 'dd-MM-yyyy', { locale: nl })}
+                  </p>
                 </div>
               </div>
 
-              {/* Valid until - bank card style */}
-              <div>
-                <p className="text-white/70 text-xs uppercase tracking-wide mb-1">Geldig tot</p>
-                <p className="text-white text-sm font-mono">
-                  {format(validUntil, 'MM/yy', { locale: nl })}
+              {/* Right: QR Code */}
+              <div className="flex flex-col items-center">
+                <button
+                  onClick={() => setShowQRModal(true)}
+                  className="bg-white rounded-xl p-3 shadow-lg hover:shadow-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/50 mb-2"
+                  data-testid="qr-plate"
+                  aria-label="Open grote QR code"
+                  style={{ minWidth: '80px', minHeight: '80px' }}
+                >
+                  <QRCodeSVG
+                    value={qrCodeUrl}
+                    size={56}
+                    className="w-full h-full"
+                    fgColor="#000000"
+                    bgColor="#ffffff"
+                  />
+                </button>
+                <p className="embossed-text text-[clamp(10px,1.4vmin,12px)] text-center leading-tight opacity-80">
+                  SCAN
                 </p>
               </div>
             </div>
-
-            {/* Right: QR Code and status */}
-            <div className="flex flex-col items-end">
-              {/* Payment status chip */}
-              <div className="mb-3">
-                <Badge 
-                  className={cn(
-                    "text-xs font-medium px-3 py-1",
-                    currentYearPaid 
-                      ? "bg-green-500/20 text-green-300 border-green-400/30" 
-                      : "bg-red-500/20 text-red-300 border-red-400/30"
-                  )}
-                  data-testid={currentYearPaid ? "chip-paid" : "chip-unpaid"}
-                >
-                  {currentYearPaid ? `BETAALD ${currentYear}` : 'ONBETAALD'}
-                </Badge>
-              </div>
-
-              {/* QR Code */}
-              <button
-                onClick={() => setShowQRModal(true)}
-                className="group bg-white rounded-lg p-2 shadow-lg hover:shadow-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/50"
-                data-testid="qr-plate"
-                aria-label="Open grote QR code"
-              >
-                <QRCodeSVG
-                  value={qrCodeUrl}
-                  size={60}
-                  className="w-full h-full"
-                  fgColor="#000000"
-                  bgColor="#ffffff"
-                />
-              </button>
-              <p className="text-white/60 text-xs text-center mt-1">
-                SCAN
-              </p>
-            </div>
           </div>
-        </div>
+      </div>
       </div>
 
       {/* QR Code Modal */}

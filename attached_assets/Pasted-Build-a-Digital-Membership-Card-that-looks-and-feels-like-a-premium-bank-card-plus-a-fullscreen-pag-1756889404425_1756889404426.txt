@@ -1,0 +1,196 @@
+Build a Digital Membership Card that looks and feels like a premium bank card, plus a fullscreen page background and scaling logic so the card fills the screen on any device. Locale nl-BE, dates dd-mm-jjjj. Do not design a back side.
+
+Tech
+
+Next.js 14 (App Router) + React 18 + TypeScript strict
+
+TailwindCSS (utility-first) + minimal CSS modules when needed
+
+qrcode.react (QR)
+
+No design system instructions needed beyond what’s below
+
+1) Typography & “bank card” look
+
+Primary font on card: Space Grotesk (variable), weights 400/500/700 — has that crisp “payment card” vibe with excellent numerals.
+
+Import via Google Fonts (display swap).
+
+Numeric details (lidnummer, geldigheid): use tabular-nums and slight letter-spacing (tracking-[0.04em]).
+
+Embossed effect (subtiel, modern – niet kitscherig):
+
+Text color: near-white #EAF2FF.
+
+Layered shadow: text-shadow: 0 1px 0 rgba(0,0,0,.25), 0 0 1px rgba(255,255,255,.15);
+
+Fallback fonts: system-ui, -apple-system, Segoe UI, Roboto.
+
+2) Card component
+
+Create components/card/MembershipCard.tsx.
+
+Props
+
+type CardStatus = 'ACTUEEL' | 'NIET_ACTUEEL' | 'VERLOPEN'; // no MOMENTOPNAME
+type CardProps = {
+  name: string;              // "Emma Janssen"
+  memberNumber: string;      // "001234"
+  category: 'Student'|'Volwassene'|'Senior';
+  status: CardStatus;        // ACTUEEL = live/ok, NIET_ACTUEEL = offline/not fresh, VERLOPEN = membership expired
+  validUntil?: string;       // "31-12-2025" (dd-mm-jjjj)
+  badges?: string[];         // ["Betaald 2025","Stemgerechtigd"]
+  qrToken: string;           // used to generate QR
+  tenantLogoUrl?: string;    // small monochrome logo in footer-left
+  etag?: string;             // version/hash (tiny text in footer-right)
+  onRefresh?: () => void;    // triggers shine + data refetch
+}
+
+
+Visual spec
+
+Container: rounded 24px, inner padding 20–24px, glossy blue gradient, plastic-card feel.
+
+Gradient: #0E3A6E → #0B4E9C with a diagonal darker overlay (top-left → bottom-right).
+
+Depth: soft inner highlight + outer drop shadow (0 18px 40px rgba(0,0,0,.35)).
+
+Shine strip: subtle diagonal sheen overlay (very low opacity).
+
+Layout (desktop & mobile consistent):
+
+Top row:
+
+Left: Naam (big), Categorie chip.
+
+Right: Status LED + statuslabel (ACTUEEL, NIET ACTUEEL, VERLOPEN).
+
+Mid: Lidnummer (tabular), Geldig tot (indien aanwezig).
+
+Badges (wrap): kleine “pills”.
+
+QR-zone: bottom-right een wit geïsoleerd vlak (≥128px) met QR; klik → modal met grote QR (≥320px).
+
+Footer: links tenantlogo (monochrome/white), rechts mini-tekst “v{etag}”.
+
+Status LED & kleuren
+
+ACTUEEL: LED #22C55E (groen).
+
+NIET ACTUEEL (offline/not fresh): LED #F59E0B (oranje), label “Niet actueel”.
+
+VERLOPEN: LED #EF4444 (rood), label “Verlopen”.
+
+LED is een 10–12px circle met soft glow (box-shadow: 0 0 0 4px rgba(color,.18)).
+
+QR modal
+
+Use a simple Dialog/Sheet. Title “Lidkaart QR”. QR size ≥ 320px.
+
+Provide a copy button for the verification URL (if you have one), otherwise just show the token beneath.
+
+Refresh
+
+Top-right small circular icon button (refresh).
+
+On click: call onRefresh?.() and play a shine sweep over de kaart (≤ 800ms).
+
+Respect prefers-reduced-motion: skip animation.
+
+3) Page background & fullscreen scaling
+
+Create components/card/CardCanvas.tsx and route app/card/[memberId]/page.tsx.
+
+Background (premium, dark blue)
+
+Full-viewport container min-h-screen w-full relative overflow-hidden.
+
+Base radial gradient spotlight (center 50%/40%): #0B2440 → #0E3A6E → #0B2440.
+
+Add vignette with a second radial gradient (edges darker 40–60%).
+
+Add diagonal sheen (very faint, linear-gradient 135°).
+
+Optional grain/noise overlay at 3–5% opacity to prevent banding.
+
+Scaling (credit-card aspect)
+
+Use a single aspect-ratio wrapper aspect-[1586/1000] (≈ 1.586:1).
+
+Size rules:
+
+Portrait phones: w-[min(92vw,70vh*1.586)] centered.
+
+Landscape (phones/tablets): h-[min(94vh,94vw/1.586)].
+
+Desktop: w-[clamp(540px, 70vmin, 860px)].
+
+Place <MembershipCard className="h-full w-full" /> inside the wrapper (no CSS transform: scale() to avoid blur).
+
+Safe areas (iOS): outer padding uses env(safe-area-inset-*).
+
+Optional FullScreenButton component (desktop) to toggle browser fullscreen; add aria-label.
+
+Meta
+
+On this page, set <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">.
+
+Ensure PWA standalone looks identical (no browser UI gaps).
+
+4) Implementation notes (exact behaviors)
+
+No “MOMENTOPNAME”. If card data isn’t freshly verifiable or connection is offline, surface it as status: 'NIET_ACTUEEL' with orange LED & label.
+
+Expired membership uses VERLOPEN (red LED).
+
+ACTUEEL is the only “green” state.
+
+Badges examples: “Betaald 2025”, “Stemgerechtigd”. Caps small, tracking-wide, pill radius 9999px, semi-transparent white background.
+
+Typography scale (guideline):
+
+Name: text-[clamp(18px,2.6vmin,28px)] weight 600
+
+Member no. & valid: text-[clamp(12px,1.8vmin,16px)] weight 500, tabular
+
+Status label: text-[clamp(11px,1.6vmin,14px)]
+
+Contrast AA on blue background; shadows to keep legibility.
+
+5) Minimal code skeletons (generate full code)
+
+app/card/[memberId]/page.tsx
+
+Reads data (mock or fetch), renders <CardCanvas> and inside it <MembershipCard />.
+
+components/card/CardCanvas.tsx
+
+Background layers + aspect wrapper + optional FullScreenButton.
+
+components/card/MembershipCard.tsx
+
+Implements layout, gradient, embossed text, status LED, QR zone, refresh shine animation, QR modal.
+
+components/card/FullScreenButton.tsx (optional).
+
+styles/card.css (optional tiny CSS for text-shadow & shine keyframes).
+
+Add Google Fonts import for Space Grotesk in app/globals.css.
+
+6) Acceptance criteria
+
+UI: Card looks like a modern bank card (rounded, glossy blue, embossed text, subtle sheen) and sits on a premium dark-blue backdrop.
+
+Scaling: Card fills the screen as much as possible while keeping the exact credit-card ratio; no blurry text.
+
+Status: Only three states: ACTUEEL, NIET ACTUEEL (offline/not fresh), VERLOPEN.
+
+QR: Readable mini QR on card + enlarged QR in modal.
+
+A11y: Buttons have labels; focus-visible rings; contrast AA.
+
+Motion: Shine ≤ 800ms; disabled when prefers-reduced-motion is on.
+
+Locale: Dutch (Belgium); dd-mm-jjjj formatting.
+
+Generate all the code files above now (TypeScript-strict, Tailwind utilities), and wire everything so I can drop the components into my existing project without redesigning the back side of the card.

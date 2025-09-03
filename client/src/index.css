@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -227,5 +228,62 @@
   /* Content area styles */
   .content-area {
     @apply w-full h-[calc(100vh-3rem)] overflow-auto;
+  }
+
+  /* Premium card styles */
+  .card-font {
+    font-family: 'Space Grotesk', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  .embossed-text {
+    color: #EAF2FF;
+    text-shadow: 0 1px 0 rgba(0,0,0,.25), 0 0 1px rgba(255,255,255,.15);
+  }
+
+  .card-gradient {
+    background: linear-gradient(135deg, #0E3A6E 0%, #0B4E9C 100%);
+    position: relative;
+  }
+
+  .card-gradient::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(0,0,0,0.1) 0%, transparent 50%, rgba(0,0,0,0.2) 100%);
+    pointer-events: none;
+  }
+
+  .status-led-glow-green {
+    box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.18);
+  }
+
+  .status-led-glow-orange {
+    box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.18);
+  }
+
+  .status-led-glow-red {
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.18);
+  }
+
+  @keyframes card-shine {
+    0% {
+      transform: translateX(-100%) rotate(35deg);
+    }
+    100% {
+      transform: translateX(400%) rotate(35deg);
+    }
+  }
+
+  .card-shine {
+    animation: card-shine 800ms ease-out;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card-shine {
+      animation: none;
+    }
   }
 }

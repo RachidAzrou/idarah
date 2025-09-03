@@ -1,0 +1,254 @@
+Make the standalone Digital Membership Card page render with the same styling as the preview. Ensure Tailwind, global styles, and font are loaded via the root layout. Build a dedicated page that shows the dark premium background and fullscreen scaling around the existing MembershipCard component.
+
+0) Stack assumptions
+
+Next.js 14 (App Router), TypeScript strict
+
+TailwindCSS already installed
+
+You already have components/card/MembershipCard.tsx (do not redesign its internals)
+
+1) Ensure Tailwind & globals load everywhere
+
+Create/overwrite these files:
+
+app/globals.css
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Font: Space Grotesk (bankcard vibe) */
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap");
+
+:root {
+  --bg-0: #0b1220;
+  --bg-1: #0e264a;
+  --bg-2: #0b1220;
+  --rim: 37, 99, 235; /* rgb for rim-light */
+}
+
+html, body, :root {
+  height: 100%;
+}
+
+body {
+  font-family: "Space Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+  background: #0b1220; /* safe fallback */
+}
+
+/* Optional: tiny grain to avoid banding on gradients */
+.bg-grain:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAECAYAAABP8J1eAAAAE0lEQVQImWNgoD9gYGBgGAIAAABfAAcA2x0rWQAAAABJRU5ErkJggg==");
+  opacity: .04;
+}
+
+
+app/layout.tsx
+
+import "./globals.css";
+import type { Metadata, Viewport } from "next";
+
+export const metadata: Metadata = {
+  title: "Digitale Lidkaart",
+  description: "Ledenbeheer – Digitale lidkaart",
+  icons: [{ rel: "icon", url: "/favicon.ico" }],
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#0B1220",
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="nl">
+      <body className="min-h-screen bg-[#0B1220] text-white antialiased">
+        {children}
+      </body>
+    </html>
+  );
+}
+
+
+tailwind.config.ts (ensure all paths are included)
+
+import type { Config } from "tailwindcss";
+const config: Config = {
+  content: [
+    "./app/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./pages/**/*.{ts,tsx}",
+  ],
+  theme: {
+    extend: {
+      boxShadow: {
+        card: "0 18px 40px rgba(0,0,0,.35)",
+      },
+    },
+  },
+  plugins: [],
+};
+export default config;
+
+2) Standalone canvas around the card
+
+Add a canvas wrapper that provides the dark premium backdrop and fullscreen scaling (no CSS scale; keep text crisp).
+
+components/card/CardCanvas.tsx
+
+"use client";
+import * as React from "react";
+
+export default function CardCanvas({ children }: { children: React.ReactNode }) {
+  return (
+    <div
+      className="
+        relative min-h-screen w-full overflow-hidden
+        px-[max(env(safe-area-inset-left),16px)]
+        py-[max(env(safe-area-inset-top),16px)]
+        grid place-items-center
+        bg-grain
+      "
+    >
+      {/* Base spotlight gradient */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(120% 80% at 50% 40%, #0E264A 0%, #0B1220 60%, #0A1426 100%)",
+        }}
+      />
+      {/* Vignette */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(80% 60% at 50% 50%, transparent 0%, rgba(0,0,0,.35) 70%, rgba(0,0,0,.6) 100%)",
+        }}
+      />
+      {/* Diagonal sheen */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 mix-blend-screen"
+        style={{
+          background:
+            "linear-gradient(135deg, rgba(255,255,255,.06) 0%, transparent 35%, transparent 65%, rgba(255,255,255,.03) 100%)",
+        }}
+      />
+      {/* Rim light behind card */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute"
+        style={{
+          inset: "auto",
+          width: "80vmin",
+          height: "52vmin",
+          filter: "blur(40px)",
+          borderRadius: "9999px",
+          background: "rgba(var(--rim),0.20)",
+        }}
+      />
+      {children}
+    </div>
+  );
+}
+
+3) Fullscreen scaling container (aspect ratio)
+
+Make a reusable sizing wrapper so the card fills the screen (esp. landscape mobile) while keeping the credit-card ratio.
+
+components/card/AspectBox.tsx
+
+import * as React from "react";
+
+/** 1586:1000 ≈ 1.586 — credit card aspect */
+export function AspectBox({ children }: { children: React.ReactNode }) {
+  return (
+    <div
+      className="
+        relative mx-auto aspect-[1586/1000]
+        w-[clamp(560px,70vmin,880px)]
+        max-w-[94vw] max-h-[94vh]
+        md:w-[clamp(560px,70vmin,880px)]
+      "
+      /* On small phones in landscape we prefer height-driven sizing via CSS */
+      style={{
+        /* No transform scale → keep text crisp */
+      }}
+    >
+      <div className="absolute inset-0">{children}</div>
+    </div>
+  );
+}
+
+
+Als je extra agressief wil schalen op mobiele landscape: vervang w-[clamp(...)] door een hoogte-gedreven regel (bv. met een media query) die height: min(94vh, 94vw/1.586) toepast. Replit mag dat toevoegen.
+
+4) Standalone route: renders canvas + sizing + card
+
+Maak een dedicated pagina die je kaart “als held” toont. Vervang de mock-props door echte data als je fetch hebt.
+
+app/card/[memberId]/page.tsx
+
+import CardCanvas from "@/components/card/CardCanvas";
+import { AspectBox } from "@/components/card/AspectBox";
+import MembershipCard from "@/components/card/MembershipCard"; // bestaand component
+
+export default async function Page({ params }: { params: { memberId: string } }) {
+  // TODO: fetch echte data (server action / API). Voorlopig mock:
+  const data = {
+    name: "Emma Janssen",
+    memberNumber: "001234",
+    category: "Standaard" as const,
+    status: "ACTUEEL" as const,
+    validUntil: "31-12-2025",
+    badges: ["Betaald 2025", "Stemgerechtigd"],
+    qrToken: "abc123xyz",
+    tenantLogoUrl: "/logo-light.svg",
+    etag: "v1.2.3",
+  };
+
+  return (
+    <CardCanvas>
+      <AspectBox>
+        <MembershipCard {...data} />
+      </AspectBox>
+    </CardCanvas>
+  );
+}
+
+5) Ensure the card itself can stretch
+
+Zorg dat je MembershipCard root een className accepteert of zelf w-full h-full gebruikt. Als je prop nog niet bestaat, voeg dit toe:
+
+type CardProps = { /* ... */ className?: string };
+export default function MembershipCard(props: CardProps) {
+  return (
+    <div className={`w-full h-full rounded-3xl shadow-card /* ... */ ${props.className ?? ""}`}>
+      {/* card content */}
+    </div>
+  );
+}
+
+6) (Optional) PWA meta voor fullscreen
+
+In app/layout.tsx hebben we viewportFit=cover gezet. Als je een manifest hebt, zorg dat display: "standalone" en de start-url naar /card/[memberId]?standalone=1 wijst.
+
+7) Acceptance criteria
+
+Visiting /card/[memberId] in Replit shows the dark premium background and your card centered, styled identiek aan de preview.
+
+Tailwind + fonts werken overal omdat globals.css in app/layout.tsx wordt geïmporteerd.
+
+De kaart vult het scherm (vooral in landscape) zonder transform: scale() (geen blur), met juiste aspect ratio.
+
+Body heeft donkere fallback zodat er geen “witte flits” is bij load.

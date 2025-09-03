@@ -129,19 +129,17 @@ export function CardPage() {
       background: `radial-gradient(circle at 50% 40%, #0B2440 0%, #0E3A6E 45%, #0B2440 100%), radial-gradient(circle at 50% 50%, transparent 40%, rgba(0,0,0,0.3) 100%), linear-gradient(135deg, rgba(255,255,255,0.02) 0%, transparent 50%, rgba(0,0,0,0.05) 100%)`
     }}>
       <FullScreenButton />
-      <div className="relative aspect-[16/10] rounded-lg overflow-hidden border border-gray-200 w-[min(92vw,70vh*1.586)] sm:w-[min(94vw,94vh*1.586)] lg:w-[clamp(540px,70vmin,860px)]">
-        <div className="relative min-h-screen w-full overflow-hidden grid place-items-center bg-spotlight bg-vignette bg-sheen bg-grain bg-rimlight h-full p-4">
-          <div className="mx-auto aspect-[1586/1000] w-full h-auto relative z-10">
-            <LiveCard
-              member={data.member}
-              cardMeta={data.cardMeta}
-              tenant={data.tenant}
-              onRefresh={handleRefresh}
-              isRefreshing={isLoading}
-              standalone={true}
-              className="h-full w-full"
-            />
-          </div>
+      <div className="relative w-[clamp(560px,70vmin,880px)] max-w-[94vw] max-h-[94vh] aspect-[1586/1000] mx-auto">
+        <div className="absolute inset-0 relative z-10">
+          <LiveCard
+            member={data.member}
+            cardMeta={data.cardMeta}
+            tenant={data.tenant}
+            onRefresh={handleRefresh}
+            isRefreshing={isLoading}
+            standalone={true}
+            className="h-full w-full"
+          />
         </div>
       </div>
       <InstallCoach 

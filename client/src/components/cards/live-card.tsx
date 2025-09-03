@@ -134,8 +134,15 @@ export function LiveCard({
       {/* Live Card - Credit card aspect ratio */}
       <div className="w-full h-full aspect-[1586/1000]">
         <div 
-          className="card-gradient relative w-full h-full rounded-3xl overflow-hidden border border-white/10 card-font"
+          className="relative w-full h-full rounded-3xl overflow-hidden border border-white/10 card-font"
           style={{
+            background: `linear-gradient(135deg, 
+              #1e3a8a 0%,     /* Intense blue start */
+              #3b82f6 25%,    /* Mid blue */
+              #1d4ed8 50%,    /* Deeper blue middle */
+              #2563eb 75%,    /* Vibrant blue */
+              #1e40af 100%    /* Deep blue end */
+            )`,
             boxShadow: `
               0 0 0 1px rgba(255,255,255,0.1) inset,
               0 18px 40px rgba(0,0,0,0.35),

@@ -143,7 +143,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/members", authMiddleware, tenantMiddleware, async (req, res) => {
     try {
       const members = await storage.getMembersByTenant(req.tenantId!);
-      res.json(members);
+      
+      // Fetch financial settings and permissions for each member
+      const membersWithDetails = await Promise.all(
+        members.map(async (member) => {
+          const [financialSettings, permissions] = await Promise.all([
+            storage.getMemberFinancialSettings(member.id),
+            storage.getMemberPermissions(member.id)
+          ]);
+          
+          return {
+            ...member,
+            financialSettings,
+            permissions
+          };
+        })
+      );
+      
+      res.json(membersWithDetails);
     } catch (error) {
       console.error("Members API error:", error);
       res.status(500).json({ message: "Failed to fetch members" });
@@ -156,7 +173,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!member || member.tenantId !== req.tenantId) {
         return res.status(404).json({ message: "Member not found" });
       }
-      res.json(member);
+      
+      // Fetch financial settings and permissions for this member
+      const [financialSettings, permissions] = await Promise.all([
+        storage.getMemberFinancialSettings(member.id),
+        storage.getMemberPermissions(member.id)
+      ]);
+      
+      res.json({
+        ...member,
+        financialSettings,
+        permissions
+      });
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch member" });
     }

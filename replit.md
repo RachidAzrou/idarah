@@ -6,6 +6,11 @@ This is a membership management web application called "Ledenbeheer" designed sp
 
 Preferred communication style: Simple, everyday language.
 
+## Card Consistency Requirements
+- The preview modal (LiveCard component) must always display exactly the same content and styling as the PWA live card (MembershipCard component)
+- Both components represent the same digital membership card - preview is what users see before accessing the actual PWA card
+- Any styling or content changes must be applied to both components simultaneously to maintain consistency
+
 # System Architecture
 
 ## Frontend Architecture

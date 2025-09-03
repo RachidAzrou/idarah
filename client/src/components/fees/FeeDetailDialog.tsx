@@ -205,12 +205,6 @@ export function FeeDetailDialog({
                   #{fee.member.memberNumber} – {fee.member.firstName} {fee.member.lastName}
                 </DialogDescription>
               </div>
-              <div className="flex flex-col items-end gap-2">
-                <Badge className={getStatusBadgeVariant(fee.status)}>
-                  {statusLabel(fee.status)}
-                </Badge>
-                <span className="text-xs text-muted-foreground">{fee.tenantName}</span>
-              </div>
             </div>
           </DialogHeader>
 

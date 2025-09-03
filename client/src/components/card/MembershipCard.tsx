@@ -216,11 +216,11 @@ export function MembershipCard({
                   className={`${isConstrained ? 'w-12 h-12' : 'w-16 h-16'}`}
                   data-testid="voting-icon"
                   style={{
-                    color: '#FFD700',
+                    color: '#B8860B',
                     background: `
-                      radial-gradient(ellipse at 30% 20%, #FFF8DC 0%, transparent 50%),
-                      radial-gradient(ellipse at 70% 80%, #FFE55C 0%, transparent 50%),
-                      linear-gradient(135deg, #B8860B 0%, #DAA520 20%, #FFD700 40%, #FFF8DC 60%, #FFD700 80%, #B8860B 100%)
+                      radial-gradient(ellipse at 30% 20%, #DAA520 0%, transparent 50%),
+                      radial-gradient(ellipse at 70% 80%, #D4AF37 0%, transparent 50%),
+                      linear-gradient(135deg, #996515 0%, #B8860B 20%, #D4AF37 40%, #DAA520 60%, #B8860B 80%, #8B6914 100%)
                     `,
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',

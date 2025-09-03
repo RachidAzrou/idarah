@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, ArrowUpDown, CreditCard } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, ArrowUpDown, CreditCard, Check, Clock, AlertTriangle } from "lucide-react";
 import { Fee } from "@shared/fees-schema";
 import { formatCurrencyBE, formatPeriodBE, formatDateBE } from "@/lib/format";
 import { RowActions } from "./row-actions";
@@ -163,8 +163,26 @@ export function FeesTable({
                      fee.method === 'BANCONTACT' ? 'Bancontact' : 'Contant'}
                   </TableCell>
                   <TableCell className="text-sm">
-                    {fee.status === 'OPEN' ? 'Openstaand' : 
-                     fee.status === 'PAID' ? 'Betaald' : 'Vervallen'}
+                    <div className="flex items-center gap-2">
+                      {fee.status === 'PAID' && (
+                        <>
+                          <Check className="h-4 w-4 text-green-600" />
+                          <span className="text-green-600 font-medium">Betaald</span>
+                        </>
+                      )}
+                      {fee.status === 'OPEN' && (
+                        <>
+                          <Clock className="h-4 w-4 text-orange-500" />
+                          <span className="text-orange-500 font-medium">Openstaand</span>
+                        </>
+                      )}
+                      {fee.status === 'OVERDUE' && (
+                        <>
+                          <AlertTriangle className="h-4 w-4 text-red-600" />
+                          <span className="text-red-600 font-medium">Vervallen</span>
+                        </>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell className="text-sm text-gray-600">
                     {fee.paidAt ? formatDateBE(fee.paidAt) : "-"}

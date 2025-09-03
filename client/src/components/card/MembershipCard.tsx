@@ -217,19 +217,25 @@ export function MembershipCard({
                   data-testid="voting-icon"
                   style={{
                     color: '#DAA520',
+                    background: 'linear-gradient(45deg, #B8860B 0%, #FFD700 25%, #FFF8DC 40%, #FFD700 60%, #DAA520 80%, #B8860B 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundSize: '400% 400%',
+                    animation: 'goldShimmer 3s ease-in-out infinite',
                     textShadow: `
-                      3px 3px 0 rgba(255,248,220,0.4),
+                      3px 3px 0 rgba(255,248,220,0.5),
                       -3px -3px 0 rgba(0,0,0,0.9),
                       -4px -4px 0 rgba(0,0,0,0.8),
                       -5px -5px 0 rgba(0,0,0,0.6),
                       -6px -6px 0 rgba(0,0,0,0.4),
                       -7px -7px 0 rgba(0,0,0,0.2),
                       inset 4px 4px 8px rgba(0,0,0,0.8),
-                      inset -2px -2px 4px rgba(255,215,0,0.2),
-                      0 0 12px rgba(218,165,32,0.4),
-                      0 0 20px rgba(218,165,32,0.2)
+                      inset -2px -2px 4px rgba(255,215,0,0.3),
+                      0 0 15px rgba(255,215,0,0.5),
+                      0 0 25px rgba(255,215,0,0.3),
+                      0 0 35px rgba(255,255,255,0.2)
                     `,
-                    filter: 'drop-shadow(3px 3px 8px rgba(0,0,0,0.6)) brightness(1.1)'
+                    filter: 'drop-shadow(3px 3px 8px rgba(0,0,0,0.6)) brightness(1.3) saturate(1.2)'
                   }}
                 />
                 

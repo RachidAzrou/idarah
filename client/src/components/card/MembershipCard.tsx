@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { RefreshCw, Wifi, WifiOff, Clock } from "lucide-react";
+import { PiMedal } from "react-icons/pi";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
@@ -39,35 +40,31 @@ interface StatusLEDProps {
   className?: string;
 }
 
-function StatusLED({ status, className }: StatusLEDProps) {
+function StatusBadge({ status, className }: StatusLEDProps) {
   const statusConfig = {
     ACTUEEL: {
-      color: 'bg-[#22C55E]',
-      glowStyle: { boxShadow: '0 0 0 3px rgba(34, 197, 94, 0.18)' },
-      label: 'Actueel',
+      color: 'bg-green-500',
+      label: 'ACTUEEL',
+      dotColor: 'bg-green-400'
     },
     NIET_ACTUEEL: {
-      color: 'bg-[#F59E0B]',
-      glowStyle: { boxShadow: '0 0 0 3px rgba(245, 158, 11, 0.18)' },
-      label: 'Niet actueel',
+      color: 'bg-orange-500',
+      label: 'NIET ACTUEEL',
+      dotColor: 'bg-orange-400'
     },
     VERLOPEN: {
-      color: 'bg-[#EF4444]',
-      glowStyle: { boxShadow: '0 0 0 3px rgba(239, 68, 68, 0.18)' },
-      label: 'Verlopen',
-    },
+      color: 'bg-red-500',
+      label: 'VERLOPEN',
+      dotColor: 'bg-red-400'
+    }
   };
 
   const config = statusConfig[status];
 
   return (
-    <div className={cn("flex items-center gap-2", className)}>
-      <div 
-        className={cn("w-3 h-3 rounded-full", config.color)}
-        style={config.glowStyle}
-        aria-hidden="true"
-      />
-      <span className="text-xs font-medium embossed-text card-font">
+    <div className={cn("inline-flex items-center gap-1.5 px-2 py-1 rounded-full", config.color, className)}>
+      <div className={cn("w-2 h-2 rounded-full", config.dotColor)} />
+      <span className="text-xs font-medium text-white uppercase tracking-wide">
         {config.label}
       </span>
     </div>
@@ -151,113 +148,113 @@ export function MembershipCard({
           aria-hidden="true"
         />
 
-        {/* Card Content */}
+        {/* Card Content - Bankkaart Layout */}
         <div className="relative h-full p-6 flex flex-col text-white">
-          {/* Top row: Organization and Status */}
-          <div className="flex items-start justify-between mb-4">
+          
+          {/* Top Row */}
+          <div className="flex justify-between items-start mb-4">
+            {/* Top-left: Organization block */}
             <div className="flex-1">
               {cardData.tenant.logoUrl && (
                 <img 
                   src={cardData.tenant.logoUrl} 
                   alt={cardData.tenant.name}
-                  className="h-5 w-auto mb-1 opacity-90"
+                  className="h-4 w-auto mb-1 opacity-90"
                 />
               )}
-              <h1 className="embossed-text text-sm font-medium uppercase tracking-widest">
+              <h1 className="embossed-text text-xs font-medium uppercase tracking-widest opacity-90">
                 {cardData.tenant.name}
               </h1>
             </div>
             
-            <div className="flex items-center gap-3">
-              <StatusLED status={displayStatus} />
-            </div>
-          </div>
-
-          {/* Member Name - Prominent */}
-          <div className="mb-6">
-            <h2 className="embossed-text text-[clamp(18px,2.6vmin,28px)] font-semibold uppercase tracking-wide leading-tight">
-              {cardData.firstName} {cardData.lastName}
-            </h2>
-          </div>
-
-          {/* Member Number */}
-          <div className="mb-6">
-            <p className="embossed-text text-[clamp(10px,1.4vmin,12px)] uppercase tracking-wide opacity-80 mb-1">
-              LIDNUMMER
-            </p>
-            <p className="embossed-text text-[clamp(12px,1.8vmin,16px)] font-medium font-mono tabular-nums">
-              {cardData.memberNumber}
-            </p>
-          </div>
-
-          {/* Bottom row: Details and QR */}
-          <div className="flex-1 flex justify-between items-end">
-            {/* Left: Member details */}
-            <div className="flex-1 space-y-3">
-              {/* Category */}
-              <div>
-                <p className="embossed-text text-[clamp(10px,1.4vmin,12px)] uppercase tracking-wide opacity-80 mb-1">
-                  CATEGORIE
-                </p>
-                <div className="flex items-center gap-2">
-                  <span className="embossed-text text-[clamp(11px,1.6vmin,14px)] font-medium">
-                    {getMemberCategoryLabel(cardData.category)}
+            {/* Top-right: Status badge */}
+            <div className="flex flex-col items-end gap-2">
+              <StatusBadge status={displayStatus} />
+              
+              {/* Stemrecht (voting rights) - contactless area */}
+              {cardData.badges.includes("Stemgerechtigd") && (
+                <div className="flex items-center gap-1">
+                  <PiMedal className="w-4 h-4 text-yellow-400" />
+                  <span className="text-xs font-medium embossed-text opacity-80">
+                    Stemgerechtigd
                   </span>
-                  {cardData.badges.includes("Stemgerechtigd") && (
-                    <span className="bg-white/15 text-white text-[10px] font-medium px-2 py-0.5 rounded-full uppercase tracking-wide">
-                      STEMGERECHTIGD
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* Payment Status */}
-              <div>
-                <p className="embossed-text text-[clamp(10px,1.4vmin,12px)] uppercase tracking-wide opacity-80 mb-1">
-                  STATUS
-                </p>
-                <span className={cn(
-                  "text-[clamp(11px,1.6vmin,14px)] font-medium",
-                  cardData.badges.some(badge => badge.includes("Betaald"))
-                    ? "text-green-300" 
-                    : "text-red-300"
-                )}>
-                  {cardData.badges.find(badge => badge.includes("Betaald")) || 'ONBETAALD'}
-                </span>
-              </div>
-
-              {/* Valid until */}
-              {cardData.validUntil && (
-                <div>
-                  <p className="embossed-text text-[clamp(10px,1.4vmin,12px)] uppercase tracking-wide opacity-80 mb-1">
-                    GELDIG TOT
-                  </p>
-                  <p className="embossed-text text-[clamp(12px,1.8vmin,16px)] font-medium font-mono tabular-nums">
-                    {format(cardData.validUntil, 'dd-MM-yyyy', { locale: nl })}
-                  </p>
                 </div>
               )}
             </div>
+          </div>
 
-            {/* Right: Debossed QR Code */}
-            <div className="flex flex-col items-center">
-              <button
-                onClick={() => setShowQRModal(true)}
-                className="debossed-qr-container transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/50 hover:scale-105"
-                data-testid="qr-plate"
-                aria-label="Toon scanbare QR code"
-                style={{ minWidth: '100px', minHeight: '100px' }}
-              >
-                <div className="debossed-qr-frame">
-                  <QRCodeSVG
-                    value={qrCodeUrl}
-                    size={70}
-                    className="debossed-qr"
-                    fgColor="rgba(255,255,255,0.2)"
-                    bgColor="transparent"
-                  />
+          {/* Left side: QR button (chip position) */}
+          <div className="absolute left-6 top-16">
+            <button
+              onClick={() => setShowQRModal(true)}
+              className="w-16 h-16 rounded-xl bg-white/10 backdrop-blur border border-white/20 
+                       flex items-center justify-center text-white font-bold text-sm
+                       hover:bg-white/20 transition-all duration-200 focus:outline-none 
+                       focus:ring-2 focus:ring-white/50"
+              data-testid="qr-button"
+              aria-label="QR code weergeven"
+            >
+              QR
+            </button>
+          </div>
+
+          {/* Center-left: Member data rows (3 lines) */}
+          <div className="mt-12 space-y-3 max-w-[60%]">
+            {/* Row 1: Member Number */}
+            <div>
+              <div className="text-xs uppercase tracking-wide opacity-70 mb-0.5">
+                LIDNUMMER
+              </div>
+              <div className="font-mono text-base font-medium tabular-nums embossed-text">
+                {cardData.memberNumber}
+              </div>
+            </div>
+
+            {/* Row 2: Category */}
+            <div>
+              <div className="text-xs uppercase tracking-wide opacity-70 mb-0.5">
+                CATEGORIE
+              </div>
+              <div className="text-sm font-medium embossed-text">
+                {getMemberCategoryLabel(cardData.category)}
+              </div>
+            </div>
+
+            {/* Row 3: Status */}
+            <div>
+              <div className="text-xs uppercase tracking-wide opacity-70 mb-0.5">
+                STATUS
+              </div>
+              <div className="text-sm font-medium embossed-text">
+                {cardData.badges.find(badge => badge.includes("Betaald")) || 'Onbetaald'}
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom-right: Validity */}
+          <div className="absolute bottom-6 right-6 text-right">
+            {cardData.validUntil && (
+              <>
+                <div className="text-xs uppercase tracking-wide opacity-70 mb-0.5">
+                  GELDIG TOT
                 </div>
-              </button>
+                <div className="font-mono text-sm font-medium tabular-nums embossed-text">
+                  {format(cardData.validUntil, 'dd-MM-yyyy', { locale: nl })}
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Footer microtext */}
+          <div className="absolute bottom-2 left-6 right-6 flex justify-between items-end">
+            {/* Bottom-left: Member name */}
+            <div className="text-xs opacity-60 uppercase tracking-wide">
+              {cardData.firstName} {cardData.lastName}
+            </div>
+            
+            {/* Bottom-right: etag */}
+            <div className="text-xs opacity-40 font-mono">
+              {cardData.etag}
             </div>
           </div>
         </div>

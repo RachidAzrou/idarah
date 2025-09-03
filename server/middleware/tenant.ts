@@ -14,6 +14,7 @@ export async function tenantMiddleware(req: Request, res: Response, next: NextFu
 
     next();
   } catch (error) {
+    console.error('Tenant middleware error:', error);
     res.status(500).json({ message: "Tenant verificatie mislukt" });
   }
 }

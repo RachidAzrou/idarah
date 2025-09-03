@@ -34,6 +34,7 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
     req.tenantId = user.tenantId;
     next();
   } catch (error) {
+    console.error('Auth middleware error:', error);
     res.status(401).json({ message: "Authenticatie mislukt" });
   }
 }

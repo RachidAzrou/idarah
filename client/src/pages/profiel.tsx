@@ -69,7 +69,9 @@ export default function Profiel() {
 
   // Initialiseer formulier met gebruikersgegevens
   useEffect(() => {
+    console.log("Profiel useEffect - user data:", user);
     if (user) {
+      console.log("Setting form values:", { name: user.name, email: user.email });
       profileForm.reset({
         name: user.name || "",
         email: user.email || "",

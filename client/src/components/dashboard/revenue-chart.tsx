@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function RevenueChart() {
-  const [monthOffset, setMonthOffset] = useState(0); // 0 = huidige maand, -1 = vorige maand, +1 = volgende maand
+  const [quarterOffset, setQuarterOffset] = useState(0); // 0 = huidig kwartaal, -1 = vorig kwartaal, +1 = volgend kwartaal
   
   const { data: transactions } = useQuery({
     queryKey: ["/api/transactions"],
@@ -13,22 +13,22 @@ export default function RevenueChart() {
   
   const data = useMemo(() => {
     if (!Array.isArray(transactions)) {
-      // Toon 6 maanden rond geselecteerde periode
+      // Toon 4 maanden voor huidig kwartaal
       const result = [];
-      for (let i = 5; i >= 0; i--) {
+      for (let i = 3; i >= 0; i--) {
         const date = new Date();
-        date.setMonth(date.getMonth() - i + monthOffset);
+        date.setMonth(date.getMonth() - i + (quarterOffset * 4));
         const monthName = date.toLocaleDateString('nl-BE', { month: 'short' });
         result.push({ month: monthName, revenue: 0 });
       }
       return result;
     }
     
-    // Bereken inkomsten voor 6 maanden rond geselecteerde periode
+    // Bereken inkomsten voor 4 maanden van geselecteerd kwartaal
     const monthlyRevenue = [];
-    for (let i = 5; i >= 0; i--) {
+    for (let i = 3; i >= 0; i--) {
       const date = new Date();
-      date.setMonth(date.getMonth() - i + monthOffset);
+      date.setMonth(date.getMonth() - i + (quarterOffset * 4));
       const year = date.getFullYear();
       const month = date.getMonth();
       const monthName = date.toLocaleDateString('nl-BE', { month: 'short' });
@@ -46,21 +46,24 @@ export default function RevenueChart() {
     }
     
     return monthlyRevenue;
-  }, [transactions, monthOffset]);
+  }, [transactions, quarterOffset]);
   
   // Bereken dynamische Y-as schaal
   const maxRevenue = Math.max(...data.map(d => d.revenue), 100);
   const yAxisMax = Math.ceil(maxRevenue * 1.1);
   
-  // Helper functies voor navigatie
-  const goToPreviousMonth = () => setMonthOffset(monthOffset - 1);
-  const goToNextMonth = () => setMonthOffset(monthOffset + 1);
-  const goToCurrentMonth = () => setMonthOffset(0);
+  // Helper functies voor kwartaal navigatie
+  const goToPreviousQuarter = () => setQuarterOffset(quarterOffset - 1);
+  const goToNextQuarter = () => setQuarterOffset(quarterOffset + 1);
+  const goToCurrentQuarter = () => setQuarterOffset(0);
   
-  // Bepaal periode label
-  const currentPeriodDate = new Date();
-  currentPeriodDate.setMonth(currentPeriodDate.getMonth() + monthOffset);
-  const periodLabel = currentPeriodDate.toLocaleDateString('nl-BE', { month: 'long', year: 'numeric' });
+  // Bepaal kwartaal label
+  const currentQuarterDate = new Date();
+  currentQuarterDate.setMonth(currentQuarterDate.getMonth() + (quarterOffset * 4));
+  const year = currentQuarterDate.getFullYear();
+  const month = currentQuarterDate.getMonth();
+  const quarter = Math.floor(month / 3) + 1;
+  const periodLabel = `${quarter}e trimester van ${year}`;
   
   return (
     <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
@@ -74,7 +77,7 @@ export default function RevenueChart() {
             <Button 
               variant="outline" 
               size="sm" 
-              onClick={goToPreviousMonth}
+              onClick={goToPreviousQuarter}
               className="h-8 w-8 p-0"
             >
               <ChevronLeft className="h-4 w-4" />
@@ -82,16 +85,16 @@ export default function RevenueChart() {
             <Button 
               variant="ghost" 
               size="sm" 
-              onClick={goToCurrentMonth}
+              onClick={goToCurrentQuarter}
               className="text-xs px-3"
-              disabled={monthOffset === 0}
+              disabled={quarterOffset === 0}
             >
               Vandaag
             </Button>
             <Button 
               variant="outline" 
               size="sm" 
-              onClick={goToNextMonth}
+              onClick={goToNextQuarter}
               className="h-8 w-8 p-0"
             >
               <ChevronRight className="h-4 w-4" />

@@ -124,7 +124,9 @@ export function LiveCard({
   // Handle refresh with animation
   const handleRefresh = () => {
     if (onRefresh) {
+      setIsFlipping(true);
       onRefresh();
+      setTimeout(() => setIsFlipping(false), 800);
     }
   };
 

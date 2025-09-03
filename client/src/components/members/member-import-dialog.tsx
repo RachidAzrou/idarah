@@ -463,6 +463,10 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
             paymentTerm: member.financialSettings.paymentTerm,
             iban: member.financialSettings.iban || "",
           },
+          organization: {
+            interestedInActiveRole: member.permissions.interestedInActiveRole,
+            roleDescription: member.permissions.roleDescription || "",
+          },
           permissions: {
             privacyAgreement: member.permissions.privacyAgreement,
             photoVideoConsent: member.permissions.photoVideoConsent,

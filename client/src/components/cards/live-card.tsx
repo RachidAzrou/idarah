@@ -57,7 +57,7 @@ function StatusLED({ status, className }: StatusLEDProps) {
         className={cn("w-2.5 h-2.5 rounded-full", config.color, config.glowClass)}
         aria-hidden="true"
       />
-      <span className="text-xs font-medium embossed-text card-font">
+      <span className="text-xs font-medium card-font debossed-text">
         {config.label}
       </span>
     </div>
@@ -222,7 +222,7 @@ export function LiveCard({
                     className="h-6 w-auto mb-2 opacity-90"
                   />
                 )}
-                <h1 className="embossed-text text-2xl font-bold uppercase tracking-wider">
+                <h1 className="embossed-text text-3xl font-bold uppercase tracking-wider">
                   Lidkaart {tenant.name.toUpperCase()}
                 </h1>
               </div>
@@ -255,7 +255,7 @@ export function LiveCard({
             </div>
 
             {/* QR Code - Left aligned with margin */}
-            <div className="flex justify-start mb-6 ml-4">
+            <div className="flex justify-start mb-8 ml-4 mt-4">
               <button
                 onClick={() => setShowQRModal(true)}
                 className="debossed-qr-container transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/50 hover:scale-105"
@@ -276,41 +276,33 @@ export function LiveCard({
             </div>
 
             {/* Member Information */}
-            <div className="mb-6 space-y-4">
+            <div className="mb-8 space-y-6 ml-8">
               {/* Member Name */}
               <div>
-                <p className="embossed-text text-[clamp(10px,1.4vmin,12px)] uppercase tracking-wide opacity-80 mb-1">
+                <p className="embossed-text text-[clamp(16px,2.0vmin,18px)] uppercase tracking-wide opacity-80 mb-1 font-medium">
                   NAAM
                 </p>
-                <h2 className="embossed-text text-[clamp(14px,1.8vmin,16px)] font-semibold uppercase tracking-wide leading-tight">
+                <h2 className="embossed-text text-[clamp(16px,2.0vmin,18px)] font-semibold uppercase tracking-wide leading-tight" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.9), -1px -1px 2px rgba(255,255,255,0.3), 0 0 8px rgba(255,255,255,0.1)', filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))'}}>
                   {member.firstName} {member.lastName}
                 </h2>
+                <div className="mt-3">
+                  <p className="embossed-text text-[clamp(16px,2.0vmin,18px)] uppercase tracking-wide opacity-80 mb-1 font-medium">
+                    LIDNUMMER
+                  </p>
+                  <p className="embossed-text text-[clamp(16px,2.0vmin,18px)] font-mono font-bold tracking-[0.2em] leading-tight" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.9), -1px -1px 2px rgba(255,255,255,0.3), 0 0 8px rgba(255,255,255,0.1)', filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))'}}>
+                    {member.memberNumber}
+                  </p>
+                </div>
               </div>
 
-              {/* Category and Status */}
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <p className="embossed-text text-[clamp(10px,1.4vmin,12px)] uppercase tracking-wide opacity-80 mb-1">
-                    CATEGORIE
-                  </p>
-                  <span className="embossed-text text-[clamp(11px,1.6vmin,14px)] font-medium">
-                    {getMemberCategoryLabel(member.category)}
-                  </span>
-                </div>
-                
-                <div>
-                  <p className="embossed-text text-[clamp(10px,1.4vmin,12px)] uppercase tracking-wide opacity-80 mb-1">
-                    STATUS
-                  </p>
-                  <span className={cn(
-                    "text-[clamp(11px,1.6vmin,14px)] font-medium",
-                    currentYearPaid 
-                      ? "text-green-300" 
-                      : "text-red-300"
-                  )}>
-                    {currentYearPaid ? `BETAALD ${currentYear}` : 'ONBETAALD'}
-                  </span>
-                </div>
+              {/* Category */}
+              <div>
+                <p className="embossed-text text-[clamp(16px,2.0vmin,18px)] uppercase tracking-wide opacity-80 mb-1 font-medium">
+                  CATEGORIE
+                </p>
+                <span className="embossed-text text-[clamp(16px,2.0vmin,18px)] font-medium uppercase" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.9), -1px -1px 2px rgba(255,255,255,0.3), 0 0 8px rgba(255,255,255,0.1)', filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))'}}>
+                  {getMemberCategoryLabel(member.category)}
+                </span>
               </div>
             </div>
 

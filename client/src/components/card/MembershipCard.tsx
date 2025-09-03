@@ -134,11 +134,19 @@ export function MembershipCard({
         }}
         data-testid="membership-card"
       >
-        {/* Glossy sheen overlay */}
+        {/* Enhanced glossy sheen overlay */}
         <div 
-          className="absolute inset-0 pointer-events-none opacity-20 mix-blend-screen"
+          className="absolute inset-0 pointer-events-none opacity-30 mix-blend-screen"
           style={{
-            background: "linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 45%, rgba(255,255,255,0.1) 100%)"
+            background: "linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 20%, transparent 40%, rgba(255,255,255,0.05) 70%, rgba(255,255,255,0.15) 100%)"
+          }}
+          aria-hidden="true"
+        />
+        {/* Additional highlight for premium effect */}
+        <div 
+          className="absolute top-0 left-0 w-full h-1/3 pointer-events-none opacity-20"
+          style={{
+            background: "linear-gradient(180deg, rgba(255,255,255,0.2) 0%, transparent 100%)"
           }}
           aria-hidden="true"
         />

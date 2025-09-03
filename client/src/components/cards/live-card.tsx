@@ -178,7 +178,23 @@ export function LiveCard({
           }}
           data-testid="live-card"
         >
-          {/* Shine overlay */}
+          {/* Enhanced glossy sheen overlay */}
+          <div 
+            className="absolute inset-0 pointer-events-none opacity-30 mix-blend-screen"
+            style={{
+              background: "linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 20%, transparent 40%, rgba(255,255,255,0.05) 70%, rgba(255,255,255,0.15) 100%)"
+            }}
+            aria-hidden="true"
+          />
+          {/* Additional highlight for premium effect */}
+          <div 
+            className="absolute top-0 left-0 w-full h-1/3 pointer-events-none opacity-20"
+            style={{
+              background: "linear-gradient(180deg, rgba(255,255,255,0.2) 0%, transparent 100%)"
+            }}
+            aria-hidden="true"
+          />
+          {/* Interactive shine overlay */}
           <div 
             className={cn(
               "absolute inset-0 pointer-events-none",
@@ -186,7 +202,7 @@ export function LiveCard({
               showGloss ? "card-shine" : ""
             )}
             style={{
-              background: "linear-gradient(35deg, transparent 40%, rgba(255,255,255,0.15) 50%, transparent 60%)",
+              background: "linear-gradient(35deg, transparent 40%, rgba(255,255,255,0.25) 50%, transparent 60%)",
               width: "100px",
               height: "200%",
               transform: showGloss ? "translateX(-100%) rotate(35deg)" : "translateX(-200%) rotate(35deg)"

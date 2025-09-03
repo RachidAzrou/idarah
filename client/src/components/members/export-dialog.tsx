@@ -184,7 +184,7 @@ export function ExportDialog({ open, onOpenChange, filteredMembers }: ExportDial
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh]">
+      <DialogContent className="sm:max-w-[650px] max-h-[85vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <FileSpreadsheet className="h-5 w-5" />
@@ -195,7 +195,7 @@ export function ExportDialog({ open, onOpenChange, filteredMembers }: ExportDial
           </p>
         </DialogHeader>
 
-        <Tabs value={currentStep} className="flex-1 flex flex-col">
+        <Tabs value={currentStep} className="flex-1 flex flex-col overflow-hidden">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="selection" disabled={currentStep === 'exporting'}>
               1. Velden Selecteren
@@ -209,7 +209,7 @@ export function ExportDialog({ open, onOpenChange, filteredMembers }: ExportDial
           </TabsList>
 
           <div className="flex-1 overflow-hidden">
-            <TabsContent value="selection" className="space-y-4 flex-1 flex flex-col mt-4">
+            <TabsContent value="selection" className="h-full flex flex-col space-y-4 mt-4">
               <div>
                 <h3 className="text-lg font-semibold">Selecteer Export Velden</h3>
                 <p className="text-sm text-gray-600">
@@ -226,7 +226,7 @@ export function ExportDialog({ open, onOpenChange, filteredMembers }: ExportDial
                 </Button>
               </div>
 
-              <div className="flex-1 overflow-auto border rounded-lg p-4">
+              <div className="flex-1 min-h-0 overflow-auto border rounded-lg p-4">
                 <div className="space-y-4">
                   {CATEGORIES.map(category => {
                     const categoryFields = EXPORT_FIELDS.filter(field => field.category === category);

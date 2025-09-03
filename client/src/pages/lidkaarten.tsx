@@ -355,13 +355,13 @@ export default function LidkaartenPage() {
                 ).length}
               </p>
               <div className="flex items-center space-x-1">
-                <span className="text-xs font-medium text-amber-500">
+                <span className="text-xs font-medium text-gray-400">
                   leden zonder lidkaart
                 </span>
               </div>
             </div>
-            <div className="w-8 h-8 bg-amber-50 rounded-full flex items-center justify-center">
-              <CiCreditCardOff className="h-4 w-4 text-amber-500" />
+            <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+              <CiCreditCardOff className="h-4 w-4 text-gray-400" />
             </div>
           </div>
         </div>

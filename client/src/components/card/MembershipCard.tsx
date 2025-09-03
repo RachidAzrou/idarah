@@ -226,12 +226,13 @@ export function MembershipCard({
                     WebkitTextFillColor: 'transparent',
                     backgroundSize: '150% 150%, 150% 150%, 300% 300%',
                     textShadow: `
-                      1px 1px 0 rgba(255,255,255,0.2),
-                      -1px -1px 0 rgba(0,0,0,0.8),
-                      -2px -2px 0 rgba(0,0,0,0.6),
-                      -3px -3px 0 rgba(0,0,0,0.4),
-                      inset 2px 2px 4px rgba(0,0,0,0.7),
-                      0 0 8px rgba(212,175,55,0.3)
+                      2px 2px 0 rgba(255,255,255,0.3),
+                      -2px -2px 0 rgba(0,0,0,0.9),
+                      -3px -3px 0 rgba(0,0,0,0.7),
+                      -4px -4px 0 rgba(0,0,0,0.5),
+                      -5px -5px 0 rgba(0,0,0,0.3),
+                      inset 3px 3px 6px rgba(0,0,0,0.8),
+                      0 0 10px rgba(212,175,55,0.2)
                     `,
                     filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.5)) contrast(1.2) saturate(1.3)'
                   }}

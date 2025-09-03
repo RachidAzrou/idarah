@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 import { LiveCard } from "@/components/cards/live-card";
 import { apiRequest } from "@/lib/queryClient";
@@ -21,7 +22,9 @@ import {
   Users,
   CheckCircle2,
   Clock,
-  MoreHorizontal
+  MoreHorizontal,
+  Edit,
+  Plus
 } from "lucide-react";
 import { CiExport } from "react-icons/ci";
 import { format } from "date-fns";
@@ -113,6 +116,26 @@ export default function LidkaartenPage() {
     },
   });
 
+  // Create card mutation
+  const createCardMutation = useMutation({
+    mutationFn: async (memberId: string) => {
+      const response = await apiRequest('POST', `/api/cards/${memberId}/create`);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/cards'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/cards/stats'] });
+      toast({ title: "Lidkaart aangemaakt", description: "De kaart is succesvol aangemaakt." });
+    },
+    onError: () => {
+      toast({ 
+        title: "Fout", 
+        description: "Kon de kaart niet aanmaken. Probeer opnieuw.", 
+        variant: "destructive" 
+      });
+    },
+  });
+
   // Regenerate card mutation
   const regenerateCardMutation = useMutation({
     mutationFn: async (memberId: string) => {
@@ -177,12 +200,21 @@ export default function LidkaartenPage() {
     setPreviewCard(cardData);
   };
 
+  const handleCreateCard = (memberId: string) => {
+    createCardMutation.mutate(memberId);
+  };
+
   const handleRegenerateCard = (memberId: string) => {
     regenerateCardMutation.mutate(memberId);
   };
 
   const handleDeactivateCard = (memberId: string) => {
     deactivateCardMutation.mutate(memberId);
+  };
+
+  const handleEditMember = (memberId: string) => {
+    // TODO: Implement member edit functionality
+    toast({ title: "Bewerken", description: "Bewerk functionaliteit wordt binnenkort toegevoegd." });
   };
 
   const handleExport = () => {
@@ -376,64 +408,55 @@ export default function LidkaartenPage() {
                     }
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      {cardMeta && (
-                        <>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handlePreview({ member, cardMeta })}
-                            data-testid={`button-preview-${member.id}`}
-                            aria-label="Bekijk kaart"
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          data-testid={`actions-menu-${member.id}`}
+                        >
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-48">
+                        {cardMeta ? (
+                          <>
+                            <DropdownMenuItem 
+                              onClick={() => handlePreview({ member, cardMeta })}
+                              className="flex items-center gap-2"
+                            >
+                              <Eye className="h-4 w-4" />
+                              Bekijken
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              onClick={() => handleEditMember(member.id)}
+                              className="flex items-center gap-2"
+                            >
+                              <Edit className="h-4 w-4" />
+                              Bewerken
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              onClick={() => handleRegenerateCard(member.id)}
+                              disabled={regenerateCardMutation.isPending}
+                              className="flex items-center gap-2"
+                            >
+                              <RefreshCw className={`h-4 w-4 ${regenerateCardMutation.isPending ? 'animate-spin' : ''}`} />
+                              Genereer
+                            </DropdownMenuItem>
+                          </>
+                        ) : (
+                          <DropdownMenuItem 
+                            onClick={() => handleCreateCard(member.id)}
+                            disabled={createCardMutation.isPending}
+                            className="flex items-center gap-2"
                           >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleRegenerateCard(member.id)}
-                            disabled={regenerateCardMutation.isPending}
-                            data-testid={`button-regenerate-${member.id}`}
-                            aria-label="Regenereer kaart"
-                          >
-                            <RefreshCw className={`h-4 w-4 ${regenerateCardMutation.isPending ? 'animate-spin' : ''}`} />
-                          </Button>
-
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                data-testid={`button-deactivate-${member.id}`}
-                                aria-label="Deactiveer kaart"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Kaart deactiveren</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  Weet je zeker dat je de kaart van {member.firstName} {member.lastName} wilt deactiveren?
-                                  Deze actie kan niet ongedaan worden gemaakt.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Annuleren</AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={() => handleDeactivateCard(member.id)}
-                                  disabled={deactivateCardMutation.isPending}
-                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                >
-                                  Deactiveren
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </>
-                      )}
-                    </div>
+                            <Plus className="h-4 w-4" />
+                            Maak kaart aan
+                          </DropdownMenuItem>
+                        )}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                 </TableRow>
               ))

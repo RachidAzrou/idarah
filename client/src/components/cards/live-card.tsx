@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { RefreshCw, Wifi, WifiOff, Clock } from "lucide-react";
-import { GoVerified } from "react-icons/go";
+import { PiUserCircleCheckLight } from "react-icons/pi";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
@@ -242,11 +242,32 @@ export function LiveCard({
                 </Button>
                 {member.votingRights && (
                   <div className="flex flex-col items-center ml-4">
-                    <GoVerified 
-                      className="w-8 h-8 text-white/70 debossed-icon"
+                    <PiUserCircleCheckLight 
+                      className="w-8 h-8"
                       data-testid="voting-icon"
+                      style={{
+                        color: '#DAA520',
+                        textShadow: `
+                          2px 2px 0 rgba(255,248,220,0.4),
+                          -2px -2px 0 rgba(0,0,0,0.9),
+                          -3px -3px 0 rgba(0,0,0,0.7),
+                          -4px -4px 0 rgba(0,0,0,0.5),
+                          inset 3px 3px 6px rgba(0,0,0,0.8),
+                          0 0 10px rgba(218,165,32,0.4)
+                        `,
+                        filter: 'drop-shadow(2px 2px 6px rgba(0,0,0,0.6))'
+                      }}
                     />
-                    <span className="embossed-text text-[10px] uppercase tracking-wide mt-1 opacity-80">
+                    <span className="embossed-text text-[10px] uppercase tracking-wide mt-1" style={{
+                      color: '#DAA520',
+                      textShadow: `
+                        1px 1px 0 rgba(255,248,220,0.3),
+                        -1px -1px 0 rgba(0,0,0,0.7),
+                        inset 2px 2px 4px rgba(0,0,0,0.6),
+                        0 0 6px rgba(218,165,32,0.3)
+                      `,
+                      filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.4))'
+                    }}>
                       STEMGERECHTIGD
                     </span>
                   </div>

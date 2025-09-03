@@ -1275,6 +1275,86 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Card lifecycle management endpoints
+  app.post('/api/members/:id/card/refresh-validuntil', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      const memberId = req.params.id;
+      
+      // Verify member belongs to user's tenant
+      const member = await storage.getMember(memberId);
+      if (!member || member.tenantId !== req.user!.tenantId) {
+        return res.status(404).json({ error: "Lid niet gevonden" });
+      }
+      
+      // Import the service functions
+      const { updateMemberValidUntil } = await import('./lib/card/simple-validuntil');
+      const { computeCardStatus } = await import('./lib/card/status');
+      
+      // Update validUntil based on paid periods
+      const newValidUntil = await updateMemberValidUntil(memberId);
+      
+      // Get updated card status
+      const newStatus = await computeCardStatus(memberId);
+      
+      res.json({
+        memberId,
+        validUntil: newValidUntil?.toISOString() || null,
+        status: newStatus,
+        updatedAt: new Date().toISOString(),
+      });
+      
+    } catch (error) {
+      console.error('Error refreshing card validUntil:', error);
+      res.status(500).json({ error: "Fout bij het vernieuwen van geldigheid" });
+    }
+  });
+
+  app.get('/api/members/:id/card/status-details', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      const memberId = req.params.id;
+      
+      // Verify member belongs to user's tenant  
+      const member = await storage.getMember(memberId);
+      if (!member || member.tenantId !== req.user!.tenantId) {
+        return res.status(404).json({ error: "Lid niet gevonden" });
+      }
+      
+      // Import and get detailed status
+      const { getCardStatusDetails } = await import('./lib/card/status');
+      const details = await getCardStatusDetails(memberId);
+      
+      res.json(details);
+      
+    } catch (error) {
+      console.error('Error getting card status details:', error);
+      res.status(500).json({ error: "Fout bij het ophalen van kaart status" });
+    }
+  });
+
+  app.post('/api/admin/rollover', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      // Check for SUPERADMIN role
+      if (req.user!.role !== 'SUPERADMIN') {
+        return res.status(403).json({ error: "Onvoldoende rechten voor deze actie" });
+      }
+      
+      // Import rollover service
+      const { rolloverDaily } = await import('./lib/fees/rollover');
+      
+      const tenantId = req.body.tenantId || req.user!.tenantId;
+      const summary = await rolloverDaily(tenantId);
+      
+      res.json({
+        success: true,
+        summary,
+      });
+      
+    } catch (error) {
+      console.error('Error running rollover:', error);
+      res.status(500).json({ error: "Fout bij het uitvoeren van rollover" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

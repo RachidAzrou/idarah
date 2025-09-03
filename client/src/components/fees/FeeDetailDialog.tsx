@@ -193,7 +193,7 @@ export function FeeDetailDialog({
   return (
     <TooltipProvider>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-4xl max-h-[95vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
             <div className="flex justify-between items-start">
               <div>
@@ -208,150 +208,98 @@ export function FeeDetailDialog({
             </div>
           </DialogHeader>
 
-          <div className="space-y-8">
-            <div className="space-y-6">
-              {/* Header Card */}
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                      <User className="h-6 w-6 text-blue-600" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900">
-                        {fee.member.firstName} {fee.member.lastName}
-                      </h3>
-                      <p className="text-sm text-gray-600">Lidnummer #{fee.member.memberNumber}</p>
-                    </div>
+          <div className="space-y-6">
+            {/* Header Info */}
+            <div className="bg-muted/50 rounded-lg p-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-mono text-sm text-muted-foreground">#{fee.member.memberNumber}</span>
+                <Badge className={getStatusBadgeVariant(fee.status)}>
+                  {statusLabel(fee.status)}
+                </Badge>
+              </div>
+              <h3 className="font-semibold text-lg">
+                {fee.member.firstName} {fee.member.lastName}
+              </h3>
+              <p className="text-muted-foreground text-sm">
+                {formatDateBE(fee.periodStart)} – {formatDateBE(fee.periodEnd)}
+              </p>
+              <p className="text-xl font-bold mt-2">{formatEUR(fee.amountCents)}</p>
+            </div>
+
+            {/* Details */}
+            <div className="space-y-4">
+              <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">
+                Details
+              </h4>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="text-muted-foreground">Vervalt op</span>
+                  <p className="font-medium">{expiryDate(fee.periodEnd)}</p>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Betaaltermijn</span>
+                  <p className="font-medium">{getTermLabel(fee.term)}</p>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Betaalmethode</span>
+                  <p className="font-medium">{getPaymentMethodLabel(fee.method)}</p>
+                </div>
+                {fee.paidAt && (
+                  <div>
+                    <span className="text-muted-foreground">Betaald op</span>
+                    <p className="font-medium">{formatDateBE(fee.paidAt)}</p>
                   </div>
-                  <Badge className={getStatusBadgeVariant(fee.status)}>
-                    {statusLabel(fee.status)}
-                  </Badge>
-                </div>
-                <div className="text-center py-2">
-                  <p className="text-2xl font-bold text-gray-900">{formatEUR(fee.amountCents)}</p>
-                  <p className="text-sm text-gray-600">{formatDateBE(fee.periodStart)} – {formatDateBE(fee.periodEnd)}</p>
-                </div>
+                )}
+                {fee.sepaBatchRef && (
+                  <div>
+                    <span className="text-muted-foreground">SEPA batch</span>
+                    <p className="font-mono text-xs">{fee.sepaBatchRef}</p>
+                  </div>
+                )}
               </div>
+            </div>
 
-              {/* Kerninfo in 2 kolommen */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="bg-white border rounded-lg p-6 shadow-sm">
-                  <h4 className="font-semibold text-gray-900 flex items-center gap-2 mb-4">
-                    <Calendar className="h-5 w-5 text-blue-600" />
-                    Periode & Timing
-                  </h4>
-                  <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <dt className="text-sm text-muted-foreground">Periode van</dt>
-                      <dd className="font-medium">{formatDateBE(fee.periodStart)}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm text-muted-foreground">Periode tot</dt>
-                      <dd className="font-medium">{formatDateBE(fee.periodEnd)}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm text-muted-foreground flex items-center gap-1">
-                        Vervalt op
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <Info className="h-3 w-3" />
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            De dag na de einddatum van de periode
-                          </TooltipContent>
-                        </Tooltip>
-                      </dt>
-                      <dd className="font-medium">{expiryDate(fee.periodEnd)}</dd>
-                    </div>
-                    {fee.paidAt && (
-                      <div>
-                        <dt className="text-sm text-muted-foreground">Betaald op</dt>
-                        <dd className="font-medium">{formatDateBE(fee.paidAt)}</dd>
-                      </div>
-                    )}
-                  </dl>
-                </div>
-
-                <div className="bg-white border rounded-lg p-6 shadow-sm">
-                  <h4 className="font-semibold text-gray-900 flex items-center gap-2 mb-4">
-                    <CreditCard className="h-5 w-5 text-green-600" />
-                    Financiële Details
-                  </h4>
-                  <dl className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                      <dt className="text-sm text-muted-foreground">Bedrag</dt>
-                      <dd className="font-semibold text-lg">{formatEUR(fee.amountCents)}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm text-muted-foreground">Betaaltermijn</dt>
-                      <dd className="font-medium">{getTermLabel(fee.term)}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm text-muted-foreground">Betaalmethode</dt>
-                      <dd className="font-medium">{getPaymentMethodLabel(fee.method)}</dd>
-                    </div>
-                    {fee.sepaBatchRef && (
-                      <div>
-                        <dt className="text-sm text-muted-foreground">SEPA batch</dt>
-                        <dd className="font-mono text-xs">{fee.sepaBatchRef}</dd>
-                      </div>
-                    )}
-                  </dl>
-                </div>
-              </div>
-
-              {/* Lid informatie */}
-              <div className="bg-white border rounded-lg p-6 shadow-sm">
-                <h4 className="font-semibold text-gray-900 flex items-center gap-2 mb-4">
-                  <User className="h-5 w-5 text-purple-600" />
-                  Lid informatie
+            {/* Contact informatie */}
+            {(fee.member.email || fee.member.phone) && (
+              <div className="space-y-4">
+                <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">
+                  Contact
                 </h4>
-                <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <dt className="text-sm text-muted-foreground">Naam</dt>
-                    <dd className="font-medium">{fee.member.firstName} {fee.member.lastName}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-sm text-muted-foreground">Categorie</dt>
-                    <dd className="font-medium">{getCategoryLabel(fee.member.category)}</dd>
-                  </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                   {fee.member.email && (
                     <div>
-                      <dt className="text-sm text-muted-foreground">E-mail</dt>
-                      <dd>
+                      <span className="text-muted-foreground">E-mail</span>
+                      <p>
                         <a 
                           href={`mailto:${fee.member.email}`} 
-                          className="text-blue-600 hover:text-blue-800 flex items-center gap-1"
+                          className="text-blue-600 hover:text-blue-800"
                         >
-                          <Mail className="h-3 w-3" />
                           {fee.member.email}
                         </a>
-                      </dd>
+                      </p>
                     </div>
                   )}
                   {fee.member.phone && (
                     <div>
-                      <dt className="text-sm text-muted-foreground">Telefoon</dt>
-                      <dd>
+                      <span className="text-muted-foreground">Telefoon</span>
+                      <p>
                         <a 
                           href={`tel:${fee.member.phone}`} 
-                          className="text-blue-600 hover:text-blue-800 flex items-center gap-1"
+                          className="text-blue-600 hover:text-blue-800"
                         >
-                          <Phone className="h-3 w-3" />
                           {fee.member.phone}
                         </a>
-                      </dd>
+                      </p>
                     </div>
                   )}
-                </dl>
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Acties */}
           {canManage && (
-            <DialogFooter className="gap-3 pt-6 border-t bg-gray-50 rounded-lg p-4 mt-6">
+            <DialogFooter className="pt-4 border-t">
               {canMarkAsPaid && (
                 <Button onClick={handleMarkPaid} className="flex items-center gap-2">
                   <Check className="h-4 w-4" />

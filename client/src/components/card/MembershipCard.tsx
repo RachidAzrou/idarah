@@ -211,47 +211,39 @@ export function MembershipCard({
             {/* Voting Rights Badge - Right side */}
             {(cardData.badges.includes("Stemgerechtigd") || true) && (
               <div className="flex flex-col items-center mr-8">
-                {/* Glass Effect Gold Icon with Deep Relief */}
+                {/* Glossy Gold Icon with Deep Relief */}
                 <GoVerified 
                   className={`${isConstrained ? 'w-12 h-12' : 'w-16 h-16'}`}
                   data-testid="voting-icon"
                   style={{
                     color: '#D4AF37',
                     textShadow: `
-                      1px 1px 0 #F4E4BC,
-                      2px 2px 0 #E6C547,
-                      3px 3px 0 #C8941F,
+                      1px 1px 0 #F5E8C8,
+                      2px 2px 0 #E8D147,
+                      3px 3px 0 #C4941F,
                       4px 4px 0 #B8860B,
-                      5px 5px 0 #996515,
-                      6px 6px 12px rgba(0,0,0,0.6),
-                      0 0 20px rgba(212,175,55,0.5)
+                      5px 5px 0 #9A6B15,
+                      6px 6px 0 #7D5A12,
+                      7px 7px 15px rgba(0,0,0,0.7),
+                      0 0 25px rgba(212,175,55,0.6),
+                      0 0 35px rgba(255,255,255,0.3)
                     `,
                     filter: `
-                      drop-shadow(3px 3px 6px rgba(0,0,0,0.5)) 
-                      brightness(1.2) 
-                      contrast(1.1)
-                    `,
-                    background: 'linear-gradient(145deg, rgba(212,175,55,0.2), rgba(255,255,255,0.1))',
-                    borderRadius: '50%',
-                    padding: '4px',
-                    boxShadow: `
-                      inset 1px 1px 2px rgba(255,255,255,0.3),
-                      inset -1px -1px 2px rgba(0,0,0,0.2),
-                      0 0 15px rgba(212,175,55,0.3)
+                      drop-shadow(4px 4px 8px rgba(0,0,0,0.6)) 
+                      brightness(1.3) 
+                      contrast(1.2)
+                      saturate(1.1)
                     `
                   }}
                 />
                 
-                {/* Simple Gold Text */}
+                {/* Minimal Gold Text */}
                 <span 
                   className={`${isConstrained ? 'text-xs' : 'text-sm'} uppercase tracking-[0.1em] font-bold mt-3`}
                   style={{
                     color: '#D4AF37',
-                    textShadow: `
-                      1px 1px 0 #F4E4BC,
-                      2px 2px 2px rgba(0,0,0,0.3)
-                    `,
-                    filter: 'drop-shadow(1px 1px 1px rgba(0,0,0,0.2))'
+                    textShadow: `1px 1px 1px rgba(0,0,0,0.4)`,
+                    filter: 'drop-shadow(0.5px 0.5px 0.5px rgba(0,0,0,0.3))'
                   }}
                 >
                   STEMGERECHTIGD

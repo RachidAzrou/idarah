@@ -1,0 +1,156 @@
+Het moet in één oogopslag alle kerninfo tonen en de juiste acties aanbieden. Geen data fetchen in de component; alles via props. Locale: nl-BE, tijdzone Europe/Brussels, datum dd-mm-jjjj, valuta €.
+
+Stack & UI
+
+Next.js 14 (App Router), TypeScript strict
+
+shadcn/ui: Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Badge, Button, Separator, ScrollArea, Tooltip, Toast (indien beschikbaar)
+
+TailwindCSS voor layout/styling
+
+date-fns + date-fns-tz voor BE-formatting (Europe/Brussels)
+
+Statusnamen (definitief)
+
+Openstaand, Betaald, Vervallen
+
+Kleurcodes badges:
+
+Openstaand → amber
+
+Betaald → groen
+
+Vervallen → rood
+
+Maak component
+
+Bestand/Component: components/fees/FeeDetailDialog.tsx
+
+Props
+
+type FeeStatus = "OPENSTAAND" | "BETAALD" | "VERVALLEN";
+type PaymentTerm = "MONTHLY" | "YEARLY";
+type PaymentMethod = "SEPA" | "OVERSCHRIJVING" | "BANCONTACT" | "CASH" | "UNKNOWN";
+
+type MemberMini = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  category: "STUDENT" | "STANDAARD" | "SENIOR";
+  email?: string | null;
+  phone?: string | null;
+  memberNumber: string;
+};
+
+type FeeDetail = {
+  id: string;
+  amountCents: number;             // bv. 1000 = €10,00
+  currency?: "EUR";
+  term: PaymentTerm;               // MONTHLY | YEARLY
+  method?: PaymentMethod | null;
+  status: FeeStatus;               // OPENSTAAND | BETAALD | VERVALLEN
+  periodStart: string;             // ISO
+  periodEnd: string;               // ISO (end-exclusive conceptueel)
+  paidAt?: string | null;          // ISO
+  sepaBatchRef?: string | null;
+  tenantName: string;
+  member: MemberMini;
+};
+
+type FeeDetailDialogProps = {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  fee: FeeDetail;
+
+  canManage?: boolean;             // RBAC: BEHEERDER+ kan acties zien
+  onMarkPaid?: (feeId: string) => Promise<void> | void;
+  onGenerateSepa?: (feeId: string) => Promise<void> | void;
+  onDelete?: (feeId: string) => Promise<void> | void; // annuleren/verwijderen
+
+  // optioneel: toon toasts extern
+  onActionSuccess?: (msg: string) => void;
+  onActionError?: (msg: string) => void;
+};
+
+
+Gedrag
+
+Kop toont “Lidgeld detail” + subtitel #<lidnummer> – <Naam> en statusbadge.
+
+Kerninfo in 2 kolommen:
+
+Periode van – tot (dd-mm-jjjj)
+
+Vervalt op: dag na periodEnd (BE-tijd)
+
+Bedrag (bv. €10,00)
+
+Betaaltermijn (Maandelijks/Jaarlijks)
+
+Betaalmethode (SEPA/Overschrijving/Bancontact/Cash)
+
+SEPA batch (indien aanwezig)
+
+Betaald op (indien status = Betaald)
+
+Lid-samenvatting (rechts of onderaan op mobiel): naam, categorie (Student/Standaard/Senior), e-mail/telefoon klikbaar.
+
+DialogFooter (Acties) — enkel als canManage=true:
+
+Markeer als betaald (zichtbaar als status ≠ Betaald)
+
+Genereer SEPA-export (zichtbaar als method=SEPA en status = Openstaand of Vervallen en geen batchRef)
+
+Verwijder/Annuleer (destructief, enkel voor beheerder)
+
+Sluiten
+
+Toont tooltips waar zinvol (bv. bij “Vervalt op” uitleg: “De dag na de einddatum van de periode”).
+
+Toont tenantnaam subtiel in de header (rechtsboven grijs).
+
+i18n helpers
+
+formatEUR(amountCents) → € 1.234,56 (nl-BE)
+
+formatDateBE(iso) → dd-MM-yyyy in Europe/Brussels
+
+expiryDate(isoEnd) → periodEnd + 1 dag in BE-tijd
+
+Styling hints
+
+Gebruik ScrollArea in content zodat lange gegevens niet het scherm overschrijden.
+
+Gebruik Separator tussen secties.
+
+Gebruik semantische <dl> voor label/waarde lijsten.
+
+Acceptance criteria
+
+Statusbadges tonen Openstaand/Betaald/Vervallen met juiste kleur.
+
+Vervalt op = dag na periodEnd (Europe/Brussels).
+
+Acties zijn contextueel zichtbaar en roepen de meegegeven callbacks aan; knoppen tonen loading-state tijdens async.
+
+UI in Nederlands (België); datum dd-mm-jjjj; valuta € met Belgische notatie.
+
+Toegankelijk: DialogTitle, DialogDescription, focus-trap, aria-*.
+
+Component bevat geen fetch; is volledig herbruikbaar.
+
+Genereer nu
+
+De volledige FeeDetailDialog.tsx component met alle props, UI, conditional rendering en helpers (formatEUR, formatDateBE, expiryDate).
+
+Gebruik date-fns + date-fns-tz voor BE formatting (Europe/Brussels).
+
+Toon voorbeeld van status → badge kleur mapping.
+
+Voeg kleine util statusLabel(status: FeeStatus): string toe → “Openstaand”, “Betaald”, “Vervallen”.
+
+Zorg dat labels exact zijn: Periode van, Periode tot, Vervalt op, Bedrag, Betaaltermijn, Betaalmethode, SEPA batch, Betaald op.
+
+Knoppen: Markeer als betaald, Genereer SEPA-export, Verwijder, Sluiten.
+
+Korte Tooltip bij Vervalt op met uitleg.

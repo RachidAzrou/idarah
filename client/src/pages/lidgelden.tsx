@@ -6,7 +6,7 @@ import { KpiCards } from "@/components/fees/kpi-cards";
 import { NewFeeDialog } from "@/components/fees/new-fee-dialog";
 import { Toolbar } from "@/components/fees/toolbar";
 import { FeesTable } from "@/components/fees/fees-table";
-import { FeeDetailSlideout } from "@/components/fees/fee-detail-slideout";
+import { FeeDetailDialog } from "@/components/fees/FeeDetailDialog";
 import { ImportDialog } from "@/components/fees/import-dialog";
 import { SepaDialog } from "@/components/fees/sepa-dialog";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -55,7 +55,7 @@ export default function Lidgelden() {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
   // Dialog state
-  const [showDetailSlideout, setShowDetailSlideout] = useState(false);
+  const [showDetailDialog, setShowDetailDialog] = useState(false);
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [showSepaDialog, setShowSepaDialog] = useState(false);
   const [showChangeMethodDialog, setShowChangeMethodDialog] = useState(false);
@@ -168,7 +168,7 @@ export default function Lidgelden() {
         break;
       case "viewDetail":
         setSelectedFee(fee);
-        setShowDetailSlideout(true);
+        setShowDetailDialog(true);
         break;
       case "changeMethod":
         setSelectedFee(fee);
@@ -422,19 +422,48 @@ export default function Lidgelden() {
         />
 
         {/* Dialogs */}
-        <FeeDetailSlideout
-          fee={selectedFee}
-          open={showDetailSlideout}
-          onClose={() => {
-            setShowDetailSlideout(false);
-            setSelectedFee(null);
-          }}
-          onMarkPaid={(fee) => {
-            handleMarkPaid([fee]);
-            setShowDetailSlideout(false);
-            setSelectedFee(null);
-          }}
-        />
+        {selectedFee && (
+          <FeeDetailDialog
+            fee={{
+              id: selectedFee.id,
+              amountCents: Math.round((selectedFee.amount || 0) * 100),
+              currency: "EUR",
+              term: "MONTHLY",
+              method: selectedFee.method || null,
+              status: selectedFee.status === "OPEN" ? "OPENSTAAND" : 
+                     selectedFee.status === "PAID" ? "BETAALD" : "VERVALLEN",
+              periodStart: selectedFee.periodStart,
+              periodEnd: selectedFee.periodEnd,
+              paidAt: selectedFee.paidAt || null,
+              sepaBatchRef: selectedFee.sepaBatchRef || null,
+              tenantName: "DARAH",
+              member: {
+                id: selectedFee.memberId,
+                firstName: selectedFee.memberFirstName || "",
+                lastName: selectedFee.memberLastName || "",
+                category: "STANDAARD",
+                email: selectedFee.memberEmail || null,
+                phone: selectedFee.memberPhone || null,
+                memberNumber: selectedFee.memberNumber
+              }
+            }}
+            open={showDetailDialog}
+            onOpenChange={(open) => {
+              setShowDetailDialog(open);
+              if (!open) setSelectedFee(null);
+            }}
+            canManage={true}
+            onMarkPaid={async (feeId) => {
+              await handleMarkPaid([selectedFee]);
+            }}
+            onActionSuccess={(msg) => {
+              toast({ title: "Succes", description: msg });
+            }}
+            onActionError={(msg) => {
+              toast({ title: "Fout", description: msg, variant: "destructive" });
+            }}
+          />
+        )}
 
         <ImportDialog
           open={showImportDialog}

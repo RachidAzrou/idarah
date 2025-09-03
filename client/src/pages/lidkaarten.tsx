@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -26,7 +27,9 @@ import {
   MoreHorizontal,
   Plus,
   ExternalLink,
-  AlertTriangle
+  AlertTriangle,
+  ChevronUp,
+  ChevronDown
 } from "lucide-react";
 import { CiExport, CiCreditCardOff } from "react-icons/ci";
 import { MdOutlineBrowserUpdated } from "react-icons/md";
@@ -43,6 +46,11 @@ interface CardStats {
   totalActive: number;
   validPercentage: number;
   lastUpdated: Date | null;
+}
+
+interface SortConfig {
+  key: string | null;
+  direction: 'asc' | 'desc';
 }
 
 function getMemberCategoryLabel(category: string): string {
@@ -89,6 +97,8 @@ export default function LidkaartenPage() {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [previewCard, setPreviewCard] = useState<CardWithMember | null>(null);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [sortConfig, setSortConfig] = useState<SortConfig>({ key: null, direction: 'asc' });
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -179,9 +189,40 @@ export default function LidkaartenPage() {
     },
   });
 
-  // Filter cards based on search and filters
+  // Sort and selection functions
+  const handleSort = (key: string) => {
+    const direction = sortConfig.key === key && sortConfig.direction === 'asc' ? 'desc' : 'asc';
+    setSortConfig({ key, direction });
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(filteredCards.map(({ member }) => member.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const handleSelectRow = (memberId: string, checked: boolean) => {
+    if (checked) {
+      setSelectedIds([...selectedIds, memberId]);
+    } else {
+      setSelectedIds(selectedIds.filter(id => id !== memberId));
+    }
+  };
+
+  const getSortIcon = (key: string) => {
+    if (sortConfig.key !== key) {
+      return <ChevronUp className="h-3 w-3 text-gray-400" />;
+    }
+    return sortConfig.direction === 'asc' 
+      ? <ChevronUp className="h-3 w-3 text-gray-700" />
+      : <ChevronDown className="h-3 w-3 text-gray-700" />;
+  };
+
+  // Filter and sort cards based on search, filters, and sort config
   const filteredCards = useMemo(() => {
-    return cards.filter(({ member, cardMeta }) => {
+    let filtered = cards.filter(({ member, cardMeta }) => {
       // Search filter
       const searchMatch = searchTerm === '' || 
         member.memberNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -197,7 +238,54 @@ export default function LidkaartenPage() {
 
       return searchMatch && statusMatch && categoryMatch;
     });
-  }, [cards, searchTerm, statusFilter, categoryFilter]);
+
+    // Apply sorting
+    if (sortConfig.key) {
+      filtered.sort((a, b) => {
+        let aValue: any;
+        let bValue: any;
+
+        switch (sortConfig.key) {
+          case 'memberNumber':
+            aValue = a.member.memberNumber;
+            bValue = b.member.memberNumber;
+            break;
+          case 'name':
+            aValue = `${a.member.lastName} ${a.member.firstName}`;
+            bValue = `${b.member.lastName} ${b.member.firstName}`;
+            break;
+          case 'category':
+            aValue = a.member.category;
+            bValue = b.member.category;
+            break;
+          case 'status':
+            aValue = a.cardMeta?.status || 'GEEN_KAART';
+            bValue = b.cardMeta?.status || 'GEEN_KAART';
+            break;
+          case 'validUntil':
+            aValue = a.cardMeta?.validUntil || '';
+            bValue = b.cardMeta?.validUntil || '';
+            break;
+          case 'lastRenderedAt':
+            aValue = a.cardMeta?.lastRenderedAt || '';
+            bValue = b.cardMeta?.lastRenderedAt || '';
+            break;
+          default:
+            return 0;
+        }
+
+        if (aValue < bValue) {
+          return sortConfig.direction === 'asc' ? -1 : 1;
+        }
+        if (aValue > bValue) {
+          return sortConfig.direction === 'asc' ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+
+    return filtered;
+  }, [cards, searchTerm, statusFilter, categoryFilter, sortConfig]);
 
   const handlePreview = (cardData: CardWithMember) => {
     setPreviewCard(cardData);
@@ -340,6 +428,21 @@ export default function LidkaartenPage() {
                 </div>
                 
                 <div className="flex gap-2 lg:flex-shrink-0">
+                  {selectedIds.length > 0 && (
+                    <div className="flex gap-2 mr-2">
+                      <Badge variant="secondary" className="px-3 py-1">
+                        {selectedIds.length} geselecteerd
+                      </Badge>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => setSelectedIds([])}
+                        className="h-8"
+                      >
+                        Wis selectie
+                      </Button>
+                    </div>
+                  )}
                   <Button 
                     variant="outline" 
                     onClick={handleExport}
@@ -387,20 +490,75 @@ export default function LidkaartenPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Lidnummer</TableHead>
-              <TableHead>Naam</TableHead>
-              <TableHead>Categorie</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Geldig tot</TableHead>
+              <TableHead className="w-12">
+                <Checkbox
+                  checked={selectedIds.length === filteredCards.length && filteredCards.length > 0}
+                  onCheckedChange={handleSelectAll}
+                  aria-label="Selecteer alle kaarten"
+                />
+              </TableHead>
+              <TableHead 
+                className="cursor-pointer hover:bg-gray-50"
+                onClick={() => handleSort('memberNumber')}
+              >
+                <div className="flex items-center gap-2">
+                  Lidnummer
+                  {getSortIcon('memberNumber')}
+                </div>
+              </TableHead>
+              <TableHead 
+                className="cursor-pointer hover:bg-gray-50"
+                onClick={() => handleSort('name')}
+              >
+                <div className="flex items-center gap-2">
+                  Naam
+                  {getSortIcon('name')}
+                </div>
+              </TableHead>
+              <TableHead 
+                className="cursor-pointer hover:bg-gray-50"
+                onClick={() => handleSort('category')}
+              >
+                <div className="flex items-center gap-2">
+                  Categorie
+                  {getSortIcon('category')}
+                </div>
+              </TableHead>
+              <TableHead 
+                className="cursor-pointer hover:bg-gray-50"
+                onClick={() => handleSort('status')}
+              >
+                <div className="flex items-center gap-2">
+                  Status
+                  {getSortIcon('status')}
+                </div>
+              </TableHead>
+              <TableHead 
+                className="cursor-pointer hover:bg-gray-50"
+                onClick={() => handleSort('validUntil')}
+              >
+                <div className="flex items-center gap-2">
+                  Geldig tot
+                  {getSortIcon('validUntil')}
+                </div>
+              </TableHead>
               <TableHead>Versie</TableHead>
-              <TableHead>Laatste update</TableHead>
+              <TableHead 
+                className="cursor-pointer hover:bg-gray-50"
+                onClick={() => handleSort('lastRenderedAt')}
+              >
+                <div className="flex items-center gap-2">
+                  Laatste update
+                  {getSortIcon('lastRenderedAt')}
+                </div>
+              </TableHead>
               <TableHead className="text-right">Acties</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {cardsLoading ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-8">
+                <TableCell colSpan={9} className="text-center py-8">
                   <div className="flex items-center justify-center gap-2">
                     <RefreshCw className="h-4 w-4 animate-spin" />
                     Lidkaarten laden...
@@ -409,13 +567,23 @@ export default function LidkaartenPage() {
               </TableRow>
             ) : filteredCards.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
                   Geen lidkaarten gevonden die voldoen aan de filters
                 </TableCell>
               </TableRow>
             ) : (
               filteredCards.map(({ member, cardMeta }) => (
-                <TableRow key={member.id}>
+                <TableRow 
+                  key={member.id}
+                  className={selectedIds.includes(member.id) ? "bg-blue-50" : ""}
+                >
+                  <TableCell>
+                    <Checkbox
+                      checked={selectedIds.includes(member.id)}
+                      onCheckedChange={(checked) => handleSelectRow(member.id, !!checked)}
+                      aria-label={`Selecteer ${member.firstName} ${member.lastName}`}
+                    />
+                  </TableCell>
                   <TableCell className="font-mono">{member.memberNumber}</TableCell>
                   <TableCell className="font-medium">
                     {member.firstName} {member.lastName}

@@ -389,7 +389,10 @@ export function MemberForm({ member, onSuccess, onCancel }: MemberFormProps) {
     }
   };
 
-  const nextTab = () => {
+  const nextTab = (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault(); // Prevent form submission
+    }
     const tabs = ["personal", "address", "financial", "organization", "permissions"];
     const currentIndex = tabs.indexOf(activeTab);
     if (currentIndex < tabs.length - 1) {
@@ -397,7 +400,10 @@ export function MemberForm({ member, onSuccess, onCancel }: MemberFormProps) {
     }
   };
 
-  const prevTab = () => {
+  const prevTab = (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault(); // Prevent form submission
+    }
     const tabs = ["personal", "address", "financial", "organization", "permissions"];
     const currentIndex = tabs.indexOf(activeTab);
     if (currentIndex > 0) {

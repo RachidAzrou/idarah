@@ -40,7 +40,7 @@ export function MethodChip({ method, className, showIcon = true }: MethodChipPro
         className
       )}
     >
-      {showIcon && <Icon className="h-3 w-3" />}
+      {showIcon && Icon && <Icon className="h-3 w-3" />}
       {labels[method]}
     </span>
   );

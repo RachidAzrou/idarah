@@ -479,7 +479,7 @@ export default function Lidgelden() {
                 <SelectContent>
                   <SelectItem value="SEPA">SEPA</SelectItem>
                   <SelectItem value="BANCONTACT">Bancontact</SelectItem>
-                  <SelectItem value="TRANSFER">Overschrijving</SelectItem>
+                  <SelectItem value="OVERSCHRIJVING">Overschrijving</SelectItem>
                   <SelectItem value="CASH">Contant</SelectItem>
                 </SelectContent>
               </Select>

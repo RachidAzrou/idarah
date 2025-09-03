@@ -50,10 +50,10 @@ export function KpiCards({ fees }: KpiCardsProps) {
   const paidFees = fees.filter(fee => fee.status === "PAID");
   const overdueFees = fees.filter(fee => fee.status === "OVERDUE");
   
-  const openAmount = openFees.reduce((sum, fee) => sum + fee.amount, 0);
-  const paidAmount = paidFees.reduce((sum, fee) => sum + fee.amount, 0);
-  const overdueAmount = overdueFees.reduce((sum, fee) => sum + fee.amount, 0);
-  const totalAmount = fees.reduce((sum, fee) => sum + fee.amount, 0);
+  const openAmount = openFees.reduce((sum, fee) => sum + Number(fee.amount || 0), 0);
+  const paidAmount = paidFees.reduce((sum, fee) => sum + Number(fee.amount || 0), 0);
+  const overdueAmount = overdueFees.reduce((sum, fee) => sum + Number(fee.amount || 0), 0);
+  const totalAmount = fees.reduce((sum, fee) => sum + Number(fee.amount || 0), 0);
   
   const paidPercentage = totalAmount > 0 ? (paidAmount / totalAmount) * 100 : 0;
   const totalCount = fees.length;

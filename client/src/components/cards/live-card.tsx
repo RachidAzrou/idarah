@@ -163,17 +163,13 @@ export function LiveCard({
       <div className="w-[min(92vw,70vh*1.586)] sm:w-[min(94vw,94vh*1.586)] lg:w-[clamp(540px,70vmin,860px)] aspect-[1586/1000]">
         <div 
           className={cn(
-            "card-gradient relative w-full h-full rounded-3xl overflow-hidden border border-white/10 card-font transition-transform duration-800",
+            "glassmorphism-card relative w-full h-full rounded-3xl overflow-hidden border border-white/20 card-font transition-transform duration-800 shadow-lg",
             isFlipping && "animate-flip-horizontal"
           )}
           style={{ 
             transform: isFlipping ? 'rotateY(360deg)' : 'rotateY(0deg)',
             transition: 'transform 800ms ease-in-out',
-            boxShadow: `
-              0 0 0 1px rgba(255,255,255,0.1) inset,
-              0 18px 40px rgba(0,0,0,0.35),
-              0 8px 20px rgba(0,0,0,0.25)
-            `
+            boxShadow: `0 18px 40px rgba(0,0,0,0.35)`
           }}
           data-testid="live-card"
         >

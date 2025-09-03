@@ -51,6 +51,42 @@
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 0 8px rgba(255, 255, 255, 0.1);
 }
 
+/* Glassmorphism effect for cards */
+.glassmorphism-card {
+  background: linear-gradient(135deg, #0E3A6E 0%, #0B4E9C 100%);
+  position: relative;
+}
+
+.glassmorphism-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: inherit;
+  z-index: 1;
+}
+
+.glassmorphism-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    45deg, 
+    rgba(255, 255, 255, 0.08) 0 1px, 
+    transparent 1px 12px
+  );
+  opacity: 0.06;
+  border-radius: inherit;
+  z-index: 2;
+}
+
+.glassmorphism-card > * {
+  position: relative;
+  z-index: 3;
+}
+
 /* 360° flip animation for card refresh */
 @keyframes flip-horizontal {
   0% { transform: rotateY(0deg); }

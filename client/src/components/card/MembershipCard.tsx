@@ -118,12 +118,11 @@ export function MembershipCard({
     <>
       <div 
         className={cn(
-          "w-full h-full rounded-3xl shadow-card relative overflow-hidden card-font transition-transform duration-800",
+          "glassmorphism-card w-full h-full rounded-3xl relative overflow-hidden card-font transition-transform duration-800 border border-white/20 shadow-lg",
           isFlipping && "animate-flip-horizontal",
           className
         )}
         style={{
-          background: "linear-gradient(135deg, #0E3A6E 0%, #0B4E9C 100%)",
           boxShadow: "0 18px 40px rgba(0,0,0,0.35)",
           transform: isFlipping ? 'rotateY(360deg)' : 'rotateY(0deg)',
           transition: 'transform 800ms ease-in-out'

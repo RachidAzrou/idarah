@@ -9,8 +9,8 @@ export function AspectBox({ children }: AspectBoxProps) {
     <div
       className="
         relative mx-auto aspect-[1586/1000]
-        w-[clamp(560px,70vmin,880px)]
-        max-w-[94vw] max-h-[94vh]
+        w-[clamp(400px,50vmin,600px)]
+        max-w-[80vw] max-h-[70vh]
       "
     >
       <div className="absolute inset-0">{children}</div>

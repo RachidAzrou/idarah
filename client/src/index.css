@@ -329,17 +329,51 @@
   }
 
   .embossed-text {
-    color: #F8FAFC;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.4), 0 0 8px rgba(255,255,255,0.1);
-    font-weight: 500;
+    color: #1E293B;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.8);
+    font-weight: 600;
+  }
+
+  .apple-wallet-text {
+    color: #1E293B;
+  }
+
+  /* Apple Wallet style premium card */
+  .apple-wallet-card {
+    background: linear-gradient(135deg, #4F7EF7 0%, #6EA9FF 50%, #B8D9FF 100%);
+    box-shadow: 0 18px 40px rgba(0,0,0,0.25);
+    position: relative;
   }
 
   .card-gradient {
-    background-image: url('../attached_assets/fading-blue-background_1756897101831.jpg'), linear-gradient(135deg, rgba(8, 35, 66, 0.9) 0%, rgba(6, 47, 89, 0.95) 100%);
-    background-size: cover;
-    background-position: center;
-    background-blend-mode: overlay;
+    background: linear-gradient(135deg, #4F7EF7 0%, #6EA9FF 50%, #B8D9FF 100%);
+    box-shadow: 0 18px 40px rgba(0,0,0,0.25);
     position: relative;
+  }
+
+  /* Apple Wallet style overlays */
+  .apple-wallet-gloss {
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 20%, transparent 40%, rgba(255,255,255,0.03) 70%, rgba(255,255,255,0.08) 100%);
+    opacity: 0.8;
+  }
+
+  .apple-wallet-texture {
+    background: 
+      radial-gradient(circle at 25% 25%, rgba(255,255,255,0.02) 1px, transparent 1px),
+      radial-gradient(circle at 75% 75%, rgba(255,255,255,0.01) 1px, transparent 1px);
+    background-size: 2px 2px, 3px 3px;
+    opacity: 0.6;
+  }
+
+  .apple-wallet-vignette {
+    background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.05) 100%);
+    opacity: 0.4;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .apple-wallet-gloss {
+      background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 100%);
+    }
   }
 
   .card-gradient::before {
@@ -349,8 +383,9 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, rgba(0,0,0,0.1) 0%, transparent 50%, rgba(0,0,0,0.2) 100%);
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 20%, transparent 40%, rgba(255,255,255,0.03) 70%, rgba(255,255,255,0.08) 100%);
     pointer-events: none;
+    opacity: 0.8;
   }
 
   .status-led-glow-green {

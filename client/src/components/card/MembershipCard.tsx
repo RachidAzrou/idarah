@@ -125,35 +125,31 @@ export function MembershipCard({
           className
         )}
         style={{
-          backgroundImage: `url(${fadingBlueBackground}), linear-gradient(135deg, rgba(8, 35, 66, 0.9) 0%, rgba(6, 47, 89, 0.95) 100%)`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundBlendMode: "overlay",
-          boxShadow: "0 18px 40px rgba(0,0,0,0.35)",
+          background: "linear-gradient(135deg, #4F7EF7 0%, #6EA9FF 50%, #B8D9FF 100%)",
+          boxShadow: "0 18px 40px rgba(0,0,0,0.25)",
           transform: isFlipping ? 'rotateY(360deg)' : 'rotateY(0deg)',
           transition: 'transform 800ms ease-in-out'
         }}
         data-testid="membership-card"
       >
-        {/* Enhanced glossy sheen overlay */}
+        {/* Apple Wallet style glossy overlay */}
         <div 
-          className="absolute inset-0 pointer-events-none opacity-30 mix-blend-screen"
-          style={{
-            background: "linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 20%, transparent 40%, rgba(255,255,255,0.05) 70%, rgba(255,255,255,0.15) 100%)"
-          }}
+          className="absolute inset-0 pointer-events-none apple-wallet-gloss"
           aria-hidden="true"
         />
-        {/* Additional highlight for premium effect */}
+        {/* Subtle noise overlay for material texture */}
         <div 
-          className="absolute top-0 left-0 w-full h-1/3 pointer-events-none opacity-20"
-          style={{
-            background: "linear-gradient(180deg, rgba(255,255,255,0.2) 0%, transparent 100%)"
-          }}
+          className="absolute inset-0 pointer-events-none apple-wallet-texture"
+          aria-hidden="true"
+        />
+        {/* Soft vignette for depth */}
+        <div 
+          className="absolute inset-0 pointer-events-none apple-wallet-vignette"
           aria-hidden="true"
         />
 
         {/* Card Content */}
-        <div className="relative h-full p-6 flex flex-col text-white">
+        <div className="relative h-full p-6 flex flex-col text-white apple-wallet-text">
           {/* Top row: Organization and Status */}
           <div className="flex items-start justify-between mb-6">
             <div className="flex-1">

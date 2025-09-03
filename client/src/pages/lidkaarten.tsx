@@ -25,7 +25,7 @@ import {
   Clock,
   MoreHorizontal,
   Plus,
-  Share
+  Copy
 } from "lucide-react";
 import { CiExport } from "react-icons/ci";
 import { format } from "date-fns";
@@ -516,8 +516,8 @@ export default function LidkaartenPage() {
                   variant="outline"
                   className="gap-2"
                 >
-                  <Share className="h-4 w-4" />
-                  Delen
+                  <Copy className="h-4 w-4" />
+                  Kopieer URL
                 </Button>
                 
                 <Button

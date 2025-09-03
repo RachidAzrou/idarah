@@ -6,13 +6,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { User, Lock, Save } from "lucide-react";
+import { Lock, Save } from "lucide-react";
 
 // Schema voor profiel gegevens
 const profileSchema = z.object({
@@ -146,12 +145,14 @@ export default function Profiel() {
   }
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      <div className="flex items-center gap-3">
-        <User className="h-8 w-8 text-primary" />
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Mijn Profiel</h1>
-          <p className="text-muted-foreground">Beheer uw account gegevens en instellingen</p>
+    <div className="space-y-6">
+      {/* Page Header */}
+      <div className="border-b border-gray-200 pb-5">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900" data-testid="page-title">Mijn Profiel</h1>
+            <p className="mt-1 text-sm text-gray-700">Beheer uw account gegevens en instellingen</p>
+          </div>
         </div>
       </div>
 
@@ -159,10 +160,7 @@ export default function Profiel() {
         {/* Profiel Gegevens */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="h-5 w-5" />
-              Profiel Gegevens
-            </CardTitle>
+            <CardTitle>Profiel Gegevens</CardTitle>
             <CardDescription>
               Werk uw naam en email adres bij
             </CardDescription>
@@ -318,8 +316,6 @@ export default function Profiel() {
         </Card>
       </div>
 
-      <Separator />
-      
       {/* Account Info */}
       <Card>
         <CardHeader>

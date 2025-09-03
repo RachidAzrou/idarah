@@ -26,6 +26,7 @@ interface CardData {
 export function CardPage() {
   const [, params] = useRoute("/card/:memberId");
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
+  const [isFlipping, setIsFlipping] = useState(false);
   const installCoach = useInstallCoach();
 
   // Listen for online/offline events
@@ -72,6 +73,12 @@ export function CardPage() {
   });
 
   const handleRefresh = () => {
+    console.log('PWA handleRefresh called - triggering flip animation');
+    setIsFlipping(true);
+    setTimeout(() => {
+      setIsFlipping(false);
+      console.log('PWA flip animation ended');
+    }, 800);
     refetch();
   };
 
@@ -159,7 +166,7 @@ export function CardPage() {
           <MembershipCard
             cardData={displayData}
             onRefresh={handleRefresh}
-            isRefreshing={isLoading}
+            isRefreshing={isFlipping || isLoading}
             isOffline={isOffline || !!error}
             className="w-full h-full"
           />

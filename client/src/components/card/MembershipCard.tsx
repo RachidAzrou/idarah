@@ -33,6 +33,7 @@ interface MembershipCardProps {
   isRefreshing?: boolean;
   isOffline?: boolean;
   className?: string;
+  triggerFlip?: boolean;
 }
 
 interface StatusLEDProps {
@@ -93,7 +94,8 @@ export function MembershipCard({
   onRefresh, 
   isRefreshing = false,
   isOffline = false,
-  className = ""
+  className = "",
+  triggerFlip = false
 }: MembershipCardProps) {
   const [showQRModal, setShowQRModal] = useState(false);
   const [isFlipping, setIsFlipping] = useState(false);

@@ -735,6 +735,34 @@ export function MemberForm({ member, onSuccess, onCancel }: MemberFormProps) {
                 <div className="space-y-6">
                   <FormField
                     control={form.control}
+                    name="organization.votingEligible"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Stemgerechtigd?</FormLabel>
+                        <FormControl>
+                          <RadioGroup
+                            onValueChange={(value) => field.onChange(value === "true")}
+                            value={field.value ? "true" : "false"}
+                            className="flex gap-6"
+                            data-testid="radio-voting-eligible"
+                          >
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="true" id="voting-yes" />
+                              <Label htmlFor="voting-yes">Ja</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="false" id="voting-no" />
+                              <Label htmlFor="voting-no">Nee</Label>
+                            </div>
+                          </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
                     name="organization.interestedInActiveRole"
                     render={({ field }) => (
                       <FormItem>
@@ -777,34 +805,6 @@ export function MemberForm({ member, onSuccess, onCancel }: MemberFormProps) {
                             className={!form.watch("organization.interestedInActiveRole") ? "bg-gray-100 text-gray-400" : ""}
                             data-testid="input-role-description" 
                           />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="organization.votingEligible"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Stemgerechtigd?</FormLabel>
-                        <FormControl>
-                          <RadioGroup
-                            onValueChange={(value) => field.onChange(value === "true")}
-                            value={field.value ? "true" : "false"}
-                            className="flex gap-6"
-                            data-testid="radio-voting-eligible"
-                          >
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem value="true" id="voting-yes" />
-                              <Label htmlFor="voting-yes">Ja</Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem value="false" id="voting-no" />
-                              <Label htmlFor="voting-no">Nee</Label>
-                            </div>
-                          </RadioGroup>
                         </FormControl>
                         <FormMessage />
                       </FormItem>

@@ -240,43 +240,11 @@ export function LiveCard({
                 >
                   <RefreshCw className={cn("h-3 w-3", isRefreshing && "animate-spin")} />
                 </Button>
-                {member.votingRights && (
-                  <div className="flex flex-col items-center ml-4">
-                    <PiUserCircleCheckLight 
-                      className="w-8 h-8"
-                      data-testid="voting-icon"
-                      style={{
-                        color: '#DAA520',
-                        textShadow: `
-                          2px 2px 0 rgba(255,248,220,0.4),
-                          -2px -2px 0 rgba(0,0,0,0.9),
-                          -3px -3px 0 rgba(0,0,0,0.7),
-                          -4px -4px 0 rgba(0,0,0,0.5),
-                          inset 3px 3px 6px rgba(0,0,0,0.8),
-                          0 0 10px rgba(218,165,32,0.4)
-                        `,
-                        filter: 'drop-shadow(2px 2px 6px rgba(0,0,0,0.6))'
-                      }}
-                    />
-                    <span className="embossed-text text-[10px] uppercase tracking-wide mt-1" style={{
-                      color: '#DAA520',
-                      textShadow: `
-                        1px 1px 0 rgba(255,248,220,0.3),
-                        -1px -1px 0 rgba(0,0,0,0.7),
-                        inset 2px 2px 4px rgba(0,0,0,0.6),
-                        0 0 6px rgba(218,165,32,0.3)
-                      `,
-                      filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.4))'
-                    }}>
-                      STEMGERECHTIGD
-                    </span>
-                  </div>
-                )}
               </div>
             </div>
 
-            {/* QR Code - Left aligned with margin */}
-            <div className="flex justify-start mb-8 ml-4 mt-4">
+            {/* QR Code and Voting Rights Badge */}
+            <div className="flex items-center justify-between mb-8 ml-4 mt-4">
               <button
                 onClick={() => setShowQRModal(true)}
                 className="debossed-qr-container transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/50 hover:scale-105"
@@ -294,6 +262,40 @@ export function LiveCard({
                   />
                 </div>
               </button>
+              
+              {/* Voting Rights Badge - Right side */}
+              {member.votingRights && (
+                <div className="flex flex-col items-center mr-8">
+                  <PiUserCircleCheckLight 
+                    className="w-8 h-8"
+                    data-testid="voting-icon"
+                    style={{
+                      color: '#DAA520',
+                      textShadow: `
+                        2px 2px 0 rgba(255,248,220,0.4),
+                        -2px -2px 0 rgba(0,0,0,0.9),
+                        -3px -3px 0 rgba(0,0,0,0.7),
+                        -4px -4px 0 rgba(0,0,0,0.5),
+                        inset 3px 3px 6px rgba(0,0,0,0.8),
+                        0 0 10px rgba(218,165,32,0.4)
+                      `,
+                      filter: 'drop-shadow(2px 2px 6px rgba(0,0,0,0.6))'
+                    }}
+                  />
+                  <span className="embossed-text text-[8px] uppercase tracking-wide mt-1 font-bold" style={{
+                    color: '#DAA520',
+                    textShadow: `
+                      1px 1px 0 rgba(255,248,220,0.3),
+                      -1px -1px 0 rgba(0,0,0,0.7),
+                      inset 2px 2px 4px rgba(0,0,0,0.6),
+                      0 0 6px rgba(218,165,32,0.3)
+                    `,
+                    filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.4))'
+                  }}>
+                    STEMGERECHTIGD
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Member Information */}

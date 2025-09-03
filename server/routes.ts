@@ -808,6 +808,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
     return 'ACTUEEL';
   }
 
+  // Public card data API (JSON)
+  app.get("/api/card/:memberId", async (req, res) => {
+    try {
+      const { memberId } = req.params;
+      
+      const cardData = await cardService.getCardData(memberId);
+      if (!cardData) {
+        return res.status(404).json({ message: "Card not found" });
+      }
+
+      // Check if member has paid for current year
+      const currentYear = new Date().getFullYear();
+      const memberFees = await storage.getMembershipFeesByMember(memberId);
+      const currentYearFees = memberFees.filter(fee => {
+        const feeYear = new Date(fee.periodStart).getFullYear();
+        return feeYear === currentYear;
+      });
+      const currentYearPaid = currentYearFees.some(fee => fee.status === 'PAID');
+
+      // Create badges array
+      const badges = [];
+      if (currentYearPaid) {
+        badges.push(`Betaald ${currentYear}`);
+      }
+      if (cardData.member.votingRights) {
+        badges.push("Stemgerechtigd");
+      }
+
+      const response = {
+        firstName: cardData.member.firstName,
+        lastName: cardData.member.lastName,
+        memberNumber: cardData.member.memberNumber,
+        category: cardData.member.category,
+        status: cardData.cardMeta.status,
+        validUntil: cardData.cardMeta.validUntil,
+        badges,
+        qrToken: cardData.cardMeta.qrToken,
+        tenant: {
+          name: cardData.tenant.name,
+          logoUrl: cardData.tenant.logoUrl,
+          primaryColor: cardData.tenant.primaryColor || '#bb2e2e'
+        },
+        etag: cardData.cardMeta.etag
+      };
+
+      // Set ETag header for caching
+      res.set('ETag', cardData.cardMeta.etag);
+      res.json(response);
+    } catch (error) {
+      console.error('Error fetching card data:', error);
+      res.status(500).json({ message: "Failed to fetch card data" });
+    }
+  });
+
   // Public card verification API
   app.get("/api/card/verify/:qrToken", async (req, res) => {
     try {

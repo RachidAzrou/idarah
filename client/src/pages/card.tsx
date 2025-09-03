@@ -1,87 +1,77 @@
 import { useEffect, useState } from "react";
 import { useRoute } from "wouter";
-import { LiveCard } from "@/components/cards/live-card";
+import { MembershipCard } from "@/components/card/MembershipCard";
 import { CardCanvas } from "@/components/card/CardCanvas";
-import { FullScreenButton } from "@/components/card/FullScreenButton";
+import { AspectBox } from "@/components/card/AspectBox";
 import { InstallCoach, useInstallCoach } from "@/components/pwa/InstallCoach";
 import { useQuery } from "@tanstack/react-query";
-import type { Member, CardMeta, Tenant } from "@shared/schema";
 
 interface CardData {
-  member: Member;
-  cardMeta: CardMeta;
-  tenant: Tenant;
+  firstName: string;
+  lastName: string;
+  memberNumber: string;
+  category: 'STUDENT' | 'STANDAARD' | 'SENIOR';
+  status: 'ACTUEEL' | 'NIET_ACTUEEL' | 'VERLOPEN';
+  validUntil: Date | null;
+  badges: string[];
+  qrToken: string;
+  tenant: {
+    name: string;
+    logoUrl?: string | null;
+    primaryColor: string;
+  };
+  etag: string;
 }
 
 export function CardPage() {
   const [, params] = useRoute("/card/:memberId");
-  const [cardData, setCardData] = useState<CardData | null>(null);
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [isOffline, setIsOffline] = useState(!navigator.onLine);
   const installCoach = useInstallCoach();
 
-  // Fetch card data
+  // Listen for online/offline events
+  useEffect(() => {
+    const handleOnline = () => setIsOffline(false);
+    const handleOffline = () => setIsOffline(true);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  // Fetch card data from the new API endpoint
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['/api/members', params?.memberId, refreshTrigger],
+    queryKey: ['/api/card', params?.memberId],
     queryFn: async () => {
       if (!params?.memberId) return null;
       
-      // For now, get member data and create mock card data
-      const response = await fetch(`/api/members/${params.memberId}`);
+      const response = await fetch(`/api/card/${params.memberId}`);
       if (!response.ok) {
-        throw new Error('Member not found');
+        throw new Error('Card not found');
       }
       
-      const member = await response.json();
+      const cardData = await response.json();
       
-      // Mock card meta and tenant data for testing
-      const mockCardMeta: CardMeta = {
-        id: 'mock-card-id',
-        tenantId: member.tenantId,
-        memberId: member.id,
-        version: 1,
-        etag: 'mock-etag',
-        secureToken: 'mock-secure-token',
-        qrToken: 'mock-qr-token',
-        status: 'ACTUEEL',
-        validUntil: new Date(new Date().getFullYear(), 11, 31),
-        lastRenderedAt: new Date(),
-      };
-      
-      const mockTenant: Tenant = {
-        id: member.tenantId,
-        name: 'Test Moskee',
-        slug: 'test-moskee',
-        street: null,
-        number: null,
-        postalCode: null,
-        city: null,
-        country: 'België',
-        email: null,
-        phone: null,
-        website: null,
-        companyNumber: null,
-        companyType: null,
-        logoUrl: null,
-        primaryColor: '#bb2e2e',
-        studentFee: '15.00',
-        adultFee: '25.00',
-        seniorFee: '20.00',
-        defaultPaymentTerm: 'YEARLY',
-        defaultPaymentMethod: 'SEPA',
-        createdAt: new Date(),
-      };
-      
+      // Convert dates from ISO strings
       return {
-        member,
-        cardMeta: mockCardMeta,
-        tenant: mockTenant,
+        ...cardData,
+        validUntil: cardData.validUntil ? new Date(cardData.validUntil) : null
       };
     },
     enabled: !!params?.memberId,
+    retry: (failureCount, error: any) => {
+      // Don't retry if offline or if it's a 404
+      if (!navigator.onLine || error?.message === 'Card not found') {
+        return false;
+      }
+      return failureCount < 3;
+    }
   });
 
   const handleRefresh = () => {
-    setRefreshTrigger(prev => prev + 1);
     refetch();
   };
 
@@ -124,18 +114,47 @@ export function CardPage() {
     );
   }
 
+  // Handle offline status - if offline or fetch failed, show NIET_ACTUEEL
+  const displayData = data ? {
+    ...data,
+    status: (isOffline || error) ? 'NIET_ACTUEEL' as const : data.status
+  } : null;
+
   return (
     <CardCanvas>
-      <FullScreenButton />
-      <LiveCard
-        member={data.member}
-        cardMeta={data.cardMeta}
-        tenant={data.tenant}
-        onRefresh={handleRefresh}
-        isRefreshing={isLoading}
-        standalone={true}
-        className="h-full w-full"
-      />
+      {/* Offline Banner */}
+      {(isOffline || error) && (
+        <div 
+          className="fixed top-4 left-4 right-4 bg-orange-500 text-white px-4 py-3 rounded-lg shadow-lg z-50 text-center"
+          data-testid="offline-banner"
+        >
+          <span className="text-sm font-medium">
+            Offline – status niet bevestigd
+          </span>
+        </div>
+      )}
+      
+      {displayData ? (
+        <AspectBox>
+          <MembershipCard
+            cardData={displayData}
+            onRefresh={handleRefresh}
+            isRefreshing={isLoading}
+            isOffline={isOffline || !!error}
+            className="w-full h-full"
+          />
+        </AspectBox>
+      ) : (
+        <AspectBox>
+          <div className="w-full h-full rounded-3xl bg-gray-800 flex items-center justify-center text-white">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-4"></div>
+              <p>Lidkaart laden...</p>
+            </div>
+          </div>
+        </AspectBox>
+      )}
+      
       <InstallCoach 
         isOpen={installCoach.isOpen} 
         onClose={installCoach.close} 

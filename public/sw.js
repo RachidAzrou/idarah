@@ -19,7 +19,8 @@ const CACHEABLE_APIS = [
   '/api/dashboard/stats',
   '/api/cards/stats',
   '/api/cards',
-  '/api/tenant/current'
+  '/api/tenant/current',
+  '/api/card/'  // Card data can be cached with stale-while-revalidate
 ];
 
 // API endpoints die NOOIT gecached mogen worden
@@ -99,7 +100,13 @@ self.addEventListener('fetch', event => {
 async function handleApiRequest(request) {
   const url = new URL(request.url);
   
-  // Verificatie endpoint: altijd NetworkOnly
+  // Verificatie endpoint: altijd NetworkFirst (belangrijke live data)
+  if (url.pathname.startsWith('/api/card/verify/')) {
+    console.log('[SW] NetworkFirst for verify endpoint:', url.pathname);
+    return networkFirstStrategy(request, API_CACHE);
+  }
+  
+  // Andere no-cache API's: NetworkOnly
   if (NO_CACHE_APIS.some(api => url.pathname.startsWith(api))) {
     console.log('[SW] NetworkOnly for:', url.pathname);
     try {

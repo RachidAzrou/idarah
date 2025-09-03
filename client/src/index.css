@@ -281,8 +281,30 @@
     animation: card-shine 800ms ease-out;
   }
 
+  /* Flip animation for card refresh */
+  @keyframes flip-horizontal {
+    0% {
+      transform: perspective(1000px) rotateY(0deg);
+    }
+    50% {
+      transform: perspective(1000px) rotateY(180deg);
+    }
+    100% {
+      transform: perspective(1000px) rotateY(360deg);
+    }
+  }
+
+  .animate-flip-horizontal {
+    animation: flip-horizontal 800ms ease-in-out;
+    transform-style: preserve-3d;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .card-shine {
+      animation: none;
+    }
+    
+    .animate-flip-horizontal {
       animation: none;
     }
   }

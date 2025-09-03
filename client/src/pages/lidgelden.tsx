@@ -72,6 +72,12 @@ export default function Lidgelden() {
     if (!allFees?.length) return [];
     
     console.log('Period filter values:', { periodFrom, periodTo });
+    console.log('Method filter value:', methodFilter);
+    
+    // Debug first few fees methods
+    if (allFees.length > 0) {
+      console.log('Sample fee methods:', allFees.slice(0, 3).map(f => ({ memberNumber: f.memberNumber, method: f.method })));
+    }
     
     return allFees.filter((fee: any) => {
       // Search filter
@@ -87,8 +93,17 @@ export default function Lidgelden() {
       const yearMatch = yearFilter === "all" || 
         new Date(fee.periodStart).getFullYear().toString() === yearFilter;
       
-      // Method filter
+      // Method filter - debug
       const methodMatch = methodFilter === "all" || fee.method === methodFilter;
+      
+      // Debug logging for method filter
+      if (methodFilter !== "all" && fee.memberNumber === "0001") {
+        console.log(`Method filter debug for ${fee.memberNumber}:`, {
+          methodFilter: methodFilter,
+          feeMethod: fee.method,
+          methodMatch: methodMatch
+        });
+      }
       
       // Category filter
       const categoryMatch = categoryFilter === "all" || fee.type === categoryFilter;

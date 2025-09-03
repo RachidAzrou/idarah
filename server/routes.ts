@@ -246,7 +246,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/members/:id", authMiddleware, tenantMiddleware, async (req, res) => {
     try {
-      const memberData = insertMemberSchema.partial().parse(req.body);
+      // Transform the data to match expected format (same as PATCH endpoint)
+      const transformedData = {
+        ...req.body,
+        // Convert string date to Date object if needed
+        birthDate: req.body.birthDate && typeof req.body.birthDate === 'string' ? new Date(req.body.birthDate) : req.body.birthDate,
+      };
+      
+      // Remove undefined/null birthDate to avoid validation issues
+      if (!transformedData.birthDate) {
+        delete transformedData.birthDate;
+      }
+      
+      const memberData = insertMemberSchema.partial().parse(transformedData);
       const member = await storage.getMember(req.params.id);
       
       if (!member || member.tenantId !== req.tenantId) {
@@ -269,8 +281,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const transformedData = {
         ...req.body,
         // Convert string date to Date object if needed
-        birthDate: typeof req.body.birthDate === 'string' ? new Date(req.body.birthDate) : req.body.birthDate,
+        birthDate: req.body.birthDate && typeof req.body.birthDate === 'string' ? new Date(req.body.birthDate) : req.body.birthDate,
       };
+      
+      // Remove undefined/null birthDate to avoid validation issues
+      if (!transformedData.birthDate) {
+        delete transformedData.birthDate;
+      }
       
       const memberData = insertMemberSchema.partial().parse(transformedData);
       console.log("Parsed member data:", JSON.stringify(memberData, null, 2));

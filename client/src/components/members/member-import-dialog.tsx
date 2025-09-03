@@ -101,6 +101,7 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
   const [validMembers, setValidMembers] = useState<any[]>([]);
   const [importProgress, setImportProgress] = useState(0);
   const [importedCount, setImportedCount] = useState(0);
+  const [duplicateWarnings, setDuplicateWarnings] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleClose = () => {
@@ -112,6 +113,7 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
     setValidMembers([]);
     setImportProgress(0);
     setImportedCount(0);
+    setDuplicateWarnings([]);
     onClose();
   };
 
@@ -503,7 +505,7 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
 
     try {
       const membersToImport = [];
-      const duplicateErrors = [];
+      const warnings = [];
       
       // Check for duplicates during import
       for (let i = 0; i < validMembers.length; i++) {
@@ -511,14 +513,17 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
         const duplicateCheck = await checkForDuplicates(member);
         
         if (duplicateCheck.hasDuplicates) {
-          if (duplicateCheck.duplicateNumber || duplicateCheck.duplicateNameAddress) {
-            const existing = duplicateCheck.duplicateNumber || duplicateCheck.duplicateNameAddress;
-            duplicateErrors.push({
-              member,
-              existing,
-              isDuplicateNumber: !!duplicateCheck.duplicateNumber,
-              suggestedNumber: duplicateCheck.suggestedNumber
-            });
+          if (duplicateCheck.duplicateNumber && duplicateCheck.duplicateNameAddress) {
+            // Both number and name/address duplicate - skip completely
+            warnings.push(`Lid ${member.firstName} ${member.lastName} bestaat al. Niet geïmporteerd.`);
+          } else if (duplicateCheck.duplicateNumber) {
+            // Only number duplicate - replace with suggested number
+            member.memberNumber = duplicateCheck.suggestedNumber;
+            warnings.push(`Dubbel lidnummer: ${duplicateCheck.duplicateNumber.memberNumber} gedetecteerd. We vervangen het door een vrij lidnummer.`);
+            membersToImport.push(member);
+          } else if (duplicateCheck.duplicateNameAddress) {
+            // Name/address duplicate - skip
+            warnings.push(`Lid ${member.firstName} ${member.lastName} bestaat al. Niet geïmporteerd.`);
           }
         } else {
           membersToImport.push(member);
@@ -527,13 +532,8 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
         setImportProgress(((i + 1) / validMembers.length) * 100);
       }
 
-      // Show duplicate warnings if any
-      if (duplicateErrors.length > 0) {
-        const errorMessage = `De volgende leden lijken reeds te bestaan:\\n\\n${duplicateErrors.map(error => 
-          `• ${error.member.firstName} ${error.member.lastName} (bestaand lidnummer: ${error.existing.memberNumber})`
-        ).join('\\n')}\\n\\nDeze worden niet geïmporteerd. Klik op een bestaand lid in de ledenlijst om het profiel te bekijken.`;
-        alert(errorMessage);
-      }
+      // Set warnings to show in UI
+      setDuplicateWarnings(warnings);
 
       if (membersToImport.length > 0) {
         // Actually import the non-duplicate members
@@ -544,7 +544,7 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
       setStep('complete');
     } catch (error) {
       console.error('Import error:', error);
-      alert('Fout bij het importeren van leden');
+      setDuplicateWarnings(['Fout bij het importeren van leden']);
     }
   };
 
@@ -795,6 +795,21 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
                 </p>
               </div>
             </div>
+
+            {/* Duplicate warnings */}
+            {duplicateWarnings.length > 0 && (
+              <div className="space-y-2">
+                <h4 className="font-medium text-amber-800">Duplicate meldingen:</h4>
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                  {duplicateWarnings.map((warning, index) => (
+                    <div key={index} className="flex items-start gap-2 text-sm text-amber-800">
+                      <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                      <span>{warning}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <DialogFooter>
               <Button onClick={handleClose} className="w-full">

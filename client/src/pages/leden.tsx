@@ -7,6 +7,7 @@ import { MembersTable } from "@/components/members/members-table";
 import { FiltersDrawer } from "@/components/members/filters-drawer";
 import { MemberImportDialog } from "@/components/members/member-import-dialog";
 import { MemberDetailDialog } from "@/components/members/member-detail-dialog";
+import { ExportDialog } from "@/components/members/export-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { FiUserPlus } from "react-icons/fi";
@@ -42,6 +43,7 @@ export default function Leden() {
   const [paymentStatusFilter, setPaymentStatusFilter] = useState("all");
   const [showNewMemberDialog, setShowNewMemberDialog] = useState(false);
   const [showImportDialog, setShowImportDialog] = useState(false);
+  const [showExportDialog, setShowExportDialog] = useState(false);
   const [showFiltersDrawer, setShowFiltersDrawer] = useState(false);
   const [showMemberDetail, setShowMemberDetail] = useState(false);
   const [showEditMember, setShowEditMember] = useState(false);
@@ -172,7 +174,7 @@ export default function Leden() {
 
   // Advanced filtering logic
   const filteredMembers = useMemo(() => {
-    if (!members) return [];
+    if (!members || !Array.isArray(members)) return [];
     
     return members.filter((member: any) => {
       // Search filter
@@ -261,7 +263,7 @@ export default function Leden() {
         toast({ title: "Lid bewerken", description: `Bewerk lid ${memberId}` });
         break;
       case 'toggleStatus':
-        const member = members?.find((m: any) => m.id === memberId);
+        const member = Array.isArray(members) ? members.find((m: any) => m.id === memberId) : null;
         if (member) {
           toggleMemberStatus(memberId, member.active);
         }
@@ -309,7 +311,7 @@ export default function Leden() {
   };
 
   const handleExport = () => {
-    toast({ title: "Export", description: "Alle leden geëxporteerd" });
+    setShowExportDialog(true);
   };
 
   const handleImport = () => {
@@ -417,6 +419,13 @@ export default function Leden() {
           open={showImportDialog}
           onClose={() => setShowImportDialog(false)}
           onImport={handleImportMembers}
+        />
+
+        {/* Export Dialog */}
+        <ExportDialog
+          open={showExportDialog}
+          onOpenChange={setShowExportDialog}
+          filteredMembers={filteredMembers}
         />
 
         {/* Member Detail Dialog */}

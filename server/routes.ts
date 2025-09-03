@@ -13,6 +13,7 @@ import { generateFeesHandler } from "./api/jobs/fees/generate";
 import { createMemberHandler } from "./api/members/create";
 import publicScreensRouter from "./routes/public-screens";
 import { z } from "zod";
+import * as XLSX from 'xlsx';
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -260,6 +261,152 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting member:", error);
       res.status(500).json({ message: "Failed to delete member" });
+    }
+  });
+
+  // Export members to Excel
+  app.post("/api/members/export", authMiddleware, tenantMiddleware, async (req, res) => {
+    try {
+      const { memberIds, fields } = req.body;
+      
+      if (!memberIds || !Array.isArray(memberIds) || memberIds.length === 0) {
+        return res.status(400).json({ message: "Member IDs are required" });
+      }
+      
+      if (!fields || !Array.isArray(fields) || fields.length === 0) {
+        return res.status(400).json({ message: "Export fields are required" });
+      }
+
+      // Fetch members and their details
+      const members = await Promise.all(
+        memberIds.map(async (memberId) => {
+          const member = await storage.getMember(memberId);
+          if (!member || member.tenantId !== req.tenantId) {
+            return null;
+          }
+          
+          // Fetch financial settings and permissions
+          const [financialSettings, permissions] = await Promise.all([
+            storage.getMemberFinancialSettings(member.id),
+            storage.getMemberPermissions(member.id)
+          ]);
+          
+          return {
+            ...member,
+            financialSettings,
+            permissions
+          };
+        })
+      );
+
+      // Filter out null members and format data for export
+      const validMembers = members.filter((member): member is NonNullable<typeof member> => member !== null);
+      
+      // Map member data to export format
+      const exportData = validMembers.map(member => {
+        const row: any = {};
+        
+        fields.forEach(field => {
+          switch (field) {
+            case 'memberNumber':
+              row['Lidnummer'] = member.memberNumber;
+              break;
+            case 'firstName':
+              row['Voornaam'] = member.firstName;
+              break;
+            case 'lastName':
+              row['Achternaam'] = member.lastName;
+              break;
+            case 'birthDate':
+              row['Geboortedatum'] = member.birthDate ? new Date(member.birthDate).toLocaleDateString('nl-BE') : '';
+              break;
+            case 'gender':
+              row['Geslacht'] = member.gender === 'M' ? 'Man' : member.gender === 'V' ? 'Vrouw' : '';
+              break;
+            case 'nationality':
+              row['Nationaliteit'] = member.country || '';
+              break;
+            case 'email':
+              row['E-mail'] = member.email || '';
+              break;
+            case 'phone':
+              row['Telefoon'] = member.phone || '';
+              break;
+            case 'address':
+              row['Adres'] = member.street && member.number ? `${member.street} ${member.number}${member.bus ? `/${member.bus}` : ''}` : '';
+              break;
+            case 'postalCode':
+              row['Postcode'] = member.postalCode || '';
+              break;
+            case 'city':
+              row['Stad'] = member.city || '';
+              break;
+            case 'country':
+              row['Land'] = member.country || '';
+              break;
+            case 'status':
+              row['Status'] = member.active ? 'Actief' : 'Inactief';
+              break;
+            case 'category':
+              row['Categorie'] = member.category;
+              break;
+            case 'joinDate':
+              row['Inschrijfdatum'] = member.createdAt ? new Date(member.createdAt).toLocaleDateString('nl-BE') : '';
+              break;
+            case 'votingRights':
+              row['Stemrecht'] = member.votingRights ? 'Ja' : 'Nee';
+              break;
+            case 'membershipFee':
+              row['Lidmaatschapsbijdrage'] = ''; // This would need to be calculated from fees
+              break;
+            case 'paymentMethod':
+              row['Betaalmethode'] = member.financialSettings?.paymentMethod || '';
+              break;
+            case 'iban':
+              row['IBAN'] = member.financialSettings?.iban || '';
+              break;
+            case 'paymentStatus':
+              row['Betaalstatus'] = ''; // This would need to be calculated from fees
+              break;
+            case 'emergencyContact':
+              row['Noodcontact'] = ''; // Not in current schema
+              break;
+            case 'emergencyPhone':
+              row['Noodcontact telefoon'] = ''; // Not in current schema
+              break;
+            case 'notes':
+              row['Notities'] = ''; // Not in current schema
+              break;
+          }
+        });
+        
+        return row;
+      });
+
+      // Create Excel workbook
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.json_to_sheet(exportData);
+      
+      // Auto-width columns
+      const colWidths = Object.keys(exportData[0] || {}).map(key => ({
+        wch: Math.max(key.length, 15)
+      }));
+      ws['!cols'] = colWidths;
+      
+      XLSX.utils.book_append_sheet(wb, ws, 'Leden');
+      
+      // Generate Excel buffer
+      const excelBuffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
+      
+      // Set response headers for file download
+      const timestamp = new Date().toISOString().split('T')[0];
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', `attachment; filename="leden_export_${timestamp}.xlsx"`);
+      
+      res.send(excelBuffer);
+    } catch (error) {
+      console.error("Error exporting members:", error);
+      res.status(500).json({ message: "Failed to export members" });
     }
   });
 

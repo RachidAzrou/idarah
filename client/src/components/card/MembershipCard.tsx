@@ -215,7 +215,7 @@ export function MembershipCard({
               <p className="embossed-text text-[clamp(10px,1.4vmin,12px)] uppercase tracking-wide opacity-80 mb-1">
                 NAAM
               </p>
-              <h2 className="embossed-text text-[clamp(18px,2.2vmin,20px)] font-semibold uppercase tracking-wide leading-tight">
+              <h2 className="embossed-text text-[clamp(14px,1.8vmin,16px)] font-semibold uppercase tracking-wide leading-tight">
                 {cardData.firstName} {cardData.lastName}
               </h2>
               <div className="mt-3">
@@ -233,7 +233,7 @@ export function MembershipCard({
               <p className="embossed-text text-[clamp(10px,1.4vmin,12px)] uppercase tracking-wide opacity-80 mb-1">
                 CATEGORIE
               </p>
-              <span className="embossed-text text-[clamp(11px,1.6vmin,14px)] font-medium">
+              <span className="embossed-text text-[clamp(14px,1.8vmin,16px)] font-medium">
                 {getMemberCategoryLabel(cardData.category)}
               </span>
             </div>

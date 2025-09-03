@@ -105,7 +105,7 @@ export function useAuth(): AuthState {
   };
 
   return {
-    user: (user as User) || null,
+    user: (user as any)?.user || null,
     loading: isLoading,
     login,
     logout,

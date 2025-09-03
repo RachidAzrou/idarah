@@ -69,10 +69,10 @@ export default function Profiel() {
 
   // Initialiseer formulier met gebruikersgegevens
   useEffect(() => {
-    if (user && user.user) {
+    if (user) {
       profileForm.reset({
-        name: user.user.name || "",
-        email: user.user.email || "",
+        name: user.name || "",
+        email: user.email || "",
       });
       setProfileSaved(false);
     }
@@ -143,7 +143,7 @@ export default function Profiel() {
     changePasswordMutation.mutate(data);
   };
 
-  if (!user || !user.user) {
+  if (!user) {
     return null;
   }
 
@@ -332,12 +332,12 @@ export default function Profiel() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label className="text-sm font-medium text-muted-foreground">Rol</Label>
-              <p className="text-sm" data-testid="text-user-role">{user?.user?.role}</p>
+              <p className="text-sm" data-testid="text-user-role">{user?.role}</p>
             </div>
             <div>
               <Label className="text-sm font-medium text-muted-foreground">Account aangemaakt</Label>
               <p className="text-sm" data-testid="text-created-at">
-                {user?.user?.createdAt ? new Date(user.user.createdAt).toLocaleDateString('nl-BE') : 'Onbekend'}
+                {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('nl-BE') : 'Onbekend'}
               </p>
             </div>
           </div>

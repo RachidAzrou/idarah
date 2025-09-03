@@ -255,14 +255,14 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
       setStep('validation');
       
       // Start validatie direct
-      validateData(rows);
+      await validateData(rows);
     } catch (error) {
       console.error('Error parsing file:', error);
       alert('Fout bij het lezen van het bestand: ' + (error as Error).message);
     }
   };
 
-  const validateData = (rows: CSVRow[]) => {
+  const validateData = async (rows: CSVRow[]) => {
     const errors: ValidationError[] = [];
     const validMembers: any[] = [];
 
@@ -481,8 +481,35 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
       }
     });
 
+    // Check for duplicates after basic validation
+    const finalValidMembers = [];
+    for (let i = 0; i < validMembers.length; i++) {
+      const member = validMembers[i];
+      const duplicateCheck = await checkForDuplicates(member);
+      
+      if (duplicateCheck.hasDuplicates) {
+        if (duplicateCheck.duplicateNumber) {
+          errors.push({
+            row: i + 1,
+            field: 'Lidnummer*',
+            message: `Lidnummer ${member.memberNumber} bestaat al. Voorgesteld nummer: ${duplicateCheck.suggestedNumber}`
+          });
+        }
+        if (duplicateCheck.duplicateNameAddress) {
+          const existing = duplicateCheck.duplicateNameAddress;
+          errors.push({
+            row: i + 1,
+            field: 'Naam/Adres',
+            message: `Er bestaat al een lid met deze naam/adres combinatie (lidnummer ${existing.memberNumber})`
+          });
+        }
+      } else {
+        finalValidMembers.push(member);
+      }
+    }
+
     setValidationErrors(errors);
-    setValidMembers(validMembers);
+    setValidMembers(finalValidMembers);
   };
 
   const checkForDuplicates = async (memberData: any) => {
@@ -503,47 +530,15 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
     setImportedCount(0);
 
     try {
-      const membersToImport = [];
-      
-      // Check for duplicates for each member
+      // Import all validated members (duplicates already filtered out)
       for (let i = 0; i < validMembers.length; i++) {
-        const member = validMembers[i];
-        const duplicateCheck = await checkForDuplicates(member);
-        
-        if (duplicateCheck.hasDuplicates) {
-          if (duplicateCheck.duplicateNumber && duplicateCheck.duplicateNameAddress) {
-            // Both number and name/address duplicate - show warning and skip
-            alert(`Rij ${i + 1}: Lid ${member.firstName} ${member.lastName} bestaat al (lidnummer ${member.memberNumber} en naam/adres combinatie). Import overgeslagen.`);
-            continue;
-          } else if (duplicateCheck.duplicateNameAddress) {
-            // Name/address duplicate - show existing member and skip
-            const existing = duplicateCheck.duplicateNameAddress;
-            const confirmed = confirm(`Rij ${i + 1}: Er bestaat al een lid met de naam ${member.firstName} ${member.lastName} op hetzelfde adres (lidnummer ${existing.memberNumber}). Wilt u toch importeren?`);
-            if (!confirmed) continue;
-          } else if (duplicateCheck.duplicateNumber) {
-            // Only number duplicate - offer to change number
-            const confirmed = confirm(`Rij ${i + 1}: Lidnummer ${member.memberNumber} bestaat al. Wijzigen naar ${duplicateCheck.suggestedNumber}?`);
-            if (confirmed) {
-              member.memberNumber = duplicateCheck.suggestedNumber;
-            } else {
-              continue; // Skip this member
-            }
-          }
-        }
-        
-        membersToImport.push(member);
-        setImportProgress(((i + 1) / validMembers.length) * 50); // First 50% for duplicate checks
-      }
-
-      // Now import the approved members
-      for (let i = 0; i < membersToImport.length; i++) {
         await new Promise(resolve => setTimeout(resolve, 200));
-        setImportProgress(50 + ((i + 1) / membersToImport.length) * 50); // Second 50% for actual import
+        setImportProgress(((i + 1) / validMembers.length) * 100);
         setImportedCount(i + 1);
       }
 
       // Actually import the members
-      onImport(membersToImport);
+      onImport(validMembers);
       
       setStep('complete');
     } catch (error) {

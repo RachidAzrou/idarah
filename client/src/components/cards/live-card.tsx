@@ -223,7 +223,7 @@ export function LiveCard({
                   />
                 )}
                 <h1 className="embossed-text text-2xl font-bold uppercase tracking-wider">
-                  {tenant.name}
+                  Lidkaart {tenant.name.toUpperCase()}
                 </h1>
               </div>
               

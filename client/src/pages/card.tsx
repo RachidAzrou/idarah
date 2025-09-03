@@ -3,6 +3,7 @@ import { useRoute } from "wouter";
 import { LiveCard } from "@/components/cards/live-card";
 import { CardCanvas } from "@/components/card/CardCanvas";
 import { FullScreenButton } from "@/components/card/FullScreenButton";
+import { InstallCoach, useInstallCoach } from "@/components/pwa/InstallCoach";
 import { useQuery } from "@tanstack/react-query";
 import type { Member, CardMeta, Tenant } from "@shared/schema";
 
@@ -16,6 +17,7 @@ export function CardPage() {
   const [, params] = useRoute("/card/:memberId");
   const [cardData, setCardData] = useState<CardData | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const installCoach = useInstallCoach();
 
   // Fetch card data
   const { data, isLoading, error, refetch } = useQuery({
@@ -133,6 +135,10 @@ export function CardPage() {
         isRefreshing={isLoading}
         standalone={true}
         className="h-full w-full"
+      />
+      <InstallCoach 
+        isOpen={installCoach.isOpen} 
+        onClose={installCoach.close} 
       />
     </CardCanvas>
   );

@@ -1,0 +1,109 @@
+You are a senior front-end engineer.
+Goal: Implement the InstallCoach component for the PWA Digital Membership Card, with localized NL-BE onboarding copy that explains step-by-step how to add the card to the start screen.
+
+0) Tech & context
+
+Next.js 14 (App Router) + React 18 + TypeScript strict
+
+TailwindCSS for styling
+
+Component: components/pwa/InstallCoach.tsx
+
+Hooks already exist: usePlatform.ts, useA2HS.ts, lib/storage.ts
+
+Locale: Dutch (Belgium)
+
+1) Add copy as JSON constant
+
+Create a installMessages object in components/pwa/InstallCoach.tsx:
+
+const installMessages = {
+  title: "Zet je lidkaart op je startscherm",
+  subtitle: "Zo open je ze snel en blijft ze altijd bij de hand.",
+  buttons: {
+    install: "App installeren",
+    later: "Later",
+    never: "Niet meer tonen",
+  },
+  ios: [
+    "Tik op Deel (het vierkantje met pijltje omhoog).",
+    "Kies ‘Zet op beginscherm’ in de lijst.",
+    "Bevestig met ‘Toevoegen’.",
+  ],
+  android: [
+    "Als er een knop ‘App installeren’ verschijnt, tik daarop om meteen toe te voegen.",
+    "Of open het Menu ⋮ rechtsboven.",
+    "Kies ‘App installeren’ of ‘Aan startscherm toevoegen’.",
+    "Bevestig.",
+  ],
+  samsung: [
+    "Open het Menu ☰ (linksonder of rechtsboven, afhankelijk van toestel).",
+    "Kies ‘Toevoegen aan startscherm’.",
+    "Bevestig.",
+  ],
+  desktop: [
+    "Klik in de adresbalk op het installatie-icoon (⤓ of +).",
+    "Kies ‘Installeren’.",
+    "Je lidkaart opent voortaan in een apart venster als app.",
+  ],
+  fallback: [
+    "Sla deze pagina op als snelkoppeling via het browsermenu.",
+    "Daarna vind je de lidkaart terug in je startscherm of favorieten.",
+  ],
+} as const;
+
+2) Show platform-specific instructions
+
+In InstallCoach.tsx, use usePlatform() to pick the right array:
+
+const platform = usePlatform();
+let steps: string[] = [];
+
+switch (platform) {
+  case "ios-safari":
+    steps = installMessages.ios;
+    break;
+  case "android-chrome":
+    steps = installMessages.android;
+    break;
+  case "samsung-internet":
+    steps = installMessages.samsung;
+    break;
+  case "desktop-chromium":
+    steps = installMessages.desktop;
+    break;
+  default:
+    steps = installMessages.fallback;
+}
+
+3) Render the UI
+
+Title: installMessages.title
+
+Subtitle: installMessages.subtitle
+
+Steps: render steps.map(...) as an ordered list with Tailwind (list-decimal ml-6 space-y-1).
+
+Buttons:
+
+If canPrompt from useA2HS is true → show button App installeren.
+
+Always show Later and Niet meer tonen.
+
+4) Acceptance criteria
+
+First-time visitors (not standalone, no flag in storage) see the InstallCoach modal.
+
+Copy matches NL-BE style above.
+
+Platform-specific instructions are shown (iOS, Android Chrome, Samsung Internet, Desktop Chromium, fallback).
+
+Buttons: App installeren, Later, Niet meer tonen.
+
+Accessible modal: focus-trap, Esc closes, aria-labelledby with title.
+
+LocalStorage remembers when “Niet meer tonen” is chosen.
+
+Respects prefers-reduced-motion.
+
+Generate the full InstallCoach.tsx component code now with the above copy and logic. Use TypeScript-strict and Tailwind for layout.

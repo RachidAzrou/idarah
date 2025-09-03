@@ -1,0 +1,213 @@
+Deliver a Digital Membership Card as a PWA (installable, live, dynamic) — do not generate PNGs. Build: card component (bank-card look), premium dark page background, fullscreen scaling, public verification page behind the QR, JSON verify API, first-time install coach (A2HS), and a production-sane service worker so the card is never stale (offline = show Niet actueel). Locale Dutch (Belgium), timezone Europe/Brussels.
+
+0) Tech & constraints
+
+Next.js 14 (App Router), React 18, TypeScript strict
+
+TailwindCSS (utilities), optional tiny CSS modules
+
+qrcode.react for QR on the card
+
+No PNG export, no image downloads for the card
+
+Accessibility (AA), prefers-reduced-motion
+
+Env via .env (no secrets in code)
+
+1) Routes & files to create
+
+Card view & canvas
+
+app/card/[memberId]/page.tsx — SSR shell + client hydration, includes InstallCoach.
+
+components/card/MembershipCard.tsx — the card (bank-card style).
+
+components/card/CardCanvas.tsx — dark glossy background + centering + scaling (aspect ratio).
+
+components/card/FullScreenButton.tsx — optional desktop fullscreen.
+
+Verification (QR)
+
+app/card/verify/[qrToken]/page.tsx — public human-readable verify page.
+
+app/api/card/verify/[qrToken]/route.ts — JSON verify endpoint (no-store).
+
+PWA
+
+public/manifest.webmanifest
+
+public/sw.js (or Workbox build) — service worker registration.
+
+app/layout.tsx — add manifest link + viewport meta (viewport-fit=cover).
+
+Onboarding
+
+components/pwa/InstallCoach.tsx — first-time “Add to Home Screen” coach.
+
+hooks/usePlatform.ts, hooks/useA2HS.ts, lib/storage.ts
+
+public/icons/*.svg (simple share/menu/install icons)
+
+Utils
+
+lib/time/be.ts — BE date/time helpers.
+
+lib/status/card.ts — derive card status.
+
+lib/url.ts — build verification URL from token (tenant-aware, if needed).
+
+2) Card spec (bank-card vibe, NL-BE)
+
+Typography: Space Grotesk (variable), weights 400/500/700, tabular numerals for numbers. Import in app/globals.css.
+Look:
+
+Rounded 24px, glossy blue gradient (#0E3A6E → #0B4E9C) with subtle diagonal sheen.
+
+Emboss-like text: near-white #EAF2FF, tiny layered text-shadow for depth.
+
+Outer shadow: 0 18px 40px rgba(0,0,0,.35).
+
+Props
+
+type CardStatus = 'ACTUEEL'|'NIET_ACTUEEL'|'VERLOPEN';
+
+type CardProps = {
+  name: string;               // "Emma Janssen"
+  memberNumber: string;       // "001234"
+  category: 'Student'|'Standaard'|'Senior';
+  status: CardStatus;         // no snapshot mode
+  validUntil?: string;        // dd-mm-jjjj
+  badges?: string[];          // ["Betaald 2025","Stemgerechtigd"]
+  qrToken: string;            // used for verification URL
+  tenantLogoUrl?: string;     // optional small monochrome logo
+  etag?: string;              // version/hash
+  onRefresh?: () => void;     // triggers shine/refetch
+}
+
+
+Layout
+
+Top-left: Naam (semibold), onder Categorie chip.
+
+Top-right: Status LED + label
+
+ACTUEEL: green #22C55E; NIET ACTUEEL: orange #F59E0B; VERLOPEN: red #EF4444 (+ soft glow).
+
+Mid: Lidnummer (tabular) + Geldig tot (indien aanwezig).
+
+Badges: soft pills (semi-white).
+
+Bottom-right: QR-zone (white isolation, ≥128px). Click → modal with ≥320px QR.
+
+Footer: left tenant logo; right tiny v{etag}.
+
+Refresh button top-right: click → optional shine sweep (≤800ms, skip if reduced-motion).
+
+Important: The card is never downloadable; no PNG export buttons.
+
+3) Page background & fullscreen scaling
+
+In CardCanvas.tsx:
+
+Dark premium stage:
+
+Base radial gradient spotlight (#0B1220 → #0E264A → #0B1220).
+
+Vignette (edges darker), faint diagonal sheen, optional fine grain (3–5% opacity).
+
+Optional blue rim-light ellipse behind the card to make it pop.
+
+Scaling (no transform scale):
+
+Keep credit-card ratio ≈ 1.586:1 (aspect-[1586/1000]).
+
+Portrait phones: w-[min(92vw,70vh*1.586)].
+
+Landscape: h-[min(94vh,94vw/1.586)].
+
+Desktop: w-[clamp(560px,70vmin,880px)].
+
+iOS safe areas: pad with env(safe-area-inset-*).
+
+Optional desktop FullScreenButton (aria-label “Volledig scherm”).
+
+4) Verification (QR) — public view + JSON API
+
+API GET /api/card/verify/[qrToken]
+
+Returns JSON with only needed fields:
+
+{
+  "status": "ACTUEEL|NIET_ACTUEEL|VERLOPEN",
+  "validUntil": "31-12-2025",
+  "eligibleToVote": true,
+  "member": { "name": "Emma Janssen", "memberNumber": "001234", "category": "Standaard" },
+  "tenant": { "name": "Demo Moskee", "logoUrl": "..." },
+  "etag": "v1.2.3",
+  "refreshedAt": "2025-09-03T12:34:56Z"
+}
+
+
+Public page GET /card/verify/[qrToken]
+
+Shows: status badge, naam, lidnummer, categorie (Student/Standaard/Senior), geldig tot, optional stemrecht, tenantlogo.
+
+Refetch on focus; 404/410 error messages in NL-BE.
+
+5) PWA setup
+
+manifest.webmanifest → name “Digitale Lidkaart”, display: standalone, start_url=/card/[memberId]?standalone=1.
+
+sw.js → NetworkFirst for verify API; offline = NIET ACTUEEL; no stale green allowed.
+
+Cache static assets with StaleWhileRevalidate.
+
+Register SW in layout.tsx.
+
+No PNG export anywhere.
+
+6) First-time install coach (Aan startscherm toevoegen)
+
+Detect platform (usePlatform.ts): ios-safari, android-chrome, samsung-internet, desktop-chromium, other.
+
+Handle beforeinstallprompt (Android/Chromium) with useA2HS.ts.
+
+InstallCoach.tsx: modal with instructions per platform.
+
+Text (NL-BE):
+
+Titel: “Zet je lidkaart op je startscherm”
+
+Uitleg: “Zo open je ze snel en blijft ze altijd bij de hand.”
+
+iOS: Tik Deel → Zet op beginscherm → Toevoegen.
+
+Android Chrome: knop App installeren of Menu ⋮ → App installeren.
+
+Samsung: Menu ☰ → Toevoegen aan startscherm.
+
+Desktop: klik op install-icoon in adresbalk.
+
+Buttons: App installeren · Later · Niet meer tonen.
+
+Store dismissal in localStorage (LB_PWA_INSTALL_COACH_V1).
+
+Show only if not standalone and flag not set.
+
+7) Acceptance criteria
+
+Lidkaart nooit als PNG downloadbaar.
+
+PWA werkt: installable op Android/iOS/desktop, met duidelijke onboarding.
+
+Offline = kaart toont NIET ACTUEEL (geen vals groen).
+
+QR leidt naar verificatiepagina (status+minimal data) en JSON API.
+
+Categorie is altijd Student, Standaard of Senior.
+
+Donker premium achtergrond, kaart is fullscreen hero.
+
+InstallCoach toont juiste instructies per platform, NL-BE copy, eenmalig tenzij heropend.
+
+Alles TypeScript-strict, AA contrast, focus-visible.

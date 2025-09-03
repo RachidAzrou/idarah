@@ -217,7 +217,16 @@ export function MembershipCard({
                   data-testid="voting-icon"
                   style={{
                     color: '#DAA520',
-                    background: 'linear-gradient(45deg, #B8860B 0%, #FFD700 25%, #FFF8DC 40%, #FFD700 60%, #DAA520 80%, #B8860B 100%)',
+                    background: `
+                      radial-gradient(circle at 15% 25%, #8B6914 1.5px, transparent 1.5px),
+                      radial-gradient(circle at 45% 10%, #996515 2px, transparent 2px),
+                      radial-gradient(circle at 75% 35%, #B8860B 1px, transparent 1px),
+                      radial-gradient(circle at 25% 60%, #A0751A 1.5px, transparent 1.5px),
+                      radial-gradient(circle at 65% 80%, #8B6914 2px, transparent 2px),
+                      radial-gradient(circle at 85% 15%, #996515 1px, transparent 1px),
+                      radial-gradient(circle at 35% 85%, #B8860B 1.5px, transparent 1.5px),
+                      linear-gradient(45deg, #B8860B 0%, #FFD700 25%, #FFF8DC 40%, #FFD700 60%, #DAA520 80%, #B8860B 100%)
+                    `,
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
                     backgroundSize: '400% 400%',

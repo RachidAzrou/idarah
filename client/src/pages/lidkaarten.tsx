@@ -472,7 +472,7 @@ export default function LidkaartenPage() {
                 />
               </div>
               
-              <div className="flex items-center gap-2 pt-4 border-t">
+              <div className="flex items-center justify-end gap-2 pt-4 border-t">
                 <Button
                   onClick={() => handleRegenerateCard(previewCard.member.id)}
                   disabled={regenerateCardMutation.isPending}

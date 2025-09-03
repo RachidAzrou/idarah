@@ -64,11 +64,8 @@ export default function RevenueChart() {
   const month = currentQuarterDate.getMonth();
   const quarter = Math.floor(month / 3) + 1;
   
-  // Bepaal of we in de huidige periode zitten
-  const isCurrentPeriod = quarterOffset === 0;
-  const periodLabel = isCurrentPeriod 
-    ? `${quarter}e trimester van ${year} (huidige periode)`
-    : `${quarter}e trimester van ${year}`;
+  // Bepaal periode label
+  const periodLabel = `${quarter}e trimester van ${year}`;
   
   return (
     <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">

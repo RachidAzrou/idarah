@@ -137,25 +137,54 @@ class MemberService {
   }
 
   private async generateInitialFee(member: Member): Promise<void> {
-    const now = new Date();
-    const periodStart = new Date(now.getFullYear(), now.getMonth(), 1);
-    const periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-    
-    // Default fee amount based on category
-    let amount = 25.00; // Default for VOLWASSEN
-    if (member.category === 'STUDENT') amount = 15.00;
-    if (member.category === 'SENIOR') amount = 20.00;
+    try {
+      // Get member's financial settings to determine payment frequency
+      const financialSettings = await storage.getMemberFinancialSettings(member.id);
+      
+      if (!financialSettings) {
+        console.error(`No financial settings found for member ${member.id}`);
+        return;
+      }
 
-    await storage.createMembershipFee({
-      tenantId: member.tenantId,
-      memberId: member.id,
-      memberNumber: member.memberNumber,
-      memberName: `${member.firstName} ${member.lastName}`,
-      periodStart,
-      periodEnd,
-      amount: amount.toString(),
-      status: 'OPEN',
-    });
+      const now = new Date();
+      const periodStart = new Date(now.getFullYear(), now.getMonth(), 1);
+      
+      // Calculate period end based on payment term
+      let periodEnd: Date;
+      if (financialSettings.paymentTerm === 'YEARLY') {
+        // For yearly payments, the period lasts one full year
+        periodEnd = new Date(periodStart);
+        periodEnd.setFullYear(periodEnd.getFullYear() + 1);
+        periodEnd.setDate(periodEnd.getDate() - 1); // Last day of the period
+      } else {
+        // For monthly payments, the period lasts one month
+        periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0); // Last day of next month
+      }
+      
+      // Get fee amount based on category and payment frequency
+      let amount = 25.00; // Default for STANDAARD
+      if (member.category === 'STUDENT') amount = 15.00;
+      if (member.category === 'SENIOR') amount = 20.00;
+      
+      // If yearly payment, multiply by 12 for full year amount
+      if (financialSettings.paymentTerm === 'YEARLY') {
+        amount = amount * 12;
+      }
+
+      await storage.createMembershipFee({
+        tenantId: member.tenantId,
+        memberId: member.id,
+        memberNumber: member.memberNumber,
+        memberName: `${member.firstName} ${member.lastName}`,
+        periodStart,
+        periodEnd,
+        amount: amount.toString(),
+        status: 'OPEN',
+      });
+    } catch (error) {
+      console.error('Error generating initial fee for member:', error);
+      throw error;
+    }
   }
 }
 

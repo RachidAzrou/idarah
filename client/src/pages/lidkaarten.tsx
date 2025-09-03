@@ -28,6 +28,7 @@ import {
   ExternalLink
 } from "lucide-react";
 import { CiExport } from "react-icons/ci";
+import { MdOutlineBrowserUpdated } from "react-icons/md";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 import type { Member, CardMeta, Tenant } from "@shared/schema";
@@ -289,7 +290,7 @@ export default function LidkaartenPage() {
               </div>
             </div>
             <div className="w-8 h-8 bg-amber-50 rounded-full flex items-center justify-center">
-              <Clock className="h-4 w-4 text-amber-500" />
+              <MdOutlineBrowserUpdated className="h-4 w-4 text-amber-500" />
             </div>
           </div>
         </div>

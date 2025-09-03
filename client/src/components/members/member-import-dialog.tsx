@@ -154,8 +154,8 @@ VERPLICHTE VELDEN (*)
 =====================
 
 Lidnummer*
-- Format: Tekst of nummer
-- Voorbeeld: 001, L-123, 2024-001
+- Format: Uniek nummer
+- Voorbeeld: 0001, 0002, 0003
 - Moet uniek zijn
 
 Voornaam*
@@ -180,9 +180,9 @@ Geboortedatum*
 
 Categorie*
 - Toegestane waarden: STUDENT, STANDAARD, SENIOR
-- STUDENT = Voor studenten (vaak met korting)
+- STUDENT = Voor studenten
 - STANDAARD = Regulier lidmaatschap
-- SENIOR = Voor senioren (vaak 65+)
+- SENIOR = Voor senioren
 
 Straat*
 - Format: Tekst
@@ -240,8 +240,8 @@ Telefoon
 IBAN
 - Format: Belgisch IBAN
 - Voorbeeld: BE68539007547034
-- Verplicht voor SEPA betalingen
-- Mag leeg voor CASH betalingen
+- Verplicht voor SEPA en OVERSCHRIJVING betalingen
+- Mag leeg voor CASH en BANCONTACT betalingen
 
 Actief rol interesse
 - Toegestane waarden: JA, NEE

@@ -736,22 +736,59 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
                   </p>
                 </div>
 
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4 space-y-3">
-                  {duplicateCheckResults.map((result, index) => (
-                    <div key={index} className="flex items-start gap-2 text-sm">
-                      <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0 text-red-600" />
-                      <div className="text-red-800">
-                        {result.duplicateCheck.duplicateNumber && result.duplicateCheck.duplicateNameAddress ? (
-                          <span><strong>{result.member.firstName} {result.member.lastName}</strong> bestaat al (lidnummer en naam/adres)</span>
-                        ) : result.duplicateCheck.duplicateNumber ? (
-                          <span>Dubbel lidnummer: <strong>{result.member.memberNumber}</strong> - wordt vervangen door uniek nummer</span>
-                        ) : (
-                          <span><strong>{result.member.firstName} {result.member.lastName}</strong> bestaat al (naam/adres)</span>
-                        )}
-                      </div>
+                {/* Leden die NIET geïmporteerd worden */}
+                {duplicateCheckResults.filter(result => 
+                  (result.duplicateCheck.duplicateNumber && result.duplicateCheck.duplicateNameAddress) || 
+                  result.duplicateCheck.duplicateNameAddress
+                ).length > 0 && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <h4 className="font-medium text-red-800 mb-3">
+                      Leden die NIET worden geïmporteerd (bestaan al):
+                    </h4>
+                    <div className="space-y-2">
+                      {duplicateCheckResults
+                        .filter(result => 
+                          (result.duplicateCheck.duplicateNumber && result.duplicateCheck.duplicateNameAddress) || 
+                          result.duplicateCheck.duplicateNameAddress
+                        )
+                        .map((result, index) => (
+                          <div key={index} className="flex items-start gap-2 text-sm">
+                            <X className="h-4 w-4 mt-0.5 flex-shrink-0 text-red-600" />
+                            <div className="text-red-800">
+                              <strong>{result.member.firstName} {result.member.lastName}</strong> 
+                              {result.duplicateCheck.duplicateNameAddress && (
+                                <span className="text-red-600"> (bestaand lidnummer: {result.duplicateCheck.duplicateNameAddress.memberNumber})</span>
+                              )}
+                            </div>
+                          </div>
+                        ))}
                     </div>
-                  ))}
-                </div>
+                  </div>
+                )}
+
+                {/* Leden met dubbel lidnummer die WEL geïmporteerd worden */}
+                {duplicateCheckResults.filter(result => 
+                  result.duplicateCheck.duplicateNumber && !result.duplicateCheck.duplicateNameAddress
+                ).length > 0 && (
+                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                    <h4 className="font-medium text-amber-800 mb-3">
+                      Leden met dubbel lidnummer (krijgen nieuw nummer):
+                    </h4>
+                    <div className="space-y-2">
+                      {duplicateCheckResults
+                        .filter(result => result.duplicateCheck.duplicateNumber && !result.duplicateCheck.duplicateNameAddress)
+                        .map((result, index) => (
+                          <div key={index} className="flex items-start gap-2 text-sm">
+                            <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0 text-amber-600" />
+                            <div className="text-amber-800">
+                              <strong>{result.member.firstName} {result.member.lastName}</strong> 
+                              <span className="text-amber-600"> - lidnummer {result.member.memberNumber} → {result.duplicateCheck.suggestedNumber}</span>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                )}
 
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                   <p className="text-sm text-blue-800">

@@ -65,7 +65,7 @@ export default function RevenueChart() {
   const quarter = Math.floor(month / 3) + 1;
   
   // Bepaal periode label
-  const periodLabel = `${quarter}e trimester van ${year}`;
+  const periodLabel = `${quarter}e trimester ${year}`;
   
   return (
     <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">

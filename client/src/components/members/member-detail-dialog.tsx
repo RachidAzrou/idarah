@@ -178,6 +178,10 @@ export function MemberDetailDialog({ member, open, onClose, onEdit }: MemberDeta
               </h4>
               <div className="grid grid-cols-1 gap-4 text-sm">
                 <div>
+                  <span className="text-gray-500">Stemgerechtigd</span>
+                  <p className="font-medium">{member.votingRights ? 'Ja' : 'Nee'}</p>
+                </div>
+                <div>
                   <span className="text-gray-500">Interesse in actieve rol</span>
                   <p className="font-medium">{member.permissions?.interestedInActiveRole ? 'Ja' : 'Nee'}</p>
                   {member.permissions?.interestedInActiveRole && member.permissions?.roleDescription && (

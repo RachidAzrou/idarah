@@ -720,27 +720,29 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
                   </p>
                 </div>
 
-                <div className="max-h-64 overflow-auto border rounded">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        {csvData.length > 0 && Object.keys(csvData[0]).map((header) => (
-                          <TableHead key={header} className="whitespace-nowrap min-w-[120px]">{header}</TableHead>
-                        ))}
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {csvData.slice(0, validMembers.length).map((row, index) => (
-                        <TableRow key={index}>
-                          {Object.entries(row).map(([key, value]) => (
-                            <TableCell key={key} className="whitespace-nowrap min-w-[120px] text-sm">
-                              {value || '-'}
-                            </TableCell>
+                <div className="max-h-64 overflow-y-auto overflow-x-auto border rounded">
+                  <div className="min-w-max">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          {csvData.length > 0 && Object.keys(csvData[0]).map((header) => (
+                            <TableHead key={header} className="whitespace-nowrap min-w-[120px]">{header}</TableHead>
                           ))}
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                      </TableHeader>
+                      <TableBody>
+                        {csvData.slice(0, validMembers.length).map((row, index) => (
+                          <TableRow key={index}>
+                            {Object.entries(row).map(([key, value]) => (
+                              <TableCell key={key} className="whitespace-nowrap min-w-[120px] text-sm">
+                                {value || '-'}
+                              </TableCell>
+                            ))}
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
                 </div>
 
                 {validMembers.length !== csvData.length && (

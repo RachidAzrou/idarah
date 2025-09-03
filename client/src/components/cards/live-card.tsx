@@ -130,17 +130,6 @@ export function LiveCard({
 
   return (
     <div className={cn("w-full h-full relative overflow-hidden flex items-center justify-center", className)}>
-      {/* PWA Install Banner */}
-      {isInstallable && !standalone && (
-        <div className="fixed top-4 left-4 right-4 bg-blue-600 text-white p-3 rounded-lg shadow-lg z-10">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium">Op beginscherm installeren</span>
-            <Button variant="outline" size="sm" className="text-blue-600">
-              Installeer
-            </Button>
-          </div>
-        </div>
-      )}
 
       {/* Live Card - Credit card aspect ratio */}
       <div className="w-full h-full aspect-[1586/1000]">

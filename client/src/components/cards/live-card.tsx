@@ -348,12 +348,6 @@ export function LiveCard({
             <p className="text-center text-sm text-gray-600">
               Scan deze QR code om de lidmaatschapsstatus te verifiëren
             </p>
-            <Button 
-              onClick={() => setShowQRModal(false)}
-              data-testid="button-close-qr"
-            >
-              Sluiten
-            </Button>
           </div>
         </DialogContent>
       </Dialog>

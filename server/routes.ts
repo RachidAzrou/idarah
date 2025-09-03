@@ -260,6 +260,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         delete transformedData.birthDate;
       }
       
+      // Handle voting rights field mapping
+      if (transformedData.organization?.votingEligible !== undefined) {
+        transformedData.votingRights = transformedData.organization.votingEligible;
+      }
+      
       console.log("PUT transformed data:", JSON.stringify(transformedData, null, 2));
       
       const memberData = insertMemberSchema.partial().parse(transformedData);
@@ -303,8 +308,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         delete transformedData.birthDate;
       }
       
+      // Handle voting rights field mapping
+      if (transformedData.organization?.votingEligible !== undefined) {
+        transformedData.votingRights = transformedData.organization.votingEligible;
+        console.log("PATCH mapped voting rights:", transformedData.votingRights);
+      }
+      
       const memberData = insertMemberSchema.partial().parse(transformedData);
-      console.log("Parsed member data:", JSON.stringify(memberData, null, 2));
+      console.log("PATCH parsed member data:", JSON.stringify(memberData, null, 2));
       
       const member = await storage.getMember(req.params.id);
       

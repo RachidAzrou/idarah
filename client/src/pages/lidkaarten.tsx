@@ -25,7 +25,7 @@ import {
   Clock,
   MoreHorizontal,
   Plus,
-  Copy
+  Share
 } from "lucide-react";
 import { CiExport } from "react-icons/ci";
 import { format } from "date-fns";
@@ -218,18 +218,32 @@ export default function LidkaartenPage() {
     const cardUrl = `${window.location.origin}/card/${member.id}`;
     
     try {
-      // Copy URL to clipboard
-      await navigator.clipboard.writeText(cardUrl);
-      
-      toast({ 
-        title: "URL gekopieerd", 
-        description: `De lidkaart URL is gekopieerd. Deel deze om de kaart als PWA te installeren.` 
-      });
+      // Try to use native share API if available
+      if (navigator.share) {
+        await navigator.share({
+          title: `Digitale Lidkaart - ${member.firstName} ${member.lastName}`,
+          text: 'Bekijk mijn digitale lidkaart. Je kunt deze als app installeren op je startscherm!',
+          url: cardUrl
+        });
+        
+        toast({ 
+          title: "Gedeeld", 
+          description: `Lidkaart URL is gedeeld.` 
+        });
+      } else {
+        // Fallback: copy to clipboard
+        await navigator.clipboard.writeText(cardUrl);
+        
+        toast({ 
+          title: "URL gekopieerd", 
+          description: `De lidkaart URL is gekopieerd naar je klembord. Deel deze om de kaart als PWA te installeren.` 
+        });
+      }
     } catch (error) {
-      console.error('Kopiëren mislukt:', error);
+      console.error('Delen mislukt:', error);
       
-      // Fallback: show URL in alert
-      window.prompt('Kopieer deze URL om de lidkaart te delen:', cardUrl);
+      // Ultimate fallback: show URL in alert
+      alert(`Lidkaart URL (kopieer en deel deze):\n${cardUrl}`);
       
       toast({ 
         title: "URL beschikbaar", 
@@ -488,18 +502,16 @@ export default function LidkaartenPage() {
           
           {previewCard && tenant && (
             <div className="space-y-4">
-              <div className="relative aspect-[16/10] rounded-lg overflow-hidden border border-gray-200 flex items-center justify-center p-8">
-                <div style={{ width: 'clamp(250px, 30vmin, 400px)', aspectRatio: '1586/1000' }}>
-                  <CardCanvas className="rounded-lg">
-                    <LiveCard
-                      member={previewCard.member}
-                      cardMeta={previewCard.cardMeta!}
-                      tenant={tenant}
-                      standalone={true}
-                      className="h-full w-full"
-                    />
-                  </CardCanvas>
-                </div>
+              <div className="relative aspect-[16/10] rounded-lg overflow-hidden border border-gray-200">
+                <CardCanvas className="rounded-lg">
+                  <LiveCard
+                    member={previewCard.member}
+                    cardMeta={previewCard.cardMeta!}
+                    tenant={tenant}
+                    standalone={true}
+                    className="h-full w-full"
+                  />
+                </CardCanvas>
               </div>
               
               <div className="flex items-center justify-end gap-2 pt-4 border-t">
@@ -518,8 +530,8 @@ export default function LidkaartenPage() {
                   variant="outline"
                   className="gap-2"
                 >
-                  <Copy className="h-4 w-4" />
-                  Kopieer URL
+                  <Share className="h-4 w-4" />
+                  Delen
                 </Button>
                 
                 <Button

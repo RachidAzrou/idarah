@@ -129,35 +129,31 @@ export function LiveCard({
   const validUntil = cardMeta.validUntil || new Date(currentYear, 11, 31);
 
   return (
-    <>
-      <style dangerouslySetInnerHTML={{
-        __html: `
-          .live-card-container {
-            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 25%, #1d4ed8 50%, #2563eb 75%, #1e40af 100%) !important;
-            font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif !important;
-            color: #EAF2FF !important;
-          }
-          .live-card-container * {
-            color: #EAF2FF !important;
-            font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif !important;
-          }
-          .live-card-container .embossed-text {
-            color: #EAF2FF !important;
-            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.1), 0 -1px 0 rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.5) !important;
-          }
-        `
-      }} />
-      <div className={cn("w-full h-full relative overflow-hidden flex items-center justify-center", className)}>
+    <div className={cn("w-full h-full relative overflow-hidden flex items-center justify-center", standalone ? "" : "min-h-screen p-4 sm:p-6", className)} style={!standalone ? {
+      background: `radial-gradient(circle at 50% 40%, #0B2440 0%, #0E3A6E 45%, #0B2440 100%), radial-gradient(circle at 50% 50%, transparent 40%, rgba(0,0,0,0.3) 100%), linear-gradient(135deg, rgba(255,255,255,0.02) 0%, transparent 50%, rgba(0,0,0,0.05) 100%)`
+    } : {}}>
+      {/* PWA Install Banner */}
+      {isInstallable && !standalone && (
+        <div className="fixed top-4 left-4 right-4 bg-blue-600 text-white p-3 rounded-lg shadow-lg z-10">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium">Op beginscherm installeren</span>
+            <Button variant="outline" size="sm" className="text-blue-600">
+              Installeer
+            </Button>
+          </div>
+        </div>
+      )}
 
-        {/* Live Card - Credit card aspect ratio */}
-        <div className="w-full h-full aspect-[1586/1000]">
+      {/* Live Card - Credit card aspect ratio */}
+      <div className="w-[min(92vw,70vh*1.586)] sm:w-[min(94vw,94vh*1.586)] lg:w-[clamp(540px,70vmin,860px)] aspect-[1586/1000]">
         <div 
-          className="live-card-container relative w-full h-full rounded-3xl overflow-hidden border border-white/10 card-font"
+          className="card-gradient relative w-full h-full rounded-3xl overflow-hidden border border-white/10 card-font"
           style={{
-            background: `linear-gradient(135deg, #1e3a8a 0%, #3b82f6 25%, #1d4ed8 50%, #2563eb 75%, #1e40af 100%) !important`,
-            boxShadow: `0 0 0 1px rgba(255,255,255,0.1) inset, 0 18px 40px rgba(0,0,0,0.35), 0 8px 20px rgba(0,0,0,0.25)`,
-            fontFamily: `'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif !important`,
-            color: '#EAF2FF !important'
+            boxShadow: `
+              0 0 0 1px rgba(255,255,255,0.1) inset,
+              0 18px 40px rgba(0,0,0,0.35),
+              0 8px 20px rgba(0,0,0,0.25)
+            `
           }}
           data-testid="live-card"
         >
@@ -294,7 +290,6 @@ export function LiveCard({
               </div>
             </div>
           </div>
-        </div>
       </div>
       </div>
 
@@ -326,6 +321,6 @@ export function LiveCard({
           </div>
         </DialogContent>
       </Dialog>
-    </>
+    </div>
   );
 }

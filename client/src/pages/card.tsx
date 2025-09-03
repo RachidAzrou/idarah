@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useRoute } from "wouter";
 import { LiveCard } from "@/components/cards/live-card";
 import { CardCanvas } from "@/components/card/CardCanvas";
-import { AspectBox } from "@/components/card/AspectBox";
 import { FullScreenButton } from "@/components/card/FullScreenButton";
 import { InstallCoach, useInstallCoach } from "@/components/pwa/InstallCoach";
 import { useQuery } from "@tanstack/react-query";
@@ -88,51 +87,55 @@ export function CardPage() {
 
   if (!params?.memberId) {
     return (
-      <div className="min-h-screen w-full flex items-center justify-center p-4 bg-slate-50">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-2">Geen lid geselecteerd</h1>
-          <p>Selecteer een lid om de digitale kaart te bekijken.</p>
+      <CardCanvas>
+        <div className="h-full w-full flex items-center justify-center text-center text-white/80">
+          <div>
+            <h1 className="text-2xl font-bold mb-2">Geen lid geselecteerd</h1>
+            <p>Selecteer een lid om de digitale kaart te bekijken.</p>
+          </div>
         </div>
-      </div>
+      </CardCanvas>
     );
   }
 
   if (isLoading) {
     return (
-      <div className="min-h-screen w-full flex items-center justify-center p-4 bg-slate-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p>Lidkaart laden...</p>
+      <CardCanvas>
+        <div className="h-full w-full flex items-center justify-center text-center text-white/80">
+          <div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400 mx-auto mb-4"></div>
+            <p>Lidkaart laden...</p>
+          </div>
         </div>
-      </div>
+      </CardCanvas>
     );
   }
 
   if (error || !data) {
     return (
-      <div className="min-h-screen w-full flex items-center justify-center p-4 bg-slate-50">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-2">Lidkaart niet gevonden</h1>
-          <p>De opgevraagde lidkaart bestaat niet of is niet beschikbaar.</p>
+      <CardCanvas>
+        <div className="h-full w-full flex items-center justify-center text-center text-white/80">
+          <div>
+            <h1 className="text-2xl font-bold mb-2">Lidkaart niet gevonden</h1>
+            <p>De opgevraagde lidkaart bestaat niet of is niet beschikbaar.</p>
+          </div>
         </div>
-      </div>
+      </CardCanvas>
     );
   }
 
   return (
     <CardCanvas>
       <FullScreenButton />
-      <AspectBox>
-        <LiveCard
-          member={data.member}
-          cardMeta={data.cardMeta}
-          tenant={data.tenant}
-          onRefresh={handleRefresh}
-          isRefreshing={isLoading}
-          standalone={true}
-          className="h-full w-full"
-        />
-      </AspectBox>
+      <LiveCard
+        member={data.member}
+        cardMeta={data.cardMeta}
+        tenant={data.tenant}
+        onRefresh={handleRefresh}
+        isRefreshing={isLoading}
+        standalone={true}
+        className="h-full w-full"
+      />
       <InstallCoach 
         isOpen={installCoach.isOpen} 
         onClose={installCoach.close} 

@@ -34,6 +34,17 @@ export default function Lidgelden() {
   const [amountMax, setAmountMax] = useState<number | undefined>();
   const [periodFrom, setPeriodFrom] = useState<Date | undefined>();
   const [periodTo, setPeriodTo] = useState<Date | undefined>();
+
+  // Debug logging for period state changes
+  const handlePeriodFromChange = (date: Date | undefined) => {
+    console.log('Setting periodFrom to:', date);
+    setPeriodFrom(date);
+  };
+
+  const handlePeriodToChange = (date: Date | undefined) => {
+    console.log('Setting periodTo to:', date);
+    setPeriodTo(date);
+  };
   const [onlyWithMandate, setOnlyWithMandate] = useState(false);
   const [onlyOverdue, setOnlyOverdue] = useState(false);
 
@@ -59,6 +70,8 @@ export default function Lidgelden() {
   // Apply filters and sorting
   const filteredFees = useMemo(() => {
     if (!allFees?.length) return [];
+    
+    console.log('Period filter values:', { periodFrom, periodTo });
     
     return allFees.filter((fee: any) => {
       // Search filter
@@ -91,25 +104,22 @@ export default function Lidgelden() {
         const feeStart = new Date(fee.periodStart);
         const feeEnd = new Date(fee.periodEnd);
         
-        // Debug logging
-        if (fee.memberName === "Abo Ali") {
-          console.log(`Period filter debug for ${fee.memberName}:`);
-          console.log(`Fee period: ${feeStart.toDateString()} - ${feeEnd.toDateString()}`);
-          console.log(`Filter period: ${periodFrom?.toDateString()} - ${periodTo?.toDateString()}`);
-        }
+        console.log(`Checking period for ${fee.memberName}:`, {
+          feeStart: feeStart.toDateString(),
+          feeEnd: feeEnd.toDateString(),
+          periodFrom: periodFrom?.toDateString(),
+          periodTo: periodTo?.toDateString()
+        });
         
         if (periodFrom) {
           // Check if fee period overlaps with filter period start
           periodMatch = periodMatch && feeEnd >= periodFrom;
+          console.log(`After periodFrom check: ${periodMatch}`);
         }
         if (periodTo) {
           // Check if fee period overlaps with filter period end  
           periodMatch = periodMatch && feeStart <= periodTo;
-        }
-        
-        // More debug logging
-        if (fee.memberName === "Abo Ali") {
-          console.log(`Period match result: ${periodMatch}`);
+          console.log(`After periodTo check: ${periodMatch}`);
         }
       }
       
@@ -337,8 +347,8 @@ export default function Lidgelden() {
     setCategoryFilter("all");
     setAmountMin(undefined);
     setAmountMax(undefined);
-    setPeriodFrom(undefined);
-    setPeriodTo(undefined);
+    handlePeriodFromChange(undefined);
+    handlePeriodToChange(undefined);
     setOnlyWithMandate(false);
     setOnlyOverdue(false);
   };
@@ -381,9 +391,9 @@ export default function Lidgelden() {
             amountMax={amountMax}
             onAmountMaxChange={setAmountMax}
             periodFrom={periodFrom}
-            onPeriodFromChange={setPeriodFrom}
+            onPeriodFromChange={handlePeriodFromChange}
             periodTo={periodTo}
-            onPeriodToChange={setPeriodTo}
+            onPeriodToChange={handlePeriodToChange}
             onlyWithMandate={onlyWithMandate}
             onOnlyWithMandateChange={setOnlyWithMandate}
             onlyOverdue={onlyOverdue}

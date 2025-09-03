@@ -329,6 +329,7 @@ export function Toolbar({
                         mode="single"
                         selected={periodFrom}
                         onSelect={(date) => {
+                          console.log('Calendar from date selected:', date);
                           onPeriodFromChange(date);
                           setFromDateInput("");
                           setFromPopoverOpen(false);

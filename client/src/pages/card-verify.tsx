@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle2, XCircle, AlertTriangle, Wifi, WifiOff, Clock, RefreshCw } from "lucide-react";
+import { CheckCircle2, XCircle, AlertTriangle, Wifi, WifiOff, Clock, RefreshCw, Check, Euro } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface CardVerificationData {
@@ -18,6 +18,14 @@ interface CardVerificationData {
     name: string;
     logoUrl: string | null;
   };
+  fees?: Array<{
+    id: string;
+    period: string;
+    amount: string;
+    status: 'PAID' | 'OPEN' | 'OVERDUE';
+    periodEnd: string;
+    paidAt: string | null;
+  }>;
   refreshedAt: string;
   etag: string;
 }
@@ -159,16 +167,21 @@ function VerificationView({ qrToken }: { qrToken: string }) {
   return (
     <Card className="max-w-lg mx-auto">
       <CardHeader className="pb-4">
-        <div className="flex items-start justify-between">
-          <div className="space-y-2">
-            <CardTitle className="text-xl">Lidkaart verificatie</CardTitle>
-            <StatusBadge status={data.status} />
+        <div className="flex flex-col sm:flex-row items-start sm:justify-between gap-4">
+          <div className="space-y-2 flex-1">
+            <CardTitle className="text-xl sm:text-2xl">Lidkaart verificatie</CardTitle>
+            <div className="flex items-center gap-2">
+              <StatusBadge status={data.status} />
+              {data.tenant.name && (
+                <span className="text-sm text-gray-600">{data.tenant.name}</span>
+              )}
+            </div>
           </div>
           {data.tenant.logoUrl && (
             <img 
               src={data.tenant.logoUrl} 
               alt={data.tenant.name}
-              className="h-12 w-auto opacity-90"
+              className="h-12 sm:h-16 w-auto opacity-90"
             />
           )}
         </div>
@@ -210,6 +223,54 @@ function VerificationView({ qrToken }: { qrToken: string }) {
           )}
         </div>
 
+        {/* Payment Information */}
+        {data.fees && data.fees.length > 0 && (
+          <div className="space-y-3">
+            <h3 className="font-semibold text-lg mb-3">Betaalinformatie</h3>
+            <div className="space-y-2">
+              {data.fees.map((fee) => (
+                <div key={fee.id} className="flex items-center justify-between p-3 rounded-lg bg-gray-50 border">
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
+                      {fee.status === 'PAID' && (
+                        <>
+                          <Check className="h-4 w-4 text-green-600" />
+                          <span className="text-green-600 font-medium text-sm">Betaald</span>
+                        </>
+                      )}
+                      {fee.status === 'OPEN' && (
+                        <>
+                          <Clock className="h-4 w-4 text-orange-500" />
+                          <span className="text-orange-500 font-medium text-sm">Openstaand</span>
+                        </>
+                      )}
+                      {fee.status === 'OVERDUE' && (
+                        <>
+                          <AlertTriangle className="h-4 w-4 text-red-600" />
+                          <span className="text-red-600 font-medium text-sm">Vervallen</span>
+                        </>
+                      )}
+                    </div>
+                    <div className="text-sm">
+                      <span className="font-medium">Lidgeld {fee.period}</span>
+                      {fee.status === 'PAID' && fee.paidAt && (
+                        <div className="text-xs text-gray-600">Betaald op {fee.paidAt}</div>
+                      )}
+                      {fee.status !== 'PAID' && (
+                        <div className="text-xs text-gray-600">Vervalt op {fee.periodEnd}</div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 text-sm font-mono">
+                    <Euro className="h-3 w-3" />
+                    {fee.amount}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Metadata */}
         <div className="border-t pt-4">
           <div className="flex items-center justify-between text-xs text-muted-foreground">
@@ -245,12 +306,14 @@ export default function CardVerifyPage({ params }: CardVerifyPageProps) {
 
   return (
     <div 
-      className="min-h-screen w-full relative overflow-hidden flex items-center justify-center p-4"
+      className="min-h-screen w-full relative overflow-hidden flex items-start sm:items-center justify-center p-3 sm:p-6"
       style={{
         background: `radial-gradient(circle at 50% 40%, #0B2440 0%, #0E3A6E 45%, #0B2440 100%), radial-gradient(circle at 50% 50%, transparent 40%, rgba(0,0,0,0.3) 100%), linear-gradient(135deg, rgba(255,255,255,0.02) 0%, transparent 50%, rgba(0,0,0,0.05) 100%)`
       }}
     >
-      <VerificationView qrToken={qrToken} />
+      <div className="w-full max-w-lg pt-4 sm:pt-0">
+        <VerificationView qrToken={qrToken} />
+      </div>
     </div>
   );
 }

@@ -1150,7 +1150,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Get member fees for status calculation
+      // Get member fees for status calculation and payment info
       const memberFees = await storage.getMembershipFeesByMember(member.id);
       
       // Derive current status
@@ -1176,6 +1176,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
       const category = categoryLabels[member.category] || member.category;
 
+      // Process fees for payment information (recent fees only, last 2 years)
+      const cutoffDate = new Date();
+      cutoffDate.setFullYear(cutoffDate.getFullYear() - 2);
+      
+      const recentFees = memberFees
+        .filter(fee => new Date(fee.periodStart) >= cutoffDate)
+        .sort((a, b) => new Date(b.periodStart).getTime() - new Date(a.periodStart).getTime())
+        .slice(0, 6) // Limit to last 6 fees
+        .map(fee => ({
+          id: fee.id,
+          period: `${new Date(fee.periodStart).getFullYear()}`,
+          amount: fee.amount,
+          status: fee.status,
+          periodEnd: new Date(fee.periodEnd).toLocaleDateString('nl-BE', {
+            day: '2-digit',
+            month: '2-digit', 
+            year: 'numeric',
+            timeZone: 'Europe/Brussels'
+          }),
+          paidAt: fee.paidAt ? new Date(fee.paidAt).toLocaleDateString('nl-BE', {
+            day: '2-digit',
+            month: '2-digit', 
+            year: 'numeric',
+            timeZone: 'Europe/Brussels'
+          }) : null
+        }));
+
       const response = {
         status,
         validUntil,
@@ -1189,6 +1216,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           name: tenant.name,
           logoUrl: tenant.logoUrl
         },
+        fees: recentFees,
         refreshedAt: new Date().toISOString(),
         etag: cardMeta.etag
       };

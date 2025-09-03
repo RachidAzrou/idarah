@@ -518,9 +518,24 @@ export function MemberForm({ member, onSuccess, onCancel }: MemberFormProps) {
                             <Input
                               value={field.value ? format(field.value, "dd/MM/yyyy", { locale: nl }) : ""}
                               onChange={(e) => {
-                                // Handle manual date input
                                 const inputValue = e.target.value;
-                                if (inputValue.length === 10) {
+                                
+                                // Handle numeric input (e.g., 04061993 -> 04/06/1993)
+                                if (/^\d+$/.test(inputValue)) {
+                                  if (inputValue.length === 8) {
+                                    const day = inputValue.substring(0, 2);
+                                    const month = inputValue.substring(2, 4);
+                                    const year = inputValue.substring(4, 8);
+                                    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+                                    if (!isNaN(date.getTime()) && parseInt(month) >= 1 && parseInt(month) <= 12 && parseInt(day) >= 1 && parseInt(day) <= 31) {
+                                      field.onChange(date);
+                                      return;
+                                    }
+                                  }
+                                }
+                                
+                                // Handle formatted input (DD/MM/YYYY)
+                                if (inputValue.length === 10 && inputValue.includes('/')) {
                                   const [day, month, year] = inputValue.split('/');
                                   if (day && month && year) {
                                     const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
@@ -530,7 +545,7 @@ export function MemberForm({ member, onSuccess, onCancel }: MemberFormProps) {
                                   }
                                 }
                               }}
-                              placeholder="DD/MM/YYYY"
+                              placeholder="DD/MM/YYYY of 04061993"
                               className="pr-10 border-gray-200"
                               data-testid="input-birthdate"
                               maxLength={10}

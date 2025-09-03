@@ -94,7 +94,7 @@ export function KpiCards() {
       iconBgColor: "bg-blue-50"
     },
     {
-      title: "Achterstallig Lidgeld",
+      title: "Vervallen Lidgeld",
       value: formatCurrencyBE(kpiData.overdue),
       delta: { value: "Openstaande bedragen", positive: false },
       icon: <TbClockExclamation className="h-4 w-4 text-red-600" />,

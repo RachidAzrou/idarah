@@ -75,7 +75,7 @@ export function KpiCards({ fees }: KpiCardsProps) {
       iconBgColor: "bg-green-50"
     },
     {
-      title: "Achterstallig", 
+      title: "Vervallen", 
       value: formatCurrencyBE(overdueAmount),
       delta: { value: `${overdueFees.length} facturen`, positive: overdueFees.length < 60 },
       icon: <AlertTriangle className="h-4 w-4 text-red-600" />,

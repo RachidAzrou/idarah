@@ -56,7 +56,7 @@ const PaymentMatrixView = React.memo(function PaymentMatrixView({ config }: Paym
   const chartData = [
     { name: 'Betaald', value: snapshot.totals.paid, color: config.colors.paid },
     { name: 'Openstaand', value: snapshot.totals.open, color: config.colors.open },
-    { name: 'Achterstallig', value: snapshot.totals.overdue, color: config.colors.overdue }
+    { name: 'Vervallen', value: snapshot.totals.overdue, color: config.colors.overdue }
   ];
 
   const totalPayments = snapshot.totals.paid + snapshot.totals.open + snapshot.totals.overdue;
@@ -230,7 +230,7 @@ const PaymentMatrixView = React.memo(function PaymentMatrixView({ config }: Paym
         </div>
         <div className="bg-red-50 p-4 rounded-lg">
           <div className="text-2xl font-bold text-red-600">{snapshot.totals.overdue}</div>
-          <div className="text-sm text-gray-600">Achterstallig</div>
+          <div className="text-sm text-gray-600">Vervallen</div>
         </div>
       </div>
     </div>

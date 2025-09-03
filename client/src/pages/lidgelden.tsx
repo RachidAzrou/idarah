@@ -71,13 +71,6 @@ export default function Lidgelden() {
   const filteredFees = useMemo(() => {
     if (!allFees?.length) return [];
     
-    console.log('Period filter values:', { periodFrom, periodTo });
-    console.log('Method filter value:', methodFilter);
-    
-    // Debug first few fees methods
-    if (allFees.length > 0) {
-      console.log('Sample fee methods:', allFees.slice(0, 3).map(f => ({ memberNumber: f.memberNumber, method: f.method })));
-    }
     
     return allFees.filter((fee: any) => {
       // Search filter
@@ -93,17 +86,8 @@ export default function Lidgelden() {
       const yearMatch = yearFilter === "all" || 
         new Date(fee.periodStart).getFullYear().toString() === yearFilter;
       
-      // Method filter - debug
+      // Method filter
       const methodMatch = methodFilter === "all" || fee.method === methodFilter;
-      
-      // Debug logging for method filter
-      if (methodFilter !== "all" && fee.memberNumber === "0001") {
-        console.log(`Method filter debug for ${fee.memberNumber}:`, {
-          methodFilter: methodFilter,
-          feeMethod: fee.method,
-          methodMatch: methodMatch
-        });
-      }
       
       // Category filter
       const categoryMatch = categoryFilter === "all" || fee.type === categoryFilter;
@@ -119,22 +103,13 @@ export default function Lidgelden() {
         const feeStart = new Date(fee.periodStart);
         const feeEnd = new Date(fee.periodEnd);
         
-        console.log(`Checking period for ${fee.memberName}:`, {
-          feeStart: feeStart.toDateString(),
-          feeEnd: feeEnd.toDateString(),
-          periodFrom: periodFrom?.toDateString(),
-          periodTo: periodTo?.toDateString()
-        });
-        
         if (periodFrom) {
           // Check if fee period overlaps with filter period start
           periodMatch = periodMatch && feeEnd >= periodFrom;
-          console.log(`After periodFrom check: ${periodMatch}`);
         }
         if (periodTo) {
           // Check if fee period overlaps with filter period end  
           periodMatch = periodMatch && feeStart <= periodTo;
-          console.log(`After periodTo check: ${periodMatch}`);
         }
       }
       

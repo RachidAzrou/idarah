@@ -18,7 +18,7 @@ export function MatrixPreview({ config }: MatrixPreviewProps) {
   const chartData = [
     { name: 'Betaald', value: snapshot.totals.paid, color: config.colors.paid },
     { name: 'Openstaand', value: snapshot.totals.open, color: config.colors.open },
-    { name: 'Achterstallig', value: snapshot.totals.overdue, color: config.colors.overdue }
+    { name: 'Vervallen', value: snapshot.totals.overdue, color: config.colors.overdue }
   ];
 
   const totalPayments = snapshot.totals.paid + snapshot.totals.open + snapshot.totals.overdue;
@@ -179,7 +179,7 @@ export function MatrixPreview({ config }: MatrixPreviewProps) {
         <div>Totaal leden: {snapshot.count}</div>
         <div>Betaalde transacties: {snapshot.totals.paid}</div>
         <div>Openstaande transacties: {snapshot.totals.open}</div>
-        <div>Achterstallige transacties: {snapshot.totals.overdue}</div>
+        <div>Vervallen transacties: {snapshot.totals.overdue}</div>
       </div>
     </div>
   );

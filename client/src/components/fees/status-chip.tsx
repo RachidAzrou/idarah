@@ -16,7 +16,7 @@ export function StatusChip({ status, className }: StatusChipProps) {
   const labels = {
     OPEN: "Openstaand",
     PAID: "Betaald",
-    OVERDUE: "Achterstallig",
+    OVERDUE: "Vervallen",
   };
 
   return (

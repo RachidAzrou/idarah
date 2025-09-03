@@ -30,7 +30,7 @@ const PaymentStatusChart = React.memo(function PaymentStatusChart() {
     return [
       { name: 'Betaald', value: hasData ? counts.paid : 1, color: hasData ? '#16A34A' : '#E5E7EB' },
       { name: 'Openstaand', value: hasData ? counts.open : 1, color: hasData ? '#F59E0B' : '#E5E7EB' },
-      { name: 'Achterstallig', value: hasData ? counts.overdue : 1, color: hasData ? '#EF4444' : '#E5E7EB' },
+      { name: 'Vervallen', value: hasData ? counts.overdue : 1, color: hasData ? '#EF4444' : '#E5E7EB' },
     ];
   }, [fees]);
   
@@ -87,7 +87,7 @@ const PaymentStatusChart = React.memo(function PaymentStatusChart() {
             
             if (item.name === 'Betaald') realValue = counts.paid;
             else if (item.name === 'Openstaand') realValue = counts.open;
-            else if (item.name === 'Achterstallig') realValue = counts.overdue;
+            else if (item.name === 'Vervallen') realValue = counts.overdue;
           }
           
           return (

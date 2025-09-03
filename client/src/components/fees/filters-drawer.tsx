@@ -241,7 +241,7 @@ export function FiltersDrawer({ filters, onFiltersChange, onReset }: FiltersDraw
                 onCheckedChange={(checked) => updateFilter("onlyOverdue", checked)}
               />
               <Label htmlFor="onlyOverdue" className="text-sm">
-                Alleen achterstallig
+                Alleen vervallen
               </Label>
             </div>
           </div>

@@ -216,7 +216,7 @@ export function MatrixConfigForm({ config, onChange }: MatrixConfigFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="color-overdue">Achterstallig</Label>
+            <Label htmlFor="color-overdue">Vervallen</Label>
             <div className="flex gap-2">
               <Input
                 id="color-overdue"

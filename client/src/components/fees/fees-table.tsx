@@ -164,7 +164,7 @@ export function FeesTable({
                   </TableCell>
                   <TableCell className="text-sm">
                     {fee.status === 'OPEN' ? 'Openstaand' : 
-                     fee.status === 'PAID' ? 'Betaald' : 'Achterstallig'}
+                     fee.status === 'PAID' ? 'Betaald' : 'Vervallen'}
                   </TableCell>
                   <TableCell className="text-sm text-gray-600">
                     {fee.paidAt ? formatDateBE(fee.paidAt) : "-"}

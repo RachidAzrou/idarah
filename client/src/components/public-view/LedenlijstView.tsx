@@ -43,22 +43,22 @@ export function LedenlijstView({ config }: LedenlijstViewProps) {
     return () => clearInterval(interval);
   }, [totalPages]);
 
-  const getPaymentStatusIcon = (status: 'betaald' | 'open' | 'achterstallig') => {
+  const getPaymentStatusIcon = (status: 'betaald' | 'open' | 'vervallen') => {
     switch (status) {
       case 'betaald':
         return <Check className="w-4 h-4 text-white" />;
-      case 'achterstallig':
+      case 'vervallen':
         return <X className="w-4 h-4 text-white" />;
       default:
         return null;
     }
   };
 
-  const getPaymentStatusColor = (status: 'betaald' | 'open' | 'achterstallig') => {
+  const getPaymentStatusColor = (status: 'betaald' | 'open' | 'vervallen') => {
     switch (status) {
       case 'betaald':
         return 'bg-green-500';
-      case 'achterstallig':
+      case 'vervallen':
         return 'bg-red-500';
       default:
         return 'bg-gray-300';
@@ -184,7 +184,7 @@ export function LedenlijstView({ config }: LedenlijstViewProps) {
                         <div
                           className={`w-6 h-6 rounded-md mx-auto transition-all duration-200 shadow-sm ${
                             status === 'betaald' ? 'bg-emerald-400 border-2 border-emerald-500' :
-                            status === 'achterstallig' ? 'bg-red-400 border-2 border-red-500' :
+                            status === 'vervallen' ? 'bg-red-400 border-2 border-red-500' :
                             'bg-slate-300 border-2 border-slate-400'
                           }`}
                           title={`${month}: ${status}`}

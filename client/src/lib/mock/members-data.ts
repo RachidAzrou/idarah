@@ -11,7 +11,7 @@ export interface Member {
   actief: boolean;
   betalingen: {
     [year: number]: {
-      [month: number]: 'betaald' | 'open' | 'achterstallig';
+      [month: number]: 'betaald' | 'open' | 'vervallen';
     };
   };
 }
@@ -45,7 +45,7 @@ export const mockMembers: Member[] = [
     actief: true,
     betalingen: {
       2025: {
-        1: 'betaald', 2: 'betaald', 3: 'open', 4: 'achterstallig', 5: 'achterstallig',
+        1: 'betaald', 2: 'betaald', 3: 'open', 4: 'vervallen', 5: 'vervallen',
         6: 'open', 7: 'open', 8: 'open', 9: 'open', 10: 'open', 11: 'open', 12: 'open'
       }
     }
@@ -93,7 +93,7 @@ export const mockMembers: Member[] = [
     actief: true,
     betalingen: {
       2025: {
-        1: 'betaald', 2: 'open', 3: 'achterstallig', 4: 'achterstallig', 5: 'achterstallig',
+        1: 'betaald', 2: 'open', 3: 'vervallen', 4: 'vervallen', 5: 'vervallen',
         6: 'open', 7: 'open', 8: 'open', 9: 'open', 10: 'open', 11: 'open', 12: 'open'
       }
     }

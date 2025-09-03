@@ -25,7 +25,7 @@ export function Charts({ fees }: ChartsProps) {
       color: "#3B82F6", // blue
     },
     {
-      name: "Achterstallig",
+      name: "Vervallen",
       value: fees.filter(fee => fee.status === "OVERDUE").length,
       amount: fees.filter(fee => fee.status === "OVERDUE").reduce((sum, fee) => sum + fee.amount, 0),
       color: "#EF4444", // red

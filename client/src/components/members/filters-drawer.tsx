@@ -234,7 +234,7 @@ export function FiltersDrawer({
                 {[
                   { value: 'PAID', label: 'Betaald' },
                   { value: 'OPEN', label: 'Open' },
-                  { value: 'OVERDUE', label: 'Achterstallig' }
+                  { value: 'OVERDUE', label: 'Vervallen' }
                 ].map((status) => (
                   <div key={status.value} className="flex items-center space-x-2">
                     <Checkbox

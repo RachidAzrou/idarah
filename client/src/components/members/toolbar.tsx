@@ -204,7 +204,7 @@ export function Toolbar({
                   <SelectItem value="all">Alle betaalstatussen</SelectItem>
                   <SelectItem value="PAID">Betaald</SelectItem>
                   <SelectItem value="OPEN">Open</SelectItem>
-                  <SelectItem value="OVERDUE">Achterstallig</SelectItem>
+                  <SelectItem value="OVERDUE">Vervallen</SelectItem>
                 </SelectContent>
               </Select>
             </div>

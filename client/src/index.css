@@ -161,8 +161,8 @@
   /* Neutrals */
   --muted: hsl(220, 13%, 95%);
   --muted-foreground: hsl(215, 16%, 47%);
-  --accent: hsl(217, 91%, 88%);
-  --accent-foreground: hsl(217, 91%, 15%);
+  --accent: hsl(217, 91%, 95%);
+  --accent-foreground: hsl(217, 91%, 20%);
   
   /* Status colors */
   --destructive: hsl(0, 72%, 51%);

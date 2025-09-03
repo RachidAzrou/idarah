@@ -488,7 +488,7 @@ export default function LidkaartenPage() {
                   variant="outline"
                   className="gap-2"
                 >
-                  <CiExport className="h-4 w-4" />
+                  <Download className="h-4 w-4" />
                   Downloaden
                 </Button>
                 

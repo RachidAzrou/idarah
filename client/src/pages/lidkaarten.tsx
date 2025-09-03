@@ -11,6 +11,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 import { LiveCard } from "@/components/cards/live-card";
+import { CardCanvas } from "@/components/card/CardCanvas";
 import { apiRequest } from "@/lib/queryClient";
 import { 
   Search, 
@@ -516,13 +517,16 @@ export default function LidkaartenPage() {
           
           {previewCard && tenant && (
             <div className="space-y-4">
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <LiveCard
-                  member={previewCard.member}
-                  cardMeta={previewCard.cardMeta!}
-                  tenant={tenant}
-                  standalone={false}
-                />
+              <div className="relative aspect-[16/10] rounded-lg overflow-hidden border border-gray-200">
+                <CardCanvas className="rounded-lg">
+                  <LiveCard
+                    member={previewCard.member}
+                    cardMeta={previewCard.cardMeta!}
+                    tenant={tenant}
+                    standalone={true}
+                    className="h-full w-full"
+                  />
+                </CardCanvas>
               </div>
               
               <div className="flex items-center justify-end gap-2 pt-4 border-t">

@@ -102,6 +102,8 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
   const [importProgress, setImportProgress] = useState(0);
   const [importedCount, setImportedCount] = useState(0);
   const [duplicateWarnings, setDuplicateWarnings] = useState<string[]>([]);
+  const [duplicateCheckResults, setDuplicateCheckResults] = useState<any[]>([]);
+  const [showDuplicateConfirmation, setShowDuplicateConfirmation] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleClose = () => {
@@ -114,6 +116,8 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
     setImportProgress(0);
     setImportedCount(0);
     setDuplicateWarnings([]);
+    setDuplicateCheckResults([]);
+    setShowDuplicateConfirmation(false);
     onClose();
   };
 
@@ -497,56 +501,68 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
     }
   };
 
-  const handleImport = async () => {
+  const checkDuplicatesBeforeImport = async () => {
     if (validMembers.length === 0) return;
 
+    const duplicateResults = [];
+    
+    // Check for duplicates for all members
+    for (let i = 0; i < validMembers.length; i++) {
+      const member = validMembers[i];
+      const duplicateCheck = await checkForDuplicates(member);
+      
+      duplicateResults.push({
+        member,
+        duplicateCheck,
+        index: i
+      });
+    }
+
+    const duplicates = duplicateResults.filter(result => result.duplicateCheck.hasDuplicates);
+    
+    if (duplicates.length > 0) {
+      setDuplicateCheckResults(duplicates);
+      setShowDuplicateConfirmation(true);
+    } else {
+      // No duplicates, proceed with import
+      proceedWithImport(validMembers);
+    }
+  };
+
+  const proceedWithImport = async (membersToImport: any[]) => {
+    setShowDuplicateConfirmation(false);
     setImportProgress(0);
     setImportedCount(0);
 
     try {
-      const membersToImport = [];
+      const finalMembers = [];
       const warnings = [];
       
-      // Check for duplicates during import
-      for (let i = 0; i < validMembers.length; i++) {
-        const member = validMembers[i];
+      // Process members and handle number duplicates
+      for (const member of membersToImport) {
         const duplicateCheck = await checkForDuplicates(member);
         
-        if (duplicateCheck.hasDuplicates) {
-          if (duplicateCheck.duplicateNumber && duplicateCheck.duplicateNameAddress) {
-            // Both number and name/address duplicate - skip completely
-            warnings.push(`Lid ${member.firstName} ${member.lastName} bestaat al. Niet geïmporteerd.`);
-          } else if (duplicateCheck.duplicateNumber) {
-            // Only number duplicate - replace with suggested number
-            member.memberNumber = duplicateCheck.suggestedNumber;
-            warnings.push(`Dubbel lidnummer: ${duplicateCheck.duplicateNumber.memberNumber} gedetecteerd. We vervangen het door een vrij lidnummer.`);
-            membersToImport.push(member);
-          } else if (duplicateCheck.duplicateNameAddress) {
-            // Name/address duplicate - skip
-            warnings.push(`Lid ${member.firstName} ${member.lastName} bestaat al. Niet geïmporteerd.`);
-          }
-        } else {
-          membersToImport.push(member);
+        if (duplicateCheck.hasDuplicates && duplicateCheck.duplicateNumber && !duplicateCheck.duplicateNameAddress) {
+          // Only number duplicate - replace with suggested number
+          member.memberNumber = duplicateCheck.suggestedNumber;
+          warnings.push(`Dubbel lidnummer gedetecteerd. Vervangen door uniek lidnummer: ${duplicateCheck.suggestedNumber}`);
         }
         
-        setImportProgress(((i + 1) / validMembers.length) * 100);
+        finalMembers.push(member);
       }
 
-      // Set warnings to show in UI
+      // Actually import the members
+      onImport(finalMembers);
+      setImportedCount(finalMembers.length);
       setDuplicateWarnings(warnings);
-
-      if (membersToImport.length > 0) {
-        // Actually import the non-duplicate members
-        onImport(membersToImport);
-        setImportedCount(membersToImport.length);
-      }
-      
       setStep('complete');
     } catch (error) {
       console.error('Import error:', error);
       setDuplicateWarnings(['Fout bij het importeren van leden']);
     }
   };
+
+  const handleImport = checkDuplicatesBeforeImport;
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
@@ -710,7 +726,61 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
           </TabsContent>
 
           <TabsContent value="importing" className="space-y-4">
-            {importProgress === 0 ? (
+            {showDuplicateConfirmation ? (
+              // Show duplicate confirmation
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-red-600">Duplicates Gedetecteerd</h3>
+                  <p className="text-sm text-gray-600">
+                    Er zijn {duplicateCheckResults.length} duplicates gevonden. Controleer de onderstaande lijst.
+                  </p>
+                </div>
+
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4 space-y-3">
+                  {duplicateCheckResults.map((result, index) => (
+                    <div key={index} className="flex items-start gap-2 text-sm">
+                      <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0 text-red-600" />
+                      <div className="text-red-800">
+                        {result.duplicateCheck.duplicateNumber && result.duplicateCheck.duplicateNameAddress ? (
+                          <span><strong>{result.member.firstName} {result.member.lastName}</strong> bestaat al (lidnummer en naam/adres)</span>
+                        ) : result.duplicateCheck.duplicateNumber ? (
+                          <span>Dubbel lidnummer: <strong>{result.member.memberNumber}</strong> - wordt vervangen door uniek nummer</span>
+                        ) : (
+                          <span><strong>{result.member.firstName} {result.member.lastName}</strong> bestaat al (naam/adres)</span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <p className="text-sm text-blue-800">
+                    <strong>Wat gebeurt er:</strong>
+                    <br />• Leden met dubbele lidnummers krijgen een nieuw uniek nummer
+                    <br />• Leden die volledig bestaan worden niet geïmporteerd
+                    <br />• Andere leden worden normaal geïmporteerd
+                  </p>
+                </div>
+
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setShowDuplicateConfirmation(false)}>
+                    Annuleren
+                  </Button>
+                  <Button 
+                    onClick={() => {
+                      const membersToImport = validMembers.filter(member => {
+                        const result = duplicateCheckResults.find(r => r.member === member);
+                        return !result || !(result.duplicateCheck.duplicateNumber && result.duplicateCheck.duplicateNameAddress) && !result.duplicateCheck.duplicateNameAddress;
+                      });
+                      proceedWithImport(membersToImport);
+                    }}
+                    className="gap-2 bg-red-600 hover:bg-red-700"
+                  >
+                    Toch Importeren
+                  </Button>
+                </DialogFooter>
+              </div>
+            ) : importProgress === 0 ? (
               // Preview before import
               <div className="space-y-4">
                 <div>

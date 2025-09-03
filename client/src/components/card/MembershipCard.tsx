@@ -246,9 +246,6 @@ export function MembershipCard({
                   />
                 </div>
               </button>
-              <p className="embossed-text text-[clamp(10px,1.4vmin,12px)] text-center leading-tight opacity-80 mt-2">
-                SCAN
-              </p>
             </div>
           </div>
         </div>

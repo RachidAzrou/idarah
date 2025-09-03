@@ -1,0 +1,100 @@
+Implement the visual styling of a Digital Membership Card with a premium bank-card look. No data fetching; props drive the UI. Locale nl-BE. Keep everything responsive so the card can fill a fullscreen aspect-ratio wrapper (no CSS transform: scale()).
+
+Design requirements
+
+Look & feel: rounded 24px, glossy blue gradient (linear 135° from #0E3A6E to #0B4E9C), subtle diagonal sheen, deep shadow (0 18px 40px rgba(0,0,0,.35)), crisp edges.
+
+Typography: Space Grotesk (weights 400/500/700); numeric fields use tabular-nums and slight letter-spacing.
+
+Content hierarchy:
+
+Top-left: Member name (large, semibold), below it a Category chip.
+
+Top-right: Status LED + label and a Refresh icon-button (UI only; calls provided handler).
+
+Middle: Member number (tabular) and Valid until (if present, dd-mm-jjjj).
+
+Badges row (wrap): e.g. “Betaald 2025”, “Stemgerechtigd”.
+
+Bottom-right: QR zone (white isolated card, ≥128px), clickable (opens larger QR via provided handler).
+
+Footer: bottom-left tenant logo (optional), bottom-right tiny etag/version text.
+
+Status LED colors (with soft glow):
+
+ACTUEEL → #22C55E
+
+NIET_ACTUEEL → #F59E0B
+
+VERLOPEN → #EF4444
+
+Chips: semi-transparent white (rgba(255,255,255,.15)), backdrop-blur-sm, rounded-full, compact padding, text-xs.
+
+Accessibility: AA contrast, focus-visible rings on interactive elements, icon buttons have aria-label. Respect prefers-reduced-motion (keep sheen subtle or disable).
+
+Props (TypeScript)
+type CardStatus = 'ACTUEEL' | 'NIET_ACTUEEL' | 'VERLOPEN';
+type MemberCategory = 'Student' | 'Standaard' | 'Senior';
+
+type MembershipCardProps = {
+  name: string;
+  memberNumber: string;
+  category: MemberCategory;
+  status: CardStatus;
+  validUntil?: string;        // dd-mm-jjjj
+  badges?: string[];          // e.g. ["Betaald 2025","Stemgerechtigd"]
+  qrToken: string;            // for QR rendering only
+  tenantLogoUrl?: string;
+  etag?: string;
+  className?: string;         // allow parent to size with w-full h-full
+  onQrClick?: () => void;     // open enlarged QR
+  onRefresh?: () => void;     // visual refresh action
+};
+
+Behaviour (UI only)
+
+The component must render with w-full h-full so it perfectly fills a parent aspect-ratio container (≈ 1.586:1).
+
+The Refresh icon-button simply calls onRefresh (no fetching here).
+
+The QR area is a white card with padding; clicking it calls onQrClick.
+
+Include a subtle glossy sheen overlay (disable/soften if prefers-reduced-motion).
+
+Styling details (Tailwind-friendly)
+
+Container classes suggestion: relative w-full h-full rounded-3xl text-white overflow-hidden shadow-[0_18px_40px_rgba(0,0,0,.35)] bg-gradient-to-br from-[#0E3A6E] to-[#0B4E9C].
+
+Sheen overlay: absolutely positioned, mix-blend-screen, very low opacity; animated sweep only when motion allowed.
+
+Status LED: 10–12px circle with outer glow (box-shadow ring using the status color at ~18% opacity + a soft spread).
+
+Info labels small uppercase with tracking-wide, values use tabular-nums for numbers.
+
+Badge chips: bg-white/12 backdrop-blur-sm rounded-full px-2.5 py-1 text-xs font-medium.
+
+QR zone: white background, rounded-xl p-2 shadow-md, inner square ≥128px.
+
+Copy (nl-BE)
+
+Status labels: Actueel, Niet actueel, Verlopen.
+
+Info labels: Lidnummer, Geldig tot.
+
+Buttons ARIA: “Vernieuwen”, “Toon grotere QR-code”.
+
+Acceptance criteria
+
+Renders a glossy blue bank-card with proper hierarchy and AA contrast.
+
+Status LED and label reflect the provided status.
+
+Name prominent, category chip below, member number and valid until clearly shown.
+
+Badges render as pill chips; QR zone is white and ≥128px.
+
+Tenant logo bottom-left, tiny etag bottom-right.
+
+Component cleanly fills its container (w-full h-full) with no text blur (no scaling transforms).
+
+Respects prefers-reduced-motion; sheen remains subtle or is disabled.

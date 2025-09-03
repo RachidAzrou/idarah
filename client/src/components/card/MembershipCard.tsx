@@ -41,32 +41,29 @@ interface StatusLEDProps {
 function StatusLED({ status, className }: StatusLEDProps) {
   const statusConfig = {
     ACTUEEL: {
-      color: 'bg-green-500',
-      glowClass: 'status-led-glow-green',
+      color: 'bg-[#22C55E]',
+      glowStyle: { boxShadow: '0 0 0 3px rgba(34, 197, 94, 0.18)' },
       label: 'Actueel',
-      icon: Wifi,
     },
     NIET_ACTUEEL: {
-      color: 'bg-orange-500',
-      glowClass: 'status-led-glow-orange',
+      color: 'bg-[#F59E0B]',
+      glowStyle: { boxShadow: '0 0 0 3px rgba(245, 158, 11, 0.18)' },
       label: 'Niet actueel',
-      icon: WifiOff,
     },
     VERLOPEN: {
-      color: 'bg-red-500',
-      glowClass: 'status-led-glow-red',
+      color: 'bg-[#EF4444]',
+      glowStyle: { boxShadow: '0 0 0 3px rgba(239, 68, 68, 0.18)' },
       label: 'Verlopen',
-      icon: Clock,
     },
   };
 
   const config = statusConfig[status];
-  const Icon = config.icon;
 
   return (
-    <div className={cn("flex items-center gap-1.5", className)}>
+    <div className={cn("flex items-center gap-2", className)}>
       <div 
-        className={cn("w-2.5 h-2.5 rounded-full", config.color, config.glowClass)}
+        className={cn("w-3 h-3 rounded-full", config.color)}
+        style={config.glowStyle}
         aria-hidden="true"
       />
       <span className="text-xs font-medium embossed-text card-font">
@@ -122,129 +119,119 @@ export function MembershipCard({
           className
         )}
         style={{
-          background: `linear-gradient(135deg, ${cardData.tenant.primaryColor}DD 0%, ${cardData.tenant.primaryColor}BB 50%, ${cardData.tenant.primaryColor}EE 100%)`,
-          boxShadow: `
-            0 0 0 1px rgba(255,255,255,0.1) inset,
-            0 18px 40px rgba(0,0,0,0.35),
-            0 8px 20px rgba(0,0,0,0.25)
-          `
+          background: "linear-gradient(135deg, #0E3A6E 0%, #0B4E9C 100%)",
+          boxShadow: "0 18px 40px rgba(0,0,0,0.35)"
         }}
         data-testid="membership-card"
       >
-        {/* Gloss overlay effect */}
+        {/* Glossy sheen overlay */}
         <div 
-          className="absolute inset-0 pointer-events-none opacity-30"
+          className="absolute inset-0 pointer-events-none opacity-20 mix-blend-screen"
           style={{
-            background: "linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%, rgba(255,255,255,0.05) 100%)"
+            background: "linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 45%, rgba(255,255,255,0.1) 100%)"
           }}
           aria-hidden="true"
         />
 
         {/* Card Content */}
         <div className="relative h-full p-6 flex flex-col text-white">
-          {/* Top row: Organization and Status */}
-          <div className="flex items-start justify-between mb-6">
-            <div className="flex-1">
+          {/* Top-left: Member name (large, semibold) */}
+          <div className="mb-4">
+            <h1 className="embossed-text text-[clamp(20px,3.2vmin,32px)] font-semibold uppercase tracking-wide leading-tight">
+              {cardData.firstName} {cardData.lastName}
+            </h1>
+            {/* Below it a Category chip */}
+            <div className="mt-2">
+              <span className="bg-white/15 backdrop-blur-sm text-white text-xs font-medium px-2.5 py-1 rounded-full uppercase tracking-wide">
+                {getMemberCategoryLabel(cardData.category)}
+              </span>
+            </div>
+          </div>
+
+          {/* Top-right: Status LED + label and Refresh button */}
+          <div className="absolute top-6 right-6 flex items-center gap-3">
+            <StatusLED status={displayStatus} />
+          </div>
+
+          {/* Middle: Member number and Valid until */}
+          <div className="mb-6 space-y-3">
+            <div>
+              <p className="embossed-text text-[clamp(10px,1.5vmin,12px)] uppercase tracking-wide opacity-80 mb-1">
+                LIDNUMMER
+              </p>
+              <p className="embossed-text text-[clamp(14px,2.2vmin,18px)] font-medium tracking-[0.08em] font-mono tabular-nums">
+                {cardData.memberNumber.padStart(16, '0').replace(/(.{4})/g, '$1 ').trim()}
+              </p>
+            </div>
+            
+            {cardData.validUntil && (
+              <div>
+                <p className="embossed-text text-[clamp(10px,1.5vmin,12px)] uppercase tracking-wide opacity-80 mb-1">
+                  GELDIG TOT
+                </p>
+                <p className="embossed-text text-[clamp(12px,1.8vmin,15px)] font-medium font-mono tabular-nums">
+                  {format(cardData.validUntil, 'dd-MM-yyyy', { locale: nl })}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Badges row */}
+          {cardData.badges.length > 0 && (
+            <div className="mb-6">
+              <div className="flex flex-wrap gap-2">
+                {cardData.badges.map((badge, index) => (
+                  <span
+                    key={index}
+                    className="bg-white/15 backdrop-blur-sm text-white text-xs font-medium px-2.5 py-1 rounded-full uppercase tracking-wide"
+                    data-testid={`badge-${index}`}
+                  >
+                    {badge}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Bottom row: Tenant logo and QR */}
+          <div className="flex-1 flex justify-between items-end">
+            {/* Bottom-left: Tenant logo */}
+            <div className="flex items-end">
               {cardData.tenant.logoUrl && (
                 <img 
                   src={cardData.tenant.logoUrl} 
                   alt={cardData.tenant.name}
-                  className="h-6 w-auto mb-2 opacity-90"
+                  className="h-8 w-auto opacity-90"
                   data-testid="tenant-logo"
                 />
               )}
-              <h1 className="embossed-text text-sm font-medium uppercase tracking-widest">
-                {cardData.tenant.name}
-              </h1>
-            </div>
-            
-            <div className="flex items-center gap-3">
-              <StatusLED status={displayStatus} />
-            </div>
-          </div>
-
-          {/* Member Name - Prominent */}
-          <div className="mb-6">
-            <h2 className="embossed-text text-[clamp(20px,3.2vmin,32px)] font-semibold uppercase tracking-wide leading-tight">
-              {cardData.firstName} {cardData.lastName}
-            </h2>
-          </div>
-
-          {/* Card Number - Bankcard style */}
-          <div className="mb-6">
-            <p className="embossed-text text-[clamp(14px,2.2vmin,18px)] font-medium tracking-[0.08em] font-mono tabular-nums">
-              {cardData.memberNumber.padStart(16, '0').replace(/(.{4})/g, '$1 ').trim()}
-            </p>
-          </div>
-
-          {/* Bottom row: Details and QR */}
-          <div className="flex-1 flex justify-between items-end">
-            {/* Left: Member details */}
-            <div className="flex-1 space-y-3">
-              {/* Category */}
-              <div>
-                <p className="embossed-text text-[clamp(10px,1.5vmin,12px)] uppercase tracking-wide opacity-80 mb-1">
-                  CATEGORIE
-                </p>
-                <span className="embossed-text text-[clamp(12px,1.8vmin,15px)] font-medium">
-                  {getMemberCategoryLabel(cardData.category)}
-                </span>
-              </div>
-
-              {/* Badges */}
-              {cardData.badges.length > 0 && (
-                <div>
-                  <p className="embossed-text text-[clamp(10px,1.5vmin,12px)] uppercase tracking-wide opacity-80 mb-1">
-                    STATUS
-                  </p>
-                  <div className="flex flex-wrap gap-1">
-                    {cardData.badges.map((badge, index) => (
-                      <span
-                        key={index}
-                        className="bg-white/15 text-white text-[10px] font-medium px-2 py-0.5 rounded-full uppercase tracking-wide"
-                        data-testid={`badge-${index}`}
-                      >
-                        {badge}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Valid until */}
-              {cardData.validUntil && (
-                <div>
-                  <p className="embossed-text text-[clamp(10px,1.5vmin,12px)] uppercase tracking-wide opacity-80 mb-1">
-                    GELDIG TOT
-                  </p>
-                  <p className="embossed-text text-[clamp(12px,1.8vmin,15px)] font-medium font-mono tabular-nums">
-                    {format(cardData.validUntil, 'dd-MM-yyyy', { locale: nl })}
-                  </p>
-                </div>
-              )}
             </div>
 
-            {/* Right: QR Code */}
+            {/* Bottom-right: QR zone */}
             <div className="flex flex-col items-center">
               <button
                 onClick={() => setShowQRModal(true)}
-                className="bg-white rounded-xl p-3 shadow-lg hover:shadow-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/50 mb-2"
+                className="bg-white rounded-xl p-2 shadow-md hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/50 focus-visible:ring-2 focus-visible:ring-white/50"
                 data-testid="qr-code-button"
-                aria-label="Toon grote QR code"
-                style={{ minWidth: '80px', minHeight: '80px' }}
+                aria-label="Toon grotere QR-code"
+                style={{ minWidth: '128px', minHeight: '128px' }}
               >
                 <QRCodeSVG
                   value={qrCodeUrl}
-                  size={56}
+                  size={112}
                   className="w-full h-full"
                   fgColor="#000000"
                   bgColor="#ffffff"
                 />
               </button>
-              <p className="embossed-text text-[clamp(10px,1.5vmin,12px)] text-center leading-tight opacity-80">
-                SCAN
-              </p>
             </div>
+          </div>
+
+          {/* Bottom-right: tiny etag/version text */}
+          <div className="absolute bottom-2 right-2">
+            <span className="text-[10px] opacity-60 font-mono">
+              {cardData.etag.substring(0, 8)}
+            </span>
           </div>
         </div>
       </div>

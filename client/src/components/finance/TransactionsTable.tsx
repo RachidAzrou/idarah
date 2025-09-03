@@ -169,9 +169,9 @@ const TransactionsTable = React.memo(function TransactionsTable({
       <div className="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow className="bg-gray-50 dark:bg-gray-900">
+            <TableRow>
               <TableHead 
-                className="sticky top-0 px-6 py-3 text-left text-xs font-medium text-[#65758b] bg-[#f3f4f6] font-poppins uppercase tracking-wider cursor-pointer hover:bg-gray-200 select-none"
+                className="cursor-pointer hover:bg-gray-50 select-none"
                 onClick={() => handleSort('date')}
               >
                 <div className="flex items-center gap-2">
@@ -180,7 +180,7 @@ const TransactionsTable = React.memo(function TransactionsTable({
                 </div>
               </TableHead>
               <TableHead 
-                className="sticky top-0 px-6 py-3 text-left text-xs font-medium text-[#65758b] bg-[#f3f4f6] font-poppins uppercase tracking-wider cursor-pointer hover:bg-gray-200 select-none"
+                className="cursor-pointer hover:bg-gray-50 select-none"
                 onClick={() => handleSort('type')}
               >
                 <div className="flex items-center gap-2">
@@ -189,7 +189,7 @@ const TransactionsTable = React.memo(function TransactionsTable({
                 </div>
               </TableHead>
               <TableHead 
-                className="sticky top-0 px-6 py-3 text-left text-xs font-medium text-[#65758b] bg-[#f3f4f6] font-poppins uppercase tracking-wider cursor-pointer hover:bg-gray-200 select-none"
+                className="cursor-pointer hover:bg-gray-50 select-none"
                 onClick={() => handleSort('category')}
               >
                 <div className="flex items-center gap-2">
@@ -199,7 +199,7 @@ const TransactionsTable = React.memo(function TransactionsTable({
               </TableHead>
               <TableHead>Lid</TableHead>
               <TableHead 
-                className="cursor-pointer select-none hover:bg-gray-100 dark:hover:bg-gray-800 text-right"
+                className="cursor-pointer hover:bg-gray-50 select-none text-right"
                 onClick={() => handleSort('amount')}
               >
                 <div className="flex items-center justify-end gap-2">
@@ -209,7 +209,7 @@ const TransactionsTable = React.memo(function TransactionsTable({
               </TableHead>
               <TableHead>Methode</TableHead>
               <TableHead>Omschrijving</TableHead>
-              <TableHead className="sticky top-0 w-[50px] px-6 py-3 text-right text-xs font-medium text-[#65758b] bg-[#f3f4f6] font-poppins uppercase tracking-wider">Acties</TableHead>
+              <TableHead className="text-right">Acties</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

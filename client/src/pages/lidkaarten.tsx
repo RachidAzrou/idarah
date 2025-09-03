@@ -213,6 +213,59 @@ export default function LidkaartenPage() {
   };
 
 
+  const handleDownloadCard = async (member: Member, cardMeta: CardMeta) => {
+    try {
+      // Create a temporary container for the card
+      const cardContainer = document.createElement('div');
+      cardContainer.style.position = 'fixed';
+      cardContainer.style.top = '-9999px';
+      cardContainer.style.left = '-9999px';
+      cardContainer.style.width = '800px';
+      cardContainer.style.height = '500px';
+      document.body.appendChild(cardContainer);
+
+      // Import html2canvas dynamically
+      const html2canvas = (await import('html2canvas')).default;
+      
+      // Find the actual card element
+      const cardElement = document.querySelector('[data-testid="live-card"]') as HTMLElement;
+      if (!cardElement) {
+        throw new Error('Kaart element niet gevonden');
+      }
+
+      // Take screenshot of the card
+      const canvas = await html2canvas(cardElement, {
+        backgroundColor: null,
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+      });
+
+      // Clean up
+      document.body.removeChild(cardContainer);
+
+      // Create download link
+      const link = document.createElement('a');
+      link.download = `lidkaart-${member.firstName}-${member.lastName}-${member.memberNumber}.png`;
+      link.href = canvas.toDataURL('image/png');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      toast({ 
+        title: "Download voltooid", 
+        description: `Lidkaart van ${member.firstName} ${member.lastName} is gedownload.` 
+      });
+    } catch (error) {
+      console.error('Download fout:', error);
+      toast({ 
+        title: "Download mislukt", 
+        description: "Er ging iets fout bij het downloaden van de kaart.", 
+        variant: "destructive" 
+      });
+    }
+  };
+
   const handleExport = () => {
     // TODO: Implement export functionality
     toast({ title: "Export", description: "Export functionaliteit wordt binnenkort toegevoegd." });
@@ -484,7 +537,7 @@ export default function LidkaartenPage() {
                 </Button>
                 
                 <Button
-                  onClick={() => toast({ title: "Download", description: "Download functionaliteit wordt binnenkort toegevoegd." })}
+                  onClick={() => handleDownloadCard(previewCard.member, previewCard.cardMeta!)}
                   variant="outline"
                   className="gap-2"
                 >

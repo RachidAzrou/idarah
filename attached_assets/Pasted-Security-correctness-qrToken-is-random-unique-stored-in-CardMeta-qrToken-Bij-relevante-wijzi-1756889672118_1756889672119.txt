@@ -1,0 +1,164 @@
+Security & correctness
+
+qrToken is random & unique; stored in CardMeta.qrToken.
+
+Bij relevante wijzigingen (betaling/status/regels/branding) roteren jullie reeds qrToken en/of etag → oude QR’s worden ongeldig.
+
+Endpoint is public maar rate-limited (basic in-memory limiter).
+
+Tenant-scoping via qrToken → resolve tenantId from the card meta (no session needed).
+
+Return 404 voor onbestaand/ingetrokken token; 410 (Gone) als expliciet ongeldig verklaard.
+
+Caching & headers
+
+API: Cache-Control: no-store (status moet live zijn).
+
+Page: SSR met korte revalidate (bv. revalidate: 5) en client-side refetch op focus.
+
+Add ETag header met etag wanneer nuttig.
+
+A11y & locale
+
+Labels in Nederlands (België), datum dd-mm-jjjj.
+
+Icon-only knoppen hebben aria-label.
+
+High contrast badges (AA).
+
+Respect prefers-reduced-motion.
+
+Visual (keep simple; Replit may style)
+
+Gebruik bestaande CardCanvas achtergrond als beschikbaar (donkerblauw spotlight).
+
+Toon grote statusbadge bovenaan, daarna kerngegevens in twee kolommen (labels/waarden).
+
+Toon logo van tenant compact rechtsboven.
+
+1) Data access (Prisma)
+
+Assume these models exist per your schema (simplified):
+
+CardMeta { memberId, qrToken, secureToken, status, validUntil, etag, tenantId }
+
+Member { id, tenantId, firstName, lastName, memberNumber, category, active }
+
+RuleOutcome (optioneel voor eligibleToVote)
+
+Tenant { id, name, logoUrl }
+
+MembershipFee (optional if you compute “actueel/verlopen” elsewhere)
+
+Status logic (server):
+
+ACTUEEL wanneer:
+
+kaartstatus in CardMeta.status == ACTUEEL en lid is actief en (optioneel) financieel in orde (bv. laatste fee voor huidige periode is PAID).
+
+NIET_ACTUEEL wanneer de kaart niet live te verifiëren is (offline/not fresh) of CardMeta.status != ACTUEEL maar lid niet expliciet verlopen is.
+
+VERLOPEN wanneer lidmaatschap verlopen is (bv. Member.active=false of validUntil in verleden t.o.v. Europe/Brussels).
+
+2) API route
+
+Create app/api/card/verify/[qrToken]/route.ts:
+
+Validate qrToken (string, length/range).
+
+Lookup CardMeta by qrToken → join Member & Tenant.
+
+Compute status, validUntil (dd-mm-jjjj), eligibleToVote (via latest RuleOutcome if present, else false).
+
+Return JSON as above.
+
+Errors:
+
+Not found → 404 { error: "Onbekende of ingetrokken code" }
+
+Gone (optional flag on CardMeta) → 410 { error: "Code is niet meer geldig" }
+
+Headers:
+
+Cache-Control: no-store
+
+Content-Type: application/json; charset=utf-8
+
+(Optional) ETag: <etag>
+
+Add a very small rate-limit per IP (e.g., 30 req/min) using an in-memory map (it’s fine for MVP).
+
+3) Public page
+
+Create app/card/verify/[qrToken]/page.tsx:
+
+Server Component: fetch initial JSON from the API (internal call) for SSR.
+
+Render a VerificationView client component:
+
+Props: the fetched payload + qrToken
+
+On visibilitychange or window.focus, refetch the API to reflect latest status.
+
+Layout:
+
+Optional CardCanvas background wrapper (if you already have it).
+
+Header row with:
+
+Left: Titel “Lidkaart verificatie” + statusbadge (kleur volgens status).
+
+Right: tenant logo (if present).
+
+Details panel:
+
+Naam, Lidnummer, Categorie
+
+Geldig tot (indien aanwezig)
+
+(optioneel) Stemgerechtigd (ja/nee)
+
+Metadata (klein): Laatst geverifieerd: 14:05 (Europe/Brussels), v{etag}.
+
+Empty/error states:
+
+404 → nette melding: “Code onbekend of ingetrokken”.
+
+410 → “Deze QR-code is niet meer geldig. Vraag een nieuwe kaart aan.”
+
+Generic → “Er ging iets mis. Probeer opnieuw.”
+
+4) Utilities
+
+lib/time/be.ts
+
+beNow() (Date in Europe/Brussels)
+
+formatBe(date, 'dd-MM-yyyy') & time HH:mm
+
+lib/status/card.ts
+
+deriveCardStatus({ cardMeta, member, latestFee? }): 'ACTUEEL'|'NIET_ACTUEEL'|'VERLOPEN'
+
+5) Optional: deep-link to app card
+
+Toon (kleine) link “Open digitale lidkaart” naar /card/[memberId] alleen als de viewer geautoriseerd is (niet in publieke context).
+In een echte publieke flow laat je dit weg.
+
+6) Acceptance criteria
+
+Scanning the QR on the card opens /card/verify/[qrToken] (public, no login).
+
+Page shows status, naam, lidnummer, categorie, en geldig tot (indien bekend), plus (optioneel) stemrecht en tenantlogo.
+
+JSON API is available at /api/card/verify/[qrToken], with no-store and simple rate-limit.
+
+Status updates reflect on refocus (no hard refresh needed).
+
+Privacy-minimal (geen e-mail/adres/telefoon).
+
+NL-BE labels, dd-mm-jjjj, AA contrast, accessible labels.
+
+TypeScript-strict, Zod-validated inputs.
+
+Generate all code files now (API route, page, small services/utils, minimal rate-limiter). Keep UI styling basic; Replit can enhance the visuals. Use safe defaults and production-friendly error handling.

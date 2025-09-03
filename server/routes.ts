@@ -195,7 +195,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/members/check-duplicates", authMiddleware, tenantMiddleware, async (req, res) => {
     try {
       const memberData = req.body;
+      console.log("🔍 DUPLICATE CHECK - Tenant:", req.tenantId, "Member:", JSON.stringify({
+        memberNumber: memberData.memberNumber,
+        firstName: memberData.firstName,
+        lastName: memberData.lastName
+      }));
+      
       const duplicateCheck = await memberService.checkForDuplicates(req.tenantId!, memberData);
+      
+      console.log("🔍 DUPLICATE RESULT:", JSON.stringify(duplicateCheck));
       res.json(duplicateCheck);
     } catch (error) {
       console.error("Error checking duplicates:", error);

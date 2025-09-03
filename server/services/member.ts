@@ -37,13 +37,18 @@ class MemberService {
   async checkForDuplicates(tenantId: string, memberData: CreateMemberData & { memberNumber?: string }): Promise<DuplicateCheckResult> {
     const result: DuplicateCheckResult = { hasDuplicates: false };
 
+    console.log("🔍 SERVICE - Checking duplicates for tenant:", tenantId, "memberNumber:", memberData.memberNumber);
+
     // Check for duplicate member number if provided
     if (memberData.memberNumber) {
       const existingByNumber = await storage.getMemberByNumber(tenantId, memberData.memberNumber);
+      console.log("🔍 SERVICE - Found existing member:", existingByNumber ? `ID: ${existingByNumber.id}, Number: ${existingByNumber.memberNumber}` : "NONE");
+      
       if (existingByNumber) {
         result.hasDuplicates = true;
         result.duplicateNumber = existingByNumber;
         result.suggestedNumber = await storage.getNextAvailableMemberNumber(tenantId, memberData.memberNumber);
+        console.log("🔍 SERVICE - DUPLICATE DETECTED! Suggested number:", result.suggestedNumber);
       }
     }
 

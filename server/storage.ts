@@ -223,9 +223,16 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getMemberByNumber(tenantId: string, memberNumber: string): Promise<Member | undefined> {
+    // Normaliseer lidnummer naar 4-cijferige format (0007)
+    const normalizedNumber = memberNumber.padStart(4, '0');
+    
+    console.log("🔍 STORAGE - Looking for member in tenant:", tenantId, "original number:", memberNumber, "normalized:", normalizedNumber);
+    
     const [member] = await db.select().from(members).where(
-      and(eq(members.tenantId, tenantId), eq(members.memberNumber, memberNumber))
+      and(eq(members.tenantId, tenantId), eq(members.memberNumber, normalizedNumber))
     );
+    
+    console.log("🔍 STORAGE - Found member:", member ? `ID: ${member.id}, Number: ${member.memberNumber}` : "NONE");
     return member || undefined;
   }
 

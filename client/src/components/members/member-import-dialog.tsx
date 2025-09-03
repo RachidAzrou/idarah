@@ -144,6 +144,160 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
     URL.revokeObjectURL(url);
   };
 
+  const downloadSyntaxGuide = () => {
+    const guideContent = `SYNTAX HANDLEIDING - LEDEN IMPORT
+==================================
+
+Deze handleiding legt uit welke waarden acceptabel zijn voor elk veld in de leden import.
+
+VERPLICHTE VELDEN (*)
+=====================
+
+Lidnummer*
+- Format: Tekst of nummer
+- Voorbeeld: 001, L-123, 2024-001
+- Moet uniek zijn
+
+Voornaam*
+- Format: Tekst
+- Voorbeeld: Ahmed, Fatima, Mohamed
+- Minimaal 2 karakters
+
+Achternaam*
+- Format: Tekst
+- Voorbeeld: Hassan, Al-Rashid, Van den Berg
+- Minimaal 2 karakters
+
+Geslacht*
+- Toegestane waarden: M, V
+- M = Man, V = Vrouw
+- Hoofdlettergevoelig
+
+Geboortedatum*
+- Format: DD/MM/YYYY
+- Voorbeeld: 15/03/1980, 01/12/1995
+- Moet geldige datum zijn
+
+Categorie*
+- Toegestane waarden: STUDENT, STANDAARD, SENIOR
+- STUDENT = Voor studenten (vaak met korting)
+- STANDAARD = Regulier lidmaatschap
+- SENIOR = Voor senioren (vaak 65+)
+
+Straat*
+- Format: Tekst
+- Voorbeeld: Kerkstraat, Avenue Louise
+- Minimaal 2 karakters
+
+Nummer*
+- Format: Tekst/nummer
+- Voorbeeld: 25, 12A, 100 bus 3
+- Mag niet leeg zijn
+
+Postcode*
+- Format: 4 cijfers (België)
+- Voorbeeld: 1000, 2000, 3000
+
+Stad*
+- Format: Tekst
+- Voorbeeld: Brussel, Antwerpen, Gent
+- Minimaal 2 karakters
+
+Land*
+- Format: Tekst
+- Voorbeeld: België, Nederland, Frankrijk
+- Minimaal 2 karakters
+
+Betaalmethode*
+- Toegestane waarden: SEPA, OVERSCHRIJVING, BANCONTACT, CASH
+- SEPA = Automatische incasso (vereist IBAN)
+- OVERSCHRIJVING = Handmatige bankoverschrijving
+- BANCONTACT = Bancontact betaling
+- CASH = Contante betaling
+
+Betalingsperiode*
+- Toegestane waarden: MONTHLY, YEARLY
+- MONTHLY = Maandelijkse betaling
+- YEARLY = Jaarlijkse betaling
+
+Privacy akkoord*
+- Toegestane waarden: JA
+- Moet altijd JA zijn (verplicht)
+
+OPTIONELE VELDEN
+================
+
+E-mail
+- Format: geldig e-mailadres
+- Voorbeeld: naam@voorbeeld.com
+- Mag leeg blijven
+
+Telefoon
+- Format: telefoonnummer
+- Voorbeeld: +32123456789, 0123456789
+- Mag leeg blijven
+
+IBAN
+- Format: Belgisch IBAN
+- Voorbeeld: BE68539007547034
+- Verplicht voor SEPA betalingen
+- Mag leeg voor CASH betalingen
+
+Actief rol interesse
+- Toegestane waarden: JA, NEE
+- JA = Interesse in actieve rol
+- NEE = Geen interesse
+- Standaard: NEE
+
+Rol beschrijving
+- Format: Tekst
+- Voorbeeld: Vrijwilliger evenementen
+- Alleen relevant als "Actief rol interesse" = JA
+
+Stemgerechtigd
+- Toegestane waarden: JA, NEE
+- JA = Lid is stemgerechtigd
+- NEE = Lid is niet stemgerechtigd
+- Standaard: NEE
+
+Foto/video toestemming
+- Toegestane waarden: JA, NEE
+- JA = Toestemming gegeven
+- NEE = Geen toestemming
+- Standaard: NEE
+
+Nieuwsbrief
+- Toegestane waarden: JA, NEE
+- JA = Aangemeld voor nieuwsbrief
+- NEE = Niet aangemeld
+- Standaard: NEE
+
+WhatsApp lijst
+- Toegestane waarden: JA, NEE
+- JA = Toegevoegd aan WhatsApp lijst
+- NEE = Niet toegevoegd
+- Standaard: NEE
+
+BELANGRIJKE OPMERKINGEN
+=======================
+
+1. Alle JA/NEE waarden zijn hoofdlettergevoelig
+2. Datums moeten exact DD/MM/YYYY format hebben
+3. Lege velden voor optionele kolommen zijn toegestaan
+4. IBAN is verplicht voor SEPA betalingen
+5. Lidnummers moeten uniek zijn binnen de organisatie
+6. Bij duplicaten krijgt het nieuwe lid automatisch een uniek nummer
+
+VOORBEELD RIJ
+=============
+001,Ahmed,Hassan,M,15/03/1980,STANDAARD,ahmed@email.com,+32123456789,Kerkstraat,25,1000,Brussel,België,SEPA,BE68539007547034,MONTHLY,NEE,,NEE,JA,JA,JA,NEE
+
+Voor meer hulp: raadpleeg de Excel template met voorbeelden.`;
+
+    const blob = new Blob([guideContent], { type: 'text/plain;charset=utf-8' });
+    saveAs(blob, 'syntax-handleiding-leden-import.txt');
+  };
+
   const downloadExcelTemplate = () => {
     // Voorbeelddata voor Excel template
     const exampleData = [
@@ -603,9 +757,9 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
                     <FileSpreadsheet className="h-4 w-4" />
                     Excel Template
                   </Button>
-                  <Button onClick={() => downloadFieldGuide()} variant="outline" className="gap-2">
+                  <Button onClick={() => downloadSyntaxGuide()} variant="outline" className="gap-2">
                     <MdDownloading className="h-4 w-4" />
-                    Veld Handleiding
+                    Syntax Handleiding
                   </Button>
                 </div>
               </div>

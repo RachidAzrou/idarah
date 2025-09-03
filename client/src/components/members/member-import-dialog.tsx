@@ -730,7 +730,6 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
               // Show duplicate confirmation
               <div className="space-y-4">
                 <div>
-                  <h3 className="text-lg font-semibold text-red-600">Duplicates Gedetecteerd</h3>
                   <p className="text-sm text-gray-600">
                     Er zijn {duplicateCheckResults.length} duplicates gevonden. Controleer de onderstaande lijst.
                   </p>

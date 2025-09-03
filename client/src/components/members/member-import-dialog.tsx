@@ -414,10 +414,10 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
         member.financialSettings.paymentTerm = paymentTerm;
       }
 
-      // Organization fields
+      // Organization/Permission fields
       const roleInterest = row['Actief rol interesse']?.toUpperCase();
-      member.organization.interestedInActiveRole = roleInterest === 'JA';
-      member.organization.roleDescription = row['Rol beschrijving'] || '';
+      member.permissions.interestedInActiveRole = roleInterest === 'JA';
+      member.permissions.roleDescription = row['Rol beschrijving'] || '';
 
       // Permissions
       const privacyAgreement = row['Privacy akkoord*']?.toUpperCase();
@@ -443,7 +443,36 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
       // Only add to valid members if no errors for this row
       const rowErrors = errors.filter(e => e.row === index + 1);
       if (rowErrors.length === 0) {
-        validMembers.push(member);
+        // Restructure member object to match expected API format
+        const structuredMember = {
+          memberNumber: member.memberNumber,
+          firstName: member.firstName,
+          lastName: member.lastName,
+          gender: member.gender,
+          birthDate: member.birthDate,
+          category: member.category,
+          email: member.email || "",
+          phone: member.phone || "",
+          street: member.street,
+          number: member.number,
+          postalCode: member.postalCode,
+          city: member.city,
+          country: member.country,
+          financialSettings: {
+            paymentMethod: member.financialSettings.paymentMethod,
+            paymentTerm: member.financialSettings.paymentTerm,
+            iban: member.financialSettings.iban || "",
+          },
+          permissions: {
+            privacyAgreement: member.permissions.privacyAgreement,
+            photoVideoConsent: member.permissions.photoVideoConsent,
+            newsletterSubscription: member.permissions.newsletterSubscription,
+            whatsappList: member.permissions.whatsappList,
+            interestedInActiveRole: member.permissions.interestedInActiveRole,
+            roleDescription: member.permissions.roleDescription || "",
+          }
+        };
+        validMembers.push(structuredMember);
       }
     });
 

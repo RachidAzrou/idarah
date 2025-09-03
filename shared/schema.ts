@@ -92,6 +92,17 @@ export const memberFinancialSettings = pgTable("member_financial_settings", {
   iban: text("iban"),
 });
 
+export const memberPermissions = pgTable("member_permissions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  memberId: varchar("member_id").notNull().unique(),
+  privacyAgreement: boolean("privacy_agreement").default(false).notNull(),
+  photoVideoConsent: boolean("photo_video_consent").default(false).notNull(),
+  newsletterSubscription: boolean("newsletter_subscription").default(false).notNull(),
+  whatsappList: boolean("whatsapp_list").default(false).notNull(),
+  interestedInActiveRole: boolean("interested_in_active_role").default(false).notNull(),
+  roleDescription: text("role_description"),
+});
+
 export const mandates = pgTable("mandates", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   tenantId: varchar("tenant_id").notNull(),
@@ -242,7 +253,14 @@ export const membersRelations = relations(members, ({ one, many }) => ({
     fields: [members.tenantId],
     references: [tenants.id],
   }),
-  finSettings: one(memberFinancialSettings),
+  financialSettings: one(memberFinancialSettings, {
+    fields: [members.id],
+    references: [memberFinancialSettings.memberId],
+  }),
+  permissions: one(memberPermissions, {
+    fields: [members.id],
+    references: [memberPermissions.memberId],
+  }),
   card: one(cardMeta),
   fees: many(membershipFees),
   mandates: many(mandates),
@@ -253,6 +271,13 @@ export const membersRelations = relations(members, ({ one, many }) => ({
 export const memberFinancialSettingsRelations = relations(memberFinancialSettings, ({ one }) => ({
   member: one(members, {
     fields: [memberFinancialSettings.memberId],
+    references: [members.id],
+  }),
+}));
+
+export const memberPermissionsRelations = relations(memberPermissions, ({ one }) => ({
+  member: one(members, {
+    fields: [memberPermissions.memberId],
     references: [members.id],
   }),
 }));

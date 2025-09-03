@@ -3,6 +3,7 @@ import {
   users, 
   members, 
   memberFinancialSettings,
+  memberPermissions,
   mandates,
   membershipFees,
   transactions,
@@ -16,6 +17,8 @@ import {
   type Tenant,
   type User,
   type Member,
+  type MemberFinancialSettings,
+  type MemberPermissions,
   type MembershipFee,
   type Transaction,
   type Rule,
@@ -28,6 +31,8 @@ import {
   type InsertTenant,
   type InsertUser,
   type InsertMember,
+  type InsertMemberFinancialSettings,
+  type InsertMemberPermissions,
   type InsertMembershipFee,
   type InsertTransaction,
   type InsertRule,
@@ -64,6 +69,16 @@ export interface IStorage {
   createMember(member: InsertMember): Promise<Member>;
   updateMember(id: string, member: Partial<InsertMember>): Promise<Member>;
   deleteMember(id: string): Promise<void>;
+  
+  // Member Financial Settings
+  getMemberFinancialSettings(memberId: string): Promise<MemberFinancialSettings | undefined>;
+  createMemberFinancialSettings(settings: InsertMemberFinancialSettings): Promise<MemberFinancialSettings>;
+  updateMemberFinancialSettings(memberId: string, settings: Partial<InsertMemberFinancialSettings>): Promise<MemberFinancialSettings>;
+  
+  // Member Permissions
+  getMemberPermissions(memberId: string): Promise<MemberPermissions | undefined>;
+  createMemberPermissions(permissions: InsertMemberPermissions): Promise<MemberPermissions>;
+  updateMemberPermissions(memberId: string, permissions: Partial<InsertMemberPermissions>): Promise<MemberPermissions>;
 
   // Membership Fees
   getMembershipFee(id: string): Promise<MembershipFee | undefined>;
@@ -234,6 +249,38 @@ export class DatabaseStorage implements IStorage {
       cache.deletePattern(`members:tenant:${member.tenantId}`);
       cache.deletePattern(`dashboard:stats:${member.tenantId}`);
     }
+  }
+
+  // Member Financial Settings
+  async getMemberFinancialSettings(memberId: string): Promise<MemberFinancialSettings | undefined> {
+    const [settings] = await db.select().from(memberFinancialSettings).where(eq(memberFinancialSettings.memberId, memberId));
+    return settings || undefined;
+  }
+
+  async createMemberFinancialSettings(settings: InsertMemberFinancialSettings): Promise<MemberFinancialSettings> {
+    const [newSettings] = await db.insert(memberFinancialSettings).values(settings).returning();
+    return newSettings;
+  }
+
+  async updateMemberFinancialSettings(memberId: string, settings: Partial<InsertMemberFinancialSettings>): Promise<MemberFinancialSettings> {
+    const [updatedSettings] = await db.update(memberFinancialSettings).set(settings).where(eq(memberFinancialSettings.memberId, memberId)).returning();
+    return updatedSettings;
+  }
+
+  // Member Permissions
+  async getMemberPermissions(memberId: string): Promise<MemberPermissions | undefined> {
+    const [permissions] = await db.select().from(memberPermissions).where(eq(memberPermissions.memberId, memberId));
+    return permissions || undefined;
+  }
+
+  async createMemberPermissions(permissions: InsertMemberPermissions): Promise<MemberPermissions> {
+    const [newPermissions] = await db.insert(memberPermissions).values(permissions).returning();
+    return newPermissions;
+  }
+
+  async updateMemberPermissions(memberId: string, permissions: Partial<InsertMemberPermissions>): Promise<MemberPermissions> {
+    const [updatedPermissions] = await db.update(memberPermissions).set(permissions).where(eq(memberPermissions.memberId, memberId)).returning();
+    return updatedPermissions;
   }
 
   // Membership Fees

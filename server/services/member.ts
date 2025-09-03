@@ -42,8 +42,18 @@ class MemberService {
 
       // Create financial settings if provided
       if (memberData.financialSettings) {
-        // In a real implementation, you'd create the financial settings record
-        // For now, we'll just store it as the schema is already set up
+        await storage.createMemberFinancialSettings({
+          memberId: member.id,
+          ...memberData.financialSettings,
+        });
+      }
+
+      // Create permissions if provided
+      if (memberData.permissions) {
+        await storage.createMemberPermissions({
+          memberId: member.id,
+          ...memberData.permissions,
+        });
       }
 
       // Generate initial membership fee

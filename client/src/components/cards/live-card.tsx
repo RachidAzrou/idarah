@@ -119,7 +119,7 @@ export function LiveCard({
   useEffect(() => {
     if (isRefreshing) {
       setIsFlipping(true);
-      setTimeout(() => setIsFlipping(false), 800);
+      setTimeout(() => setIsFlipping(false), 400);
     }
   }, [isRefreshing]);
 
@@ -131,7 +131,7 @@ export function LiveCard({
     setTimeout(() => {
       setIsFlipping(false);
       console.log('Flip animation ended');
-    }, 800);
+    }, 400);
     
     if (onRefresh) {
       onRefresh();

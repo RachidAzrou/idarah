@@ -78,7 +78,7 @@ export function CardPage() {
     setTimeout(() => {
       setIsFlipping(false);
       console.log('PWA flip animation ended');
-    }, 800);
+    }, 400);
     refetch();
   };
 

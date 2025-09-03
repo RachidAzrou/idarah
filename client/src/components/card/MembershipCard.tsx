@@ -111,7 +111,7 @@ export function MembershipCard({
       setTimeout(() => {
         setIsFlipping(false);
         console.log('PWA Card: Flip animation ended');
-      }, 800);
+      }, 400);
     }
   }, [isRefreshing]);
 

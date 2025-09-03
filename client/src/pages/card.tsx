@@ -82,6 +82,20 @@ export function CardPage() {
     refetch();
   };
 
+  // Update document title when card data loads
+  useEffect(() => {
+    if (data) {
+      document.title = `Lidkaart ${data.firstName} ${data.lastName}`;
+    } else {
+      document.title = 'Lidkaart';
+    }
+    
+    // Cleanup - reset title when component unmounts
+    return () => {
+      document.title = 'Ledenbeheer';
+    };
+  }, [data]);
+
   if (!params?.memberId) {
     return (
       <CardCanvas>

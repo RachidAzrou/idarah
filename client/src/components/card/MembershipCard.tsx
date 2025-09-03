@@ -185,8 +185,8 @@ export function MembershipCard({
             </div>
           </div>
 
-          {/* QR Code - Center-right aligned */}
-          <div className="flex justify-center mb-6">
+          {/* QR Code - Left aligned with margin */}
+          <div className="flex justify-start mb-6 ml-4">
             <button
               onClick={() => setShowQRModal(true)}
               className="debossed-qr-container transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/50 hover:scale-105"

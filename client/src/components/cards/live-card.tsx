@@ -87,6 +87,7 @@ export function LiveCard({
   const [showQRModal, setShowQRModal] = useState(false);
   const [showGloss, setShowGloss] = useState(false);
   const [isInstallable, setIsInstallable] = useState(false);
+  const [isFlipping, setIsFlipping] = useState(false);
 
   // Check for PWA installability and reduced motion
   useEffect(() => {
@@ -112,12 +113,18 @@ export function LiveCard({
   // Determine primary color with fallback
   const primaryColor = tenant.primaryColor || '#bb2e2e';
 
+  // Trigger flip animation when refreshing state changes
+  useEffect(() => {
+    if (isRefreshing) {
+      setIsFlipping(true);
+      setTimeout(() => setIsFlipping(false), 800);
+    }
+  }, [isRefreshing]);
+
   // Handle refresh with animation
   const handleRefresh = () => {
     if (onRefresh) {
-      setShowGloss(true);
       onRefresh();
-      setTimeout(() => setShowGloss(false), 800);
     }
   };
 
@@ -147,7 +154,10 @@ export function LiveCard({
       {/* Live Card - Credit card aspect ratio */}
       <div className="w-[min(92vw,70vh*1.586)] sm:w-[min(94vw,94vh*1.586)] lg:w-[clamp(540px,70vmin,860px)] aspect-[1586/1000]">
         <div 
-          className="card-gradient relative w-full h-full rounded-3xl overflow-hidden border border-white/10 card-font"
+          className={cn(
+            "card-gradient relative w-full h-full rounded-3xl overflow-hidden border border-white/10 card-font transition-transform duration-800",
+            isFlipping && "animate-flip-horizontal"
+          )}
           style={{
             boxShadow: `
               0 0 0 1px rgba(255,255,255,0.1) inset,

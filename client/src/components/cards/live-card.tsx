@@ -346,10 +346,10 @@ export function LiveCard({
           {/* Bottom right: Valid until */}
           <div className="absolute bottom-4 right-4">
             <div className="flex items-center gap-2">
-              <span className="embossed-text text-[clamp(10px,1.4vmin,12px)] uppercase tracking-wide opacity-70 font-medium">
+              <span className="embossed-text text-[clamp(7px,1.0vmin,9px)] uppercase tracking-wide opacity-70 font-medium">
                 GELDIG TOT
               </span>
-              <span className="embossed-text text-[clamp(10px,1.4vmin,12px)] font-medium font-mono tabular-nums">
+              <span className="embossed-text text-[clamp(8px,1.1vmin,10px)] font-medium font-mono tabular-nums">
                 {cardMeta.validUntil ? format(cardMeta.validUntil, 'dd-MM-yyyy', { locale: nl }) : '31-12-2025'}
               </span>
             </div>

@@ -26,6 +26,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Member } from "@shared/schema";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { AlertTriangle } from "lucide-react";
 
 
 const memberSchema = z.object({
@@ -79,6 +81,9 @@ interface MemberFormProps {
 export function MemberForm({ member, onSuccess, onCancel }: MemberFormProps) {
   const [activeTab, setActiveTab] = useState("personal");
   const [isScanning, setIsScanning] = useState(false);
+  const [showDuplicateWarning, setShowDuplicateWarning] = useState(false);
+  const [duplicateInfo, setDuplicateInfo] = useState<any>(null);
+  const [pendingData, setPendingData] = useState<MemberFormData | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -178,6 +183,29 @@ export function MemberForm({ member, onSuccess, onCancel }: MemberFormProps) {
     }
   };
 
+  const checkDuplicatesMutation = useMutation({
+    mutationFn: async (data: MemberFormData) => {
+      // Generate a temporary member number for duplicate checking
+      const tempMemberNumber = Math.floor(Math.random() * 9999).toString().padStart(4, '0');
+      
+      const memberData = {
+        memberNumber: tempMemberNumber,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        birthDate: data.dateOfBirth ? data.dateOfBirth.toISOString() : undefined,
+        email: data.email || null,
+        phone: data.phone || null,
+        street: data.street,
+        number: data.number,
+        postalCode: data.postalCode,
+        city: data.city,
+      };
+      
+      const response = await apiRequest('POST', '/api/members/check-duplicates', memberData);
+      return response.json();
+    },
+  });
+
   const createMemberMutation = useMutation({
     mutationFn: async (data: MemberFormData) => {
       // Transform data for backend compatibility
@@ -260,7 +288,39 @@ export function MemberForm({ member, onSuccess, onCancel }: MemberFormProps) {
       return;
     }
     
+    // For new members, check for duplicates first
+    if (!member) {
+      setPendingData(data);
+      try {
+        const duplicateCheck = await checkDuplicatesMutation.mutateAsync(data);
+        
+        if (duplicateCheck.hasDuplicates) {
+          // Show duplicate warning
+          setDuplicateInfo(duplicateCheck);
+          setShowDuplicateWarning(true);
+          return;
+        }
+      } catch (error) {
+        console.error('Duplicate check failed:', error);
+      }
+    }
+    
     createMemberMutation.mutate(data);
+  };
+
+  const handleConfirmDuplicate = () => {
+    if (pendingData) {
+      setShowDuplicateWarning(false);
+      createMemberMutation.mutate(pendingData);
+      setPendingData(null);
+      setDuplicateInfo(null);
+    }
+  };
+
+  const handleCancelDuplicate = () => {
+    setShowDuplicateWarning(false);
+    setPendingData(null);
+    setDuplicateInfo(null);
   };
 
   // Mock EID scan functionaliteit - in productie zou dit een echte EID reader library gebruiken
@@ -862,6 +922,55 @@ export function MemberForm({ member, onSuccess, onCancel }: MemberFormProps) {
             </div>
           </form>
         </Form>
+
+        {/* Duplicate Warning Dialog */}
+        <Dialog open={showDuplicateWarning} onOpenChange={setShowDuplicateWarning}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-amber-800">
+                <AlertTriangle className="h-5 w-5" />
+                Mogelijk dubbel lid gedetecteerd
+              </DialogTitle>
+            </DialogHeader>
+            
+            <div className="space-y-4">
+              {duplicateInfo?.duplicates?.map((duplicate: any, index: number) => (
+                <div key={index} className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                  <p className="text-sm text-amber-800">
+                    <strong>Een lid met soortgelijke gegevens bestaat al:</strong>
+                  </p>
+                  <div className="mt-2 text-sm text-gray-700">
+                    <p>• Naam: {duplicate.existingMember.firstName} {duplicate.existingMember.lastName}</p>
+                    <p>• Lidnummer: {duplicate.existingMember.memberNumber}</p>
+                    {duplicate.existingMember.email && (
+                      <p>• E-mail: {duplicate.existingMember.email}</p>
+                    )}
+                  </div>
+                </div>
+              ))}
+              
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p className="text-sm text-blue-800">
+                  <strong>Wat gebeurt er:</strong>
+                  <br />• Het nieuwe lid krijgt automatisch een uniek lidnummer
+                  <br />• Alle andere gegevens blijven zoals ingevuld
+                </p>
+              </div>
+            </div>
+
+            <DialogFooter>
+              <Button variant="outline" onClick={handleCancelDuplicate}>
+                Annuleren
+              </Button>
+              <Button 
+                onClick={handleConfirmDuplicate}
+                className="bg-amber-600 hover:bg-amber-700"
+              >
+                Toch aanmaken
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
     </div>
   );
 }

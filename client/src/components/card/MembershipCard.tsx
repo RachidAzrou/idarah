@@ -211,27 +211,27 @@ export function MembershipCard({
             {/* Voting Rights Badge - Right side */}
             {(cardData.badges.includes("Stemgerechtigd") || true) && (
               <div className="flex flex-col items-center mr-8">
-                {/* Embossed Dark Gold Icon */}
+                {/* Embossed Gold Icon */}
                 <GoVerified 
                   className={`${isConstrained ? 'w-12 h-12' : 'w-16 h-16'}`}
                   data-testid="voting-icon"
                   style={{
-                    color: '#B8860B',
+                    color: '#FFD700',
                     textShadow: `
-                      1px 1px 0 #D4AF37,
+                      1px 1px 0 #FFF8DC,
                       2px 2px 3px rgba(0,0,0,0.4)
                     `,
                     filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.3))'
                   }}
                 />
                 
-                {/* Embossed Dark Gold Text */}
+                {/* Embossed Gold Text */}
                 <span 
                   className={`${isConstrained ? 'text-xs' : 'text-sm'} uppercase tracking-[0.1em] font-bold mt-3`}
                   style={{
-                    color: '#B8860B',
+                    color: '#FFD700',
                     textShadow: `
-                      1px 1px 0 #D4AF37,
+                      1px 1px 0 #FFF8DC,
                       2px 2px 3px rgba(0,0,0,0.3)
                     `,
                     filter: 'drop-shadow(1px 1px 1px rgba(0,0,0,0.2))'

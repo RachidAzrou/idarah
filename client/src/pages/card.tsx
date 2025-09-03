@@ -122,10 +122,30 @@ export function CardPage() {
 
   return (
     <CardCanvas>
+      {/* Refresh Button - Top Right */}
+      {displayData && (
+        <button
+          onClick={handleRefresh}
+          disabled={isLoading}
+          className="fixed top-6 right-6 z-50 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full p-3 text-white transition-all"
+          data-testid="refresh-button-top"
+          aria-label="Ververs kaart"
+        >
+          <svg 
+            className={`w-6 h-6 ${isLoading ? 'animate-spin' : ''}`} 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+        </button>
+      )}
+
       {/* Offline Banner */}
       {(isOffline || error) && (
         <div 
-          className="fixed top-4 left-4 right-4 bg-orange-500 text-white px-4 py-3 rounded-lg shadow-lg z-50 text-center"
+          className="fixed top-6 left-6 right-6 bg-orange-500 text-white px-4 py-3 rounded-lg shadow-lg z-50 text-center"
           data-testid="offline-banner"
         >
           <span className="text-sm font-medium">
@@ -134,8 +154,8 @@ export function CardPage() {
         </div>
       )}
       
-      {displayData ? (
-        <AspectBox>
+      <AspectBox>
+        {displayData ? (
           <MembershipCard
             cardData={displayData}
             onRefresh={handleRefresh}
@@ -143,17 +163,15 @@ export function CardPage() {
             isOffline={isOffline || !!error}
             className="w-full h-full"
           />
-        </AspectBox>
-      ) : (
-        <AspectBox>
+        ) : (
           <div className="w-full h-full rounded-3xl bg-gray-800 flex items-center justify-center text-white">
             <div className="text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-4"></div>
               <p>Lidkaart laden...</p>
             </div>
           </div>
-        </AspectBox>
-      )}
+        )}
+      </AspectBox>
       
       <InstallCoach 
         isOpen={installCoach.isOpen} 

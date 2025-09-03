@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -102,14 +102,13 @@ export function MembershipCard({
   // Generate QR code URL for verification
   const qrCodeUrl = `${window.location.origin}/card/verify/${cardData.qrToken}`;
 
-  // Handle refresh with flip animation
-  const handleRefresh = () => {
-    if (onRefresh) {
+  // Trigger flip animation when refreshing state changes
+  useEffect(() => {
+    if (isRefreshing) {
       setIsFlipping(true);
-      onRefresh();
       setTimeout(() => setIsFlipping(false), 800);
     }
-  };
+  }, [isRefreshing]);
 
   // Determine card status - force to NIET_ACTUEEL if offline
   const displayStatus = isOffline ? 'NIET_ACTUEEL' : cardData.status;
@@ -161,19 +160,6 @@ export function MembershipCard({
             
             <div className="flex items-center gap-3">
               <StatusLED status={displayStatus} />
-              {onRefresh && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-6 w-6 text-white/60 hover:text-white hover:bg-white/10 rounded-full"
-                  onClick={handleRefresh}
-                  disabled={isRefreshing}
-                  data-testid="button-refresh"
-                  aria-label="Ververs kaart"
-                >
-                  <RefreshCw className={cn("h-3 w-3", isRefreshing && "animate-spin")} />
-                </Button>
-              )}
             </div>
           </div>
 

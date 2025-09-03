@@ -774,7 +774,11 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
                               <div className="font-medium mb-1">{result.member.firstName} {result.member.lastName}</div>
                               <div className="space-y-1 text-sm">
                                 {result.duplicateCheck.duplicateNumber && (
-                                  <div>• Lidnummer bestaat al: {result.duplicateCheck.duplicateNumber.memberNumber}</div>
+                                  <div>• Lidnummer bestaat al: {result.duplicateCheck.duplicateNumber.memberNumber} 
+                                    {result.duplicateCheck.duplicateNameAddress && (
+                                      <span className="text-gray-600"> (zou vervangen worden door nieuw uniek nummer)</span>
+                                    )}
+                                  </div>
                                 )}
                                 {result.duplicateCheck.duplicateNameAddress && (
                                   <div>• De persoon lijkt al te bestaan met dezelfde gegevens</div>

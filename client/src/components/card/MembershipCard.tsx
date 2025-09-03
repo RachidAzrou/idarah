@@ -199,7 +199,7 @@ export function MembershipCard({
                   value={qrCodeUrl}
                   size={70}
                   className="debossed-qr"
-                  fgColor="rgba(255,255,255,0.2)"
+                  fgColor="rgba(0,0,0,0.6)"
                   bgColor="transparent"
                 />
               </div>

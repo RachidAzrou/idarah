@@ -195,15 +195,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/members/check-duplicates", authMiddleware, tenantMiddleware, async (req, res) => {
     try {
       const memberData = req.body;
-      console.log("🔍 DUPLICATE CHECK - Tenant:", req.tenantId, "Member:", JSON.stringify({
-        memberNumber: memberData.memberNumber,
-        firstName: memberData.firstName,
-        lastName: memberData.lastName
-      }));
+      
+      // FORCE DEBUG: Kijk eerst wat er in de database staat
+      const allMembers = await storage.getMembersByTenant(req.tenantId!);
+      const memberNumbers = allMembers.map(m => m.memberNumber);
+      
+      console.log("🔍 TENANT:", req.tenantId);
+      console.log("🔍 EXISTING NUMBERS:", memberNumbers);
+      console.log("🔍 CHECKING FOR:", memberData.memberNumber);
+      console.log("🔍 NORMALIZED CHECK:", memberData.memberNumber ? memberData.memberNumber.padStart(4, '0') : 'NO NUMBER');
       
       const duplicateCheck = await memberService.checkForDuplicates(req.tenantId!, memberData);
       
-      console.log("🔍 DUPLICATE RESULT:", JSON.stringify(duplicateCheck));
+      console.log("🔍 RESULT:", duplicateCheck);
       res.json(duplicateCheck);
     } catch (error) {
       console.error("Error checking duplicates:", error);

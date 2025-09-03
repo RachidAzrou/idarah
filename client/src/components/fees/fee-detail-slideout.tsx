@@ -22,7 +22,7 @@ export function FeeDetailSlideout({ fee, open, onClose, onMarkPaid }: FeeDetailS
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-2xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Lidgeld Detail</DialogTitle>
           <DialogDescription>
@@ -32,15 +32,15 @@ export function FeeDetailSlideout({ fee, open, onClose, onMarkPaid }: FeeDetailS
 
         <div className="space-y-6">
           {/* Header Info */}
-          <div className="bg-gray-50 rounded-lg p-4">
+          <div className="bg-muted/50 rounded-lg p-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="font-mono text-sm text-gray-600">#{fee.memberNumber}</span>
+              <span className="font-mono text-sm text-muted-foreground">#{fee.memberNumber}</span>
               <StatusChip status={fee.status} />
             </div>
             <h3 className="font-semibold text-lg">
               {fee.memberLastName}, {fee.memberFirstName}
             </h3>
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               {formatPeriodBE(fee.periodStart, fee.periodEnd)}
             </p>
           </div>
@@ -53,21 +53,21 @@ export function FeeDetailSlideout({ fee, open, onClose, onMarkPaid }: FeeDetailS
             </h4>
             <div className="grid grid-cols-3 gap-6 text-sm">
               <div>
-                <span className="text-gray-500">Bedrag</span>
+                <span className="text-muted-foreground">Bedrag</span>
                 <p className="font-semibold text-lg">{formatCurrencyBE(fee.amount)}</p>
               </div>
               <div>
-                <span className="text-gray-500">Methode</span>
+                <span className="text-muted-foreground">Methode</span>
                 <div className="mt-1">
                   <MethodChip method={fee.method} />
                 </div>
               </div>
               <div>
-                <span className="text-gray-500">Vervaldatum</span>
+                <span className="text-muted-foreground">Vervaldatum</span>
                 <p className="font-medium">{formatDateBE(fee.dueDate)}</p>
               </div>
               <div>
-                <span className="text-gray-500">Categorie</span>
+                <span className="text-muted-foreground">Categorie</span>
                 <p className="font-medium">{fee.category}</p>
               </div>
             </div>
@@ -83,19 +83,19 @@ export function FeeDetailSlideout({ fee, open, onClose, onMarkPaid }: FeeDetailS
             </h4>
             <div className="grid grid-cols-2 gap-6 text-sm">
               <div>
-                <span className="text-gray-500">Naam</span>
+                <span className="text-muted-foreground">Naam</span>
                 <p className="font-medium">{fee.memberFirstName} {fee.memberLastName}</p>
               </div>
               <div>
-                <span className="text-gray-500">Lidnummer</span>
+                <span className="text-muted-foreground">Lidnummer</span>
                 <p className="font-mono">{fee.memberNumber}</p>
               </div>
               <div>
-                <span className="text-gray-500">E-mail</span>
+                <span className="text-muted-foreground">E-mail</span>
                 <p>{fee.memberEmail}</p>
               </div>
               <div>
-                <span className="text-gray-500">Telefoon</span>
+                <span className="text-muted-foreground">Telefoon</span>
                 <p>{fee.memberPhone}</p>
               </div>
             </div>
@@ -112,18 +112,18 @@ export function FeeDetailSlideout({ fee, open, onClose, onMarkPaid }: FeeDetailS
               </h4>
               <div className="space-y-3 text-sm">
                 <div>
-                  <span className="text-gray-500">Betaald op</span>
+                  <span className="text-muted-foreground">Betaald op</span>
                   <p className="font-medium">{formatDateBE(fee.paidAt)}</p>
                 </div>
                 {fee.transactionId && (
                   <div>
-                    <span className="text-gray-500">Transactie ID</span>
+                    <span className="text-muted-foreground">Transactie ID</span>
                     <p className="font-mono text-xs">{fee.transactionId}</p>
                   </div>
                 )}
                 {fee.reference && (
                   <div>
-                    <span className="text-gray-500">Referentie</span>
+                    <span className="text-muted-foreground">Referentie</span>
                     <p className="font-mono text-xs">{fee.reference}</p>
                   </div>
                 )}
@@ -140,7 +140,7 @@ export function FeeDetailSlideout({ fee, open, onClose, onMarkPaid }: FeeDetailS
                   <FileText className="h-4 w-4" />
                   Opmerkingen
                 </h4>
-                <div className="bg-gray-50 rounded-lg p-3">
+                <div className="bg-muted/50 rounded-lg p-3">
                   <p className="text-sm">{fee.notes}</p>
                 </div>
               </div>
@@ -148,7 +148,7 @@ export function FeeDetailSlideout({ fee, open, onClose, onMarkPaid }: FeeDetailS
           )}
 
           {/* Actions */}
-          <div className="pt-4 border-t">
+          <div className="pt-6">
             <div className="flex gap-3">
               {canMarkPaid && (
                 <Button 

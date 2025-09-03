@@ -239,22 +239,32 @@ export function MemberForm({ member, onSuccess, onCancel }: MemberFormProps) {
       const response = await apiRequest(method, url, transformedData);
       return response.json();
     },
-    onSuccess: async (newMember, variables) => {
-      // Optimistic update - voeg nieuwe member toe aan lijst
-      queryClient.setQueryData(["/api/members"], (oldData: any) => {
-        if (!Array.isArray(oldData)) return [newMember];
-        return [newMember, ...oldData];
-      });
-      
-      // Update dashboard stats optimistically 
-      queryClient.setQueryData(["/api/dashboard/stats"], (oldStats: any) => {
-        if (!oldStats) return oldStats;
-        return {
-          ...oldStats,
-          totalMembers: (parseInt(oldStats.totalMembers) + 1).toString(),
-          activeMembers: (parseInt(oldStats.activeMembers) + (newMember.active ? 1 : 0)).toString(),
-        };
-      });
+    onSuccess: async (updatedMember, variables) => {
+      if (member) {
+        // Update existing member in the list
+        queryClient.setQueryData(["/api/members"], (oldData: any) => {
+          if (!Array.isArray(oldData)) return oldData;
+          return oldData.map((m: any) => 
+            m.id === member.id ? { ...m, ...updatedMember } : m
+          );
+        });
+      } else {
+        // Add new member to the list
+        queryClient.setQueryData(["/api/members"], (oldData: any) => {
+          if (!Array.isArray(oldData)) return [updatedMember];
+          return [updatedMember, ...oldData];
+        });
+        
+        // Update dashboard stats for new member only
+        queryClient.setQueryData(["/api/dashboard/stats"], (oldStats: any) => {
+          if (!oldStats) return oldStats;
+          return {
+            ...oldStats,
+            totalMembers: (parseInt(oldStats.totalMembers) + 1).toString(),
+            activeMembers: (parseInt(oldStats.activeMembers) + (updatedMember.active ? 1 : 0)).toString(),
+          };
+        });
+      }
       
       await queryClient.invalidateQueries({ queryKey: ["/api/members"] });
       await queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });

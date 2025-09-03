@@ -166,7 +166,7 @@ export function MembershipCard({
                   className="h-6 w-auto mb-2 opacity-90"
                 />
               )}
-              <h1 className="embossed-text text-2xl font-bold uppercase tracking-wider">
+              <h1 className="embossed-text text-3xl font-bold uppercase tracking-wider">
                 Lidkaart {cardData.tenant.name.toUpperCase()}
               </h1>
             </div>

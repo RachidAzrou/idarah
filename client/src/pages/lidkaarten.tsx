@@ -28,7 +28,7 @@ import {
   ExternalLink,
   AlertTriangle
 } from "lucide-react";
-import { CiExport } from "react-icons/ci";
+import { CiExport, CiCreditCardOff } from "react-icons/ci";
 import { MdOutlineBrowserUpdated } from "react-icons/md";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
@@ -246,13 +246,13 @@ export default function LidkaartenPage() {
               <p className="text-xs font-medium text-gray-500 mb-1">Actieve Lidkaarten</p>
               <p className="text-lg font-bold text-gray-900 mb-1">{stats?.totalActive || 0}</p>
               <div className="flex items-center space-x-1">
-                <span className="text-xs font-medium text-blue-600">
+                <span className="text-xs font-medium text-green-600">
                   kaarten met status 'Actueel'
                 </span>
               </div>
             </div>
-            <div className="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center">
-              <CreditCard className="h-4 w-4 text-blue-600" />
+            <div className="w-8 h-8 bg-green-50 rounded-full flex items-center justify-center">
+              <CreditCard className="h-4 w-4 text-green-600" />
             </div>
           </div>
         </div>
@@ -260,16 +260,20 @@ export default function LidkaartenPage() {
         <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <p className="text-xs font-medium text-gray-500 mb-1">Geldigheidspercentage</p>
-              <p className="text-lg font-bold text-gray-900 mb-1">{stats?.validPercentage || 0}%</p>
+              <p className="text-xs font-medium text-gray-500 mb-1">Geen Kaart</p>
+              <p className="text-lg font-bold text-gray-900 mb-1">
+                {filteredCards.filter(({ cardMeta }) => 
+                  !cardMeta
+                ).length}
+              </p>
               <div className="flex items-center space-x-1">
-                <span className="text-xs font-medium text-green-600">
-                  leden met geldige kaart
+                <span className="text-xs font-medium text-amber-500">
+                  leden zonder lidkaart
                 </span>
               </div>
             </div>
-            <div className="w-8 h-8 bg-green-50 rounded-full flex items-center justify-center">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
+            <div className="w-8 h-8 bg-amber-50 rounded-full flex items-center justify-center">
+              <CiCreditCardOff className="h-4 w-4 text-amber-500" />
             </div>
           </div>
         </div>

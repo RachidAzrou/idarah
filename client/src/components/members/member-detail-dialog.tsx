@@ -44,17 +44,17 @@ export function MemberDetailDialog({ member, open, onClose, onEdit }: MemberDeta
         </DialogHeader>
 
         {/* Header Info */}
-        <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3 mb-4">
-          <div className="flex items-center justify-between mb-2">
-            <span className="font-mono text-sm text-gray-600">#{member.memberNumber}</span>
-            <Badge variant={member.active ? "default" : "secondary"}>
+        <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-2 mb-3">
+          <div className="flex items-center justify-between mb-1">
+            <span className="font-mono text-xs text-gray-600">#{member.memberNumber}</span>
+            <Badge variant={member.active ? "default" : "secondary"} className="text-xs">
               {member.active ? 'Actief' : 'Inactief'}
             </Badge>
           </div>
-          <h3 className="font-semibold text-lg">
+          <h3 className="font-semibold text-base">
             {member.firstName} {member.lastName}
           </h3>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-gray-600 dark:text-gray-400 text-sm">
             {getMemberCategoryLabel(member.category)}
           </p>
         </div>

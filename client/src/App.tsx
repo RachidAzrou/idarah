@@ -17,6 +17,7 @@ import PublicScreenViewPage from "@/pages/PublicScreenViewPage";
 import { PublicViewPage } from "@/pages/PublicViewPage";
 import Instellingen from "@/pages/instellingen";
 import { CardPage } from "@/pages/card";
+import CardVerifyPage from "@/pages/card-verify";
 import Lidkaarten from "@/pages/lidkaarten";
 import { InstallPrompt } from "@/components/pwa/install-prompt";
 import { OfflineIndicator } from "@/components/pwa/offline-indicator";
@@ -64,6 +65,7 @@ function Router() {
       <Route path="/public/screen/:publicToken" component={PublicScreenViewPage} />
       <Route path="/screen/:screenId" component={PublicViewPage} />
       <Route path="/card/:memberId" component={CardPage} />
+      <Route path="/card/verify/:qrToken" component={CardVerifyPage} />
       <Route path="/instellingen" component={() => <ProtectedRoute component={Instellingen} />} />
       <Route component={NotFound} />
     </Switch>

@@ -105,7 +105,7 @@ export function LiveCard({
   }, []);
 
   // Generate QR code URL for verification
-  const qrCodeUrl = `${window.location.origin}/api/card/verify/${cardMeta.qrToken}`;
+  const qrCodeUrl = `${window.location.origin}/card/verify/${cardMeta.qrToken}`;
 
   // Determine primary color with fallback
   const primaryColor = tenant.primaryColor || '#bb2e2e';

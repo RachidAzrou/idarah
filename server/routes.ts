@@ -618,33 +618,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Card verification endpoint
-  app.get("/api/card/verify/:qrToken", async (req, res) => {
-    try {
-      const { qrToken } = req.params;
-      
-      const verificationData = await cardService.verifyCardByQrToken(qrToken);
-      if (!verificationData) {
-        return res.status(404).json({ 
-          ok: false, 
-          message: "Card not found or invalid token" 
-        });
-      }
-
-      // Set headers to prevent caching for live verification
-      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-      res.setHeader('Pragma', 'no-cache');
-      res.setHeader('Expires', '0');
-      
-      res.json(verificationData);
-    } catch (error) {
-      console.error('Error verifying card:', error);
-      res.status(500).json({ 
-        ok: false, 
-        message: "Internal server error" 
-      });
-    }
-  });
 
   // Card invalidation endpoint (authenticated)
   app.post("/api/card/invalidate", authMiddleware, tenantMiddleware, async (req, res) => {
@@ -773,6 +746,166 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error deactivating card:', error);
       res.status(500).json({ message: "Failed to deactivate card" });
+    }
+  });
+
+  // Rate limiting for card verification (in-memory)
+  const verificationRateLimit = new Map<string, { count: number; resetTime: number }>();
+  const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute
+  const RATE_LIMIT_MAX_REQUESTS = 30;
+
+  function checkRateLimit(ip: string): boolean {
+    const now = Date.now();
+    const userLimit = verificationRateLimit.get(ip);
+    
+    if (!userLimit || now > userLimit.resetTime) {
+      verificationRateLimit.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
+      return true;
+    }
+    
+    if (userLimit.count >= RATE_LIMIT_MAX_REQUESTS) {
+      return false;
+    }
+    
+    userLimit.count++;
+    return true;
+  }
+
+  // Card verification status logic
+  function deriveCardStatus(cardMeta: any, member: any, fees?: any[]): 'ACTUEEL' | 'NIET_ACTUEEL' | 'VERLOPEN' {
+    if (!member.active) {
+      return 'VERLOPEN';
+    }
+    
+    // Check if card is valid until date has passed
+    if (cardMeta.validUntil && new Date(cardMeta.validUntil) < new Date()) {
+      return 'VERLOPEN';
+    }
+    
+    // Check card meta status
+    if (cardMeta.status === 'VERLOPEN') {
+      return 'VERLOPEN';
+    }
+    
+    if (cardMeta.status === 'MOMENTOPNAME') {
+      return 'NIET_ACTUEEL';
+    }
+    
+    // Check if current year fees are paid (optional business logic)
+    if (fees && fees.length > 0) {
+      const currentYear = new Date().getFullYear();
+      const currentYearFees = fees.filter(fee => {
+        const feeYear = new Date(fee.periodStart).getFullYear();
+        return feeYear === currentYear;
+      });
+      
+      const hasPaidCurrentYear = currentYearFees.some(fee => fee.status === 'PAID');
+      if (!hasPaidCurrentYear) {
+        return 'NIET_ACTUEEL';
+      }
+    }
+    
+    return 'ACTUEEL';
+  }
+
+  // Public card verification API
+  app.get("/api/card/verify/:qrToken", async (req, res) => {
+    try {
+      const { qrToken } = req.params;
+      const clientIp = req.ip || req.connection.remoteAddress || 'unknown';
+      
+      // Rate limiting
+      if (!checkRateLimit(clientIp)) {
+        return res.status(429).json({ 
+          error: "Te veel verzoeken. Probeer later opnieuw." 
+        });
+      }
+
+      // Validate qrToken format
+      if (!qrToken || typeof qrToken !== 'string' || qrToken.length < 10) {
+        return res.status(404).json({ 
+          error: "Onbekende of ingetrokken code" 
+        });
+      }
+
+      // Lookup card by qrToken
+      const cardMeta = await storage.getCardMetaByQrToken(qrToken);
+      if (!cardMeta) {
+        return res.status(404).json({ 
+          error: "Onbekende of ingetrokken code" 
+        });
+      }
+
+      // Get member and tenant info
+      const member = await storage.getMember(cardMeta.memberId);
+      const tenant = await storage.getTenant(cardMeta.tenantId);
+      
+      if (!member || !tenant) {
+        return res.status(404).json({ 
+          error: "Onbekende of ingetrokken code" 
+        });
+      }
+
+      // Get member fees for status calculation
+      const memberFees = await storage.getMembershipFeesByMember(member.id);
+      
+      // Derive current status
+      const status = deriveCardStatus(cardMeta, member, memberFees);
+      
+      // Format valid until date (Belgian format)
+      const validUntil = cardMeta.validUntil ? 
+        new Date(cardMeta.validUntil).toLocaleDateString('nl-BE', {
+          day: '2-digit',
+          month: '2-digit', 
+          year: 'numeric',
+          timeZone: 'Europe/Brussels'
+        }) : null;
+
+      // Check voting rights (default false if not set)
+      const eligibleToVote = member.votingRights || false;
+
+      // Get member category label
+      const categoryLabels = {
+        'STUDENT': 'Student',
+        'STANDAARD': 'Volwassene', 
+        'SENIOR': 'Senior'
+      };
+      const category = categoryLabels[member.category] || member.category;
+
+      const response = {
+        status,
+        validUntil,
+        eligibleToVote,
+        member: {
+          name: `${member.firstName} ${member.lastName}`,
+          memberNumber: member.memberNumber,
+          category
+        },
+        tenant: {
+          name: tenant.name,
+          logoUrl: tenant.logoUrl
+        },
+        refreshedAt: new Date().toISOString(),
+        etag: cardMeta.etag
+      };
+
+      // Set headers
+      res.set({
+        'Cache-Control': 'no-store',
+        'Content-Type': 'application/json; charset=utf-8'
+      });
+      
+      if (cardMeta.etag) {
+        res.set('ETag', cardMeta.etag);
+      }
+
+      res.json(response);
+      
+    } catch (error) {
+      console.error('Error in card verification:', error);
+      res.status(500).json({ 
+        error: "Er ging iets mis. Probeer opnieuw." 
+      });
     }
   });
 

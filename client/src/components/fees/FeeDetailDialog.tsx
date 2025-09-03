@@ -338,13 +338,8 @@ export function FeeDetailDialog({
 
           {canManage && (
             <TabsContent value="actions" className="space-y-3">
-              <div className="space-y-3">
-                <h4 className="font-medium flex items-center gap-2 text-sm">
-                  <Building2 className="h-4 w-4" />
-                  Beschikbare acties
-                </h4>
-                <div className="flex flex-wrap gap-3 justify-end">
-                  {canMarkAsPaid && (
+              <div className="flex flex-wrap gap-3 justify-end">
+                {canMarkAsPaid && (
                     <Button onClick={handleMarkPaid} className="flex items-center gap-2 bg-green-600 hover:bg-green-700">
                       <Check className="h-4 w-4" />
                       Markeer als betaald
@@ -370,7 +365,7 @@ export function FeeDetailDialog({
                     <Trash2 className="h-4 w-4" />
                     Verwijder lidgeld
                   </Button>
-                </div>
+                )}
               </div>
             </TabsContent>
           )}

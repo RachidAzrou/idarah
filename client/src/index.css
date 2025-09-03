@@ -51,6 +51,63 @@
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 0 8px rgba(255, 255, 255, 0.1);
 }
 
+/* Debossed QR code effect - looks pressed into the card */
+.debossed-qr-container {
+  width: 80px;
+  height: 80px;
+  padding: 8px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.1);
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 0 1px rgba(0, 0, 0, 0.5),
+    0 1px 0 rgba(255, 255, 255, 0.1);
+  position: relative;
+}
+
+.debossed-qr-frame {
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.05);
+  box-shadow: 
+    inset 0 1px 2px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.debossed-qr-frame::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      rgba(255, 255, 255, 0.02) 1px,
+      transparent 2px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      rgba(255, 255, 255, 0.02) 1px,
+      transparent 2px
+    );
+  pointer-events: none;
+}
+
+.debossed-qr {
+  opacity: 0.6;
+  filter: 
+    contrast(0.7) 
+    brightness(1.2) 
+    drop-shadow(0 0 1px rgba(255, 255, 255, 0.1));
+}
+
 /* 360° flip animation for card refresh */
 @keyframes flip-horizontal {
   0% { transform: rotateY(0deg); }

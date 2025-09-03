@@ -227,24 +227,26 @@ export function MembershipCard({
               )}
             </div>
 
-            {/* Right: QR Code */}
+            {/* Right: Debossed QR Code */}
             <div className="flex flex-col items-center">
               <button
                 onClick={() => setShowQRModal(true)}
-                className="bg-white rounded-xl p-3 shadow-lg hover:shadow-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/50 mb-2"
+                className="debossed-qr-container transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/50 hover:scale-105"
                 data-testid="qr-plate"
-                aria-label="Open grote QR code"
+                aria-label="Toon scanbare QR code"
                 style={{ minWidth: '80px', minHeight: '80px' }}
               >
-                <QRCodeSVG
-                  value={qrCodeUrl}
-                  size={56}
-                  className="w-full h-full"
-                  fgColor="#000000"
-                  bgColor="#ffffff"
-                />
+                <div className="debossed-qr-frame">
+                  <QRCodeSVG
+                    value={qrCodeUrl}
+                    size={56}
+                    className="debossed-qr"
+                    fgColor="rgba(255,255,255,0.2)"
+                    bgColor="transparent"
+                  />
+                </div>
               </button>
-              <p className="embossed-text text-[clamp(10px,1.4vmin,12px)] text-center leading-tight opacity-80">
+              <p className="embossed-text text-[clamp(10px,1.4vmin,12px)] text-center leading-tight opacity-80 mt-2">
                 SCAN
               </p>
             </div>
@@ -259,7 +261,7 @@ export function MembershipCard({
             <DialogTitle>Verificatie QR Code</DialogTitle>
           </DialogHeader>
           <div className="flex flex-col items-center gap-4 py-4">
-            <div className="bg-white p-6 rounded-xl shadow-lg">
+            <div className="bg-white p-6 rounded-xl shadow-xl border">
               <QRCodeSVG
                 value={qrCodeUrl}
                 size={320}

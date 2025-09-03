@@ -23,7 +23,6 @@ import {
   CheckCircle2,
   Clock,
   MoreHorizontal,
-  Edit,
   Plus,
   Download
 } from "lucide-react";
@@ -213,10 +212,6 @@ export default function LidkaartenPage() {
     deactivateCardMutation.mutate(memberId);
   };
 
-  const handleEditMember = (memberId: string) => {
-    // TODO: Implement member edit functionality
-    toast({ title: "Bewerken", description: "Bewerk functionaliteit wordt binnenkort toegevoegd." });
-  };
 
   const handleExport = () => {
     // TODO: Implement export functionality
@@ -429,13 +424,6 @@ export default function LidkaartenPage() {
                             >
                               <Eye className="h-4 w-4" />
                               Bekijken
-                            </DropdownMenuItem>
-                            <DropdownMenuItem 
-                              onClick={() => handleEditMember(member.id)}
-                              className="flex items-center gap-2"
-                            >
-                              <Edit className="h-4 w-4" />
-                              Bewerken
                             </DropdownMenuItem>
                             <DropdownMenuItem 
                               onClick={() => handleRegenerateCard(member.id)}

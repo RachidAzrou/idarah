@@ -743,7 +743,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const cardData = await cardService.getOrCreateCardMeta(memberId);
       if (cardData) {
-        await cardService.invalidateCard(cardData.cardMeta.id);
+        await cardService.invalidateCard(memberId);
         res.json({ success: true, message: "Card regenerated" });
       } else {
         res.status(500).json({ message: "Failed to regenerate card" });

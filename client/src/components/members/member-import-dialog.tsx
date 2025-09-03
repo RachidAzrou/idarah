@@ -731,7 +731,24 @@ export function MemberImportDialog({ open, onClose, onImport }: MemberImportDial
               <div className="space-y-4">
                 <div>
                   <p className="text-sm text-gray-600">
-                    Er zijn {duplicateCheckResults.length} duplicates gevonden. Controleer de onderstaande lijst.
+                    {duplicateCheckResults.filter(result => result.duplicateCheck.duplicateNumber).length > 0 && 
+                     duplicateCheckResults.filter(result => result.duplicateCheck.duplicateNameAddress).length > 0 ? (
+                      <>
+                        <span className="font-medium">Duplicates gevonden:</span>
+                        <br />• {duplicateCheckResults.filter(result => result.duplicateCheck.duplicateNumber).length} dubbele lidnummers
+                        <br />• {duplicateCheckResults.filter(result => result.duplicateCheck.duplicateNameAddress).length} leden die al bestaan
+                      </>
+                    ) : duplicateCheckResults.filter(result => result.duplicateCheck.duplicateNumber).length > 0 ? (
+                      <>
+                        <span className="font-medium">Dubbele lidnummers gevonden:</span>
+                        <br />• {duplicateCheckResults.filter(result => result.duplicateCheck.duplicateNumber).length} leden met dubbel lidnummer
+                      </>
+                    ) : (
+                      <>
+                        <span className="font-medium">Bestaande leden gevonden:</span>
+                        <br />• {duplicateCheckResults.filter(result => result.duplicateCheck.duplicateNameAddress).length} leden die al bestaan
+                      </>
+                    )}
                   </p>
                 </div>
 

@@ -484,12 +484,12 @@ export default function LidkaartenPage() {
                 </Button>
                 
                 <Button
-                  onClick={() => toast({ title: "Export", description: "Export functionaliteit wordt binnenkort toegevoegd." })}
+                  onClick={() => toast({ title: "Download", description: "Download functionaliteit wordt binnenkort toegevoegd." })}
                   variant="outline"
                   className="gap-2"
                 >
-                  <Download className="h-4 w-4" />
-                  Exporteren
+                  <CiExport className="h-4 w-4" />
+                  Downloaden
                 </Button>
                 
                 <Button

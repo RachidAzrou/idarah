@@ -4,77 +4,64 @@ import { isDateInPeriod, isPeriodActive, isPeriodExpired } from '../fees/periods
 
 export type CardStatus = 'ACTUEEL' | 'NIET_ACTUEEL' | 'VERLOPEN';
 
-interface PeriodWithStatus {
-  id: string;
-  memberId: string;
-  status: 'OPEN' | 'PAID' | 'OVERDUE';
-  periodStart: Date;
-  periodEnd: Date;
-  paidAt: Date | null;
+/**
+ * Check if membership is expired based on validUntil date
+ * VERLOPEN = validUntil date has passed
+ */
+export async function isMembershipExpired(memberId: string): Promise<boolean> {
+  try {
+    const fees = await storage.getMembershipFeesByMember(memberId);
+    if (fees.length === 0) {
+      return false; // No fees = not expired, just no data
+    }
+    
+    const now = nowBE();
+    
+    // Find the latest PAID period to determine validUntil
+    const paidFees = fees.filter(fee => fee.status === 'PAID');
+    
+    if (paidFees.length === 0) {
+      return false; // No paid periods = not expired, just unpaid
+    }
+    
+    // Get the latest paid period end date as validUntil
+    const latestPaidPeriod = paidFees.reduce((latest, current) => 
+      current.periodEnd > latest.periodEnd ? current : latest
+    );
+    
+    const validUntil = toBEDate(latestPaidPeriod.periodEnd);
+    
+    // Membership is expired if now is after validUntil date
+    return now > validUntil;
+    
+  } catch (error) {
+    console.error('Error checking membership expiry:', error);
+    return false;
+  }
 }
 
 /**
  * Compute the current card status for a member
- * Based on the domain rules:
- * - ACTUEEL: Current period exists and is paid
- * - VERLOPEN: No paid current period and now > latest period end
- * - NIET_ACTUEEL: Fallback for other cases (offline/temporary)
+ * Based on the correct domain rules:
+ * - VERLOPEN: Membership expired (past validUntil date)
+ * - ACTUEEL: Default status for valid memberships
+ * 
+ * Note: ACTUEEL/NIET_ACTUEEL connectivity status is handled in the PWA frontend
  */
 export async function computeCardStatus(memberId: string): Promise<CardStatus> {
   try {
-    // Get all membership fees for this member
-    const fees = await storage.getMembershipFeesByMember(memberId);
-    
-    if (fees.length === 0) {
-      return 'NIET_ACTUEEL';
-    }
-    
-    const now = nowBE();
-    const periods: PeriodWithStatus[] = fees.map(fee => ({
-      id: fee.id,
-      memberId: fee.memberId,
-      status: fee.status,
-      periodStart: toBEDate(fee.periodStart),
-      periodEnd: toBEDate(fee.periodEnd),
-      paidAt: fee.paidAt ? toBEDate(fee.paidAt) : null,
-    }));
-    
-    // Find periods that are currently active (now is within [start, end))
-    const activePeriods = periods.filter(period => 
-      isDateInPeriod(now, {
-        start: period.periodStart,
-        end: period.periodEnd
-      })
-    );
-    
-    // If there's an active period and it's paid, status is ACTUEEL
-    const paidActivePeriod = activePeriods.find(period => period.status === 'PAID');
-    if (paidActivePeriod) {
-      return 'ACTUEEL';
-    }
-    
-    // Find the latest period to check if we're past all periods
-    const latestPeriod = periods.reduce((latest, current) => 
-      current.periodEnd > latest.periodEnd ? current : latest
-    );
-    
-    // If now is after the latest period end and that period is not paid, status is VERLOPEN
-    if (now >= latestPeriod.periodEnd && latestPeriod.status !== 'PAID') {
+    // Check if membership is expired based on validUntil date
+    const expired = await isMembershipExpired(memberId);
+    if (expired) {
       return 'VERLOPEN';
     }
     
-    // Check if there are any paid periods at all
-    const hasPaidPeriods = periods.some(period => period.status === 'PAID');
-    if (!hasPaidPeriods) {
-      return 'NIET_ACTUEEL';
-    }
-    
-    // Default fallback
-    return 'NIET_ACTUEEL';
+    // If not expired, default to ACTUEEL (frontend handles online/offline)
+    return 'ACTUEEL';
     
   } catch (error) {
     console.error('Error computing card status:', error);
-    return 'NIET_ACTUEEL';
+    return 'ACTUEEL'; // Default to valid when in doubt
   }
 }
 

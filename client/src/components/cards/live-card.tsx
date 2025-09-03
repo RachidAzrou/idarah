@@ -22,27 +22,27 @@ interface LiveCardProps {
 }
 
 interface StatusLEDProps {
-  status: 'ACTUEEL' | 'MOMENTOPNAME' | 'VERLOPEN';
+  status: 'ACTUEEL' | 'NIET_ACTUEEL' | 'VERLOPEN';
   className?: string;
 }
 
 function StatusLED({ status, className }: StatusLEDProps) {
   const statusConfig = {
     ACTUEEL: {
-      color: 'bg-green-500',
-      glowClass: 'status-led-glow-green',
+      color: 'bg-[#22C55E]',
+      glowStyle: { boxShadow: '0 0 0 3px rgba(34, 197, 94, 0.18)' },
       label: 'Actueel',
       icon: Wifi,
     },
-    MOMENTOPNAME: {
-      color: 'bg-orange-500',
-      glowClass: 'status-led-glow-orange',
+    NIET_ACTUEEL: {
+      color: 'bg-[#F59E0B]',
+      glowStyle: { boxShadow: '0 0 0 3px rgba(245, 158, 11, 0.18)' },
       label: 'Niet actueel',
       icon: WifiOff,
     },
     VERLOPEN: {
-      color: 'bg-red-500',
-      glowClass: 'status-led-glow-red',
+      color: 'bg-[#EF4444]',
+      glowStyle: { boxShadow: '0 0 0 3px rgba(239, 68, 68, 0.18)' },
       label: 'Verlopen',
       icon: Clock,
     },
@@ -52,9 +52,10 @@ function StatusLED({ status, className }: StatusLEDProps) {
   const Icon = config.icon;
 
   return (
-    <div className={cn("flex items-center gap-1.5", className)}>
+    <div className={cn("flex items-center gap-2", className)}>
       <div 
-        className={cn("w-2.5 h-2.5 rounded-full", config.color, config.glowClass)}
+        className={cn("w-3 h-3 rounded-full", config.color)}
+        style={config.glowStyle}
         aria-hidden="true"
       />
       <span className="text-xs font-medium card-font debossed-text">
@@ -90,6 +91,7 @@ export function LiveCard({
   const [showGloss, setShowGloss] = useState(false);
   const [isInstallable, setIsInstallable] = useState(false);
   const [isFlipping, setIsFlipping] = useState(false);
+  const [isOffline, setIsOffline] = useState(!navigator.onLine);
 
   // Check for PWA installability and reduced motion
   useEffect(() => {
@@ -98,7 +100,13 @@ export function LiveCard({
       setIsInstallable(true);
     };
 
+    // Listen for online/offline events
+    const handleOnline = () => setIsOffline(false);
+    const handleOfflineEvent = () => setIsOffline(true);
+
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOfflineEvent);
     
     // Check for reduced motion preference
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -106,6 +114,8 @@ export function LiveCard({
     
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOfflineEvent);
     };
   }, []);
 
@@ -138,12 +148,16 @@ export function LiveCard({
     }
   };
 
-  // Check if current year is paid (mock logic - should come from fees)
-  const currentYear = new Date().getFullYear();
-  const currentYearPaid = true; // This should be calculated from membership fees
+  // Determine display status based on connectivity and membership validity
+  // VERLOPEN = membership expired (server determines this)
+  // NIET_ACTUEEL = offline PWA (no internet)  
+  // ACTUEEL = online PWA with valid membership
+  const displayStatus = cardMeta.status === 'VERLOPEN' 
+    ? 'VERLOPEN' 
+    : (isOffline ? 'NIET_ACTUEEL' : 'ACTUEEL');
 
-  // Calculate valid until date (mock logic)
-  const validUntil = cardMeta.validUntil || new Date(currentYear, 11, 31);
+  // Calculate valid until date
+  const validUntil = cardMeta.validUntil || new Date();
 
   return (
     <div className={cn("w-full h-full relative overflow-hidden flex items-center justify-center", standalone ? "" : "min-h-screen p-4 sm:p-6", className)} style={!standalone ? {
@@ -230,7 +244,7 @@ export function LiveCard({
               </div>
               
               <div className="flex items-start gap-3">
-                <StatusLED status={cardMeta.status} />
+                <StatusLED status={displayStatus} />
                 <Button
                   variant="ghost"
                   size="icon"

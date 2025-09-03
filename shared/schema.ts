@@ -21,7 +21,7 @@ export const paymentTermEnum = pgEnum('payment_term', ['MONTHLY', 'YEARLY']);
 export const paymentMethodEnum = pgEnum('payment_method', ['SEPA', 'OVERSCHRIJVING', 'BANCONTACT', 'CASH']);
 export const feeStatusEnum = pgEnum('fee_status', ['OPEN', 'PAID', 'OVERDUE']);
 export const screenTypeEnum = pgEnum('screen_type', ['LEDENLIJST', 'MEDEDELINGEN', 'MULTIMEDIA']);
-export const cardStatusEnum = pgEnum('card_status', ['ACTUEEL', 'MOMENTOPNAME', 'VERLOPEN']);
+export const cardStatusEnum = pgEnum('card_status', ['ACTUEEL', 'NIET_ACTUEEL', 'VERLOPEN']);
 export const ruleScopeEnum = pgEnum('rule_scope', ['STEMRECHT', 'VERKIESBAAR']);
 export const companyTypeEnum = pgEnum('company_type', ['VZW', 'BVBA', 'NV', 'VOF', 'EENMANSZAAK', 'CVBA', 'SE', 'ANDERE']);
 

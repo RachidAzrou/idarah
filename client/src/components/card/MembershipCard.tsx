@@ -117,8 +117,13 @@ export function MembershipCard({
     }
   }, [isRefreshing]);
 
-  // Determine card status - force to NIET_ACTUEEL if offline
-  const displayStatus = isOffline ? 'NIET_ACTUEEL' : cardData.status;
+  // Determine display status based on connectivity and membership validity
+  // VERLOPEN = membership expired (server determines this)
+  // NIET_ACTUEEL = offline PWA (no internet)  
+  // ACTUEEL = online PWA with valid membership
+  const displayStatus = cardData.status === 'VERLOPEN' 
+    ? 'VERLOPEN' 
+    : (isOffline ? 'NIET_ACTUEEL' : 'ACTUEEL');
   
   // Scale text sizes based on constrained mode
   const textScale = isConstrained ? 0.7 : 1;

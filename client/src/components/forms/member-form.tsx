@@ -85,16 +85,15 @@ export function MemberForm({ member, onSuccess, onCancel }: MemberFormProps) {
   // Build default values based on whether we're editing or creating
   const getDefaultValues = (): Partial<MemberFormData> => {
     if (member) {
-      // Parse address for editing
-      const addressParts = member.address ? member.address.split(' ') : [];
-      const number = addressParts.length > 0 ? addressParts.pop() || '' : '';
-      const street = addressParts.join(' ');
+      // Parse member data for editing
+      const street = member.street || '';
+      const number = member.number || '';
       
       return {
         firstName: member.firstName || '',
         lastName: member.lastName || '',
         gender: (member.gender as 'M' | 'V') || 'M',
-        dateOfBirth: member.dateOfBirth ? new Date(member.dateOfBirth) : undefined,
+        dateOfBirth: member.birthDate ? new Date(member.birthDate) : undefined,
         category: member.category || 'STANDAARD',
         email: member.email || '',
         phone: member.phone || '',
@@ -105,9 +104,9 @@ export function MemberForm({ member, onSuccess, onCancel }: MemberFormProps) {
         city: member.city || '',
         country: member.country || 'België',
         financialSettings: {
-          paymentMethod: (member.paymentMethod as any) || 'SEPA',
-          iban: member.iban || '',
-          paymentTerm: 'YEARLY',
+          paymentMethod: 'SEPA' as const,
+          iban: '',
+          paymentTerm: 'YEARLY' as const,
         },
         organization: {
           interestedInActiveRole: false,
@@ -159,6 +158,26 @@ export function MemberForm({ member, onSuccess, onCancel }: MemberFormProps) {
     defaultValues: getDefaultValues(),
   });
 
+  // Functie om te controleren of een tab fouten heeft
+  const hasTabErrors = (tabName: string) => {
+    const errors = form.formState.errors;
+    
+    switch (tabName) {
+      case "personal":
+        return !!(errors.firstName || errors.lastName || errors.gender || errors.dateOfBirth || errors.category || errors.email || errors.phone);
+      case "address":
+        return !!(errors.street || errors.number || errors.postalCode || errors.city || errors.country);
+      case "financial":
+        return !!(errors.financialSettings?.paymentMethod || errors.financialSettings?.iban || errors.financialSettings?.paymentTerm);
+      case "organization":
+        return !!(errors.organization?.interestedInActiveRole || errors.organization?.roleDescription);
+      case "permissions":
+        return !!(errors.permissions?.privacyAgreement || errors.permissions?.photoVideoConsent || errors.permissions?.newsletterSubscription || errors.permissions?.whatsappList);
+      default:
+        return false;
+    }
+  };
+
   const createMemberMutation = useMutation({
     mutationFn: async (data: MemberFormData) => {
       const method = member ? "PATCH" : "POST";
@@ -200,21 +219,25 @@ export function MemberForm({ member, onSuccess, onCancel }: MemberFormProps) {
     },
   });
 
-  const onSubmit = (data: MemberFormData) => {
-    // Controleer op validatiefouten en toon melding
-    if (!form.formState.isValid) {
+  const onSubmit = async (data: MemberFormData) => {
+    // Force validation and wait for it to complete
+    const isValid = await form.trigger();
+    
+    if (!isValid) {
       const errors = form.formState.errors;
       console.log('Form validation errors:', errors);
       
       // Bepaal welke tab de eerste fout bevat
       let targetTab = "personal";
-      if (errors.street || errors.number || errors.postalCode || errors.city || errors.country) {
+      if (hasTabErrors('personal')) {
+        targetTab = "personal";
+      } else if (hasTabErrors('address')) {
         targetTab = "address";
-      } else if (errors.financialSettings) {
+      } else if (hasTabErrors('financial')) {
         targetTab = "financial";
-      } else if (errors.organization) {
+      } else if (hasTabErrors('organization')) {
         targetTab = "organization";
-      } else if (errors.permissions) {
+      } else if (hasTabErrors('permissions')) {
         targetTab = "permissions";
       }
       
@@ -293,26 +316,6 @@ export function MemberForm({ member, onSuccess, onCancel }: MemberFormProps) {
     const currentIndex = tabs.indexOf(activeTab);
     if (currentIndex > 0) {
       setActiveTab(tabs[currentIndex - 1]);
-    }
-  };
-
-  // Functie om te controleren of een tab fouten heeft
-  const hasTabErrors = (tabName: string) => {
-    const errors = form.formState.errors;
-    
-    switch (tabName) {
-      case "personal":
-        return !!(errors.firstName || errors.lastName || errors.gender || errors.dateOfBirth || errors.category || errors.email || errors.phone);
-      case "address":
-        return !!(errors.street || errors.number || errors.postalCode || errors.city || errors.country);
-      case "financial":
-        return !!(errors.financialSettings);
-      case "organization":
-        return !!(errors.organization);
-      case "permissions":
-        return !!(errors.permissions);
-      default:
-        return false;
     }
   };
 

@@ -159,14 +159,6 @@ export function FeeDetailSlideout({ fee, open, onClose, onMarkPaid }: FeeDetailS
                   Markeer betaald
                 </Button>
               )}
-              <Button 
-                onClick={onClose}
-                variant="outline"
-                className="flex-1"
-              >
-                <X className="h-4 w-4 mr-2" />
-                Sluiten
-              </Button>
             </div>
           </div>
         </div>

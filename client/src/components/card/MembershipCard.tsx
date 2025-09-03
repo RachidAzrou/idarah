@@ -215,14 +215,14 @@ export function MembershipCard({
               <p className="embossed-text text-[clamp(14px,1.8vmin,16px)] uppercase tracking-wide opacity-80 mb-1 font-medium">
                 NAAM
               </p>
-              <h2 className="embossed-text text-[clamp(16px,2.0vmin,18px)] font-semibold uppercase tracking-wide leading-tight">
+              <h2 className="embossed-text text-[clamp(16px,2.0vmin,18px)] font-semibold uppercase tracking-wide leading-tight" style={{textShadow: '1px 1px 2px rgba(0,0,0,0.8), -1px -1px 1px rgba(255,255,255,0.1)'}}>
                 {cardData.firstName} {cardData.lastName}
               </h2>
               <div className="mt-3">
                 <p className="embossed-text text-[clamp(14px,1.8vmin,16px)] uppercase tracking-wide opacity-80 mb-1 font-medium">
                   LIDNUMMER
                 </p>
-                <p className="embossed-text text-[clamp(16px,2.0vmin,18px)] font-mono font-bold tracking-[0.2em] leading-tight">
+                <p className="embossed-text text-[clamp(16px,2.0vmin,18px)] font-mono font-bold tracking-[0.2em] leading-tight" style={{textShadow: '1px 1px 2px rgba(0,0,0,0.8), -1px -1px 1px rgba(255,255,255,0.1)'}}>
                   {cardData.memberNumber}
                 </p>
               </div>
@@ -233,7 +233,7 @@ export function MembershipCard({
               <p className="embossed-text text-[clamp(14px,1.8vmin,16px)] uppercase tracking-wide opacity-80 mb-1 font-medium">
                 CATEGORIE
               </p>
-              <span className="embossed-text text-[clamp(16px,2.0vmin,18px)] font-medium uppercase">
+              <span className="embossed-text text-[clamp(16px,2.0vmin,18px)] font-medium uppercase" style={{textShadow: '1px 1px 2px rgba(0,0,0,0.8), -1px -1px 1px rgba(255,255,255,0.1)'}}>
                 {getMemberCategoryLabel(cardData.category)}
               </span>
             </div>

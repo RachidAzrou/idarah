@@ -14,30 +14,31 @@ const PaymentStatusChart = React.memo(function PaymentStatusChart() {
   });
   
   const data: PaymentStatusData[] = useMemo(() => {
-    if (!Array.isArray(fees) || fees.length === 0) {
-      return [
-        { name: 'Betaald', value: 0, color: '#16A34A' },
-        { name: 'Openstaand', value: 0, color: '#F59E0B' },
-        { name: 'Achterstallig', value: 0, color: '#EF4444' },
-      ];
-    }
-    
     // Optimized counting with a single pass
-    const counts = fees.reduce((acc: any, f: any) => {
-      if (f.status === 'PAID') acc.paid++;
-      else if (f.status === 'OPEN') acc.open++;
-      else if (f.status === 'OVERDUE') acc.overdue++;
-      return acc;
-    }, { paid: 0, open: 0, overdue: 0 });
+    const counts = Array.isArray(fees) && fees.length > 0 
+      ? fees.reduce((acc: any, f: any) => {
+          if (f.status === 'PAID') acc.paid++;
+          else if (f.status === 'OPEN') acc.open++;
+          else if (f.status === 'OVERDUE') acc.overdue++;
+          return acc;
+        }, { paid: 0, open: 0, overdue: 0 })
+      : { paid: 0, open: 0, overdue: 0 };
+    
+    // Als alle waarden 0 zijn, toon een minimale waarde zodat de grafiek zichtbaar is
+    const hasData = counts.paid > 0 || counts.open > 0 || counts.overdue > 0;
     
     return [
-      { name: 'Betaald', value: counts.paid, color: '#16A34A' },
-      { name: 'Openstaand', value: counts.open, color: '#F59E0B' },
-      { name: 'Achterstallig', value: counts.overdue, color: '#EF4444' },
+      { name: 'Betaald', value: hasData ? counts.paid : 1, color: hasData ? '#16A34A' : '#E5E7EB' },
+      { name: 'Openstaand', value: hasData ? counts.open : 1, color: hasData ? '#F59E0B' : '#E5E7EB' },
+      { name: 'Achterstallig', value: hasData ? counts.overdue : 1, color: hasData ? '#EF4444' : '#E5E7EB' },
     ];
   }, [fees]);
   
-  const total = data.reduce((sum, item) => sum + item.value, 0);
+  // Bereken het echte totaal (zonder de minimale waarden voor lege grafiek)
+  const total = useMemo(() => {
+    if (!Array.isArray(fees) || fees.length === 0) return 0;
+    return fees.length;
+  }, [fees]);
   
   return (
     <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
@@ -73,20 +74,39 @@ const PaymentStatusChart = React.memo(function PaymentStatusChart() {
       </div>
 
       <div className="space-y-3">
-        {data.map((item, index) => (
-          <div key={index} className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <div 
-                className="w-3 h-3 rounded-full" 
-                style={{ backgroundColor: item.color }}
-              ></div>
-              <span className="text-sm font-medium text-gray-700">{item.name}</span>
+        {data.map((item, index) => {
+          // Bereken de echte waarde voor de legenda
+          const realValue = useMemo(() => {
+            if (!Array.isArray(fees) || fees.length === 0) return 0;
+            
+            const counts = fees.reduce((acc: any, f: any) => {
+              if (f.status === 'PAID') acc.paid++;
+              else if (f.status === 'OPEN') acc.open++;
+              else if (f.status === 'OVERDUE') acc.overdue++;
+              return acc;
+            }, { paid: 0, open: 0, overdue: 0 });
+            
+            if (item.name === 'Betaald') return counts.paid;
+            if (item.name === 'Openstaand') return counts.open;
+            if (item.name === 'Achterstallig') return counts.overdue;
+            return 0;
+          }, [fees, item.name]);
+          
+          return (
+            <div key={index} className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <div 
+                  className="w-3 h-3 rounded-full" 
+                  style={{ backgroundColor: item.color }}
+                ></div>
+                <span className="text-sm font-medium text-gray-700">{item.name}</span>
+              </div>
+              <span className="text-sm font-semibold text-gray-900">
+                {realValue.toLocaleString('nl-BE')}
+              </span>
             </div>
-            <span className="text-sm font-semibold text-gray-900">
-              {item.value.toLocaleString('nl-BE')}
-            </span>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

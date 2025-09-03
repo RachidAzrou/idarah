@@ -223,71 +223,73 @@ export function ExportDialog({ open, onOpenChange, filteredMembers }: ExportDial
           </TabsList>
 
           <div className="flex-1 overflow-hidden">
-            <TabsContent value="selection" className="h-full flex flex-col space-y-4 mt-4">
-              <div>
-                <h3 className="text-lg font-semibold">Selecteer Export Velden</h3>
-                <p className="text-sm text-gray-600">
-                  Kies welke velden u wilt exporteren naar het Excel bestand.
-                </p>
-              </div>
+            <TabsContent value="selection" className="h-full flex flex-col mt-4">
+              <div className="space-y-4 flex-1">
+                <div>
+                  <h3 className="text-lg font-semibold">Selecteer Export Velden</h3>
+                  <p className="text-sm text-gray-600">
+                    Kies welke velden u wilt exporteren naar het Excel bestand.
+                  </p>
+                </div>
 
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={handleSelectAll}>
-                  Alles selecteren
-                </Button>
-                <Button variant="outline" size="sm" onClick={handleSelectNone}>
-                  Niets selecteren
-                </Button>
-              </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" onClick={handleSelectAll}>
+                    Alles selecteren
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={handleSelectNone}>
+                    Niets selecteren
+                  </Button>
+                </div>
 
-              <div className="border rounded-lg p-4 max-h-[400px] overflow-y-auto">
-                <div className="space-y-4">
-                  {CATEGORIES.map(category => {
-                    const categoryFields = EXPORT_FIELDS.filter(field => field.category === category);
-                    const isSelected = isCategorySelected(category);
-                    const isPartiallySelected = isCategoryPartiallySelected(category);
+                <div className="border rounded-lg p-4 max-h-[400px] overflow-y-auto">
+                  <div className="space-y-4">
+                    {CATEGORIES.map(category => {
+                      const categoryFields = EXPORT_FIELDS.filter(field => field.category === category);
+                      const isSelected = isCategorySelected(category);
+                      const isPartiallySelected = isCategoryPartiallySelected(category);
 
-                    return (
-                      <div key={category} className="space-y-2">
-                        <div className="flex items-center space-x-2">
-                          <Checkbox
-                            id={`category-${category}`}
-                            checked={isSelected}
-                            data-state={isPartiallySelected ? "indeterminate" : undefined}
-                            onCheckedChange={(checked) => handleCategoryToggle(category, checked as boolean)}
-                          />
-                          <label 
-                            htmlFor={`category-${category}`}
-                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                          >
-                            {category}
-                          </label>
+                      return (
+                        <div key={category} className="space-y-2">
+                          <div className="flex items-center space-x-2">
+                            <Checkbox
+                              id={`category-${category}`}
+                              checked={isSelected}
+                              data-state={isPartiallySelected ? "indeterminate" : undefined}
+                              onCheckedChange={(checked) => handleCategoryToggle(category, checked as boolean)}
+                            />
+                            <label 
+                              htmlFor={`category-${category}`}
+                              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                            >
+                              {category}
+                            </label>
+                          </div>
+                          
+                          <div className="ml-6 space-y-2">
+                            {categoryFields.map(field => (
+                              <div key={field.key} className="flex items-center space-x-2">
+                                <Checkbox
+                                  id={field.key}
+                                  checked={selectedFields.includes(field.key)}
+                                  onCheckedChange={() => handleFieldToggle(field.key)}
+                                />
+                                <label 
+                                  htmlFor={field.key}
+                                  className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                >
+                                  {field.label}
+                                </label>
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                        
-                        <div className="ml-6 space-y-2">
-                          {categoryFields.map(field => (
-                            <div key={field.key} className="flex items-center space-x-2">
-                              <Checkbox
-                                id={field.key}
-                                checked={selectedFields.includes(field.key)}
-                                onCheckedChange={() => handleFieldToggle(field.key)}
-                              />
-                              <label 
-                                htmlFor={field.key}
-                                className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                              >
-                                {field.label}
-                              </label>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
 
-              <DialogFooter className="flex justify-between">
+              <div className="flex justify-between pt-4 border-t">
                 <Button variant="outline" onClick={handleClose}>
                   Annuleren
                 </Button>
@@ -299,7 +301,7 @@ export function ExportDialog({ open, onOpenChange, filteredMembers }: ExportDial
                   <CiExport className="h-4 w-4" />
                   Volgende - Exporteren ({selectedFields.length} velden)
                 </Button>
-              </DialogFooter>
+              </div>
             </TabsContent>
 
             <TabsContent value="exporting" className="space-y-4 flex-1 flex flex-col mt-4">
@@ -320,33 +322,35 @@ export function ExportDialog({ open, onOpenChange, filteredMembers }: ExportDial
               </div>
             </TabsContent>
 
-            <TabsContent value="complete" className="space-y-4 flex-1 flex flex-col mt-4">
-              <div className="text-center space-y-4">
-                <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-                  <Check className="h-8 w-8 text-green-600" />
-                </div>
-                
-                <div>
-                  <h3 className="text-lg font-semibold text-green-800">Export Voltooid!</h3>
-                  <p className="text-sm text-gray-600">
-                    {filteredMembers.length} leden succesvol geëxporteerd
-                  </p>
-                  {exportedFile && (
-                    <p className="text-sm text-gray-500 mt-2">
-                      Bestand: {exportedFile}
+            <TabsContent value="complete" className="h-full flex flex-col mt-4">
+              <div className="flex-1 flex items-center justify-center">
+                <div className="text-center space-y-4">
+                  <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                    <Check className="h-8 w-8 text-green-600" />
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-lg font-semibold text-green-800">Export Voltooid!</h3>
+                    <p className="text-sm text-gray-600">
+                      {filteredMembers.length} leden succesvol geëxporteerd
                     </p>
-                  )}
+                    {exportedFile && (
+                      <p className="text-sm text-gray-500 mt-2">
+                        Bestand: {exportedFile}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
 
-              <DialogFooter className="flex justify-between">
+              <div className="flex justify-between pt-4 border-t">
                 <Button variant="outline" onClick={goToPrevious}>
                   Vorige
                 </Button>
                 <Button onClick={handleClose}>
                   Sluiten
                 </Button>
-              </DialogFooter>
+              </div>
             </TabsContent>
           </div>
         </Tabs>

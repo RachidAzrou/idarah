@@ -211,23 +211,28 @@ export function MembershipCard({
             {/* Voting Rights Badge - Right side */}
             {(cardData.badges.includes("Stemgerechtigd") || true) && (
               <div className="flex flex-col items-center mr-8">
-                {/* Real Gold Effect Icon */}
+                {/* Realistic Gold Icon */}
                 <GoVerified 
                   className={`${isConstrained ? 'w-12 h-12' : 'w-16 h-16'}`}
                   data-testid="voting-icon"
                   style={{
-                    color: '#D4AF37',
-                    background: 'linear-gradient(45deg, #D4AF37 0%, #F7E98E 25%, #D4AF37 50%, #B8860B 75%, #D4AF37 100%)',
+                    color: '#FFD700',
+                    background: `
+                      radial-gradient(ellipse at 30% 20%, #FFF8DC 0%, transparent 50%),
+                      radial-gradient(ellipse at 70% 80%, #FFE55C 0%, transparent 50%),
+                      linear-gradient(135deg, #B8860B 0%, #DAA520 20%, #FFD700 40%, #FFF8DC 60%, #FFD700 80%, #B8860B 100%)
+                    `,
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
-                    backgroundSize: '200% 200%',
-                    animation: 'goldShimmer 3s ease-in-out infinite',
+                    backgroundSize: '150% 150%, 150% 150%, 300% 300%',
                     textShadow: `
-                      1px 1px 2px rgba(0,0,0,0.5),
-                      0 0 10px rgba(212,175,55,0.4),
-                      0 0 20px rgba(255,215,0,0.2)
+                      1px 1px 0 #B8860B,
+                      2px 2px 0 #A0751A,
+                      3px 3px 0 #8B6914,
+                      4px 4px 8px rgba(0,0,0,0.6),
+                      0 0 15px rgba(255,215,0,0.4)
                     `,
-                    filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3)) brightness(1.1)'
+                    filter: 'drop-shadow(2px 2px 6px rgba(0,0,0,0.4)) contrast(1.1) saturate(1.2)'
                   }}
                 />
                 

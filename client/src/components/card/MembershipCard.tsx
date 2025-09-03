@@ -216,23 +216,23 @@ export function MembershipCard({
                   className={`${isConstrained ? 'w-12 h-12' : 'w-16 h-16'}`}
                   data-testid="voting-icon"
                   style={{
-                    color: '#FFD700',
-                    background: 'linear-gradient(135deg, #DAA520 0%, #FFD700 25%, #FFF8DC 50%, #FFD700 75%, #B8860B 100%)',
+                    color: '#C0C0C0',
+                    background: 'linear-gradient(135deg, #A8A8A8 0%, #E0E0E0 25%, #F5F5F5 50%, #E0E0E0 75%, #808080 100%)',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
                     backgroundSize: '200% 200%',
-                    animation: 'goldShimmer 2s ease-in-out infinite',
+                    animation: 'goldShimmer 3s ease-in-out infinite',
                     textShadow: `
-                      2px 2px 0 rgba(255,255,255,0.4),
-                      -2px -2px 0 rgba(0,0,0,0.9),
-                      -3px -3px 0 rgba(0,0,0,0.7),
-                      -4px -4px 0 rgba(0,0,0,0.5),
-                      -5px -5px 0 rgba(0,0,0,0.3),
-                      inset 3px 3px 6px rgba(0,0,0,0.8),
-                      0 0 12px rgba(255,215,0,0.4),
-                      0 0 20px rgba(255,215,0,0.2)
+                      2px 2px 0 rgba(255,255,255,0.6),
+                      -2px -2px 0 rgba(0,0,0,0.8),
+                      -3px -3px 0 rgba(0,0,0,0.6),
+                      -4px -4px 0 rgba(0,0,0,0.4),
+                      -5px -5px 0 rgba(0,0,0,0.2),
+                      inset 3px 3px 6px rgba(0,0,0,0.7),
+                      0 0 15px rgba(192,192,192,0.5),
+                      0 0 25px rgba(255,255,255,0.3)
                     `,
-                    filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.5)) brightness(1.1)'
+                    filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.4)) brightness(1.2) contrast(1.1)'
                   }}
                 />
                 

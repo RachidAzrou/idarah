@@ -75,7 +75,7 @@ export default function DueDates() {
         {dueDates.map((item) => (
           <div key={item.id} className="flex items-center space-x-3">
             <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-              item.status === 'today' ? 'bg-red-50' :
+              item.status === 'today' ? 'bg-red-500' :
               item.status === 'urgent' ? 'bg-orange-50' :
               item.status === 'success' ? 'bg-green-50' :
               'bg-blue-50'

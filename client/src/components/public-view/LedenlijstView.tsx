@@ -12,6 +12,11 @@ interface LedenlijstViewProps {
 }
 
 export function LedenlijstView({ config, members = [] }: LedenlijstViewProps) {
+  console.log('=== LedenlijstView Props Debug ===');
+  console.log('members prop:', members);
+  console.log('members length:', members?.length || 0);
+  console.log('config:', config);
+  
   const [currentPage, setCurrentPage] = useState(0);
 
   const convertedMembers = useMemo(() => {
@@ -38,6 +43,10 @@ export function LedenlijstView({ config, members = [] }: LedenlijstViewProps) {
   }, [members]);
   
   const filteredMembers = useMemo(() => {
+    console.log('=== useMemo filteredMembers ===');
+    console.log('convertedMembers:', convertedMembers);
+    console.log('convertedMembers length:', convertedMembers.length);
+    
     const filtered = getFilteredMembers(convertedMembers, {
       categories: config.categories,
       useFullNames: config.display.useFullNames,
@@ -46,6 +55,9 @@ export function LedenlijstView({ config, members = [] }: LedenlijstViewProps) {
       showVotingRights: config.display.showVotingRights,
       actieveLedenOnly: true
     });
+    
+    console.log('filtered result:', filtered);
+    console.log('filtered length:', filtered.length);
     return filtered;
   }, [convertedMembers, config.categories, config.display.filterByCategories, config.display.useFullNames, config.display.useInitials, config.display.showVotingRights]);
   

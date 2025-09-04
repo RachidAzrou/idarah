@@ -164,6 +164,10 @@ export function getFilteredMembers(
     actieveLedenOnly?: boolean;
   }
 ): Member[] {
+  console.log('=== getFilteredMembers Debug ===');
+  console.log('Input members count:', members.length);
+  console.log('Input members:', members);
+  console.log('Config:', config);
   
   let filtered = [...members];
 
@@ -172,9 +176,14 @@ export function getFilteredMembers(
   }
 
   if (config.filterByCategories && config.categories.length > 0) {
+    console.log('Filtering by categories:', config.categories);
+    console.log('Member categories:', filtered.map(m => m.categorie));
+    const beforeFilter = filtered.length;
     filtered = filtered.filter(member => config.categories.includes(member.categorie));
+    console.log(`Category filter: ${beforeFilter} -> ${filtered.length}`);
   }
 
+  console.log('Final result count:', filtered.length);
   return filtered;
 }
 

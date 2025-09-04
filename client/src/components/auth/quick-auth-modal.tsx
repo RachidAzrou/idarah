@@ -48,8 +48,8 @@ export function QuickAuthModal({ onAuthenticated, isOpen }: QuickAuthModalProps)
         throw new Error("Geen toegang - alleen medewerkers en beheerders");
       }
 
-      // Sla verificatie token op in sessionStorage
-      const verifyToken = `verify_${Date.now()}_${result.user.id}`;
+      // Sla verificatie token op in sessionStorage (gebruik token van server)
+      const verifyToken = result.token;
       sessionStorage.setItem("qr_verify_token", verifyToken);
       sessionStorage.setItem("qr_verify_user", JSON.stringify({
         name: result.user.name,

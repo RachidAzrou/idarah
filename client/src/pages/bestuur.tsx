@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { BoardMemberForm } from "@/components/forms/board-member-form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
@@ -67,6 +68,8 @@ export default function Bestuur() {
   const [searchTerm, setSearchTerm] = useState("");
   const [showNewMemberDialog, setShowNewMemberDialog] = useState(false);
   const [selectedBoardMember, setSelectedBoardMember] = useState<any>(null);
+  const [memberToDeactivate, setMemberToDeactivate] = useState<BoardMemberWithMember | null>(null);
+  const [memberToReactivate, setMemberToReactivate] = useState<BoardMemberWithMember | null>(null);
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -164,6 +167,30 @@ export default function Bestuur() {
     },
   });
 
+  // Mutation for reactivating board member
+  const reactivateBoardMemberMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return apiRequest('PUT', `/api/board/members/${id}`, { 
+        status: 'ACTIEF',
+        termEnd: null
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/board/members"] });
+      toast({
+        title: "Bestuurslid gereactiveerd",
+        description: "Het bestuurslid is succesvol gereactiveerd.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fout",
+        description: error.message || "Er is een fout opgetreden bij het reactiveren van het bestuurslid.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleUpdateBoardMember = (formData: any) => {
     if (selectedBoardMember) {
       updateBoardMemberMutation.mutate({ 
@@ -174,9 +201,13 @@ export default function Bestuur() {
   };
 
   const handleDeactivateBoardMember = (id: string) => {
-    if (confirm("Weet je zeker dat je dit bestuurslid wilt deactiveren? Het bestuurslid wordt verplaatst naar de historiek.")) {
-      deactivateBoardMemberMutation.mutate(id);
-    }
+    deactivateBoardMemberMutation.mutate(id);
+    setMemberToDeactivate(null);
+  };
+
+  const handleReactivateBoardMember = (id: string) => {
+    reactivateBoardMemberMutation.mutate(id);
+    setMemberToReactivate(null);
   };
 
   const getName = (item: BoardMemberWithMember) => {
@@ -370,15 +401,36 @@ export default function Bestuur() {
                               <Edit className="w-4 h-4" />
                             </Button>
                             {item.boardMember.status === 'ACTIEF' && (
-                              <Button 
-                                size="sm" 
-                                variant="outline"
-                                onClick={() => handleDeactivateBoardMember(item.boardMember.id)}
-                                disabled={deactivateBoardMemberMutation.isPending}
-                                data-testid={`button-end-term-${item.boardMember.id}`}
-                              >
-                                <FiUserX className="w-4 h-4" />
-                              </Button>
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button 
+                                    size="sm" 
+                                    variant="outline"
+                                    disabled={deactivateBoardMemberMutation.isPending}
+                                    data-testid={`button-end-term-${item.boardMember.id}`}
+                                  >
+                                    <FiUserX className="w-4 h-4" />
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Bestuurslid deactiveren</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      Weet je zeker dat je <strong>{getName(item)}</strong> wilt deactiveren? 
+                                      Het bestuurslid wordt verplaatst naar de historiek en kan later weer gereactiveerd worden.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Annuleren</AlertDialogCancel>
+                                    <AlertDialogAction 
+                                      onClick={() => handleDeactivateBoardMember(item.boardMember.id)}
+                                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                    >
+                                      Deactiveren
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
                             )}
                           </div>
                         )}
@@ -515,6 +567,42 @@ export default function Bestuur() {
                               <p className="mt-1" data-testid={`history-responsibilities-${item.boardMember.id}`}>
                                 {item.boardMember.responsibilities}
                               </p>
+                            </div>
+                          )}
+                          {canEdit && (
+                            <div className="flex gap-2 pt-2 mt-3 border-t border-gray-200">
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button 
+                                    size="sm" 
+                                    variant="outline"
+                                    disabled={reactivateBoardMemberMutation.isPending}
+                                    data-testid={`button-reactivate-${item.boardMember.id}`}
+                                    className="text-green-600 border-green-200 hover:bg-green-50"
+                                  >
+                                    <User className="w-4 h-4 mr-1" />
+                                    Reactiveren
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Bestuurslid reactiveren</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      Weet je zeker dat je <strong>{name}</strong> weer wilt activeren als bestuurslid? 
+                                      Het bestuurslid wordt terug verplaatst naar het actieve overzicht.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Annuleren</AlertDialogCancel>
+                                    <AlertDialogAction 
+                                      onClick={() => handleReactivateBoardMember(item.boardMember.id)}
+                                      className="bg-green-600 text-white hover:bg-green-700"
+                                    >
+                                      Reactiveren
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
                             </div>
                           )}
                         </div>

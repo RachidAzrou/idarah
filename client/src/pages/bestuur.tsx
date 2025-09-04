@@ -75,7 +75,9 @@ export default function Bestuur() {
 
   const { data: boardMembers, isLoading } = useQuery({
     queryKey: ["/api/board/members", { status: statusFilter, role: roleFilter, q: searchTerm }],
-    staleTime: 10000,
+    staleTime: 30000, // 30 seconds - longer caching for stability
+    gcTime: 300000, // 5 minutes - keep data in cache longer
+    refetchOnWindowFocus: false,
     queryFn: async () => {
       const params = new URLSearchParams();
       if (statusFilter && statusFilter !== 'all') params.append('status', statusFilter);
@@ -83,12 +85,7 @@ export default function Bestuur() {
       if (searchTerm) params.append('q', searchTerm);
       
       const url = `/api/board/members${params.toString() ? '?' + params.toString() : ''}`;
-      const response = await fetch(url, { credentials: 'include' });
-      
-      if (!response.ok) {
-        throw new Error(`Failed to fetch board members: ${response.statusText}`);
-      }
-      
+      const response = await apiRequest('GET', url);
       return response.json();
     },
   });

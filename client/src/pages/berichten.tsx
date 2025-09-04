@@ -450,136 +450,10 @@ export default function Berichten() {
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-medium">E-mail Templates</h2>
             {canEdit && (
-              <div className="flex gap-2 flex-wrap">
-                <Button onClick={handleNewTemplate} className="flex items-center gap-2" data-testid="button-new-template">
-                  <Plus className="w-4 h-4" />
-                  Nieuwe Template
-                </Button>
-                <Button 
-                  onClick={() => {
-                    setEditingTemplate(null);
-                    templateForm.reset({
-                      name: "Uitnodiging Algemene Vergadering",
-                      code: "GENERAL_ASSEMBLY",
-                      subject: "Uitnodiging Algemene Vergadering - {{tenant.name}}",
-                      content: `Beste {{member.firstName}} {{member.lastName}},
-
-Hierbij nodigen wij u uit voor de Algemene Vergadering van {{tenant.name}}.
-
-Datum: [DATUM]
-Tijd: [TIJD]
-Locatie: [LOCATIE/ADRES]
-
-Agenda:
-- Opening door de voorzitter
-- Verslag vorige vergadering
-- Jaarverslag bestuur
-- Financieel verslag
-- Verkiezing bestuur
-- Rondvraag
-
-Uw aanwezigheid wordt zeer op prijs gesteld. Heeft u vragen of suggesties voor de agenda, dan kunt u contact met ons opnemen.
-
-Voor leden met stemrecht: vergeet niet uw lidkaart mee te nemen.
-
-Met vriendelijke groet,
-Het bestuur van {{tenant.name}}`
-                    });
-                    setShowTemplateDialog(true);
-                  }}
-                  className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2" 
-                  data-testid="button-create-assembly-template"
-                >
-                  <Calendar className="w-4 h-4" />
-                  Algemene Vergadering
-                </Button>
-                <Button 
-                  onClick={() => {
-                    setEditingTemplate(null);
-                    templateForm.reset({
-                      name: "Uitnodiging Activiteit/Evenement",
-                      code: "ACTIVITY_EVENT",
-                      subject: "Uitnodiging: [ACTIVITEIT NAAM] - {{tenant.name}}",
-                      content: `Beste {{member.firstName}} {{member.lastName}},
-
-We nodigen u graag uit voor onze aankomende activiteit!
-
-🎯 Activiteit: [ACTIVITEIT NAAM]
-📅 Datum: [DATUM]
-🕐 Tijd: [STARTTIJD] - [EINDTIJD]  
-📍 Locatie: [LOCATIE/ADRES]
-
-Over deze activiteit:
-[BESCHRIJVING VAN DE ACTIVITEIT]
-
-Praktische informatie:
-- Kosten: [GRATIS / €X per persoon]
-- Inschrijving vereist: [JA/NEE]
-- Wat meenemen: [ITEMS]
-- Contact voor vragen: {{tenant.email}}
-
-We hopen u te zien bij deze bijzondere gelegenheid!
-
-Heeft u vragen of speciale wensen? Neem gerust contact met ons op.
-
-Met hartelijke groet,
-{{tenant.name}}`
-                    });
-                    setShowTemplateDialog(true);
-                  }}
-                  className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2" 
-                  data-testid="button-create-activity-template"
-                >
-                  <Megaphone className="w-4 h-4" />
-                  Activiteit/Evenement
-                </Button>
-                <Button 
-                  onClick={() => {
-                    setEditingTemplate(null);
-                    templateForm.reset({
-                      name: "Uitnodiging Festiviteit",
-                      code: "FESTIVITY",
-                      subject: "Uitnodiging: [FESTIVITEIT] - {{tenant.name}}",
-                      content: `Beste {{member.firstName}} {{member.lastName}},
-
-Het is ons een genoegen u uit te nodigen voor onze festiviteit!
-
-🎉 Gelegenheid: [FESTIVITEIT NAAM]
-📅 Datum: [DATUM]
-🕐 Tijd: [STARTTIJD]
-📍 Locatie: [LOCATIE/ADRES]
-
-Programma:
-[TIJDSCHEMA VAN DE FESTIVITEIT]
-
-Wat kunt u verwachten:
-- [ACTIVITEIT 1]
-- [ACTIVITEIT 2] 
-- [ETEN/DRINKEN]
-- [ENTERTAINMENT]
-
-Praktische zaken:
-- Toegang: [GRATIS/BIJDRAGE]
-- Kledingscode: [INFORMEEL/FORMEEL/TRADITIONEEL]
-- Parkeren: [INFORMATIE]
-- Kinderen welkom: [JA/NEE]
-
-Voor catering en organisatie is het fijn als u uw komst bevestigt via {{tenant.email}} of telefonisch.
-
-We kijken ernaar uit om samen met u te vieren!
-
-Met feestelijke groet,
-Het organisatieteam van {{tenant.name}}`
-                    });
-                    setShowTemplateDialog(true);
-                  }}
-                  className="bg-purple-600 hover:bg-purple-700 text-white flex items-center gap-2" 
-                  data-testid="button-create-festivity-template"
-                >
-                  <PartyPopper className="w-4 h-4" />
-                  Festiviteit
-                </Button>
-              </div>
+              <Button onClick={handleNewTemplate} className="flex items-center gap-2" data-testid="button-new-template">
+                <Plus className="w-4 h-4" />
+                Nieuwe Template
+              </Button>
             )}
           </div>
 
@@ -606,7 +480,210 @@ Het organisatieteam van {{tenant.name}}`
                 )}
               </div>
             ) : (
-              Array.isArray(templates) && templates.map((template: any) => (
+              <>
+                {/* Template Voorbeelden Cards */}
+                {canEdit && (
+                  <>
+                    {/* Algemene Vergadering Template Card */}
+                    <Card className="hover:shadow-lg transition-shadow border-blue-200 bg-blue-50" data-testid="card-template-assembly">
+                      <CardHeader>
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <Calendar className="w-5 h-5 text-blue-600" />
+                              <CardTitle className="text-base text-blue-900" data-testid="text-template-name-assembly">
+                                Uitnodiging Algemene Vergadering
+                              </CardTitle>
+                            </div>
+                            <CardDescription className="text-blue-700" data-testid="text-template-subject-assembly">
+                              Formele uitnodiging voor jaarvergadering
+                            </CardDescription>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex gap-2">
+                          <Button 
+                            size="sm" 
+                            className="bg-blue-600 hover:bg-blue-700 text-white"
+                            onClick={() => {
+                              setEditingTemplate(null);
+                              templateForm.reset({
+                                name: "Uitnodiging Algemene Vergadering",
+                                code: "GENERAL_ASSEMBLY",
+                                subject: "Uitnodiging Algemene Vergadering - {{tenant.name}}",
+                                content: `Beste {{member.firstName}} {{member.lastName}},
+
+Hierbij nodigen wij u uit voor de Algemene Vergadering van {{tenant.name}}.
+
+Datum: [DATUM]
+Tijd: [TIJD]
+Locatie: [LOCATIE/ADRES]
+
+Agenda:
+- Opening door de voorzitter
+- Verslag vorige vergadering
+- Jaarverslag bestuur
+- Financieel verslag
+- Verkiezing bestuur
+- Rondvraag
+
+Uw aanwezigheid wordt zeer op prijs gesteld. Heeft u vragen of suggesties voor de agenda, dan kunt u contact met ons opnemen.
+
+Voor leden met stemrecht: vergeet niet uw lidkaart mee te nemen.
+
+Met vriendelijke groet,
+Het bestuur van {{tenant.name}}`
+                              });
+                              setShowTemplateDialog(true);
+                            }}
+                            data-testid="button-create-assembly-template"
+                          >
+                            <Plus className="w-4 h-4 mr-1" />
+                            Aanmaken
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Activiteit/Evenement Template Card */}
+                    <Card className="hover:shadow-lg transition-shadow border-green-200 bg-green-50" data-testid="card-template-activity">
+                      <CardHeader>
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <Megaphone className="w-5 h-5 text-green-600" />
+                              <CardTitle className="text-base text-green-900" data-testid="text-template-name-activity">
+                                Uitnodiging Activiteit/Evenement
+                              </CardTitle>
+                            </div>
+                            <CardDescription className="text-green-700" data-testid="text-template-subject-activity">
+                              Template voor activiteiten en evenementen
+                            </CardDescription>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex gap-2">
+                          <Button 
+                            size="sm" 
+                            className="bg-green-600 hover:bg-green-700 text-white"
+                            onClick={() => {
+                              setEditingTemplate(null);
+                              templateForm.reset({
+                                name: "Uitnodiging Activiteit/Evenement",
+                                code: "ACTIVITY_EVENT",
+                                subject: "Uitnodiging: [ACTIVITEIT NAAM] - {{tenant.name}}",
+                                content: `Beste {{member.firstName}} {{member.lastName}},
+
+We nodigen u graag uit voor onze aankomende activiteit!
+
+🎯 Activiteit: [ACTIVITEIT NAAM]
+📅 Datum: [DATUM]
+🕐 Tijd: [STARTTIJD] - [EINDTIJD]  
+📍 Locatie: [LOCATIE/ADRES]
+
+Over deze activiteit:
+[BESCHRIJVING VAN DE ACTIVITEIT]
+
+Praktische informatie:
+- Kosten: [GRATIS / €X per persoon]
+- Inschrijving vereist: [JA/NEE]
+- Wat meenemen: [ITEMS]
+- Contact voor vragen: {{tenant.email}}
+
+We hopen u te zien bij deze bijzondere gelegenheid!
+
+Heeft u vragen of speciale wensen? Neem gerust contact met ons op.
+
+Met hartelijke groet,
+{{tenant.name}}`
+                              });
+                              setShowTemplateDialog(true);
+                            }}
+                            data-testid="button-create-activity-template"
+                          >
+                            <Plus className="w-4 h-4 mr-1" />
+                            Aanmaken
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Festiviteit Template Card */}
+                    <Card className="hover:shadow-lg transition-shadow border-purple-200 bg-purple-50" data-testid="card-template-festivity">
+                      <CardHeader>
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <PartyPopper className="w-5 h-5 text-purple-600" />
+                              <CardTitle className="text-base text-purple-900" data-testid="text-template-name-festivity">
+                                Uitnodiging Festiviteit
+                              </CardTitle>
+                            </div>
+                            <CardDescription className="text-purple-700" data-testid="text-template-subject-festivity">
+                              Template voor feesten en festiviteiten
+                            </CardDescription>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex gap-2">
+                          <Button 
+                            size="sm" 
+                            className="bg-purple-600 hover:bg-purple-700 text-white"
+                            onClick={() => {
+                              setEditingTemplate(null);
+                              templateForm.reset({
+                                name: "Uitnodiging Festiviteit",
+                                code: "FESTIVITY",
+                                subject: "Uitnodiging: [FESTIVITEIT] - {{tenant.name}}",
+                                content: `Beste {{member.firstName}} {{member.lastName}},
+
+Het is ons een genoegen u uit te nodigen voor onze festiviteit!
+
+🎉 Gelegenheid: [FESTIVITEIT NAAM]
+📅 Datum: [DATUM]
+🕐 Tijd: [STARTTIJD]
+📍 Locatie: [LOCATIE/ADRES]
+
+Programma:
+[TIJDSCHEMA VAN DE FESTIVITEIT]
+
+Wat kunt u verwachten:
+- [ACTIVITEIT 1]
+- [ACTIVITEIT 2] 
+- [ETEN/DRINKEN]
+- [ENTERTAINMENT]
+
+Praktische zaken:
+- Toegang: [GRATIS/BIJDRAGE]
+- Kledingcode: [INFORMEEL/FORMEEL/TRADITIONEEL]
+- Parkeren: [INFORMATIE]
+- Kinderen welkom: [JA/NEE]
+
+Voor catering en organisatie is het fijn als u uw komst bevestigt via {{tenant.email}} of telefonisch.
+
+We kijken ernaar uit om samen met u te vieren!
+
+Met feestelijke groet,
+Het organisatieteam van {{tenant.name}}`
+                              });
+                              setShowTemplateDialog(true);
+                            }}
+                            data-testid="button-create-festivity-template"
+                          >
+                            <Plus className="w-4 h-4 mr-1" />
+                            Aanmaken
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </>
+                )}
+                
+                {/* Regular Templates */}
+                {Array.isArray(templates) && templates.map((template: any) => (
                   <Card key={template.id} className="hover:shadow-lg transition-shadow" data-testid={`card-template-${template.id}`}>
                     <CardHeader>
                       <div className="flex items-start justify-between">
@@ -636,6 +713,7 @@ Het organisatieteam van {{tenant.name}}`
                     </CardContent>
                   </Card>
                 ))
+              </>
             )}
           </div>
         </TabsContent>

@@ -204,27 +204,6 @@ export default function Berichten() {
   });
 
 
-  // Delete template mutation
-  const deleteTemplateMutation = useMutation({
-    mutationFn: async (templateId: string) => {
-      return apiRequest("DELETE", `/api/messages/templates/${templateId}`);
-    },
-    onSuccess: () => {
-      // Force immediate cache invalidation and refetch
-      queryClient.removeQueries({ queryKey: ["/api/messages/templates"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/messages/templates"] });
-      queryClient.refetchQueries({ queryKey: ["/api/messages/templates"], type: 'active' });
-      toast({ title: "Template verwijderd", description: "De template is succesvol verwijderd." });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Fout bij verwijderen template",
-        description: error.message || "Er is een fout opgetreden",
-        variant: "destructive"
-      });
-    }
-  });
-
   // Mutations
   const createTemplateMutation = useMutation({
     mutationFn: async (data: z.infer<typeof templateSchema>) => {
@@ -1103,27 +1082,10 @@ Het organisatieteam van {{tenant.name}}`
                             Preview
                           </Button>
                           {canEdit && (
-                            <>
-                              <Button size="sm" variant="outline" onClick={() => handleEditTemplate(template)} data-testid={`button-edit-template-${template.id}`}>
-                                <Edit className="w-4 h-4 mr-1" />
-                                Bewerk
-                              </Button>
-                              <Button 
-                                size="sm" 
-                                variant="outline" 
-                                onClick={() => {
-                                  if (window.confirm(`Weet je zeker dat je de template "${template.name}" wilt verwijderen?`)) {
-                                    deleteTemplateMutation.mutate(template.id);
-                                  }
-                                }} 
-                                data-testid={`button-delete-template-${template.id}`}
-                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                disabled={deleteTemplateMutation.isPending}
-                              >
-                                <Ban className="w-4 h-4 mr-1" />
-                                Verwijder
-                              </Button>
-                            </>
+                            <Button size="sm" variant="outline" onClick={() => handleEditTemplate(template)} data-testid={`button-edit-template-${template.id}`}>
+                              <Edit className="w-4 h-4 mr-1" />
+                              Bewerk
+                            </Button>
                           )}
                         </div>
                       </CardContent>

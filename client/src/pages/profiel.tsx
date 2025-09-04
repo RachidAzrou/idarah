@@ -162,7 +162,7 @@ export default function Profiel() {
 
         <div className="grid gap-6 md:grid-cols-2 mt-6">
         {/* Profiel Gegevens */}
-        <Card>
+        <Card className="glass-card card-hover animate-fade-in group border-0">
           <CardHeader>
             <CardTitle>Profiel Gegevens</CardTitle>
             <CardDescription>
@@ -235,7 +235,7 @@ export default function Profiel() {
         </Card>
 
         {/* Wachtwoord Wijzigen */}
-        <Card>
+        <Card className="glass-card card-hover animate-fade-in group border-0">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Lock className="h-5 w-5" />
@@ -321,7 +321,7 @@ export default function Profiel() {
         </div>
 
         {/* Account Info */}
-        <Card className="mt-6">
+        <Card className="mt-6 glass-card card-hover animate-fade-in group border-0">
         <CardHeader>
           <CardTitle>Account Informatie</CardTitle>
           <CardDescription>

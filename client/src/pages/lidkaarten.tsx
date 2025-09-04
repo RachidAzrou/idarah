@@ -651,7 +651,7 @@ export default function LidkaartenPage() {
 
       {/* Preview Modal */}
       <Dialog open={!!previewCard} onOpenChange={() => setPreviewCard(null)}>
-        <DialogContent className="max-w-3xl max-h-[95vh] overflow-y-auto">
+        <DialogContent className="max-w-5xl max-h-[95vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Lidkaart Preview</DialogTitle>
           </DialogHeader>

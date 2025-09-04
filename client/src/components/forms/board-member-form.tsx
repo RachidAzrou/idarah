@@ -723,32 +723,46 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
                               onChange={(e) => {
                                 const inputValue = e.target.value;
                                 
-                                // Handle numeric input (e.g., 01012024 -> 01/01/2024)
+                                // Handle numeric input with automatic formatting
                                 if (/^\d+$/.test(inputValue)) {
+                                  // Auto-format as user types: 04061993 -> 04/06/1993
                                   if (inputValue.length === 8) {
                                     const day = inputValue.substring(0, 2);
                                     const month = inputValue.substring(2, 4);
                                     const year = inputValue.substring(4, 8);
-                                    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-                                    if (!isNaN(date.getTime()) && parseInt(month) >= 1 && parseInt(month) <= 12 && parseInt(day) >= 1 && parseInt(day) <= 31) {
-                                      field.onChange(date);
-                                      return;
+                                    
+                                    // Validate date components
+                                    const dayNum = parseInt(day);
+                                    const monthNum = parseInt(month);
+                                    const yearNum = parseInt(year);
+                                    
+                                    if (dayNum >= 1 && dayNum <= 31 && monthNum >= 1 && monthNum <= 12 && yearNum >= 1900 && yearNum <= 2100) {
+                                      const date = new Date(yearNum, monthNum - 1, dayNum);
+                                      if (!isNaN(date.getTime()) && date.getDate() === dayNum) {
+                                        field.onChange(date);
+                                        return;
+                                      }
                                     }
                                   }
+                                  // Allow partial input for progressive typing
+                                  return;
                                 }
                                 
                                 // Handle formatted input (DD/MM/YYYY)
-                                if (inputValue.length === 10 && inputValue.includes('/')) {
-                                  const [day, month, year] = inputValue.split('/');
-                                  if (day && month && year) {
-                                    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-                                    if (!isNaN(date.getTime())) {
-                                      field.onChange(date);
+                                if (inputValue.includes('/')) {
+                                  const parts = inputValue.split('/');
+                                  if (parts.length === 3) {
+                                    const [day, month, year] = parts;
+                                    if (day && month && year && year.length === 4) {
+                                      const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+                                      if (!isNaN(date.getTime())) {
+                                        field.onChange(date);
+                                      }
                                     }
                                   }
                                 }
                               }}
-                              placeholder="DD/MM/YYYY"
+                              placeholder="DD/MM/YYYY of 04061993"
                               className="pr-10 border-gray-200"
                               data-testid="input-term-start"
                               maxLength={10}
@@ -865,32 +879,46 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
                               onChange={(e) => {
                                 const inputValue = e.target.value;
                                 
-                                // Handle numeric input (e.g., 31122025 -> 31/12/2025)
+                                // Handle numeric input with automatic formatting
                                 if (/^\d+$/.test(inputValue)) {
+                                  // Auto-format as user types: 31122025 -> 31/12/2025
                                   if (inputValue.length === 8) {
                                     const day = inputValue.substring(0, 2);
                                     const month = inputValue.substring(2, 4);
                                     const year = inputValue.substring(4, 8);
-                                    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-                                    if (!isNaN(date.getTime()) && parseInt(month) >= 1 && parseInt(month) <= 12 && parseInt(day) >= 1 && parseInt(day) <= 31) {
-                                      field.onChange(date);
-                                      return;
+                                    
+                                    // Validate date components
+                                    const dayNum = parseInt(day);
+                                    const monthNum = parseInt(month);
+                                    const yearNum = parseInt(year);
+                                    
+                                    if (dayNum >= 1 && dayNum <= 31 && monthNum >= 1 && monthNum <= 12 && yearNum >= 1900 && yearNum <= 2100) {
+                                      const date = new Date(yearNum, monthNum - 1, dayNum);
+                                      if (!isNaN(date.getTime()) && date.getDate() === dayNum) {
+                                        field.onChange(date);
+                                        return;
+                                      }
                                     }
                                   }
+                                  // Allow partial input for progressive typing
+                                  return;
                                 }
                                 
                                 // Handle formatted input (DD/MM/YYYY)
-                                if (inputValue.length === 10 && inputValue.includes('/')) {
-                                  const [day, month, year] = inputValue.split('/');
-                                  if (day && month && year) {
-                                    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-                                    if (!isNaN(date.getTime())) {
-                                      field.onChange(date);
+                                if (inputValue.includes('/')) {
+                                  const parts = inputValue.split('/');
+                                  if (parts.length === 3) {
+                                    const [day, month, year] = parts;
+                                    if (day && month && year && year.length === 4) {
+                                      const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+                                      if (!isNaN(date.getTime())) {
+                                        field.onChange(date);
+                                      }
                                     }
                                   }
                                 }
                               }}
-                              placeholder="DD/MM/YYYY"
+                              placeholder="DD/MM/YYYY of 31122025"
                               className="pr-10 border-gray-200"
                               data-testid="input-term-end"
                               maxLength={10}

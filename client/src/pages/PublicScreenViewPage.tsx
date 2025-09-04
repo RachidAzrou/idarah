@@ -21,6 +21,10 @@ export default function PublicScreenViewPage() {
         const response = await fetch(`/api/public-screens/token/${publicToken}`);
         if (response.ok) {
           const foundScreen = await response.json();
+          console.log('=== PublicScreenViewPage Debug ===');
+          console.log('API Response screen:', foundScreen);
+          console.log('Screen members:', foundScreen.members);
+          console.log('Screen members length:', foundScreen.members?.length || 0);
           setScreen(foundScreen);
         } else {
           setScreen(null);

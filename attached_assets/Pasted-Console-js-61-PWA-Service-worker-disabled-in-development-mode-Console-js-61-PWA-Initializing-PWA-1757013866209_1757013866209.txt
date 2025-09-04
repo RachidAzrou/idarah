@@ -1,0 +1,51 @@
+Console.js:61 [PWA] Service worker disabled in development mode
+Console.js:61 [PWA] Initializing PWA features...
+Console.js:61 [PWA] Running in development mode - service worker disabled
+Console.js:61 [PWA] App is running as installed PWA
+Console.js:61 [PWA] PWA features initialized
+workspace_iframe.html?initialPath=%2Fscreen%2Fscreen-gq0n8v1kl0o&id=%3Arek%3A:1 Unrecognized feature: 'ambient-light-sensor'.Understand this warning
+workspace_iframe.html?initialPath=%2Fscreen%2Fscreen-gq0n8v1kl0o&id=%3Arek%3A:1 Unrecognized feature: 'battery'.Understand this warning
+workspace_iframe.html?initialPath=%2Fscreen%2Fscreen-gq0n8v1kl0o&id=%3Arek%3A:1 Unrecognized feature: 'execution-while-not-rendered'.Understand this warning
+workspace_iframe.html?initialPath=%2Fscreen%2Fscreen-gq0n8v1kl0o&id=%3Arek%3A:1 Unrecognized feature: 'execution-while-out-of-viewport'.Understand this warning
+workspace_iframe.html?initialPath=%2Fscreen%2Fscreen-gq0n8v1kl0o&id=%3Arek%3A:1 Unrecognized feature: 'layout-animations'.Understand this warning
+workspace_iframe.html?initialPath=%2Fscreen%2Fscreen-gq0n8v1kl0o&id=%3Arek%3A:1 Unrecognized feature: 'legacy-image-formats'.Understand this warning
+workspace_iframe.html?initialPath=%2Fscreen%2Fscreen-gq0n8v1kl0o&id=%3Arek%3A:1 Unrecognized feature: 'navigation-override'.Understand this warning
+workspace_iframe.html?initialPath=%2Fscreen%2Fscreen-gq0n8v1kl0o&id=%3Arek%3A:1 Unrecognized feature: 'oversized-images'.Understand this warning
+workspace_iframe.html?initialPath=%2Fscreen%2Fscreen-gq0n8v1kl0o&id=%3Arek%3A:1 Unrecognized feature: 'publickey-credentials'.Understand this warning
+workspace_iframe.html?initialPath=%2Fscreen%2Fscreen-gq0n8v1kl0o&id=%3Arek%3A:1 Unrecognized feature: 'speaker-selection'.Understand this warning
+workspace_iframe.html?initialPath=%2Fscreen%2Fscreen-gq0n8v1kl0o&id=%3Arek%3A:1 Unrecognized feature: 'unoptimized-images'.Understand this warning
+workspace_iframe.html?initialPath=%2Fscreen%2Fscreen-gq0n8v1kl0o&id=%3Arek%3A:1 Unrecognized feature: 'unsized-media'.Understand this warning
+workspace_iframe.html?initialPath=%2Fscreen%2Fscreen-gq0n8v1kl0o&id=%3Arek%3A:1 Allow attribute will take precedence over 'allowfullscreen'.Understand this warning
+workspace_iframe.html?initialPath=%2Fscreen%2Fscreen-gq0n8v1kl0o&id=%3Arek%3A:1 Allow attribute will take precedence over 'allowpaymentrequest'.Understand this warning
+SaaSProduct:1 Unrecognized feature: 'ambient-light-sensor'.Understand this warning
+SaaSProduct:1 Unrecognized feature: 'battery'.Understand this warning
+SaaSProduct:1 Unrecognized feature: 'execution-while-not-rendered'.Understand this warning
+SaaSProduct:1 Unrecognized feature: 'execution-while-out-of-viewport'.Understand this warning
+SaaSProduct:1 Unrecognized feature: 'layout-animations'.Understand this warning
+SaaSProduct:1 Unrecognized feature: 'legacy-image-formats'.Understand this warning
+SaaSProduct:1 Unrecognized feature: 'navigation-override'.Understand this warning
+SaaSProduct:1 Unrecognized feature: 'oversized-images'.Understand this warning
+SaaSProduct:1 Unrecognized feature: 'publickey-credentials'.Understand this warning
+SaaSProduct:1 Unrecognized feature: 'speaker-selection'.Understand this warning
+SaaSProduct:1 Unrecognized feature: 'unoptimized-images'.Understand this warning
+SaaSProduct:1 Unrecognized feature: 'unsized-media'.Understand this warning
+SaaSProduct:1 Unrecognized feature: 'pointer-lock'.Understand this warning
+SaaSProduct:1 Allow attribute will take precedence over 'allowfullscreen'.Understand this warning
+SaaSProduct:1 Allow attribute will take precedence over 'allowpaymentrequest'.Understand this warning
+Console.js:61 === LedenlijstView Props Debug ===
+Console.js:61 members prop: []
+Console.js:61 members length: 0
+Console.js:61 config: {description: 'test', title: {…}, subtitle: {…}, display: {…}, year: 2025, …}
+Console.js:61 === useMemo filteredMembers ===
+Console.js:61 convertedMembers: []
+Console.js:61 convertedMembers length: 0
+Console.js:61 === getFilteredMembers Debug ===
+Console.js:61 Input members count: 0
+Console.js:61 Input members: []
+Console.js:61 Config: {categories: Array(2), useFullNames: true, useInitials: false, filterByCategories: true, showVotingRights: false, …}
+Console.js:61 Filtering by categories: (2) ['Student', 'Standaard']
+Console.js:61 Member categories: []
+Console.js:61 Category filter: 0 -> 0
+Console.js:61 Final result count: 0
+Console.js:61 filtered result: []
+Console.js:61 filtered length: 0

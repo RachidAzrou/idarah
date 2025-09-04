@@ -1222,10 +1222,21 @@ Het organisatieteam van {{tenant.name}}`
                         Preview
                       </Button>
                       {canEdit && (
-                        <Button size="sm" variant="outline" onClick={() => handleEditSegment(segment)} data-testid={`button-edit-segment-${segment.id}`}>
-                          <Edit className="w-4 h-4 mr-1" />
-                          Bewerk
-                        </Button>
+                        <>
+                          <Button size="sm" variant="outline" onClick={() => handleEditSegment(segment)} data-testid={`button-edit-segment-${segment.id}`}>
+                            <Edit className="w-4 h-4 mr-1" />
+                            Bewerk
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => handleDeleteSegment(segment)}
+                            className="text-red-600 hover:text-red-700 hover:border-red-200 hover:bg-red-50"
+                            data-testid={`button-delete-segment-${segment.id}`}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </>
                       )}
                     </div>
                   </CardContent>

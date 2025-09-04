@@ -31,10 +31,7 @@ export default function Login() {
         title: "Succesvol ingelogd",
         description: "Welkom terug!",
       });
-      // Kleine delay om user data te laten laden voordat we redirecten
-      setTimeout(() => {
-        setLocation("/dashboard");
-      }, 100);
+      setLocation("/dashboard");
     } else {
       setError(result.message || "Inloggen mislukt. Controleer uw gegevens.");
     }

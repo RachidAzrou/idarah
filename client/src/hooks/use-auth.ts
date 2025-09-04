@@ -79,7 +79,12 @@ export function useAuth(): AuthState {
 
   const login = async (email: string, password: string) => {
     try {
-      await loginMutation.mutateAsync({ email, password });
+      const result = await loginMutation.mutateAsync({ email, password });
+      
+      // Wacht tot user query geïnvalideerd en opnieuw gefetcht is
+      await queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+      await queryClient.refetchQueries({ queryKey: ["/api/auth/me"] });
+      
       return { success: true };
     } catch (error: any) {
       return { success: false, message: error.message || "Inloggen mislukt. Controleer uw gegevens." };

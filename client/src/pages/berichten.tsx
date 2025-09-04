@@ -1466,7 +1466,7 @@ Het organisatieteam van {{tenant.name}}`
                   <div className="space-y-2">
                     {/* Recipients Tags */}
                     {emailRecipients.length > 0 && (
-                      <div className="flex flex-wrap gap-2 p-3 bg-gray-50 border border-gray-200 rounded-md">
+                      <div className="flex flex-wrap gap-2 p-3 glass-card border-0 rounded-md">
                         {emailRecipients.map((recipient, index) => (
                           <div 
                             key={index} 
@@ -1515,7 +1515,7 @@ Het organisatieteam van {{tenant.name}}`
                       
                       {/* Autocomplete Suggestions */}
                       {showRecipientSuggestions && recipientInput.length > 0 && (
-                        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                        <div className="absolute z-10 w-full mt-1 glass-card border-0 rounded-md max-h-60 overflow-y-auto">
                           {getRecipientSuggestions().map((suggestion, index) => (
                             <button
                               key={index}
@@ -1588,7 +1588,7 @@ Het organisatieteam van {{tenant.name}}`
                     
                     <Collapsible open={showVariablesHelper} onOpenChange={setShowVariablesHelper}>
                       <CollapsibleContent className="w-80">
-                        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 ml-2">
+                        <div className="glass-card border-0 rounded-lg p-4 ml-2">
                           <h3 className="text-sm font-semibold mb-3 text-gray-900">Beschikbare Variabelen</h3>
                           <div className="space-y-4 max-h-80 overflow-y-auto">
                             

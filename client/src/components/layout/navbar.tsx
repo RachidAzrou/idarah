@@ -47,20 +47,20 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-sidebar-border bg-sidebar backdrop-blur supports-[backdrop-filter]:bg-sidebar/95">
-      <div className="w-full flex h-12 items-center pl-0 pr-4 sm:pr-6 lg:pr-8">
-        {/* Logo - helemaal links */}
-        <div className="flex items-center">
+      <div className="w-full flex h-12 items-center pl-0 pr-4 sm:pr-6 lg:pr-8 relative">
+        {/* Logo - absolute positioning */}
+        <div className="absolute left-4 flex items-center">
           <Link href="/dashboard" className="flex items-center">
             <img 
               src={darahLogo} 
               alt="DARAH Logo" 
-              className="w-56 h-14 xs:w-60 xs:h-15 sm:w-64 sm:h-16 md:w-72 md:h-18 lg:w-80 lg:h-20 object-contain object-left ml-4"
+              className="w-56 h-14 xs:w-60 xs:h-15 sm:w-64 sm:h-16 md:w-72 md:h-18 lg:w-80 lg:h-20 object-contain object-left"
             />
           </Link>
         </div>
 
-        {/* Navigation - perfect gecentreerd */}
-        <div className="flex-1 flex justify-center overflow-x-auto">
+        {/* Navigation - perfect gecentreerd over volledige breedte */}
+        <div className="w-full flex justify-center overflow-x-auto">
           <nav className="hidden lg:flex items-center space-x-2 xl:space-x-3">
             {navigation.map((item) => {
               const isActive = location === item.href || (item.href !== "/dashboard" && location.startsWith(item.href));
@@ -109,8 +109,8 @@ export default function Navbar() {
           </DropdownMenu>
         </div>
 
-        {/* Profiel - helemaal rechts met gelijke ruimte */}
-        <div className="flex items-center">
+        {/* Profiel - absolute positioning rechts */}
+        <div className="absolute right-4 sm:right-6 lg:right-8 flex items-center">
           {user && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

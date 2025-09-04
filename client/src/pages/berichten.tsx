@@ -71,6 +71,27 @@ function convertToHTML(plainText: string): string {
         <p>${trimmed}</p>
       </div>`;
       }
+      
+      // Red highlighting for VERVALLEN BEDRAGEN section
+      if (trimmed.includes('VERVALLEN BEDRAGEN') || (trimmed.includes('{{#each vervallenFees}}') || trimmed.includes('vervallenFees'))) {
+        return `        <div class="expired-amount">
+        <p>${trimmed}</p>
+      </div>`;
+      }
+      
+      // Yellow/orange highlighting for OPENSTAANDE BEDRAGEN section  
+      if (trimmed.includes('OPENSTAANDE BEDRAGEN') || trimmed.includes('{{#each openstaandeFees}}')) {
+        return `        <div style="background-color: #fef3c7; padding: 15px; border-left: 4px solid #f59e0b; margin: 20px 0; border-radius: 0 4px 4px 0;">
+        <p style="color: #92400e; font-weight: 500;">${trimmed}</p>
+      </div>`;
+      }
+      
+      // Green highlighting for BETAALDE BEDRAGEN section
+      if (trimmed.includes('BETAALDE BEDRAGEN') || trimmed.includes('{{#each betaaldeFees}}')) {
+        return `        <div style="background-color: #d1fae5; padding: 15px; border-left: 4px solid #10b981; margin: 20px 0; border-radius: 0 4px 4px 0;">
+        <p style="color: #065f46; font-weight: 500;">${trimmed}</p>
+      </div>`;
+      }
       return `        <p>${trimmed}</p>`;
     })
     .join('\n');
@@ -598,14 +619,30 @@ Met vriendelijke groet,
 
 We willen u eraan herinneren dat uw lidgeld nog niet is betaald.
 
-Vervallen bedragen:
-{{#each member.fees.expired}}
+{{#if vervallenFees}}
+VERVALLEN BEDRAGEN:
+{{#each vervallenFees}}
 - {{this.description}}: {{currency this.amount}} (vervaldatum: {{date this.dueDate}})
 {{/each}}
 
 Totaal vervallen bedrag: {{currency member.fees.totalExpiredAmount}}
+{{/if}}
 
-Gelieve dit bedrag zo spoedig mogelijk te voldoen. Voor vragen over de betaling kunt u contact met ons opnemen.
+{{#if openstaandeFees}}
+OPENSTAANDE BEDRAGEN:
+{{#each openstaandeFees}}
+- {{this.description}}: {{currency this.amount}} (vervaldatum: {{date this.dueDate}})
+{{/each}}
+{{/if}}
+
+{{#if betaaldeFees}}
+BETAALDE BEDRAGEN (ter referentie):
+{{#each betaaldeFees}}
+- {{this.description}}: {{currency this.amount}} (betaald op: {{date this.paidAt}})
+{{/each}}
+{{/if}}
+
+Gelieve de openstaande en vervallen bedragen zo spoedig mogelijk te voldoen. Voor vragen over de betaling kunt u contact met ons opnemen.
 
 Betaalgegevens:
 Rekeningnummer: [IBAN NUMMER]
@@ -632,14 +669,30 @@ Met vriendelijke groet,
 
 We willen u eraan herinneren dat uw lidgeld nog niet is betaald.
 
-Vervallen bedragen:
-{{#each member.fees.expired}}
+{{#if vervallenFees}}
+VERVALLEN BEDRAGEN:
+{{#each vervallenFees}}
 - {{this.description}}: {{currency this.amount}} (vervaldatum: {{date this.dueDate}})
 {{/each}}
 
 Totaal vervallen bedrag: {{currency member.fees.totalExpiredAmount}}
+{{/if}}
 
-Gelieve dit bedrag zo spoedig mogelijk te voldoen. Voor vragen over de betaling kunt u contact met ons opnemen.
+{{#if openstaandeFees}}
+OPENSTAANDE BEDRAGEN:
+{{#each openstaandeFees}}
+- {{this.description}}: {{currency this.amount}} (vervaldatum: {{date this.dueDate}})
+{{/each}}
+{{/if}}
+
+{{#if betaaldeFees}}
+BETAALDE BEDRAGEN (ter referentie):
+{{#each betaaldeFees}}
+- {{this.description}}: {{currency this.amount}} (betaald op: {{date this.paidAt}})
+{{/each}}
+{{/if}}
+
+Gelieve de openstaande en vervallen bedragen zo spoedig mogelijk te voldoen. Voor vragen over de betaling kunt u contact met ons opnemen.
 
 Betaalgegevens:
 Rekeningnummer: [IBAN NUMMER]

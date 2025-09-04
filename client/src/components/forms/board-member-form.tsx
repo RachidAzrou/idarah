@@ -800,7 +800,7 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
                                   }
                                 }
                               }}
-                              placeholder="DD/MM/YYYY of 04061993"
+                              placeholder="DD/MM/YYYY"
                               className="pr-10 border-gray-200"
                               data-testid="input-term-start"
                               maxLength={10}
@@ -956,7 +956,7 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
                                   }
                                 }
                               }}
-                              placeholder="DD/MM/YYYY of 31122025"
+                              placeholder="DD/MM/YYYY"
                               className="pr-10 border-gray-200"
                               data-testid="input-term-end"
                               maxLength={10}

@@ -578,7 +578,7 @@ export default function Instellingen() {
               </TabsList>
 
               <TabsContent value="organization" className="space-y-6">
-                <Card>
+                <Card className="glass-card card-hover animate-fade-in group border-0">
                   <CardHeader>
                     <CardTitle>Organisatie Informatie</CardTitle>
                     <p className="text-sm text-gray-500">Basis informatie over uw moskee organisatie</p>
@@ -822,7 +822,7 @@ export default function Instellingen() {
 
 
               <TabsContent value="fees" className="space-y-6">
-                <Card>
+                <Card className="glass-card card-hover animate-fade-in group border-0">
                   <CardHeader>
                     <CardTitle>Standaard Lidgeld Tarieven</CardTitle>
                     <p className="text-sm text-gray-500">Configureer de standaard bijdragen per lidcategorie</p>
@@ -951,7 +951,7 @@ export default function Instellingen() {
               </TabsContent>
 
               <TabsContent value="security" className="space-y-6">
-                <Card>
+                <Card className="glass-card card-hover animate-fade-in group border-0">
                   <CardHeader className="flex flex-row items-center justify-between">
                     <div>
                       <CardTitle>Gebruikersbeheer</CardTitle>
@@ -1069,7 +1069,7 @@ export default function Instellingen() {
                         {Array.isArray(users) && users.map((currentUser: any) => {
                           const isCurrentUser = currentUser.email === user?.email;
                           return (
-                          <div key={currentUser.id} className={`flex items-center justify-between p-4 border border-gray-200 rounded-xl ${isCurrentUser ? 'opacity-50' : ''}`} data-testid={`user-item-${currentUser.id}`}>
+                          <div key={currentUser.id} className={`flex items-center justify-between p-4 glass-card border-0 rounded-xl ${isCurrentUser ? 'opacity-50' : ''}`} data-testid={`user-item-${currentUser.id}`}>
                             <div className="flex items-center space-x-4">
                               <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
                                 {currentUser.role === 'BEHEERDER' ? (
@@ -1200,7 +1200,7 @@ export default function Instellingen() {
               </TabsContent>
 
               <TabsContent value="rules" className="space-y-6">
-                <Card>
+                <Card className="glass-card card-hover animate-fade-in group border-0">
                   <CardHeader className="flex flex-row items-center justify-between">
                     <div>
                       <CardTitle>Organisatieregels</CardTitle>
@@ -1362,7 +1362,7 @@ export default function Instellingen() {
                     ) : (
                       <div className="space-y-4">
                         {Array.isArray(rules) && rules.map((rule: any) => (
-                          <div key={rule.id} className="p-4 border border-gray-200 rounded-xl" data-testid={`rule-item-${rule.id}`}>
+                          <div key={rule.id} className="p-4 glass-card border-0 rounded-xl" data-testid={`rule-item-${rule.id}`}>
                             <div className="flex items-start justify-between">
                               <div className="flex-1">
                                 <div className="flex items-center space-x-2 mb-2">

@@ -249,24 +249,26 @@ export default function Bestuur() {
                 Beheer bestuursleden en hun mandaten
               </p>
             </div>
-            {canEdit && (
-              <Button
-                onClick={() => setShowNewMemberDialog(true)}
-                className="flex items-center gap-2"
-                data-testid="button-new-board-member"
-              >
-                <Plus className="w-4 h-4" />
-                Nieuw Bestuurslid
-              </Button>
-            )}
           </div>
         </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid grid-cols-2 w-auto" data-testid="board-tabs">
-          <TabsTrigger value="overzicht" data-testid="tab-overview">Overzicht</TabsTrigger>
-          <TabsTrigger value="historiek" data-testid="tab-history">Historiek</TabsTrigger>
-        </TabsList>
+        <div className="flex items-center justify-between">
+          <TabsList className="grid grid-cols-2 w-auto" data-testid="board-tabs">
+            <TabsTrigger value="overzicht" data-testid="tab-overview">Overzicht</TabsTrigger>
+            <TabsTrigger value="historiek" data-testid="tab-history">Historiek</TabsTrigger>
+          </TabsList>
+          {canEdit && (
+            <Button
+              onClick={() => setShowNewMemberDialog(true)}
+              className="flex items-center gap-2"
+              data-testid="button-new-board-member"
+            >
+              <Plus className="w-4 h-4" />
+              Nieuw Bestuurslid
+            </Button>
+          )}
+        </div>
 
         <TabsContent value="overzicht" className="space-y-6">
           {/* Filters */}

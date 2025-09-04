@@ -161,9 +161,9 @@ export function Toolbar({
 
           {/* All Filters */}
           <div className="flex flex-col gap-4">
-            <div className="flex flex-wrap gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               <Select value={statusFilter} onValueChange={onStatusFilterChange}>
-                <SelectTrigger className="w-[160px] h-9 border-gray-200" data-testid="status-filter">
+                <SelectTrigger className="h-9 border-gray-200" data-testid="status-filter">
                   <SelectValue placeholder="Alle statussen" />
                 </SelectTrigger>
                 <SelectContent>
@@ -174,7 +174,7 @@ export function Toolbar({
               </Select>
 
               <Select value={categoryFilter} onValueChange={onCategoryFilterChange}>
-                <SelectTrigger className="w-[170px] h-9 border-gray-200" data-testid="category-filter">
+                <SelectTrigger className="h-9 border-gray-200" data-testid="category-filter">
                   <SelectValue placeholder="Alle categorieën" />
                 </SelectTrigger>
                 <SelectContent>
@@ -187,7 +187,7 @@ export function Toolbar({
               </Select>
 
               <Select value={votingRightsFilter} onValueChange={onVotingRightsFilterChange}>
-                <SelectTrigger className="w-[200px] h-9 border-gray-200" data-testid="voting-rights-filter">
+                <SelectTrigger className="h-9 border-gray-200" data-testid="voting-rights-filter">
                   <SelectValue placeholder="Stemgerechtigdheid" />
                 </SelectTrigger>
                 <SelectContent>
@@ -197,7 +197,7 @@ export function Toolbar({
               </Select>
 
               <Select value={paymentStatusFilter} onValueChange={onPaymentStatusFilterChange}>
-                <SelectTrigger className="w-[200px] h-9 border-gray-200" data-testid="payment-status-filter">
+                <SelectTrigger className="h-9 border-gray-200" data-testid="payment-status-filter">
                   <SelectValue placeholder="Alle betaalstatussen" />
                 </SelectTrigger>
                 <SelectContent>
@@ -209,7 +209,7 @@ export function Toolbar({
               </Select>
             </div>
 
-            <div className="flex flex-wrap gap-3 items-center">
+            <div className="hidden lg:flex flex-wrap gap-3 items-center">
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-600">Inschrijving:</span>
                 

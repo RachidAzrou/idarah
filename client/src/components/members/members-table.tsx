@@ -153,7 +153,7 @@ export function MembersTable({
             </p>
           </div>
           
-          <div className="flex items-center gap-4">
+          <div className="hidden sm:flex items-center gap-4">
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-500">Per pagina:</span>
               <Select value={perPage.toString()} onValueChange={(value) => onPerPageChange(Number(value))}>
@@ -209,11 +209,11 @@ export function MembersTable({
               <TableHead>
                 Status
               </TableHead>
-              <TableHead>
+              <TableHead className="hidden md:table-cell">
                 Categorie
               </TableHead>
               <TableHead 
-                className="cursor-pointer hover:bg-[#f9fafb]"
+                className="hidden lg:table-cell cursor-pointer hover:bg-[#f9fafb]"
                 onClick={() => handleSort('createdAt')}
               >
                 <div className="flex items-center gap-2">
@@ -260,12 +260,12 @@ export function MembersTable({
                 <TableCell>
                   <StatusBadge status={member.active ? 'ACTIEF' : 'INACTIEF'} />
                 </TableCell>
-                <TableCell>
+                <TableCell className="hidden md:table-cell">
                   <Badge variant="secondary" className="text-xs">
                     {getMemberCategoryLabel(member.category)}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-gray-500">
+                <TableCell className="hidden lg:table-cell text-gray-500">
                   {formatDate(member.createdAt)}
                 </TableCell>
                 <TableCell className="text-right">

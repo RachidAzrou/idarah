@@ -116,7 +116,7 @@ export default function Navbar() {
                       {getUserInitials(user.name)}
                     </span>
                   </div>
-                  <div className="flex flex-col items-start">
+                  <div className="hidden sm:flex flex-col items-start">
                     <span className="text-sm font-medium text-sidebar-foreground">{user.name}</span>
                     <span className="text-xs text-sidebar-foreground/70">{user.role}</span>
                   </div>

@@ -244,21 +244,21 @@ export default function FinancePage() {
         {/* Main Content Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:grid-cols-4">
-            <TabsTrigger value="overview" className="gap-2" data-testid="tab-overview">
+            <TabsTrigger value="overview" className="gap-1 sm:gap-2" data-testid="tab-overview">
               <BarChart3 className="h-4 w-4" />
-              Overzicht
+              <span className="hidden sm:inline">Overzicht</span>
             </TabsTrigger>
-            <TabsTrigger value="journal" className="gap-2" data-testid="tab-journal">
+            <TabsTrigger value="journal" className="gap-1 sm:gap-2" data-testid="tab-journal">
               <BookOpen className="h-4 w-4" />
-              Journaal
+              <span className="hidden sm:inline">Journaal</span>
             </TabsTrigger>
-            <TabsTrigger value="reconciliation" className="gap-2" data-testid="tab-reconciliation">
+            <TabsTrigger value="reconciliation" className="gap-1 sm:gap-2" data-testid="tab-reconciliation">
               <RefreshCw className="h-4 w-4" />
-              Reconciliatie
+              <span className="hidden sm:inline">Reconciliatie</span>
             </TabsTrigger>
-            <TabsTrigger value="reports" className="gap-2" data-testid="tab-reports">
+            <TabsTrigger value="reports" className="gap-1 sm:gap-2" data-testid="tab-reports">
               <PieChart className="h-4 w-4" />
-              Rapporten
+              <span className="hidden sm:inline">Rapporten</span>
             </TabsTrigger>
           </TabsList>
 

@@ -507,7 +507,7 @@ export default function LidkaartenPage() {
                 </div>
               </TableHead>
               <TableHead 
-                className="cursor-pointer hover:bg-gray-50"
+                className="hidden md:table-cell cursor-pointer hover:bg-gray-50"
                 onClick={() => handleSort('category')}
               >
                 <div className="flex items-center gap-2">
@@ -525,7 +525,7 @@ export default function LidkaartenPage() {
                 </div>
               </TableHead>
               <TableHead 
-                className="cursor-pointer hover:bg-gray-50"
+                className="hidden lg:table-cell cursor-pointer hover:bg-gray-50"
                 onClick={() => handleSort('validUntil')}
               >
                 <div className="flex items-center gap-2">
@@ -533,9 +533,9 @@ export default function LidkaartenPage() {
                   {getSortIcon('validUntil')}
                 </div>
               </TableHead>
-              <TableHead>Versie</TableHead>
+              <TableHead className="hidden lg:table-cell">Versie</TableHead>
               <TableHead 
-                className="cursor-pointer hover:bg-gray-50"
+                className="hidden xl:table-cell cursor-pointer hover:bg-gray-50"
                 onClick={() => handleSort('lastRenderedAt')}
               >
                 <div className="flex items-center gap-2">
@@ -579,18 +579,20 @@ export default function LidkaartenPage() {
                   <TableCell className="font-medium">
                     {member.firstName} {member.lastName}
                   </TableCell>
-                  <TableCell>{getMemberCategoryLabel(member.category)}</TableCell>
+                  <TableCell className="hidden md:table-cell">{getMemberCategoryLabel(member.category)}</TableCell>
                   <TableCell>
-                    {cardMeta ? getStatusLabel(cardMeta.status) : 'Geen kaart'}
+                    <Badge variant={getStatusVariant(cardMeta?.status || 'GEEN_KAART')}>
+                      {cardMeta ? getStatusLabel(cardMeta.status) : 'Geen kaart'}
+                    </Badge>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="hidden lg:table-cell">
                     {cardMeta?.validUntil 
                       ? format(new Date(cardMeta.validUntil), 'dd/MM/yyyy', { locale: nl })
                       : '-'
                     }
                   </TableCell>
-                  <TableCell>{cardMeta?.version || '-'}</TableCell>
-                  <TableCell>
+                  <TableCell className="hidden lg:table-cell">{cardMeta?.version || '-'}</TableCell>
+                  <TableCell className="hidden xl:table-cell">
                     {cardMeta?.lastRenderedAt 
                       ? format(new Date(cardMeta.lastRenderedAt), 'dd/MM/yyyy HH:mm', { locale: nl })
                       : '-'

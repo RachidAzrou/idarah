@@ -14,21 +14,28 @@ export default function PublicScreenViewPage() {
   const [loading, setLoading] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showControls, setShowControls] = useState(true);
-  
-  console.log('=== Component Render ===', { publicToken, loading, screen: !!screen });
-  
 
-  const loadScreen = async () => {
-    console.log('=== loadScreen called ===');
-    console.log('publicToken:', publicToken);
+  console.log('=== COMPONENT RENDERED ===', { publicToken, loading, hasScreen: !!screen });
+
+  // FETCH DATA IMMEDIATELY WHEN COMPONENT MOUNTS OR TOKEN CHANGES
+  React.useEffect(() => {
+    console.log('=== useEffect TRIGGERED ===', publicToken);
     
-    if (publicToken) {
-      setLoading(true);
+    if (!publicToken) {
+      console.log('No publicToken, stopping');
+      setLoading(false);
+      return;
+    }
+
+    console.log('Starting data fetch...');
+    setLoading(true);
+
+    const fetchData = async () => {
       try {
-        // Add timestamp to force cache bypass
         const timestamp = new Date().getTime();
         const url = `/api/public-screens/token/${publicToken}?t=${timestamp}`;
-        console.log('Fetching URL:', url);
+        
+        console.log('=== FETCHING API ===', url);
         
         const response = await fetch(url, {
           method: 'GET',
@@ -39,106 +46,77 @@ export default function PublicScreenViewPage() {
             'Expires': '0'
           }
         });
-        
-        console.log('Response status:', response.status);
-        
+
+        console.log('=== API RESPONSE ===', response.status);
+
         if (response.ok) {
-          const screenData = await response.json();
-          console.log('=== RAW API RESPONSE ===');
-          console.log('Full response data:', JSON.stringify(screenData, null, 2));
-          console.log('Response keys:', Object.keys(screenData));
-          console.log('Members key exists:', 'members' in screenData);
-          console.log('Members value:', screenData.members);
-          console.log('Members length:', screenData.members?.length || 'undefined');
+          const data = await response.json();
+          console.log('=== RAW API DATA ===');
+          console.log('Full response:', JSON.stringify(data, null, 2));
+          console.log('Has members?', 'members' in data);
+          console.log('Members count:', data.members?.length || 0);
           
-          // Force a fresh screen object to trigger React re-renders
-          const freshScreen = {
-            ...screenData,
-            _loadTime: timestamp // Add unique property to force re-render
-          };
-          
-          console.log('=== PROCESSED SCREEN OBJECT ===');
-          console.log('Fresh screen members:', freshScreen.members);
-          console.log('Fresh screen members length:', freshScreen.members?.length || 'undefined');
-          
-          setScreen(freshScreen);
+          setScreen(data);
+          console.log('Screen state updated with:', data.members?.length || 0, 'members');
         } else {
-          console.log('Response not ok:', response.status, response.statusText);
+          console.error('API response not ok:', response.status);
           setScreen(null);
         }
       } catch (error) {
-        console.error('Error loading screen:', error);
+        console.error('=== FETCH ERROR ===', error);
         setScreen(null);
       } finally {
         setLoading(false);
+        console.log('Loading complete');
       }
-    } else {
-      console.log('No publicToken provided');
-      setLoading(false);
-    }
-  };
+    };
 
-  // IMMEDIATE DATA LOADING
-  useEffect(() => {
-    console.log('=== useEffect TRIGGERED ===', publicToken);
-    if (publicToken) {
-      console.log('Starting loadScreen...');
-      loadScreen();
-    }
+    fetchData();
   }, [publicToken]);
 
-  // Update document title when screen data is loaded
-  useEffect(() => {
+  // Update document title
+  React.useEffect(() => {
     if (screen?.name) {
       document.title = screen.name;
     }
-    // Reset title when component unmounts
     return () => {
       document.title = 'Ledenbeheer';
     };
   }, [screen?.name]);
 
-  useEffect(() => {
-    // Auto-hide controls after 3 seconds
-    const timer = setTimeout(() => {
-      setShowControls(false);
-    }, 3000);
-
+  // Handle keyboard shortcuts and mouse controls
+  React.useEffect(() => {
+    const timer = setTimeout(() => setShowControls(false), 3000);
+    
     const handleMouseMove = () => {
       setShowControls(true);
       clearTimeout(timer);
       setTimeout(() => setShowControls(false), 3000);
     };
 
-    document.addEventListener('mousemove', handleMouseMove);
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      clearTimeout(timer);
-    };
-  }, []);
-
-  useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       switch (e.key.toLowerCase()) {
         case 'f':
           e.preventDefault();
           handleFullscreen();
           break;
-        case ' ':
-          e.preventDefault();
-          // Handle play/pause - will be implemented per type
-          break;
         case 'r':
           e.preventDefault();
-          // Refresh data instead of reloading page
           setLoading(true);
-          loadScreen();
+          // Trigger re-fetch by incrementing a counter
+          window.location.reload();
           break;
       }
     };
 
+    document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('keydown', handleKeyPress);
-    return () => document.removeEventListener('keydown', handleKeyPress);
+    
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('keydown', handleKeyPress);
+    };
   }, []);
 
   const handleFullscreen = async () => {
@@ -196,22 +174,20 @@ export default function PublicScreenViewPage() {
     );
   }
 
+  console.log('=== RENDERING SCREEN ===');
+  console.log('Screen type:', screen.type);
+  console.log('Screen members:', (screen as any).members?.length || 0);
+
   return (
     <div className="min-h-screen relative">
       {/* Main Content */}
-      {screen.type === 'LEDENLIJST' && (() => {
-        console.log('=== Rendering LedenlijstView ===');
-        console.log('Screen object:', screen);
-        console.log('Members from screen:', (screen as any).members);
-        console.log('Members length:', (screen as any).members?.length || 0);
-        return (
-          <LedenlijstView 
-            key={`${screen.id}-${(screen as any).members?.length || 0}`}
-            config={screen.config as LedenlijstConfig} 
-            members={(screen as any).members || []}
-          />
-        );
-      })()}
+      {screen.type === 'LEDENLIJST' && (
+        <LedenlijstView 
+          key={`ledenlijst-${Date.now()}`}
+          config={screen.config as LedenlijstConfig} 
+          members={(screen as any).members || []}
+        />
+      )}
       
       {screen.type === 'MEDEDELINGEN' && (
         <AnnouncementsView config={screen.config as MededelingenConfig} />
@@ -223,16 +199,12 @@ export default function PublicScreenViewPage() {
         </div>
       )}
 
-      {/* Controls Overlay */}
-      <Controls
-        screen={screen}
+      {/* Controls */}
+      <Controls 
+        visible={showControls}
         isFullscreen={isFullscreen}
-        showControls={showControls}
         onFullscreen={handleFullscreen}
-        onRefresh={() => {
-          console.log('Refreshing screen manually...');
-          loadScreen();
-        }}
+        onRefresh={() => window.location.reload()}
       />
     </div>
   );

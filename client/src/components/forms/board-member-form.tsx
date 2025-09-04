@@ -43,8 +43,8 @@ const boardMemberSchema = z.object({
   termEnd: z.union([
     z.date(),
     z.string().transform((val) => new Date(val))
-  ]).optional().refine((date) => !date || (date instanceof Date && !isNaN(date.getTime())), {
-    message: "Ongeldige einddatum"
+  ]).refine((date) => date instanceof Date && !isNaN(date.getTime()), {
+    message: "Einddatum is verplicht"
   }),
   
   // Additional info
@@ -95,11 +95,11 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
   const [selectedMember, setSelectedMember] = useState<any>(null);
   const [activeTab, setActiveTab] = useState(isEditMode ? "personal" : "linking");
 
-  // Fetch members for autocomplete
+  // Fetch members for autocomplete (search by name or member number)
   const { data: members } = useQuery<any[]>({
     queryKey: ["/api/members", { q: memberSearch }],
     staleTime: 10000,
-    enabled: linkType === 'EXISTING_MEMBER' && memberSearch.length > 0,
+    enabled: linkType === 'EXISTING_MEMBER' && memberSearch.length > 1,
   });
 
   // Fetch member details for edit mode
@@ -130,6 +130,9 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
     setSelectedMember(member);
     form.setValue('memberId', member.id);
     setMemberSearch(`${member.firstName} ${member.lastName}`);
+    
+    // Auto-navigate to personal tab after selection
+    setActiveTab('personal');
   };
 
   const handleLinkTypeChange = (type: 'EXISTING_MEMBER' | 'EXTERNAL_PERSON') => {
@@ -145,6 +148,8 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
       form.setValue('memberId', '');
       setSelectedMember(null);
       setMemberSearch('');
+      // Auto-navigate to personal tab for external person
+      setActiveTab('personal');
     }
   };
 
@@ -286,62 +291,100 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
                 ) : (
                   /* Add Mode: Normal form fields */
                   linkType === 'EXISTING_MEMBER' ? (
-                    <>
-                      {/* Member Search */}
-                      <div className="space-y-2">
-                        <Label htmlFor="member-search">Zoek lid</Label>
-                        <div className="relative">
-                          <Input
-                            id="member-search"
-                            placeholder="Typ naam om te zoeken..."
-                            value={memberSearch}
-                            onChange={(e) => setMemberSearch(e.target.value)}
-                            data-testid="input-member-search"
-                          />
-                          {memberSearch.length > 0 && members && members.length > 0 && !selectedMember && (
-                            <div className="absolute z-10 w-full bg-white border border-gray-200 rounded-md shadow-lg mt-1 max-h-40 overflow-y-auto">
-                              {members.map((member: any) => (
-                                <button
-                                  key={member.id}
-                                  type="button"
-                                  className="w-full px-3 py-2 text-left hover:bg-gray-50 border-b last:border-b-0"
-                                  onClick={() => handleMemberSelect(member)}
-                                  data-testid={`option-member-${member.id}`}
-                                >
-                                  <div className="font-medium">{member.firstName} {member.lastName}</div>
-                                  <div className="text-sm text-gray-500">#{member.memberNumber}</div>
-                                </button>
-                              ))}
+                    selectedMember ? (
+                      /* Show selected member info (prefilled and greyed out) */
+                      <div className="space-y-4 text-gray-600">
+                        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                          <div className="flex items-center gap-2 text-green-800 mb-2">
+                            <User className="w-4 h-4" />
+                            <span className="font-medium">Geselecteerd lid</span>
+                          </div>
+                          <div className="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                              <span className="text-gray-500">Naam</span>
+                              <p className="font-medium">{selectedMember.firstName} {selectedMember.lastName}</p>
                             </div>
-                          )}
+                            <div>
+                              <span className="text-gray-500">Lidnummer</span>
+                              <p className="font-medium">#{selectedMember.memberNumber}</p>
+                            </div>
+                            <div>
+                              <span className="text-gray-500">Categorie</span>
+                              <p className="font-medium">{selectedMember.category}</p>
+                            </div>
+                            <div>
+                              <span className="text-gray-500">Status</span>
+                              <p className="font-medium">{selectedMember.active ? 'Actief' : 'Inactief'}</p>
+                            </div>
+                            <div>
+                              <span className="text-gray-500">E-mail</span>
+                              <p className="font-medium">{selectedMember.email || 'Niet opgegeven'}</p>
+                            </div>
+                            <div>
+                              <span className="text-gray-500">Telefoon</span>
+                              <p className="font-medium">{selectedMember.phone || 'Niet opgegeven'}</p>
+                            </div>
+                          </div>
+                          <div className="mt-3 flex gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setActiveTab('role')}
+                              className="px-3 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                            >
+                              Ga naar Bestuursrol →
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedMember(null);
+                                setMemberSearch('');
+                                form.setValue('memberId', '');
+                              }}
+                              className="px-3 py-2 bg-gray-600 text-white text-sm rounded hover:bg-gray-700"
+                            >
+                              Ander lid kiezen
+                            </button>
+                          </div>
                         </div>
                       </div>
-
-                      {/* Selected Member Preview */}
-                      {selectedMember && (
-                        <div className="p-4 bg-gray-50 rounded-lg" data-testid="member-preview">
-                          <h4 className="font-medium mb-2">Geselecteerd lid</h4>
-                          <div className="space-y-2 text-sm">
-                            <div className="flex items-center gap-2">
-                              <User className="w-4 h-4" />
-                              <span>{selectedMember.firstName} {selectedMember.lastName}</span>
-                            </div>
-                            {selectedMember.email && (
-                              <div className="flex items-center gap-2">
-                                <Mail className="w-4 h-4" />
-                                <span>{selectedMember.email}</span>
-                              </div>
-                            )}
-                            {selectedMember.phone && (
-                              <div className="flex items-center gap-2">
-                                <Phone className="w-4 h-4" />
-                                <span>{selectedMember.phone}</span>
+                    ) : (
+                      <>
+                        {/* Member Search */}
+                        <div className="space-y-2">
+                          <Label htmlFor="member-search">Zoek lid</Label>
+                          <div className="relative">
+                            <Input
+                              id="member-search"
+                              placeholder="Zoek op naam of lidnummer (bijv. Ahmed Hassan of #0004)..."
+                              value={memberSearch}
+                              onChange={(e) => setMemberSearch(e.target.value)}
+                              data-testid="input-member-search"
+                            />
+                            {memberSearch.length > 1 && members && members.length > 0 && (
+                              <div className="absolute z-10 w-full bg-white border border-gray-200 rounded-md shadow-lg mt-1 max-h-40 overflow-y-auto">
+                                {members.map((member: any) => (
+                                  <button
+                                    key={member.id}
+                                    type="button"
+                                    className="w-full px-3 py-2 text-left hover:bg-gray-50 border-b last:border-b-0"
+                                    onClick={() => handleMemberSelect(member)}
+                                    data-testid={`option-member-${member.id}`}
+                                  >
+                                    <div className="font-medium">{member.firstName} {member.lastName}</div>
+                                    <div className="text-sm text-gray-500">#{member.memberNumber} • {member.category}</div>
+                                  </button>
+                                ))}
                               </div>
                             )}
                           </div>
                         </div>
-                      )}
-                    </>
+                        {memberSearch.length > 1 && members && members.length === 0 && (
+                          <div className="text-sm text-gray-500 italic">
+                            Geen leden gevonden voor "{memberSearch}"
+                          </div>
+                        )}
+                      </>
+                    )
                   ) : (
                     <>
                       {/* External Person Fields */}
@@ -356,6 +399,13 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
                                 {...field} 
                                 placeholder="Volledige naam"
                                 data-testid="input-external-name"
+                                onBlur={(e) => {
+                                  field.onBlur();
+                                  // Auto navigate to role tab if name is filled
+                                  if (e.target.value.trim()) {
+                                    setTimeout(() => setActiveTab('role'), 500);
+                                  }
+                                }}
                               />
                             </FormControl>
                             <FormMessage />
@@ -478,7 +528,7 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
                     name="termEnd"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Einddatum (optioneel)</FormLabel>
+                        <FormLabel>Einddatum *</FormLabel>
                         <Popover>
                           <PopoverTrigger asChild>
                             <FormControl>

@@ -299,7 +299,7 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
                                             </div>
                                           </div>
                                           <div className="flex-1 min-w-0">
-                                            <div className="font-medium text-gray-900 truncate">
+                                            <div className="font-medium text-gray-900 truncate text-sm">
                                               {member.firstName} {member.lastName}
                                             </div>
                                             <div className="flex items-center gap-2 text-sm text-gray-500">
@@ -340,7 +340,7 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
                                       </div>
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                      <div className="font-semibold text-blue-900 text-lg">
+                                      <div className="font-semibold text-blue-900 text-base">
                                         {selectedMember.firstName} {selectedMember.lastName}
                                       </div>
                                       <div className="flex items-center gap-4 text-sm text-blue-700 mt-1">
@@ -759,7 +759,7 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
                             <Input
                               value={field.value ? format(field.value, "dd/MM/yyyy", { locale: nl }) : ""}
                               onChange={(e) => {
-                                const inputValue = e.target.value;
+                                const inputValue = e.target.value.trim();
                                 
                                 // Handle numeric input with automatic formatting
                                 if (/^\d+$/.test(inputValue)) {
@@ -784,6 +784,37 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
                                   }
                                   // Allow partial input for progressive typing
                                   return;
+                                }
+                                
+                                // Handle text input (natural language)
+                                if (/[a-zA-Z]/.test(inputValue)) {
+                                  // Try to parse natural date formats
+                                  const today = new Date();
+                                  const lowerInput = inputValue.toLowerCase();
+                                  
+                                  if (lowerInput.includes('vandaag')) {
+                                    field.onChange(today);
+                                    return;
+                                  }
+                                  if (lowerInput.includes('morgen')) {
+                                    const tomorrow = new Date(today);
+                                    tomorrow.setDate(today.getDate() + 1);
+                                    field.onChange(tomorrow);
+                                    return;
+                                  }
+                                  if (lowerInput.includes('gisteren')) {
+                                    const yesterday = new Date(today);
+                                    yesterday.setDate(today.getDate() - 1);
+                                    field.onChange(yesterday);
+                                    return;
+                                  }
+                                  
+                                  // Try to parse with native Date constructor
+                                  const parsedDate = new Date(inputValue);
+                                  if (!isNaN(parsedDate.getTime())) {
+                                    field.onChange(parsedDate);
+                                    return;
+                                  }
                                 }
                                 
                                 // Handle formatted input (DD/MM/YYYY)
@@ -915,7 +946,7 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
                             <Input
                               value={field.value ? format(field.value, "dd/MM/yyyy", { locale: nl }) : ""}
                               onChange={(e) => {
-                                const inputValue = e.target.value;
+                                const inputValue = e.target.value.trim();
                                 
                                 // Handle numeric input with automatic formatting
                                 if (/^\d+$/.test(inputValue)) {
@@ -940,6 +971,37 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
                                   }
                                   // Allow partial input for progressive typing
                                   return;
+                                }
+                                
+                                // Handle text input (natural language)
+                                if (/[a-zA-Z]/.test(inputValue)) {
+                                  // Try to parse natural date formats
+                                  const today = new Date();
+                                  const lowerInput = inputValue.toLowerCase();
+                                  
+                                  if (lowerInput.includes('vandaag')) {
+                                    field.onChange(today);
+                                    return;
+                                  }
+                                  if (lowerInput.includes('morgen')) {
+                                    const tomorrow = new Date(today);
+                                    tomorrow.setDate(today.getDate() + 1);
+                                    field.onChange(tomorrow);
+                                    return;
+                                  }
+                                  if (lowerInput.includes('gisteren')) {
+                                    const yesterday = new Date(today);
+                                    yesterday.setDate(today.getDate() - 1);
+                                    field.onChange(yesterday);
+                                    return;
+                                  }
+                                  
+                                  // Try to parse with native Date constructor
+                                  const parsedDate = new Date(inputValue);
+                                  if (!isNaN(parsedDate.getTime())) {
+                                    field.onChange(parsedDate);
+                                    return;
+                                  }
                                 }
                                 
                                 // Handle formatted input (DD/MM/YYYY)

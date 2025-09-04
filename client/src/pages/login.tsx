@@ -73,9 +73,6 @@ export default function Login() {
             <h1 className="text-4xl font-bold text-white mb-6 leading-tight">
               Inloggen bij uw account
             </h1>
-            <p className="text-xl text-gray-200">
-              Beheersysteem voor uw moskee gemeenschap
-            </p>
           </div>
         </div>
       </div>

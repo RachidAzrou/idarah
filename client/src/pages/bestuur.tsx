@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { BoardMemberForm } from "@/components/forms/board-member-form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -76,6 +77,32 @@ export default function Bestuur() {
     queryKey: ["/api/board/members", { status: statusFilter, role: roleFilter, q: searchTerm }],
     staleTime: 10000,
   });
+
+  // Mutation for creating new board member
+  const createBoardMemberMutation = useMutation({
+    mutationFn: async (data: any) => {
+      return apiRequest('/api/board/members', 'POST', data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/board/members"] });
+      setShowNewMemberDialog(false);
+      toast({
+        title: "Bestuurslid toegevoegd",
+        description: "Het nieuwe bestuurslid is succesvol toegevoegd.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fout",
+        description: error.message || "Er is een fout opgetreden bij het toevoegen van het bestuurslid.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleCreateBoardMember = (formData: any) => {
+    createBoardMemberMutation.mutate(formData);
+  };
 
   const getName = (item: BoardMemberWithMember) => {
     if (item.member) {
@@ -312,19 +339,11 @@ export default function Bestuur() {
             <DialogHeader>
               <DialogTitle>Nieuw Bestuurslid</DialogTitle>
             </DialogHeader>
-            <div className="py-4">
-              <p className="text-gray-500 text-center" data-testid="new-member-placeholder">
-                Bestuurslid formulier wordt binnenkort toegevoegd
-              </p>
-              <div className="flex justify-end gap-2 pt-4">
-                <Button variant="outline" onClick={() => setShowNewMemberDialog(false)} data-testid="button-cancel">
-                  Annuleren
-                </Button>
-                <Button data-testid="button-save">
-                  Opslaan
-                </Button>
-              </div>
-            </div>
+            <BoardMemberForm
+              onSubmit={handleCreateBoardMember}
+              onCancel={() => setShowNewMemberDialog(false)}
+              isLoading={createBoardMemberMutation.isPending}
+            />
           </DialogContent>
         </Dialog>
       )}

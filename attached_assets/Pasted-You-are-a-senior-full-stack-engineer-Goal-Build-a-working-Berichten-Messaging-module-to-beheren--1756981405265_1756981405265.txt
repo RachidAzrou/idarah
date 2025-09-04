@@ -1,0 +1,285 @@
+You are a senior full-stack engineer.
+Goal: Build a working Berichten (Messaging) module to beheren van e-mailtemplates (bv. nieuw lid, vervallen lidgeld, uitnodigingen, nieuwsbrieven) en e-mails verzenden naar leden op basis van filters (segmenten) of selectie.
+Stack: Next.js 14 (app router), TypeScript strict, Prisma + PostgreSQL, Zod, Nodemailer (SMTP).
+Locale: nl-BE, TZ Europe/Brussels. Volg bestaande huisstijl voor UI (geen design-details hier).
+
+0) Functional scope (what must work)
+
+Templates beheren (CRUD): onderwerp, categorie (transactioneel/marketing), body met Handlebars-placeholders (bv. {{member.firstName}}).
+
+Voorbeeld & test: live render met voorbeelddata, testmail naar één adres.
+
+Segmentatie (audiences): filters op leden (categorie, actief, rol, bestuurslid, betaalstatus openstaand/vervallen/betaald, leeftijdsrange, stad/postcode, createdAt range, Rule outcomes zoals stemrecht). Segmenten opslaan (save & reuse).
+
+Campagnes (marketing) en Transacties (transactioneel één-op-één of bulk met systeemtriggers).
+
+Verzenden via SMTP met throttling (batching), schedulen (versturen nu/later).
+
+Unsubscribe/suppressie voor marketing: footer met link; beheerspagina voor uitschrijvingen.
+
+Logging: per ontvanger queued/sent/failed/opened/clicked/unsubscribed.
+
+Open-tracking (pixel) en click-tracking (redirect endpoint met token).
+
+RBAC: BEHEERDER & SUPERADMIN verzenden; MEDEWERKER read-only.
+
+SMTP uit .env:
+
+SMTP_HOST=...
+SMTP_USER=...
+SMTP_PASS=...
+SMTP_FROM="Organisatienaam <no-reply@domein.be>"
+APP_BASE_URL=https://app.domein.be
+
+1) Prisma schema (add)
+enum EmailKind { TRANSACTIONEEL MARKETING }
+enum EmailStatus { DRAFT QUEUED SENDING SENT PARTIAL FAILED CANCELLED }
+enum RecipientStatus { QUEUED SENT FAILED OPENED CLICKED UNSUBSCRIBED }
+enum SuppressReason { UNSUB_REQUEST BOUNCE SPAM_COMPLAINT MANUAL }
+
+model EmailTemplate {
+  id        String     @id @default(cuid())
+  tenantId  String
+  name      String
+  code      String     @unique // e.g. "nieuw_lid", "vervallen_lidgeld"
+  kind      EmailKind  // TRANSACTIONEEL of MARKETING
+  subject   String
+  bodyHtml  String     // Handlebars/MJML/HTML (we render Handlebars -> HTML)
+  bodyText  String?    // optional plain text
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model EmailSegment {
+  id        String   @id @default(cuid())
+  tenantId  String
+  name      String
+  // JSON rules, e.g. { "category":["STUDENT","SENIOR"], "memberActive":true, "feeStatus":["OPENSTAAND"], "city":"Antwerpen" }
+  rules     Json
+  createdAt DateTime @default(now())
+}
+
+model EmailCampaign {
+  id         String      @id @default(cuid())
+  tenantId   String
+  name       String
+  templateId String
+  template   EmailTemplate @relation(fields: [templateId], references: [id])
+  segmentId  String?
+  segment    EmailSegment? @relation(fields: [segmentId], references: [id])
+  kind       EmailKind     // MARKETING (typisch) of TRANSACTIONEEL (batch)
+  status     EmailStatus   @default(DRAFT)
+  scheduledAt DateTime?
+  startedAt  DateTime?
+  finishedAt DateTime?
+  createdById String?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  messages   EmailMessage[]
+}
+
+model EmailMessage {
+  id          String      @id @default(cuid())
+  tenantId    String
+  campaignId  String?
+  campaign    EmailCampaign? @relation(fields: [campaignId], references: [id])
+  templateId  String
+  template    EmailTemplate  @relation(fields: [templateId], references: [id])
+  memberId    String?
+  email       String         // resolved destination
+  subject     String
+  bodyHtml    String
+  bodyText    String?
+  status      RecipientStatus @default(QUEUED)
+  lastError   String?
+  tokens      Json           // { openToken, clickToken, unsubToken }
+  sentAt      DateTime?
+  openedAt    DateTime?
+  clickedAt   DateTime?
+  createdAt   DateTime       @default(now())
+}
+
+model EmailSuppress {
+  id        String         @id @default(cuid())
+  tenantId  String
+  email     String
+  memberId  String?
+  reason    SuppressReason @default(UNSUB_REQUEST)
+  createdAt DateTime       @default(now())
+  @@unique([tenantId, email])
+}
+
+
+NB: We verschillen marketing vs transactioneel: suppressies gelden alleen voor MARKETING.
+
+2) Rendering & templating
+
+Gebruik Handlebars voor variabelen/if/each.
+
+Beschikbare variabelen in context:
+
+tenant: { name, logoUrl, primaryColor }
+
+member: { firstName, lastName, email, memberNumber, category, city, ... }
+
+card: { url } (deeplink naar PWA kaart)
+
+fees: lijst met recente openstaande/vervallen bedragen (voor reminders)
+
+now: ISO datum/tijd in Europe/Brussels
+
+unsubUrl: enkel voor MARKETING
+
+Service renderTemplate(template, ctx) → { html, text, subject }
+
+Inject tracking pixel: <img src="{{openUrl}}" .../> (1×1 transparant).
+
+Wrap links: <a href="{{clickUrl original=href}}">.
+
+3) Segmentatie (audience builder)
+
+Functie resolveSegment(tenantId, rules) → lijst van memberIds + e-mails.
+
+Ondersteunde filters (Zod-gevalideerd):
+
+memberActive (bool), category (array), gender (array), city, postalCode, createdFrom/To
+
+Bestuurslid actief (join op BoardMember)
+
+Fee status (Openstaand/Betaald/Vervallen) actueel of in periode range
+
+Rule outcome (bv. stemrecht=true)
+
+Mogelijkheid om ad-hoc selectie (aangevinkte leden) door te geven i.p.v. segment.
+
+4) Verzenden (queue + throttle)
+
+Queue via simpele DB-batch + route (geen externe Redis vereist):
+
+POST /api/messages/campaigns/:id/queue → maakt EmailMessage records voor alle ontvangers (status=QUEUED).
+
+POST /api/messages/worker/tick → pakt N queued messages (bv. 50) en verstuurt via Nodemailer (SMTP uit .env).
+
+Respecteer rate limit (bv. 50/min) met setTimeout/batch pacing of cron.
+
+Campaign status: DRAFT → QUEUED → SENDING → SENT/PARTIAL/FAILED.
+
+Schedule: CRON of external scheduler call hit .../tick vanaf scheduledAt.
+
+Transactionele single send:
+
+POST /api/messages/send body: { templateCode, memberId or email, context }.
+
+Check suppress alleen als kind=MARKETING.
+
+5) Tracking & compliance
+
+Open tracking: GET /api/messages/track/open/:msgId/:openToken.png → 1×1 PNG; set openedAt als nog niet gezet.
+
+Click tracking: GET /api/messages/track/click/:msgId/:clickToken?u=<base64Url> → log clickedAt, 302 naar originele URL.
+
+Unsubscribe (marketing):
+
+Link: /email/unsubscribe?token=... → resolves tenantId + email → upsert EmailSuppress.
+
+Footer automatisch injecteren als kind=MARKETING: “Uitschrijven” link.
+
+Do not send indien EmailSuppress bestaat voor (tenant,email) en kind=MARKETING.
+
+Logging bij send-fout → EmailMessage.lastError.
+
+6) API (tRPC/REST) endpoints
+
+Templates
+
+GET /api/messages/templates (list)
+
+POST /api/messages/templates (create)
+
+PUT /api/messages/templates/:id (update)
+
+POST /api/messages/templates/:id/test { toEmail, sampleContext? } → rendert & verzendt testmail
+
+Segments
+
+GET /api/messages/segments (list)
+
+POST /api/messages/segments (create/update with rules)
+
+POST /api/messages/segments/:id/preview → count + sample members
+
+Campaigns
+
+POST /api/messages/campaigns (create: name, templateId, segmentId?, kind, scheduledAt?)
+
+GET /api/messages/campaigns (list with stats)
+
+GET /api/messages/campaigns/:id (detail + recipients with statuses)
+
+POST /api/messages/campaigns/:id/queue
+
+POST /api/messages/campaigns/:id/cancel (if not yet sent)
+
+Worker / tracking / unsub
+
+POST /api/messages/worker/tick (idempotent batch sender)
+
+GET /api/messages/track/open/:msgId/:token.png
+
+GET /api/messages/track/click/:msgId/:token
+
+GET /email/unsubscribe (token) → creates EmailSuppress, returns confirmation page
+
+Single transactional send
+
+POST /api/messages/send → { templateCode, memberId? email?, context? }
+
+RBAC: BEHEERDER & SUPERADMIN can create/send; MEDEWERKER read-only.
+
+Zod: all inputs strictly validated; ensure subject not empty, HTML length limits, etc.
+
+7) Data linking & context helpers
+
+buildMemberContext(memberId) → { member, tenant, card, fees }
+
+card.url = APP_BASE_URL + "/card/" + memberId + "?standalone=1"
+
+fees = openstaande/vervallen van lopende/recente perioden (samenvatting)
+
+listMembersBySegment(rules) returns { memberId, email }[] (only with consent if marketing/newsletter flag on Member).
+
+Consent flags op Member (bestonden al): newsletterOptIn etc.
+
+Segments/marketing respecteren opt-in; transactioneel (bv. welkomstmail, betaalherinnering) mag zonder opt-in, maar geen unsubscribe footer.
+
+8) Page /berichten (functioneel, geen design-specificaties)
+
+Tabs/sections:
+
+Templates: lijst + CRUD; Preview (render) + Testmail.
+
+Segmenten: builder (rules JSON via UI), Preview count.
+
+Campagnes: maak campagne (kies template + segment, plan of nu), queue, statussen per ontvanger (sent/opened/failed).
+
+Verzenden (single/adhoc): kies template + selectie leden of e-mail.
+
+Uitschrijvingen: lijst suppressies (alleen marketing), zoek & restore (manual).
+
+Logs: EmailMessage feed met filters (status, periode).
+
+UI volgt bestaande huisstijl; jij levert werkende logica + endpoints + minimale formulieren.
+
+9) Operational & limits
+
+Throttling: env EMAIL_RATE_PER_MIN=50 (configurable).
+
+Retries: per message max 3 retries (exponential backoff in worker).
+
+Error handling: capture SMTP errors (auth, 4xx/5xx), log lastError.
+
+Security: all routes tenant-scoped, tokens (open/click/unsub) zijn cryptographically random en per message.
+
+Privacy: geen gevoelige PII in tracking URLs; only opaque tokens.
+
+i18n: subject/body in nl-BE; data formats dd-MM-yyyy, € via Intl.NumberFormat('nl-BE', { style:'currency', currency:'EUR' }).

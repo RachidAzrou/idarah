@@ -35,7 +35,7 @@ router.get('/token/:token', async (req, res) => {
       return res.status(404).json({ error: 'Screen not found' });
     }
     
-    // For LEDENLIJST screens, also fetch member data
+    // For LEDENLIJST screens, also fetch member and fee data
     let screenData: any = screen;
     if (screen.type === 'LEDENLIJST') {
       try {
@@ -45,9 +45,27 @@ router.get('/token/:token', async (req, res) => {
         // Only send active members for public display
         const activeMembers = members.filter(member => member.active);
         console.log(`Found ${activeMembers.length} active members for public display`);
+        
+        // Also fetch membership fees for payment status
+        const allFees = await storage.getMembershipFeesByTenant(screen.tenantId);
+        console.log(`Found ${allFees.length} membership fees`);
+        
+        // Organize fees by member and period for easy lookup
+        const feesByMember = allFees.reduce((acc: any, fee: any) => {
+          if (!acc[fee.memberId]) acc[fee.memberId] = [];
+          acc[fee.memberId].push(fee);
+          return acc;
+        }, {});
+        
+        // Add payment status to each member
+        const membersWithPayments = activeMembers.map(member => ({
+          ...member,
+          membershipFees: feesByMember[member.id] || []
+        }));
+        
         screenData = {
           ...screen,
-          members: activeMembers
+          members: membersWithPayments
         } as any;
       } catch (error) {
         console.error('Error fetching members for public screen:', error);

@@ -23,6 +23,29 @@ export function LedenlijstView({ config, members = [] }: LedenlijstViewProps) {
       else if (member.category === 'SENIOR') displayCategory = 'Senior';  
       else if (member.category === 'STANDAARD') displayCategory = 'Standaard';
       
+      // Calculate payment status by month for current year
+      const currentYear = new Date().getFullYear();
+      const betalingenByMonth: { [key: number]: 'betaald' | 'open' | 'vervallen' } = {};
+      
+      // Process membership fees if available
+      if (member.membershipFees) {
+        member.membershipFees.forEach((fee: any) => {
+          const feeDate = new Date(fee.periodStart);
+          if (feeDate.getFullYear() === currentYear) {
+            const month = feeDate.getMonth() + 1; // Convert to 1-12
+            
+            // Determine status based on fee status and dates
+            if (fee.status === 'PAID') {
+              betalingenByMonth[month] = 'betaald';
+            } else if (fee.status === 'OVERDUE') {
+              betalingenByMonth[month] = 'vervallen';
+            } else {
+              betalingenByMonth[month] = 'open';
+            }
+          }
+        });
+      }
+      
       return {
         id: member.id,
         lidnummer: member.memberNumber,
@@ -32,8 +55,10 @@ export function LedenlijstView({ config, members = [] }: LedenlijstViewProps) {
         categorie: displayCategory,
         actief: member.active,
         stemrecht: member.votingRights,
-        betaalstatus: [], // Will be filled with actual payment data if needed
-        betalingen: {} // Payment data by year
+        betaalstatus: [], 
+        betalingen: {
+          [currentYear]: betalingenByMonth
+        }
       };
     });
   }, [members]);

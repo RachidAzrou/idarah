@@ -175,7 +175,12 @@ export function getFilteredMembers(
     filtered = filtered.filter(member => config.categories.includes(member.categorie));
   }
 
-  return filtered;
+  // Sort chronologically by member number (lidnummer)
+  return filtered.sort((a, b) => {
+    const numA = parseInt(a.lidnummer.toString());
+    const numB = parseInt(b.lidnummer.toString());
+    return numA - numB;
+  });
 }
 
 export function getMemberDisplayName(member: Member, config: { useFullNames: boolean; useInitials: boolean }): string {

@@ -76,6 +76,21 @@ export default function Bestuur() {
   const { data: boardMembers, isLoading } = useQuery({
     queryKey: ["/api/board/members", { status: statusFilter, role: roleFilter, q: searchTerm }],
     staleTime: 10000,
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (statusFilter && statusFilter !== 'all') params.append('status', statusFilter);
+      if (roleFilter && roleFilter !== 'all') params.append('role', roleFilter);
+      if (searchTerm) params.append('q', searchTerm);
+      
+      const url = `/api/board/members${params.toString() ? '?' + params.toString() : ''}`;
+      const response = await fetch(url, { credentials: 'include' });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch board members: ${response.statusText}`);
+      }
+      
+      return response.json();
+    },
   });
 
   // Mutation for creating new board member

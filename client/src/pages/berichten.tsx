@@ -37,15 +37,15 @@ export default function Berichten() {
   });
 
   return (
-    <div className="px-4 sm:px-6 lg:px-8 w-full space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-900" data-testid="page-title">Berichten</h1>
-          <p className="text-sm text-gray-600 mt-1" data-testid="page-description">
-            Beheer e-mail templates, segmenten en campagnes
-          </p>
+    <main className="flex-1 py-4">
+      <div className="px-4 sm:px-6 lg:px-8 w-full">
+        {/* Page Header */}
+        <div className="border-b border-gray-200 pb-5 mb-6">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900" data-testid="page-title">Berichten</h1>
+            <p className="mt-1 text-sm text-gray-700">Beheer e-mail templates, segmenten en campagnes</p>
+          </div>
         </div>
-      </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid grid-cols-6 w-auto" data-testid="message-tabs">
@@ -364,6 +364,7 @@ export default function Berichten() {
           </Card>
         </TabsContent>
       </Tabs>
-    </div>
+      </div>
+    </main>
   );
 }

@@ -105,7 +105,7 @@ export function FiltersToolbar({
             type="date"
             value={filters.dateFrom || ""}
             onChange={(e) => updateFilter('dateFrom', e.target.value || undefined)}
-            className="w-[140px] h-9 border-gray-200"
+            className="w-[160px] h-9 border-gray-200"
             data-testid="input-date-from"
           />
           <span className="text-sm text-gray-400">tot</span>
@@ -113,7 +113,7 @@ export function FiltersToolbar({
             type="date"
             value={filters.dateTo || ""}
             onChange={(e) => updateFilter('dateTo', e.target.value || undefined)}
-            className="w-[140px] h-9 border-gray-200"
+            className="w-[160px] h-9 border-gray-200"
             data-testid="input-date-to"
           />
         </div>

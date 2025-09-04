@@ -222,8 +222,8 @@ export default function Berichten() {
       name: template.name,
       code: template.code,
       subject: template.subject,
-      bodyHtml: template.body_html,
-      bodyText: template.body_text
+      bodyHtml: template.bodyHtml || template.body_html || "",
+      bodyText: template.bodyText || template.body_text || ""
     });
     setShowTemplateDialog(true);
   };
@@ -1115,7 +1115,7 @@ export default function Berichten() {
               <div className="mt-1 border rounded-md overflow-hidden">
                 <div 
                   className="p-4 bg-white max-h-96 overflow-auto"
-                  dangerouslySetInnerHTML={{ __html: previewTemplate?.body_html || '' }}
+                  dangerouslySetInnerHTML={{ __html: previewTemplate?.bodyHtml || previewTemplate?.body_html || '' }}
                 />
               </div>
             </div>
@@ -1124,7 +1124,7 @@ export default function Berichten() {
               <Label className="text-sm font-medium text-gray-700">Tekst Versie</Label>
               <div className="mt-1 p-3 bg-gray-50 border rounded-md max-h-32 overflow-auto">
                 <pre className="text-sm text-gray-700 whitespace-pre-wrap">
-                  {previewTemplate?.body_text}
+                  {previewTemplate?.bodyText || previewTemplate?.body_text}
                 </pre>
               </div>
             </div>

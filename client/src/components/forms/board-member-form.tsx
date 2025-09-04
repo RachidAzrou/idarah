@@ -32,7 +32,7 @@ const boardMemberSchema = z.object({
   phone: z.string().optional(),
   
   // Board role info
-  role: z.enum(['VOORZITTER', 'ONDERVERZITTER', 'SECRETARIS', 'PENNINGMEESTER', 'BESTUURSLID', 'ADVISEUR'], { required_error: "Rol is verplicht" }),
+  role: z.string().min(1, "Rol is verplicht").default('BESTUURSLID'),
   status: z.enum(['ACTIEF', 'INACTIEF']).default('ACTIEF'),
   termStart: z.union([
     z.date(),
@@ -118,7 +118,7 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
       externalName: initialData?.externalName || '',
       email: initialData?.email || '',
       phone: initialData?.phone || '',
-      role: initialData?.role || '',
+      role: initialData?.role || 'BESTUURSLID',
       termStart: initialData?.termStart ? new Date(initialData.termStart) : undefined,
       termEnd: initialData?.termEnd ? new Date(initialData.termEnd) : undefined,
       responsibilities: initialData?.responsibilities || '',
@@ -418,11 +418,11 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
                   name="role"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Rol *</FormLabel>
+                      <FormLabel>Rol</FormLabel>
                       <FormControl>
                         <Input 
                           {...field} 
-                          placeholder="Bijv. Voorzitter, Secretaris, etc."
+                          placeholder="Voorzitter, Secretaris, Bestuurslid, etc."
                           data-testid="input-role"
                         />
                       </FormControl>

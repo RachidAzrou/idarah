@@ -612,7 +612,7 @@ export default function Berichten() {
                   
                   {selectedSegment && (
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                      <h4 className="font-medium text-blue-900 mb-2">📊 Segment Overzicht</h4>
+                      <h4 className="font-medium text-blue-900 mb-2">Segment Overzicht</h4>
                       <p className="text-sm text-blue-700">
                         Segment: {segments?.find((s: any) => s.id === selectedSegment)?.name}
                       </p>
@@ -772,7 +772,7 @@ export default function Berichten() {
                 <div className="space-y-4 max-h-96 overflow-y-auto">
                   
                   <div className="space-y-2">
-                    <h4 className="font-medium text-sm text-gray-900">📝 Lid Informatie</h4>
+                    <h4 className="font-medium text-sm text-gray-900">Lid Informatie</h4>
                     <div className="space-y-1 text-xs">
                       <div className="flex justify-between">
                         <code className="bg-gray-100 px-1 rounded">{"{{member.firstName}}"}</code>
@@ -802,7 +802,7 @@ export default function Berichten() {
                   </div>
 
                   <div className="space-y-2">
-                    <h4 className="font-medium text-sm text-gray-900">🏛️ Organisatie</h4>
+                    <h4 className="font-medium text-sm text-gray-900">Organisatie</h4>
                     <div className="space-y-1 text-xs">
                       <div className="flex justify-between">
                         <code className="bg-gray-100 px-1 rounded">{"{{tenant.name}}"}</code>
@@ -816,7 +816,7 @@ export default function Berichten() {
                   </div>
 
                   <div className="space-y-2">
-                    <h4 className="font-medium text-sm text-gray-900">🪪 Lidkaart</h4>
+                    <h4 className="font-medium text-sm text-gray-900">Lidkaart</h4>
                     <div className="space-y-1 text-xs">
                       <div className="flex justify-between">
                         <code className="bg-gray-100 px-1 rounded">{"{{card.url}}"}</code>
@@ -830,7 +830,7 @@ export default function Berichten() {
                   </div>
 
                   <div className="space-y-2">
-                    <h4 className="font-medium text-sm text-gray-900">💰 Lidgelden</h4>
+                    <h4 className="font-medium text-sm text-gray-900">Lidgelden</h4>
                     <div className="space-y-1 text-xs">
                       <div className="text-gray-600 mb-1">Loop door lidgelden:</div>
                       <code className="bg-gray-100 px-1 rounded text-xs">{"{{#each fees}}"}</code>
@@ -853,7 +853,7 @@ export default function Berichten() {
                   </div>
 
                   <div className="space-y-2">
-                    <h4 className="font-medium text-sm text-gray-900">📊 Tracking</h4>
+                    <h4 className="font-medium text-sm text-gray-900">Tracking</h4>
                     <div className="space-y-1 text-xs">
                       <div className="flex justify-between">
                         <code className="bg-gray-100 px-1 rounded">{"{{openUrl}}"}</code>
@@ -897,14 +897,14 @@ export default function Berichten() {
 
               <div className="space-y-6">
                 <div>
-                  <Label className="text-base font-medium">🎯 Filter Criteria</Label>
+                  <Label className="text-base font-medium">Filter Criteria</Label>
                   <p className="text-sm text-gray-600 mt-1">Definieer wie dit segment moet ontvangen</p>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-6">
                   {/* Status Filters */}
                   <div className="space-y-4">
-                    <h4 className="font-medium text-sm">👤 Status & Rechten</h4>
+                    <h4 className="font-medium text-sm">Status & Rechten</h4>
                     <div className="space-y-3">
                       <div>
                         <Label>Alleen Actieve Leden</Label>
@@ -984,7 +984,7 @@ export default function Berichten() {
                   
                   {/* Location & Demographics */}
                   <div className="space-y-4">
-                    <h4 className="font-medium text-sm">📍 Locatie & Leeftijd</h4>
+                    <h4 className="font-medium text-sm">Locatie & Leeftijd</h4>
                     <div className="space-y-3">
                       <div>
                         <Label>Stad</Label>
@@ -1051,42 +1051,35 @@ export default function Berichten() {
 
       {/* Preview Dialog */}
       <Dialog open={showPreviewDialog} onOpenChange={setShowPreviewDialog}>
-        <DialogContent className="max-w-5xl">
+        <DialogContent className="max-w-4xl">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Eye className="w-5 h-5" />
-              Template Preview: {previewTemplate?.name}
-            </DialogTitle>
+            <DialogTitle>Template Preview: {previewTemplate?.name}</DialogTitle>
           </DialogHeader>
-          <div className="space-y-6">
-            {/* Subject Preview */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <Label className="text-blue-800 font-medium">📧 Onderwerp</Label>
-              <p className="text-lg font-semibold text-blue-900 mt-2">{previewTemplate?.subject}</p>
+          <div className="space-y-4">
+            <div>
+              <Label className="text-sm font-medium text-gray-700">Onderwerp</Label>
+              <div className="mt-1 p-3 bg-gray-50 border rounded-md">
+                <p className="font-medium text-gray-900">{previewTemplate?.subject}</p>
+              </div>
             </div>
             
-            {/* Email Preview */}
-            <div className="bg-white border rounded-lg overflow-hidden">
-              <div className="bg-gray-50 px-4 py-2 border-b flex items-center justify-between">
-                <Label className="font-medium text-gray-700">📱 E-mail Weergave</Label>
-                <Badge variant="outline">HTML</Badge>
+            <div>
+              <Label className="text-sm font-medium text-gray-700">E-mail Inhoud</Label>
+              <div className="mt-1 border rounded-md overflow-hidden">
+                <div 
+                  className="p-4 bg-white max-h-96 overflow-auto"
+                  dangerouslySetInnerHTML={{ __html: previewTemplate?.body_html || '' }}
+                />
               </div>
-              <div 
-                className="p-6 max-h-96 overflow-auto"
-                style={{ fontFamily: 'Arial, sans-serif' }}
-                dangerouslySetInnerHTML={{ __html: previewTemplate?.body_html || '' }}
-              />
             </div>
             
-            {/* Text Version */}
-            <div className="bg-gray-50 border rounded-lg overflow-hidden">
-              <div className="bg-gray-100 px-4 py-2 border-b flex items-center justify-between">
-                <Label className="font-medium text-gray-700">📝 Tekst Versie</Label>
-                <Badge variant="outline">Plain Text</Badge>
+            <div>
+              <Label className="text-sm font-medium text-gray-700">Tekst Versie</Label>
+              <div className="mt-1 p-3 bg-gray-50 border rounded-md max-h-32 overflow-auto">
+                <pre className="text-sm text-gray-700 whitespace-pre-wrap">
+                  {previewTemplate?.body_text}
+                </pre>
               </div>
-              <pre className="text-sm text-gray-700 p-4 max-h-48 overflow-auto whitespace-pre-wrap font-mono">
-                {previewTemplate?.body_text}
-              </pre>
             </div>
           </div>
         </DialogContent>

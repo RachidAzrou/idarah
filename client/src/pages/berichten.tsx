@@ -10,13 +10,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { apiRequest } from "@/lib/queryClient";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Mail, Plus, Send, Users, Eye, Settings, Ban, Edit, Play, TestTube } from "lucide-react";
+import { Mail, Plus, Send, Users, Eye, Settings, Ban, Edit, Play, TestTube, ChevronDown, ChevronRight } from "lucide-react";
 import { PiPuzzlePiece } from "react-icons/pi";
 import { CgTemplate } from "react-icons/cg";
 import { MdEvent } from "react-icons/md";
@@ -69,6 +70,8 @@ export default function Berichten() {
   const [sendRecipient, setSendRecipient] = useState("");
   const [sendMode, setSendMode] = useState<"single" | "bulk">("single");
   const [selectedSegment, setSelectedSegment] = useState("");
+  const [htmlBodyExpanded, setHtmlBodyExpanded] = useState(false);
+  const [textBodyExpanded, setTextBodyExpanded] = useState(false);
 
   // Fetch data for each tab
   const { data: templates, isLoading: templatesLoading } = useQuery({
@@ -725,33 +728,53 @@ export default function Berichten() {
                 />
               </div>
 
-              <FormField
-                control={templateForm.control}
-                name="bodyHtml"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>HTML Body</FormLabel>
-                    <FormControl>
-                      <Textarea {...field} placeholder="HTML inhoud van de e-mail" rows={8} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* HTML Body - Collapsible */}
+              <Collapsible open={htmlBodyExpanded} onOpenChange={setHtmlBodyExpanded}>
+                <CollapsibleTrigger asChild>
+                  <Button variant="ghost" className="w-full justify-between p-0 h-auto">
+                    <Label className="cursor-pointer">HTML Body</Label>
+                    {htmlBodyExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                  </Button>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="mt-2">
+                  <FormField
+                    control={templateForm.control}
+                    name="bodyHtml"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Textarea {...field} placeholder="HTML inhoud van de e-mail" rows={8} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </CollapsibleContent>
+              </Collapsible>
 
-              <FormField
-                control={templateForm.control}
-                name="bodyText"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Text Body</FormLabel>
-                    <FormControl>
-                      <Textarea {...field} placeholder="Platte tekst versie" rows={6} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* Text Body - Collapsible */}
+              <Collapsible open={textBodyExpanded} onOpenChange={setTextBodyExpanded}>
+                <CollapsibleTrigger asChild>
+                  <Button variant="ghost" className="w-full justify-between p-0 h-auto">
+                    <Label className="cursor-pointer">Text Body</Label>
+                    {textBodyExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                  </Button>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="mt-2">
+                  <FormField
+                    control={templateForm.control}
+                    name="bodyText"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Textarea {...field} placeholder="Platte tekst versie" rows={6} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </CollapsibleContent>
+              </Collapsible>
 
               <div className="flex justify-end gap-3">
                 <Button type="button" variant="outline" onClick={() => setShowTemplateDialog(false)}>

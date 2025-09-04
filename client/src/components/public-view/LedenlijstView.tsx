@@ -153,6 +153,14 @@ export function LedenlijstView({ config, members = [] }: LedenlijstViewProps) {
         </div>
       </div>
 
+      {/* Debug info */}
+      <div className="w-full relative z-10 mb-4">
+        <div className="bg-red-100 border border-red-300 rounded p-4">
+          <p>Debug: currentMembers.length = {currentMembers.length}</p>
+          <p>Debug: filteredMembers.length = {filteredMembers.length}</p>
+        </div>
+      </div>
+
       {/* Tabel */}
       <div className="w-full relative z-10">
         <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden" style={{ boxShadow: '0 6px 16px rgba(2,6,23,0.08)' }}>
@@ -181,10 +189,17 @@ export function LedenlijstView({ config, members = [] }: LedenlijstViewProps) {
               </tr>
             </thead>
             <tbody>
-              {currentMembers.map((member, memberIndex) => (
+              {/* Test row */}
+              <tr style={{backgroundColor: 'red'}}>
+                <td>TEST</td>
+                <td>TEST MEMBER</td>
+                <td colSpan={12}>TEST DATA</td>
+              </tr>
+              
+              {console.log('Rendering currentMembers:', currentMembers.length) || currentMembers.map((member, memberIndex) => (
                 <tr key={member.id} className="hover:bg-blue-50/50 border-b border-blue-100 last:border-0 transition-all duration-200">
                   <td className="px-6 py-3 font-mono text-xs text-slate-500">
-                    {member.lidnummer}
+                    {console.log('Member in render:', member) || member.lidnummer}
                   </td>
                   <td className="px-6 py-3 text-blue-900 font-medium text-sm">
                     {getMemberDisplayName(member, {

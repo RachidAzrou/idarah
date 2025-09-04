@@ -135,6 +135,24 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
     setActiveTab('personal');
   };
 
+  // Function to check if a tab has errors
+  const hasTabErrors = (tabName: string) => {
+    const errors = form.formState.errors;
+    
+    switch (tabName) {
+      case "linking":
+        return !!(errors.linkType || errors.memberId || errors.externalName);
+      case "personal":
+        return !!(errors.externalName || errors.email || errors.phone);
+      case "role":
+        return !!(errors.role || errors.termStart || errors.termEnd || errors.status);
+      case "extra":
+        return !!(errors.responsibilities || errors.avatarUrl || errors.orderIndex);
+      default:
+        return false;
+    }
+  };
+
   const handleLinkTypeChange = (type: 'EXISTING_MEMBER' | 'EXTERNAL_PERSON') => {
     setLinkType(type);
     form.setValue('linkType', type);
@@ -155,26 +173,50 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit((data) => {
+        // Transform data for backend compatibility
+        const transformedData = {
+          ...data,
+          // Convert Date objects to ISO strings for backend
+          termStart: data.termStart ? data.termStart.toISOString() : undefined,
+          termEnd: data.termEnd ? data.termEnd.toISOString() : undefined,
+        };
+        onSubmit(transformedData);
+      }, (errors) => {
+        // Handle form validation errors - navigate to first tab with errors
+        if (!isEditMode && (errors.linkType || errors.memberId || errors.externalName)) {
+          setActiveTab('linking');
+        } else if (errors.externalName || errors.email || errors.phone) {
+          setActiveTab('personal');
+        } else if (errors.role || errors.termStart || errors.termEnd || errors.status) {
+          setActiveTab('role');
+        } else if (errors.responsibilities || errors.avatarUrl || errors.orderIndex) {
+          setActiveTab('extra');
+        }
+      })} className="space-y-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className={`grid w-full ${isEditMode ? 'grid-cols-3' : 'grid-cols-4'}`}>
             {!isEditMode && (
               <TabsTrigger value="linking" data-testid="tab-linking" className="flex items-center gap-2">
                 <Link className="h-4 w-4" />
                 Koppeling
+                {hasTabErrors("linking") && <span className="text-red-500 ml-1">•</span>}
               </TabsTrigger>
             )}
             <TabsTrigger value="personal" data-testid="tab-personal" className="flex items-center gap-2">
               <MdOutlinePermIdentity className="h-4 w-4" />
               Persoonlijk
+              {hasTabErrors("personal") && <span className="text-red-500 ml-1">•</span>}
             </TabsTrigger>
             <TabsTrigger value="role" data-testid="tab-role" className="flex items-center gap-2">
               <Crown className="h-4 w-4" />
               Bestuursrol
+              {hasTabErrors("role") && <span className="text-red-500 ml-1">•</span>}
             </TabsTrigger>
             <TabsTrigger value="extra" data-testid="tab-extra" className="flex items-center gap-2">
               <FileText className="h-4 w-4" />
               Extra
+              {hasTabErrors("extra") && <span className="text-red-500 ml-1">•</span>}
             </TabsTrigger>
           </TabsList>
 

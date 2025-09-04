@@ -1355,6 +1355,348 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Reconciliatie endpoints
+  
+  // Import bankafschrift
+  app.post('/api/finance/import', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      if (req.user!.role === 'MEDEWERKER') {
+        return res.status(403).json({ error: "Onvoldoende rechten" });
+      }
+
+      const { StatementImportService } = await import('../lib/reconcile/import');
+      const importService = new StatementImportService();
+      
+      // Voor demo - in productie zou dit file upload zijn
+      const { file, options } = req.body;
+      
+      const validation = importService.validateFile(file);
+      if (!validation.valid) {
+        return res.status(400).json({ 
+          error: "Bestand validatie mislukt", 
+          details: validation.errors 
+        });
+      }
+      
+      const result = await importService.importStatement(
+        file, 
+        options, 
+        req.user!.tenantId, 
+        req.user!.id
+      );
+      
+      res.json({
+        success: true,
+        statement: result.statement,
+        transactionCount: result.transactions.length,
+      });
+      
+    } catch (error) {
+      console.error('Import error:', error);
+      res.status(500).json({ 
+        error: "Fout bij importeren", 
+        message: error instanceof Error ? error.message : "Onbekende fout" 
+      });
+    }
+  });
+
+  // Preview import zonder opslaan
+  app.post('/api/finance/import/preview', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      if (req.user!.role === 'MEDEWERKER') {
+        return res.status(403).json({ error: "Onvoldoende rechten" });
+      }
+
+      const { StatementImportService } = await import('../lib/reconcile/import');
+      const importService = new StatementImportService();
+      
+      const { file, options } = req.body;
+      const preview = await importService.previewTransactions(file, options);
+      
+      res.json(preview);
+      
+    } catch (error) {
+      console.error('Preview error:', error);
+      res.status(500).json({ 
+        error: "Fout bij preview", 
+        message: error instanceof Error ? error.message : "Onbekende fout" 
+      });
+    }
+  });
+
+  // Bank statements lijst
+  app.get('/api/finance/statements', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      // TODO: Implementeer database query voor bank statements
+      res.json([]);
+    } catch (error) {
+      res.status(500).json({ error: "Fout bij ophalen statements" });
+    }
+  });
+
+  // Bank transacties met filters
+  app.get('/api/finance/bank-transactions', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      // TODO: Implementeer database query met filters
+      const { status, from, to, side, category, vendor, q } = req.query;
+      res.json([]);
+    } catch (error) {
+      res.status(500).json({ error: "Fout bij ophalen transacties" });
+    }
+  });
+
+  // Bevestig match
+  app.post('/api/finance/bank-transactions/:id/confirm', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      if (req.user!.role === 'MEDEWERKER') {
+        return res.status(403).json({ error: "Onvoldoende rechten" });
+      }
+
+      const transactionId = req.params.id;
+      const { matchedFeeId, matchedMemberId, categoryId, vendorId } = req.body;
+      
+      // TODO: Implementeer database update
+      console.log(`Confirming match for transaction ${transactionId}`);
+      
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Fout bij bevestigen match" });
+    }
+  });
+
+  // Split transactie
+  app.post('/api/finance/bank-transactions/:id/split', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      if (req.user!.role === 'MEDEWERKER') {
+        return res.status(403).json({ error: "Onvoldoende rechten" });
+      }
+
+      const transactionId = req.params.id;
+      const { splits } = req.body;
+      
+      // TODO: Implementeer split logica
+      console.log(`Splitting transaction ${transactionId}`);
+      
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Fout bij splitsen transactie" });
+    }
+  });
+
+  // Afkeuren transactie
+  app.post('/api/finance/bank-transactions/:id/reject', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      if (req.user!.role === 'MEDEWERKER') {
+        return res.status(403).json({ error: "Onvoldoende rechten" });
+      }
+
+      const transactionId = req.params.id;
+      const { note } = req.body;
+      
+      // TODO: Implementeer reject logica
+      console.log(`Rejecting transaction ${transactionId}`);
+      
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Fout bij afkeuren transactie" });
+    }
+  });
+
+  // Boek transacties naar journaal
+  app.post('/api/finance/book', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      if (req.user!.role === 'MEDEWERKER') {
+        return res.status(403).json({ error: "Onvoldoende rechten" });
+      }
+
+      const { statementId, transactionIds } = req.body;
+      
+      // TODO: Implementeer booking logica
+      console.log(`Booking transactions`, { statementId, transactionIds });
+      
+      res.json({ success: true, bookedCount: transactionIds?.length || 0 });
+    } catch (error) {
+      res.status(500).json({ error: "Fout bij boeken transacties" });
+    }
+  });
+
+  // Expense categories CRUD
+  app.get('/api/finance/categories', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      // TODO: Implementeer database query
+      res.json([]);
+    } catch (error) {
+      res.status(500).json({ error: "Fout bij ophalen categorieën" });
+    }
+  });
+
+  app.post('/api/finance/categories', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      if (req.user!.role === 'MEDEWERKER') {
+        return res.status(403).json({ error: "Onvoldoende rechten" });
+      }
+
+      const { name, code, color } = req.body;
+      // TODO: Implementeer database insert
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Fout bij aanmaken categorie" });
+    }
+  });
+
+  // Vendors CRUD
+  app.get('/api/finance/vendors', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      // TODO: Implementeer database query
+      res.json([]);
+    } catch (error) {
+      res.status(500).json({ error: "Fout bij ophalen leveranciers" });
+    }
+  });
+
+  app.post('/api/finance/vendors', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      if (req.user!.role === 'MEDEWERKER') {
+        return res.status(403).json({ error: "Onvoldoende rechten" });
+      }
+
+      const { name, iban, defaultCategoryId } = req.body;
+      // TODO: Implementeer database insert
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Fout bij aanmaken leverancier" });
+    }
+  });
+
+  // Match rules CRUD
+  app.get('/api/finance/rules', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      // TODO: Implementeer database query
+      res.json([]);
+    } catch (error) {
+      res.status(500).json({ error: "Fout bij ophalen regels" });
+    }
+  });
+
+  app.post('/api/finance/rules', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      if (req.user!.role === 'MEDEWERKER') {
+        return res.status(403).json({ error: "Onvoldoende rechten" });
+      }
+
+      const { name, priority, criteria, action } = req.body;
+      // TODO: Implementeer database insert
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Fout bij aanmaken regel" });
+    }
+  });
+
+  // Rapportage endpoints
+  
+  // Cashflow rapportage
+  app.get('/api/reports/cashflow', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { from, to, types, categories, methods, statuses } = req.query;
+      
+      // Mock data voor nu - TODO: Implementeer echte queries
+      const mockData = [
+        { date: '2024-01-01', income: 12500, expense: 8300, net: 4200 },
+        { date: '2024-01-02', income: 15600, expense: 9100, net: 6500 },
+        { date: '2024-01-03', income: 13400, expense: 7800, net: 5600 },
+      ];
+      
+      res.json(mockData);
+    } catch (error) {
+      res.status(500).json({ error: "Fout bij ophalen cashflow data" });
+    }
+  });
+
+  // Categorie breakdown
+  app.get('/api/reports/categories', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { kind = 'expense', from, to } = req.query;
+      
+      // Mock data - TODO: Implementeer echte aggregatie
+      const mockData = [
+        { category: 'Lidgelden', amount: 25000, count: 120 },
+        { category: 'Nutsvoorzieningen', amount: 4500, count: 12 },
+        { category: 'Onderhoud', amount: 3200, count: 8 },
+        { category: 'Verzekeringen', amount: 2800, count: 4 },
+      ];
+      
+      res.json(mockData);
+    } catch (error) {
+      res.status(500).json({ error: "Fout bij ophalen categorie data" });
+    }
+  });
+
+  // Gestapelde categorie data per maand
+  app.get('/api/reports/stacked-by-category', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      // Mock data - TODO: Implementeer echte aggregatie
+      const mockData = [
+        { month: '2024-01', 'Lidgelden': 8500, 'Nutsvoorzieningen': 1200, 'Onderhoud': 800 },
+        { month: '2024-02', 'Lidgelden': 9200, 'Nutsvoorzieningen': 1100, 'Onderhoud': 600 },
+        { month: '2024-03', 'Lidgelden': 7800, 'Nutsvoorzieningen': 1300, 'Onderhoud': 1200 },
+      ];
+      
+      res.json(mockData);
+    } catch (error) {
+      res.status(500).json({ error: "Fout bij ophalen gestapelde data" });
+    }
+  });
+
+  // Fee status trend
+  app.get('/api/reports/fee-status-trend', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      // Mock data - TODO: Implementeer echte aggregatie
+      const mockData = [
+        { month: '2024-01', betaald: 85, openstaand: 25, vervallen: 5 },
+        { month: '2024-02', betaald: 92, openstaand: 18, vervallen: 8 },
+        { month: '2024-03', betaald: 88, openstaand: 22, vervallen: 6 },
+      ];
+      
+      res.json(mockData);
+    } catch (error) {
+      res.status(500).json({ error: "Fout bij ophalen fee status trend" });
+    }
+  });
+
+  // Top leden per bedrag
+  app.get('/api/reports/top-members', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      // Mock data - TODO: Implementeer echte aggregatie
+      const mockData = [
+        { memberId: '1', name: 'Jan Janssen', total: 2500, count: 12, spark: [200, 220, 180, 250, 300] },
+        { memberId: '2', name: 'Marie Peeters', total: 2200, count: 11, spark: [180, 200, 210, 190, 220] },
+        { memberId: '3', name: 'Ahmed Hassan', total: 1950, count: 10, spark: [195, 180, 200, 175, 210] },
+      ];
+      
+      res.json(mockData);
+    } catch (error) {
+      res.status(500).json({ error: "Fout bij ophalen top leden data" });
+    }
+  });
+
+  // Betaalmethode breakdown
+  app.get('/api/reports/methods', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      // Mock data - TODO: Implementeer echte aggregatie
+      const mockData = [
+        { method: 'SEPA', amount: 18500, count: 85 },
+        { method: 'OVERSCHRIJVING', amount: 6200, count: 25 },
+        { method: 'BANCONTACT', amount: 1800, count: 12 },
+        { method: 'CASH', amount: 950, count: 8 },
+        { method: 'OVERIG', amount: 450, count: 3 },
+      ];
+      
+      res.json(mockData);
+    } catch (error) {
+      res.status(500).json({ error: "Fout bij ophalen betaalmethode data" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

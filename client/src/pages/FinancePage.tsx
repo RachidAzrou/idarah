@@ -15,7 +15,7 @@ import { ExportDialog } from "@/components/finance/ExportDialog";
 import { JournalView } from "@/components/finance/JournalView";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { FilterData } from "@/lib/zod/transaction";
-import { Plus, BarChart3, BookOpen } from "lucide-react";
+import { Plus, BarChart3, BookOpen, RefreshCw, PieChart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -243,7 +243,7 @@ export default function FinancePage() {
 
         {/* Main Content Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 lg:w-auto lg:grid-cols-2">
+          <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:grid-cols-4">
             <TabsTrigger value="overview" className="gap-2" data-testid="tab-overview">
               <BarChart3 className="h-4 w-4" />
               Overzicht
@@ -251,6 +251,14 @@ export default function FinancePage() {
             <TabsTrigger value="journal" className="gap-2" data-testid="tab-journal">
               <BookOpen className="h-4 w-4" />
               Journaal
+            </TabsTrigger>
+            <TabsTrigger value="reconciliation" className="gap-2" data-testid="tab-reconciliation">
+              <RefreshCw className="h-4 w-4" />
+              Reconciliatie
+            </TabsTrigger>
+            <TabsTrigger value="reports" className="gap-2" data-testid="tab-reports">
+              <PieChart className="h-4 w-4" />
+              Rapporten
             </TabsTrigger>
           </TabsList>
 
@@ -285,6 +293,58 @@ export default function FinancePage() {
           <TabsContent value="journal" className="space-y-8 mt-8">
             {/* Journal View */}
             <JournalView transactions={filteredTransactions} />
+          </TabsContent>
+
+          <TabsContent value="reconciliation" className="space-y-8 mt-8">
+            {/* Reconciliatie Content */}
+            <div className="bg-white border border-gray-200 rounded-lg p-6">
+              <div className="text-center py-12">
+                <RefreshCw className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  Bankreconciliatie
+                </h3>
+                <p className="text-gray-500 max-w-md mx-auto mb-6">
+                  Importeer bankafschriften, match transacties automatisch met lidgelden en categoriseer uitgaven. 
+                  Deze functionaliteit wordt binnenkort beschikbaar gesteld.
+                </p>
+                <div className="flex justify-center gap-3">
+                  <Button variant="outline" disabled>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Afschrift Importeren
+                  </Button>
+                  <Button variant="outline" disabled>
+                    <BarChart3 className="h-4 w-4 mr-2" />
+                    Transacties Bekijken
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="reports" className="space-y-8 mt-8">
+            {/* Rapporten Content */}
+            <div className="bg-white border border-gray-200 rounded-lg p-6">
+              <div className="text-center py-12">
+                <PieChart className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  Financiële Rapporten
+                </h3>
+                <p className="text-gray-500 max-w-md mx-auto mb-6">
+                  Interactieve dashboards met cashflow analyse, categorie breakdowns, 
+                  fee status trends en top leden overzichten. Binnenkort beschikbaar.
+                </p>
+                <div className="flex justify-center gap-3">
+                  <Button variant="outline" disabled>
+                    <BarChart3 className="h-4 w-4 mr-2" />
+                    Cashflow Analyse
+                  </Button>
+                  <Button variant="outline" disabled>
+                    <PieChart className="h-4 w-4 mr-2" />
+                    Categorie Breakdown
+                  </Button>
+                </div>
+              </div>
+            </div>
           </TabsContent>
         </Tabs>
 

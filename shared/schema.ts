@@ -24,6 +24,9 @@ export const screenTypeEnum = pgEnum('screen_type', ['LEDENLIJST', 'MEDEDELINGEN
 export const cardStatusEnum = pgEnum('card_status', ['ACTUEEL', 'NIET_ACTUEEL', 'VERLOPEN']);
 export const ruleScopeEnum = pgEnum('rule_scope', ['STEMRECHT', 'VERKIESBAAR']);
 export const companyTypeEnum = pgEnum('company_type', ['VZW', 'BVBA', 'NV', 'VOF', 'EENMANSZAAK', 'CVBA', 'SE', 'ANDERE']);
+export const reconcileStatusEnum = pgEnum('reconcile_status', ['ONTVANGEN', 'VOORGESTELD', 'GEDEELTELIJK_GEMATCHT', 'GEMATCHT', 'AFGEKEURD', 'GEBOEKT']);
+export const statementTypeEnum = pgEnum('statement_type', ['BANK', 'CSV', 'MT940', 'CODA']);
+export const txnSideEnum = pgEnum('txn_side', ['CREDIT', 'DEBET']);
 
 // Tables
 export const tenants = pgTable("tenants", {
@@ -228,6 +231,69 @@ export const sepaExports = pgTable("sepa_exports", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const bankStatements = pgTable("bank_statements", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tenantId: varchar("tenant_id").notNull(),
+  type: statementTypeEnum("type").notNull(),
+  sourceName: text("source_name").notNull(),
+  importedAt: timestamp("imported_at").defaultNow().notNull(),
+  importedById: varchar("imported_by_id"),
+  numTx: integer("num_tx").notNull(),
+  rawFileUrl: text("raw_file_url"),
+});
+
+export const bankTransactions = pgTable("bank_transactions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tenantId: varchar("tenant_id").notNull(),
+  statementId: varchar("statement_id").notNull(),
+  bookingDate: timestamp("booking_date").notNull(),
+  valueDate: timestamp("value_date"),
+  side: txnSideEnum("side").notNull(),
+  amount: decimal("amount", { precision: 12, scale: 2 }).notNull(),
+  currency: text("currency").default("EUR").notNull(),
+  counterparty: text("counterparty"),
+  iban: text("iban"),
+  description: text("description"),
+  ref: text("ref"), // end-to-end / mededeling
+  status: reconcileStatusEnum("status").default('ONTVANGEN').notNull(),
+  categoryId: varchar("category_id"),
+  vendorId: varchar("vendor_id"),
+  matchedFeeId: varchar("matched_fee_id"),
+  matchedMemberId: varchar("matched_member_id"),
+  matchScore: integer("match_score"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const expenseCategories = pgTable("expense_categories", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tenantId: varchar("tenant_id").notNull(),
+  name: text("name").notNull(),
+  code: text("code"),
+  color: text("color"),
+  active: boolean("active").default(true).notNull(),
+});
+
+export const vendors = pgTable("vendors", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tenantId: varchar("tenant_id").notNull(),
+  name: text("name").notNull(),
+  iban: text("iban"),
+  defaultCategoryId: varchar("default_category_id"),
+  active: boolean("active").default(true).notNull(),
+});
+
+export const matchRules = pgTable("match_rules", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tenantId: varchar("tenant_id").notNull(),
+  name: text("name").notNull(),
+  priority: integer("priority").default(100).notNull(),
+  active: boolean("active").default(true).notNull(),
+  criteria: json("criteria").notNull(), // bv. {contains:["lidgeld"], iban:"BE..", amountToleranceCents:100}
+  action: json("action").notNull(), // bv. {categoryId:"..", vendorId:"..", linkTo:"FEE|MEMBER"}
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // Relations
 export const tenantsRelations = relations(tenants, ({ many }) => ({
   users: many(users),
@@ -240,6 +306,11 @@ export const tenantsRelations = relations(tenants, ({ many }) => ({
   transactions: many(transactions),
   notifications: many(notifications),
   sepaBatches: many(sepaExports),
+  bankStatements: many(bankStatements),
+  bankTransactions: many(bankTransactions),
+  expenseCategories: many(expenseCategories),
+  vendors: many(vendors),
+  matchRules: many(matchRules),
 }));
 
 export const usersRelations = relations(users, ({ one }) => ({
@@ -392,6 +463,73 @@ export const sepaExportsRelations = relations(sepaExports, ({ one, many }) => ({
   fees: many(membershipFees),
 }));
 
+export const bankStatementsRelations = relations(bankStatements, ({ one, many }) => ({
+  tenant: one(tenants, {
+    fields: [bankStatements.tenantId],
+    references: [tenants.id],
+  }),
+  importedBy: one(users, {
+    fields: [bankStatements.importedById],
+    references: [users.id],
+  }),
+  transactions: many(bankTransactions),
+}));
+
+export const bankTransactionsRelations = relations(bankTransactions, ({ one }) => ({
+  tenant: one(tenants, {
+    fields: [bankTransactions.tenantId],
+    references: [tenants.id],
+  }),
+  statement: one(bankStatements, {
+    fields: [bankTransactions.statementId],
+    references: [bankStatements.id],
+  }),
+  category: one(expenseCategories, {
+    fields: [bankTransactions.categoryId],
+    references: [expenseCategories.id],
+  }),
+  vendor: one(vendors, {
+    fields: [bankTransactions.vendorId],
+    references: [vendors.id],
+  }),
+  matchedFee: one(membershipFees, {
+    fields: [bankTransactions.matchedFeeId],
+    references: [membershipFees.id],
+  }),
+  matchedMember: one(members, {
+    fields: [bankTransactions.matchedMemberId],
+    references: [members.id],
+  }),
+}));
+
+export const expenseCategoriesRelations = relations(expenseCategories, ({ one, many }) => ({
+  tenant: one(tenants, {
+    fields: [expenseCategories.tenantId],
+    references: [tenants.id],
+  }),
+  transactions: many(bankTransactions),
+  vendors: many(vendors),
+}));
+
+export const vendorsRelations = relations(vendors, ({ one, many }) => ({
+  tenant: one(tenants, {
+    fields: [vendors.tenantId],
+    references: [tenants.id],
+  }),
+  defaultCategory: one(expenseCategories, {
+    fields: [vendors.defaultCategoryId],
+    references: [expenseCategories.id],
+  }),
+  transactions: many(bankTransactions),
+}));
+
+export const matchRulesRelations = relations(matchRules, ({ one }) => ({
+  tenant: one(tenants, {
+    fields: [matchRules.tenantId],
+    references: [tenants.id],
+  }),
+}));
+
 // Insert schemas
 export const insertTenantSchema = createInsertSchema(tenants).omit({
   id: true,
@@ -480,6 +618,29 @@ export const insertSepaExportSchema = createInsertSchema(sepaExports).omit({
   createdAt: true,
 });
 
+export const insertBankStatementSchema = createInsertSchema(bankStatements).omit({
+  id: true,
+  importedAt: true,
+});
+
+export const insertBankTransactionSchema = createInsertSchema(bankTransactions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertExpenseCategorySchema = createInsertSchema(expenseCategories).omit({
+  id: true,
+});
+
+export const insertVendorSchema = createInsertSchema(vendors).omit({
+  id: true,
+});
+
+export const insertMatchRuleSchema = createInsertSchema(matchRules).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type Tenant = typeof tenants.$inferSelect;
 export type InsertTenant = z.infer<typeof insertTenantSchema>;
@@ -523,4 +684,59 @@ export type InsertNotification = z.infer<typeof insertNotificationSchema>;
 export type SepaExport = typeof sepaExports.$inferSelect;
 export type InsertSepaExport = z.infer<typeof insertSepaExportSchema>;
 
+export type BankStatement = typeof bankStatements.$inferSelect;
+export type InsertBankStatement = z.infer<typeof insertBankStatementSchema>;
+
+export type BankTransaction = typeof bankTransactions.$inferSelect;
+export type InsertBankTransaction = z.infer<typeof insertBankTransactionSchema>;
+
+export type ExpenseCategory = typeof expenseCategories.$inferSelect;
+export type InsertExpenseCategory = z.infer<typeof insertExpenseCategorySchema>;
+
+export type Vendor = typeof vendors.$inferSelect;
+export type InsertVendor = z.infer<typeof insertVendorSchema>;
+
+export type MatchRule = typeof matchRules.$inferSelect;
+export type InsertMatchRule = z.infer<typeof insertMatchRuleSchema>;
+
 export type CardVerifyResponse = z.infer<typeof cardVerifyResponseSchema>;
+
+// Rapportage types
+export type MoneyPoint = {
+  date: string;
+  income: number;
+  expense: number;
+  net: number;
+};
+
+export type CategorySlice = {
+  category: string;
+  amount: number;
+  count: number;
+};
+
+export type StackedMonth = {
+  month: string;
+  [category: string]: number | string;
+};
+
+export type FeeStatusMonth = {
+  month: string;
+  betaald: number;
+  openstaand: number;
+  vervallen: number;
+};
+
+export type TopMember = {
+  memberId: string;
+  name: string;
+  total: number;
+  count: number;
+  spark: number[];
+};
+
+export type MethodSlice = {
+  method: "SEPA" | "OVERSCHRIJVING" | "BANCONTACT" | "CASH" | "OVERIG";
+  amount: number;
+  count: number;
+};

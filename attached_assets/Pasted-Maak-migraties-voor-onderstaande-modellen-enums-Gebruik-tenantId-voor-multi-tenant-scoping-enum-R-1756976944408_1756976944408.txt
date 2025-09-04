@@ -1,0 +1,236 @@
+Maak migraties voor onderstaande modellen/enums. Gebruik tenantId voor multi-tenant scoping.
+
+enum ReconcileStatus { ONTVANGEN VOORGESTELD GEDEELTELIJK_GEMATCHT GEMATCHT AFGEKEURD GEBOEKT }
+enum StatementType { BANK CSV MT940 CODA }
+enum TxnSide { CREDIT DEBET } // inkomsten / uitgaven
+
+model BankStatement {
+  id           String  @id @default(cuid())
+  tenantId     String
+  type         StatementType
+  sourceName   String
+  importedAt   DateTime @default(now())
+  importedById String?
+  numTx        Int
+  rawFileUrl   String?
+  transactions BankTransaction[]
+}
+
+model BankTransaction {
+  id              String   @id @default(cuid())
+  tenantId        String
+  statementId     String
+  statement       BankStatement @relation(fields: [statementId], references: [id])
+  bookingDate     DateTime
+  valueDate       DateTime?
+  side            TxnSide
+  amount          Decimal  @db.Numeric(12,2)
+  currency        String   @default("EUR")
+  counterparty    String?
+  iban            String?
+  description     String?
+  ref             String?   // end-to-end / mededeling
+  status          ReconcileStatus @default(ONTVANGEN)
+  categoryId      String?
+  vendorId        String?
+  matchedFeeId    String?
+  matchedMemberId String?
+  matchScore      Int?
+  notes           String?
+  createdAt       DateTime  @default(now())
+}
+
+model ExpenseCategory {
+  id        String  @id @default(cuid())
+  tenantId  String
+  name      String
+  code      String?
+  color     String?
+  active    Boolean @default(true)
+}
+
+model Vendor {
+  id                 String  @id @default(cuid())
+  tenantId           String
+  name               String
+  iban               String?
+  defaultCategoryId  String?
+  active             Boolean @default(true)
+}
+
+model MatchRule {
+  id        String  @id @default(cuid())
+  tenantId  String
+  name      String
+  priority  Int      @default(100)
+  active    Boolean  @default(true)
+  criteria  Json     // bv. {contains:["lidgeld"], iban:"BE..", amountToleranceCents:100}
+  action    Json     // bv. {categoryId:"..", vendorId:"..", linkTo:"FEE|MEMBER"}
+  createdAt DateTime @default(now())
+}
+
+
+NB: Bestaande Transaction, MembershipFee modellen blijven, maar BankTransaction(s) linken er na boeken aan.
+
+2) Parsing & import (services)
+
+lib/reconcile/parsers/csv.ts – generieke CSV parser (configureerbare kolomnamen).
+
+lib/reconcile/parsers/mt940.ts, .../coda.ts – basis parser stubs met mapping naar BankTransaction.
+
+lib/reconcile/import.ts
+
+importStatement(file, type, tenantId, userId) → BankStatement + BankTransaction[] (status=ONTVANGEN) → run suggest engine.
+
+Validatie: Zod schemas voor bestandsmetadata en rijen (datum, bedrag, beschrijving, IBAN, ref). Alle bedragen intern in centen bij verwerking, opslag in Decimal.
+
+3) Matching engine (automatisch)
+
+lib/reconcile/engine.ts:
+
+Heuristieken (score 0–100):
+
+Bedrag ≈ lidgeldbedrag (tolerantie bv. €0,50) → +40
+
+Omschrijving bevat lidnummer/naam → +25
+
+IBAN match met gekend lid → +10
+
+Periode-hint (maand/jaar in tekst) → +10
+
+MatchRule hit → +15
+
+Uitkomst:
+
+Stel matchedFeeId of matchedMemberId, categoryId, vendorId, matchScore.
+
+Status: VOORGESTELD (≥70), GEDEELTELIJK_GEMATCHT (40–69), anders ONTVANGEN.
+
+Duplicaatdetectie: zelfde bedrag + datum ±1 dag + ref → flag.
+
+Background: na import asynchroon engine.suggest(statementId) uitvoeren.
+
+4) Handmatige reconciliatie (services)
+
+confirmMatch(txId, payload) → zet matchedFeeId/memberId/categoryId/vendorId, status=GEMATCHT.
+
+splitTransaction(txId, splits[]) → verdeel uitgave over meerdere categorieën (virtueel of door child-records).
+
+rejectTransaction(txId, note?) → status=AFGEKEURD.
+
+bookTransactions(statementId?) → alle GEMATCHT posten naar Transaction (journaal) en status=GEBOEKT.
+
+Boekingsregels:
+
+CREDIT (inkomsten): maak journaalpost met type Inkomsten, categorie Lidgeld indien aan MembershipFee gelinkt.
+
+DEBET (uitgaven): journaalpost type Uitgaven met gekozen ExpenseCategory en Vendor.
+
+Update KPI’s en caches.
+
+5) Categorisatie beheer
+
+CRUD endpoints voor ExpenseCategory, Vendor, MatchRule.
+
+Rule-engine integreren in suggesties en als post-import job.
+
+Vendor default → auto-categorie bij match (naam of IBAN).
+
+6) API/tRPC endpoints
+
+POST /api/finance/import → upload + parse + suggest (returns statement summary).
+
+GET /api/finance/statements (+ detail, paginatie).
+
+GET /api/finance/bank-transactions (filters: status, periode, side, category, vendor, q).
+
+POST /api/finance/bank-transactions/:id/confirm
+
+POST /api/finance/bank-transactions/:id/split
+
+POST /api/finance/bank-transactions/:id/reject
+
+POST /api/finance/book (statementId?|txIds[])
+
+GET /api/finance/categories|vendors|rules + POST/PUT/DELETE voor elk.
+
+RBAC: BEHEERDER of SUPERADMIN.
+Validatie: Zod voor alle payloads.
+Tijdzone: alle vergelijkingen met Europe/Brussels (date-fns-tz).
+
+7) Rapportage (data-hooks & endpoints)
+
+Lever alleen data, geen styling. Deze hooks voeden de grafieken in de “Rapporten” tab.
+
+Contracts (centen in/out):
+
+type MoneyPoint = { date: string; income: number; expense: number; net: number };
+type CategorySlice = { category: string; amount: number; count: number };
+type StackedMonth = { month: string; [category: string]: number };
+type FeeStatusMonth = { month: string; betaald: number; openstaand: number; vervallen: number };
+type TopMember = { memberId: string; name: string; total: number; count: number; spark: number[] };
+type MethodSlice = { method: "SEPA"|"OVERSCHRIJVING"|"BANCONTACT"|"CASH"|"OVERIG"; amount: number; count: number };
+
+function useCashflowSeries(filters): { data: MoneyPoint[], loading, error }
+function useCategoryBreakdown(filters, kind: "income"|"expense"): { data: CategorySlice[], loading, error }
+function useStackedByCategory(filters): { data: StackedMonth[], loading, error }
+function useFeeStatusTrend(filters): { data: FeeStatusMonth[], loading, error }
+function useTopMembers(filters): { data: TopMember[], loading, error }
+function useMethodBreakdown(filters): { data: MethodSlice[], loading, error }
+
+
+Server endpoints leveren dezelfde structuren:
+
+/api/reports/cashflow
+
+/api/reports/categories?kind=income|expense
+
+/api/reports/stacked-by-category
+
+/api/reports/fee-status-trend
+
+/api/reports/top-members
+
+/api/reports/methods
+
+Filters overal: { from, to, types?, categories?, methods?, statuses? }.
+
+8) Integratie Financiën pagina
+
+Voeg derde tab “Rapporten” toe; gebruik bestaande huisstijl.
+
+Voeg nieuwe tab “Reconciliatie” toe met stappen Import → Voorstellen → Bevestigen → Boeken (UI volgt huisstijl; jij levert only logic + endpoints + hooks).
+
+Overzicht/Journaal blijven ongewijzigd maar tonen KPI’s op basis van geboekte Transaction records.
+
+9) Internationale notatie
+
+Valuta: Intl.NumberFormat('nl-BE', { style: 'currency', currency: 'EUR' }).
+
+Datums: dd-MM-yyyy, berekeningen met Europe/Brussels.
+
+10) Tests
+
+Parser unit tests met voorbeeldbestanden (CSV minimaal).
+
+Engine tests: hoge/medium/lage score, duplicaatdetectie, rule-hit.
+
+Boekingstest: gematchte transacties verschijnen in Journaal/Overzicht.
+
+Rapportage: aggregaties juist voor randen (maandgrenzen, lege sets).
+
+11) Acceptatiecriteria
+
+Bankafschrift import creëert BankStatement + BankTransaction (status ONTVANGEN).
+
+Na suggestie krijgen transacties VOORGESTELD of GEDEELTELIJK_GEMATCHT met score.
+
+Beheerder kan bevestigen, splitsen, afkeuren en boeken → dagen door naar Transaction; status GEBOEKT.
+
+Kosten kunnen aan ExpenseCategory + Vendor gelinkt worden; MatchRules werken.
+
+Rapport-endpoints en hooks leveren datasets voor cashflow, categorieën, methoden, fee-status trend, top leden.
+
+Alles tenant-scoped, RBAC-gegard, Zod-gevalideerd, en tijdzone-correct.
+
+Genereer nu alle Prisma updates, services, parsers (stubs waar nodig), matching-engine, API/tRPC endpoints, hooks voor rapportage, en basis tests. UI/design blijft conform de bestaande huisstijl; geen extra visuele specs nodig.

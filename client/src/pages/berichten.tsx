@@ -711,7 +711,7 @@ export default function Berichten() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-testid="templates-grid">
             {templatesLoading ? (
               Array.from({ length: 6 }).map((_, i) => (
-                <Card key={i} className="animate-pulse">
+                <Card key={i} className="glass-card animate-pulse">
                   <CardHeader className="pb-3">
                     <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
                     <div className="h-3 bg-gray-200 rounded w-1/2"></div>
@@ -726,7 +726,7 @@ export default function Berichten() {
               ))
             ) : !templates || !Array.isArray(templates) || templates.length === 0 ? (
               <div className="col-span-full">
-                <Card className="border-dashed border-2 border-gray-300">
+                <Card className="glass-card border-dashed border-2 border-white/30">
                   <CardContent className="text-center py-16">
                     <div className="bg-gray-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
                       <Mail className="w-10 h-10 text-gray-400" />
@@ -758,7 +758,7 @@ export default function Berichten() {
                   const TemplateIcon = templateIcon;
                   
                   return (
-                    <Card key={template.id} className="hover:shadow-lg transition-shadow border-gray-200 bg-gray-50" data-testid={`card-template-${template.id}`}>
+                    <Card key={template.id} className="glass-card card-hover animate-fade-in group border-0" data-testid={`card-template-${template.id}`}>
                       <CardHeader className="pb-4">
                         <div className="flex items-start justify-between">
                           <div className="flex-1">

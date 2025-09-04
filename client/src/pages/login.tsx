@@ -69,7 +69,7 @@ export default function Login() {
         
         {/* Welcome text positioned at middle */}
         <div className="flex-1 flex items-center justify-start">
-          <div className="max-w-md">
+          <div className="max-w-md ml-0">
             <h1 className="text-4xl font-bold text-white mb-6 leading-tight">
               Inloggen bij uw account
             </h1>

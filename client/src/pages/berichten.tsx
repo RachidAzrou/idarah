@@ -312,7 +312,20 @@ export default function Berichten() {
   };
 
   const handlePreviewTemplate = (template: any) => {
-    setPreviewTemplate(template);
+    // Generate preview content from the stored content or use existing HTML/text
+    let previewData = { ...template };
+    
+    // If template has content field (new format), generate HTML and text versions for preview
+    if (template.content && (!template.bodyHtml && !template.body_html)) {
+      previewData.bodyHtml = convertToHTML(template.content);
+      previewData.bodyText = convertToPlainText(template.content);
+    } else {
+      // Use existing HTML/text content
+      previewData.bodyHtml = template.bodyHtml || template.body_html;
+      previewData.bodyText = template.bodyText || template.body_text;
+    }
+    
+    setPreviewTemplate(previewData);
     setShowPreviewDialog(true);
   };
 

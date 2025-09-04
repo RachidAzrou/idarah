@@ -4,7 +4,7 @@ import {
   emailSegments, 
   emailCampaigns, 
   emailMessages, 
-  emailSuppress,
+  emailSuppresses,
   members,
   tenants,
   membershipFees,
@@ -225,7 +225,7 @@ export class EmailService {
         eq(membershipFees.tenantId, tenantId),
         eq(membershipFees.memberId, memberId)
       ))
-      .orderBy(desc(membershipFees.dueDate))
+      .orderBy(desc(membershipFees.periodStart))
       .limit(5);
 
     return {
@@ -239,7 +239,8 @@ export class EmailService {
       },
       fees: memberFees.map(fee => ({
         amount: fee.amount,
-        dueDate: fee.dueDate,
+        periodStart: fee.periodStart,
+        periodEnd: fee.periodEnd,
         status: fee.status,
       })),
     };
@@ -248,10 +249,10 @@ export class EmailService {
   // Check if email is suppressed
   async isEmailSuppressed(tenantId: string, email: string) {
     const [suppression] = await db.select()
-      .from(emailSuppress)
+      .from(emailSuppresses)
       .where(and(
-        eq(emailSuppress.tenantId, tenantId),
-        eq(emailSuppress.email, email)
+        eq(emailSuppresses.tenantId, tenantId),
+        eq(emailSuppresses.email, email)
       ))
       .limit(1);
     return !!suppression;
@@ -560,7 +561,7 @@ export class EmailService {
 
   // Suppress email
   async suppressEmail(tenantId: string, email: string, memberId?: string, reason: string = 'UNSUB_REQUEST') {
-    await db.insert(emailSuppress)
+    await db.insert(emailSuppresses)
       .values({
         tenantId,
         email,

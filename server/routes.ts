@@ -11,7 +11,7 @@ import { financialService } from "./services/financial";
 import { cardService } from "./services/card";
 import { ruleService } from "./services/ruleService";
 import { boardService } from "./services/board";
-import { insertUserSchema, insertMemberSchema, insertMembershipFeeSchema, cardMeta, insertBoardMemberSchema, emailSegments, emailSuppress } from "@shared/schema";
+import { insertUserSchema, insertMemberSchema, insertMembershipFeeSchema, cardMeta, insertBoardMemberSchema, emailSegments, emailSuppresses } from "@shared/schema";
 import { eq } from "drizzle-orm";
 import { db } from "./db";
 import { generateFeesHandler } from "./api/jobs/fees/generate";
@@ -2079,6 +2079,86 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+
+  app.post('/api/messages/campaigns', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      // Check permissions - only BEHEERDER and SUPERADMIN can create
+      if (req.user!.role === 'MEDEWERKER') {
+        return res.status(403).json({ error: "Geen toegang" });
+      }
+
+      const campaign = await emailService.createCampaign(req.user!.tenantId, {
+        ...req.body,
+        createdById: req.user!.id,
+      });
+      res.json(campaign);
+    } catch (error) {
+      console.error('Error creating campaign:', error);
+      res.status(500).json({ error: "Fout bij aanmaken campagne" });
+    }
+  });
+
+  app.post('/api/messages/campaigns/:id/queue', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      // Check permissions - only BEHEERDER and SUPERADMIN can queue
+      if (req.user!.role === 'MEDEWERKER') {
+        return res.status(403).json({ error: "Geen toegang" });
+      }
+
+      const result = await emailService.queueCampaign(req.user!.tenantId, req.params.id);
+      res.json(result);
+    } catch (error) {
+      console.error('Error queuing campaign:', error);
+      res.status(500).json({ error: "Fout bij in queue zetten campagne" });
+    }
+  });
+
+  // Worker endpoint
+  app.post('/api/messages/worker/tick', async (req, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 50;
+      const result = await emailService.processQueuedMessages(limit);
+      res.json(result);
+    } catch (error) {
+      console.error('Error processing queued messages:', error);
+      res.status(500).json({ error: "Fout bij verwerken berichten" });
+    }
+  });
+
+  // Tracking endpoints
+  app.get('/api/messages/track/open/:messageId/:token.png', async (req, res) => {
+    try {
+      await emailService.trackOpen(req.params.messageId, req.params.token);
+      
+      // Return 1x1 transparent PNG
+      const img = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=', 'base64');
+      res.writeHead(200, {
+        'Content-Type': 'image/png',
+        'Content-Length': img.length,
+        'Cache-Control': 'no-cache',
+      });
+      res.end(img);
+    } catch (error) {
+      console.error('Error tracking open:', error);
+      res.status(404).end();
+    }
+  });
+
+  app.get('/api/messages/track/click/:messageId/:token', async (req, res) => {
+    try {
+      const originalUrl = decodeURIComponent(req.query.u as string);
+      const redirectUrl = await emailService.trackClick(req.params.messageId, req.params.token, originalUrl);
+      
+      if (redirectUrl) {
+        res.redirect(302, redirectUrl);
+      } else {
+        res.status(404).send('Link not found');
+      }
+    } catch (error) {
+      console.error('Error tracking click:', error);
+      res.status(404).send('Link not found');
+    }
+  });
 
   // Single transactional send
   app.post('/api/messages/send', authMiddleware, async (req: AuthenticatedRequest, res) => {

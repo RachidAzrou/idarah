@@ -342,6 +342,76 @@ export const matchRules = pgTable("match_rules", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const emailTemplates = pgTable("email_templates", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tenantId: varchar("tenant_id").notNull(),
+  name: text("name").notNull(),
+  code: text("code").notNull(),
+  kind: emailKindEnum("kind").notNull(),
+  subject: text("subject").notNull(),
+  bodyHtml: text("body_html").notNull(),
+  bodyText: text("body_text"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => ({
+  uniqueCode: sql`UNIQUE (${table.tenantId}, ${table.code})`,
+}));
+
+export const emailSegments = pgTable("email_segments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tenantId: varchar("tenant_id").notNull(),
+  name: text("name").notNull(),
+  rules: json("rules").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const emailCampaigns = pgTable("email_campaigns", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tenantId: varchar("tenant_id").notNull(),
+  name: text("name").notNull(),
+  templateId: varchar("template_id").notNull(),
+  segmentId: varchar("segment_id"),
+  kind: emailKindEnum("kind").notNull(),
+  status: emailStatusEnum("status").default('DRAFT').notNull(),
+  scheduledAt: timestamp("scheduled_at"),
+  startedAt: timestamp("started_at"),
+  finishedAt: timestamp("finished_at"),
+  createdById: varchar("created_by_id"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const emailMessages = pgTable("email_messages", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tenantId: varchar("tenant_id").notNull(),
+  campaignId: varchar("campaign_id"),
+  templateId: varchar("template_id").notNull(),
+  memberId: varchar("member_id"),
+  email: text("email").notNull(),
+  subject: text("subject").notNull(),
+  bodyHtml: text("body_html").notNull(),
+  bodyText: text("body_text"),
+  status: recipientStatusEnum("status").default('QUEUED').notNull(),
+  lastError: text("last_error"),
+  tokens: json("tokens").notNull(),
+  retryCount: integer("retry_count").default(0).notNull(),
+  sentAt: timestamp("sent_at"),
+  openedAt: timestamp("opened_at"),
+  clickedAt: timestamp("clicked_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const emailSuppresses = pgTable("email_suppresses", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tenantId: varchar("tenant_id").notNull(),
+  email: text("email").notNull(),
+  memberId: varchar("member_id"),
+  reason: suppressReasonEnum("reason").default('UNSUB_REQUEST').notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => ({
+  uniqueEmail: sql`UNIQUE (${table.tenantId}, ${table.email})`,
+}));
+
 // Relations
 export const tenantsRelations = relations(tenants, ({ many }) => ({
   users: many(users),
@@ -361,6 +431,11 @@ export const tenantsRelations = relations(tenants, ({ many }) => ({
   matchRules: many(matchRules),
   boardMembers: many(boardMembers),
   boardTerms: many(boardTerms),
+  emailTemplates: many(emailTemplates),
+  emailSegments: many(emailSegments),
+  emailCampaigns: many(emailCampaigns),
+  emailMessages: many(emailMessages),
+  emailSuppresses: many(emailSuppresses),
 }));
 
 export const usersRelations = relations(users, ({ one }) => ({
@@ -607,6 +682,73 @@ export const matchRulesRelations = relations(matchRules, ({ one }) => ({
   }),
 }));
 
+export const emailTemplatesRelations = relations(emailTemplates, ({ one, many }) => ({
+  tenant: one(tenants, {
+    fields: [emailTemplates.tenantId],
+    references: [tenants.id],
+  }),
+  campaigns: many(emailCampaigns),
+  messages: many(emailMessages),
+}));
+
+export const emailSegmentsRelations = relations(emailSegments, ({ one, many }) => ({
+  tenant: one(tenants, {
+    fields: [emailSegments.tenantId],
+    references: [tenants.id],
+  }),
+  campaigns: many(emailCampaigns),
+}));
+
+export const emailCampaignsRelations = relations(emailCampaigns, ({ one, many }) => ({
+  tenant: one(tenants, {
+    fields: [emailCampaigns.tenantId],
+    references: [tenants.id],
+  }),
+  template: one(emailTemplates, {
+    fields: [emailCampaigns.templateId],
+    references: [emailTemplates.id],
+  }),
+  segment: one(emailSegments, {
+    fields: [emailCampaigns.segmentId],
+    references: [emailSegments.id],
+  }),
+  createdBy: one(users, {
+    fields: [emailCampaigns.createdById],
+    references: [users.id],
+  }),
+  messages: many(emailMessages),
+}));
+
+export const emailMessagesRelations = relations(emailMessages, ({ one }) => ({
+  tenant: one(tenants, {
+    fields: [emailMessages.tenantId],
+    references: [tenants.id],
+  }),
+  campaign: one(emailCampaigns, {
+    fields: [emailMessages.campaignId],
+    references: [emailCampaigns.id],
+  }),
+  template: one(emailTemplates, {
+    fields: [emailMessages.templateId],
+    references: [emailTemplates.id],
+  }),
+  member: one(members, {
+    fields: [emailMessages.memberId],
+    references: [members.id],
+  }),
+}));
+
+export const emailSuppressesRelations = relations(emailSuppresses, ({ one }) => ({
+  tenant: one(tenants, {
+    fields: [emailSuppresses.tenantId],
+    references: [tenants.id],
+  }),
+  member: one(members, {
+    fields: [emailSuppresses.memberId],
+    references: [members.id],
+  }),
+}));
+
 // Insert schemas
 export const insertTenantSchema = createInsertSchema(tenants).omit({
   id: true,
@@ -749,6 +891,33 @@ export const insertBoardTermSchema = createInsertSchema(boardTerms).omit({
   createdAt: true,
 });
 
+export const insertEmailTemplateSchema = createInsertSchema(emailTemplates).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertEmailSegmentSchema = createInsertSchema(emailSegments).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertEmailCampaignSchema = createInsertSchema(emailCampaigns).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertEmailMessageSchema = createInsertSchema(emailMessages).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertEmailSuppressSchema = createInsertSchema(emailSuppresses).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type Tenant = typeof tenants.$inferSelect;
 export type InsertTenant = z.infer<typeof insertTenantSchema>;
@@ -858,81 +1027,22 @@ export type MethodSlice = {
   count: number;
 };
 
-// Email Messaging Tables
-export const emailTemplates = pgTable("email_templates", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  tenantId: varchar("tenant_id").notNull(),
-  name: text("name").notNull(),
-  code: text("code").notNull(), // e.g. "nieuw_lid", "vervallen_lidgeld"
-  kind: emailKindEnum("kind").notNull(),
-  subject: text("subject").notNull(),
-  bodyHtml: text("body_html").notNull(),
-  bodyText: text("body_text"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+export type BoardTerm = typeof boardTerms.$inferSelect;
+export type InsertBoardTerm = z.infer<typeof insertBoardTermSchema>;
 
-export const emailSegments = pgTable("email_segments", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  tenantId: varchar("tenant_id").notNull(),
-  name: text("name").notNull(),
-  rules: json("rules").notNull(), // JSON filter rules
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+export type CardVerifyResponse = z.infer<typeof cardVerifyResponseSchema>;
 
-export const emailCampaigns = pgTable("email_campaigns", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  tenantId: varchar("tenant_id").notNull(),
-  name: text("name").notNull(),
-  templateId: varchar("template_id").notNull(),
-  segmentId: varchar("segment_id"),
-  kind: emailKindEnum("kind").notNull(),
-  status: emailStatusEnum("status").default('DRAFT').notNull(),
-  scheduledAt: timestamp("scheduled_at"),
-  startedAt: timestamp("started_at"),
-  finishedAt: timestamp("finished_at"),
-  createdById: varchar("created_by_id"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
-
-export const emailMessages = pgTable("email_messages", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  tenantId: varchar("tenant_id").notNull(),
-  campaignId: varchar("campaign_id"),
-  templateId: varchar("template_id").notNull(),
-  memberId: varchar("member_id"),
-  email: text("email").notNull(),
-  subject: text("subject").notNull(),
-  bodyHtml: text("body_html").notNull(),
-  bodyText: text("body_text"),
-  status: recipientStatusEnum("status").default('QUEUED').notNull(),
-  lastError: text("last_error"),
-  tokens: json("tokens").notNull(), // { openToken, clickToken, unsubToken }
-  sentAt: timestamp("sent_at"),
-  openedAt: timestamp("opened_at"),
-  clickedAt: timestamp("clicked_at"),
-  retryCount: integer("retry_count").default(0).notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-
-export const emailSuppress = pgTable("email_suppress", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  tenantId: varchar("tenant_id").notNull(),
-  email: text("email").notNull(),
-  memberId: varchar("member_id"),
-  reason: suppressReasonEnum("reason").default('UNSUB_REQUEST').notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-
-// Email messaging types
 export type EmailTemplate = typeof emailTemplates.$inferSelect;
-export type InsertEmailTemplate = typeof emailTemplates.$inferInsert;
+export type InsertEmailTemplate = z.infer<typeof insertEmailTemplateSchema>;
+
 export type EmailSegment = typeof emailSegments.$inferSelect;
-export type InsertEmailSegment = typeof emailSegments.$inferInsert;
+export type InsertEmailSegment = z.infer<typeof insertEmailSegmentSchema>;
+
 export type EmailCampaign = typeof emailCampaigns.$inferSelect;
-export type InsertEmailCampaign = typeof emailCampaigns.$inferInsert;
+export type InsertEmailCampaign = z.infer<typeof insertEmailCampaignSchema>;
+
 export type EmailMessage = typeof emailMessages.$inferSelect;
-export type InsertEmailMessage = typeof emailMessages.$inferInsert;
-export type EmailSuppress = typeof emailSuppress.$inferSelect;
-export type InsertEmailSuppress = typeof emailSuppress.$inferInsert;
+export type InsertEmailMessage = z.infer<typeof insertEmailMessageSchema>;
+
+export type EmailSuppress = typeof emailSuppresses.$inferSelect;
+export type InsertEmailSuppress = z.infer<typeof insertEmailSuppressSchema>;

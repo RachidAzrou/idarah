@@ -20,16 +20,22 @@ export function JournalView({ transactions }: JournalViewProps) {
     const debit = transactions.filter(t => t.type === 'EXPENSE').sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     const credit = transactions.filter(t => t.type === 'INCOME').sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     
-    const debitTotal = debit.reduce((sum, t) => sum + t.amount, 0);
-    const creditTotal = credit.reduce((sum, t) => sum + t.amount, 0);
+    const debitTotal = debit.reduce((sum, t) => {
+      const amount = Number(t.amount) || 0;
+      return sum + amount;
+    }, 0);
+    const creditTotal = credit.reduce((sum, t) => {
+      const amount = Number(t.amount) || 0;
+      return sum + amount;
+    }, 0);
     
     return {
       debitTransactions: debit,
       creditTransactions: credit,
       totals: {
-        debit: debitTotal,
-        credit: creditTotal,
-        balance: creditTotal - debitTotal
+        debit: isNaN(debitTotal) ? 0 : debitTotal,
+        credit: isNaN(creditTotal) ? 0 : creditTotal,
+        balance: isNaN(creditTotal - debitTotal) ? 0 : creditTotal - debitTotal
       }
     };
   }, [transactions]);

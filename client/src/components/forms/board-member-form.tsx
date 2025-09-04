@@ -567,43 +567,6 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="avatarUrl"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Avatar URL</FormLabel>
-                      <FormControl>
-                        <Input 
-                          {...field} 
-                          placeholder="https://voorbeeld.com/foto.jpg"
-                          data-testid="input-avatar-url"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="orderIndex"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Volgorde in lijst</FormLabel>
-                      <FormControl>
-                        <Input 
-                          {...field} 
-                          type="number"
-                          placeholder="1, 2, 3..."
-                          onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
-                          data-testid="input-order-index"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
               </CardContent>
             </Card>
           </TabsContent>

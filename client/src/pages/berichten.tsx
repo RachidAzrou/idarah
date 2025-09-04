@@ -39,17 +39,14 @@ const segmentSchema = z.object({
     memberActive: z.boolean().optional(),
     category: z.array(z.string()).optional(),
     city: z.string().optional(),
+    postalCode: z.string().optional(),
+    gender: z.string().optional(),
+    hasVotingRights: z.boolean().optional(),
     minAge: z.number().optional(),
     maxAge: z.number().optional()
   })
 });
 
-const campaignSchema = z.object({
-  name: z.string().min(1, "Naam is verplicht"),
-  templateId: z.string().min(1, "Template selecteren"),
-  segmentId: z.string().min(1, "Segment selecteren"),
-  scheduledAt: z.date().optional()
-});
 
 export default function Berichten() {
   const [activeTab, setActiveTab] = useState("templates");
@@ -63,15 +60,15 @@ export default function Berichten() {
   // Dialog states
   const [showTemplateDialog, setShowTemplateDialog] = useState(false);
   const [showSegmentDialog, setShowSegmentDialog] = useState(false);
-  const [showCampaignDialog, setShowCampaignDialog] = useState(false);
   const [showPreviewDialog, setShowPreviewDialog] = useState(false);
-  const [showTestDialog, setShowTestDialog] = useState(false);
+  const [showMappingTool, setShowMappingTool] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<any>(null);
   const [editingSegment, setEditingSegment] = useState<any>(null);
   const [previewTemplate, setPreviewTemplate] = useState<any>(null);
-  const [testTemplate, setTestTemplate] = useState<any>(null);
   const [sendTemplateCode, setSendTemplateCode] = useState("");
   const [sendRecipient, setSendRecipient] = useState("");
+  const [sendMode, setSendMode] = useState<"single" | "bulk">("single");
+  const [selectedSegment, setSelectedSegment] = useState("");
 
   // Fetch data for each tab
   const { data: templates, isLoading: templatesLoading } = useQuery({
@@ -84,10 +81,6 @@ export default function Berichten() {
     staleTime: 10000,
   });
 
-  const { data: campaigns, isLoading: campaignsLoading } = useQuery({
-    queryKey: ["/api/messages/campaigns"],
-    staleTime: 10000,
-  });
 
   // Forms
   const templateForm = useForm({
@@ -110,21 +103,15 @@ export default function Berichten() {
         memberActive: true,
         category: [],
         city: "",
+        postalCode: "",
+        gender: "",
+        hasVotingRights: undefined,
         minAge: undefined,
         maxAge: undefined
       }
     }
   });
 
-  const campaignForm = useForm({
-    resolver: zodResolver(campaignSchema),
-    defaultValues: {
-      name: "",
-      templateId: "",
-      segmentId: "",
-      scheduledAt: undefined
-    }
-  });
 
   // Mutations
   const createTemplateMutation = useMutation({
@@ -219,29 +206,6 @@ export default function Berichten() {
     }
   });
 
-  const createCampaignMutation = useMutation({
-    mutationFn: async (data: z.infer<typeof campaignSchema>) => {
-      return apiRequest("POST", "/api/messages/campaigns", {
-        name: data.name,
-        template_id: data.templateId,
-        segment_id: data.segmentId,
-        scheduled_at: data.scheduledAt?.toISOString()
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/messages/campaigns"] });
-      toast({ title: "Campagne aangemaakt", description: "De campagne is succesvol aangemaakt." });
-      setShowCampaignDialog(false);
-      campaignForm.reset();
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Fout bij aanmaken campagne",
-        description: error.message || "Er is een fout opgetreden",
-        variant: "destructive"
-      });
-    }
-  });
 
   // Handler functions
   const handleEditTemplate = (template: any) => {
@@ -262,10 +226,6 @@ export default function Berichten() {
     setShowPreviewDialog(true);
   };
 
-  const handleTestTemplate = (template: any) => {
-    setTestTemplate(template);
-    setShowTestDialog(true);
-  };
 
   const handleEditSegment = (segment: any) => {
     setEditingSegment(segment);
@@ -295,10 +255,6 @@ export default function Berichten() {
     setShowSegmentDialog(true);
   };
 
-  const handleNewCampaign = () => {
-    campaignForm.reset();
-    setShowCampaignDialog(true);
-  };
 
   const onTemplateSubmit = (data: z.infer<typeof templateSchema>) => {
     if (editingTemplate) {
@@ -316,9 +272,6 @@ export default function Berichten() {
     }
   };
 
-  const onCampaignSubmit = (data: z.infer<typeof campaignSchema>) => {
-    createCampaignMutation.mutate(data);
-  };
 
   // Send single email mutation
   const sendSingleEmailMutation = useMutation({
@@ -366,7 +319,7 @@ export default function Berichten() {
         </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid grid-cols-4 w-auto" data-testid="message-tabs">
+        <TabsList className="grid grid-cols-3 w-auto" data-testid="message-tabs">
           <TabsTrigger value="templates" data-testid="tab-templates">
             <CgTemplate className="w-4 h-4 mr-2" />
             Templates
@@ -374,10 +327,6 @@ export default function Berichten() {
           <TabsTrigger value="segments" data-testid="tab-segments">
             <PiPuzzlePiece className="w-4 h-4 mr-2" />
             Segmenten
-          </TabsTrigger>
-          <TabsTrigger value="campaigns" data-testid="tab-campaigns">
-            <MdEvent className="w-4 h-4 mr-2" />
-            Campagnes
           </TabsTrigger>
           <TabsTrigger value="send" data-testid="tab-send">
             <LuSend className="w-4 h-4 mr-2" />
@@ -447,16 +396,10 @@ export default function Berichten() {
                         Preview
                       </Button>
                       {canEdit && (
-                        <>
-                          <Button size="sm" variant="outline" onClick={() => handleTestTemplate(template)} data-testid={`button-test-${template.id}`}>
-                            <TestTube className="w-4 h-4 mr-1" />
-                            Test
-                          </Button>
-                          <Button size="sm" variant="outline" onClick={() => handleEditTemplate(template)} data-testid={`button-edit-template-${template.id}`}>
-                            <Edit className="w-4 h-4 mr-1" />
-                            Bewerk
-                          </Button>
-                        </>
+                        <Button size="sm" variant="outline" onClick={() => handleEditTemplate(template)} data-testid={`button-edit-template-${template.id}`}>
+                          <Edit className="w-4 h-4 mr-1" />
+                          Bewerk
+                        </Button>
                       )}
                     </div>
                   </CardContent>
@@ -531,148 +474,190 @@ export default function Berichten() {
           </div>
         </TabsContent>
 
-        {/* Campaigns Tab */}
-        <TabsContent value="campaigns" className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-medium">Campagnes</h2>
-            {canEdit && (
-              <Button onClick={handleNewCampaign} className="flex items-center gap-2" data-testid="button-new-campaign">
-                <Plus className="w-4 h-4" />
-                Nieuwe Campagne
-              </Button>
-            )}
-          </div>
-
-          <div className="space-y-4" data-testid="campaigns-list">
-            {campaignsLoading ? (
-              Array.from({ length: 3 }).map((_, i) => (
-                <Card key={i} className="animate-pulse">
-                  <CardHeader>
-                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                  </CardHeader>
-                </Card>
-              ))
-            ) : !campaigns || !Array.isArray(campaigns) || campaigns.length === 0 ? (
-              <div className="text-center py-12" data-testid="campaigns-empty-state">
-                <Send className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Nog geen campagnes</h3>
-                <p className="text-gray-500 mb-4">Maak je eerste e-mail campagne</p>
-                {canEdit && (
-                  <Button data-testid="button-add-first-campaign">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Campagne Toevoegen
-                  </Button>
-                )}
-              </div>
-            ) : (
-              Array.isArray(campaigns) && campaigns.map((campaign: any) => (
-                <Card key={campaign.campaign.id} className="hover:shadow-lg transition-shadow" data-testid={`card-campaign-${campaign.campaign.id}`}>
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <CardTitle className="text-base" data-testid={`text-campaign-name-${campaign.campaign.id}`}>
-                          {campaign.campaign.name}
-                        </CardTitle>
-                        <CardDescription data-testid={`text-campaign-template-${campaign.campaign.id}`}>
-                          Template: {campaign.template?.name || 'Onbekend'}
-                        </CardDescription>
-                      </div>
-                      <Badge 
-                        variant={campaign.campaign.status === 'SENT' ? 'default' : 'secondary'}
-                        data-testid={`badge-campaign-status-${campaign.campaign.id}`}
-                      >
-                        {campaign.campaign.status}
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex gap-2">
-                      <Button size="sm" variant="outline" data-testid={`button-view-campaign-${campaign.campaign.id}`}>
-                        <Eye className="w-4 h-4 mr-1" />
-                        Bekijk
-                      </Button>
-                      {canEdit && campaign.campaign.status === 'DRAFT' && (
-                        <Button size="sm" variant="outline" data-testid={`button-queue-campaign-${campaign.campaign.id}`}>
-                          <Send className="w-4 h-4 mr-1" />
-                          Verstuur
-                        </Button>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
-            )}
-          </div>
-        </TabsContent>
 
         {/* Send Tab */}
         <TabsContent value="send" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Enkelvoudige E-mail Verzenden</CardTitle>
-              <CardDescription>
-                Verstuur een transactionele e-mail naar een specifiek lid of e-mailadres
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label>Template</Label>
-                    <Select value={sendTemplateCode} onValueChange={setSendTemplateCode}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecteer template" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Array.isArray(templates) && templates.map((template: any) => (
-                          <SelectItem key={template.id} value={template.code}>
-                            {template.name} ({template.code})
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+          <div className="flex justify-between items-center">
+            <div>
+              <h2 className="text-2xl font-semibold text-gray-900">E-mail Verzenden</h2>
+              <p className="text-sm text-gray-600 mt-1">
+                Verstuur e-mails naar individuele leden of hele groepen
+              </p>
+            </div>
+          </div>
+
+          {/* Send Mode Toggle */}
+          <div className="flex gap-2 p-1 bg-gray-100 rounded-lg w-fit">
+            <Button 
+              variant={sendMode === "single" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setSendMode("single")}
+              data-testid="button-mode-single"
+            >
+              💬 Enkel Lid
+            </Button>
+            <Button 
+              variant={sendMode === "bulk" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setSendMode("bulk")}
+              data-testid="button-mode-bulk"
+            >
+              📢 Bulk Verzending
+            </Button>
+          </div>
+
+          {sendMode === "single" ? (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Send className="w-5 h-5" />
+                  Enkelvoudige E-mail
+                </CardTitle>
+                <CardDescription>
+                  Verstuur een e-mail naar een specifiek lid of e-mailadres
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>Template</Label>
+                      <Select value={sendTemplateCode} onValueChange={setSendTemplateCode}>
+                        <SelectTrigger data-testid="select-template-single">
+                          <SelectValue placeholder="Selecteer template" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Array.isArray(templates) && templates.map((template: any) => (
+                            <SelectItem key={template.id} value={template.code}>
+                              {template.name} ({template.code})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label>Ontvanger</Label>
+                      <Input
+                        value={sendRecipient}
+                        onChange={(e) => setSendRecipient(e.target.value)}
+                        placeholder="E-mailadres of Lid ID"
+                        data-testid="input-recipient"
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <Label>Ontvanger</Label>
-                    <Input
-                      value={sendRecipient}
-                      onChange={(e) => setSendRecipient(e.target.value)}
-                      placeholder="E-mailadres of Lid ID"
-                      data-testid="input-recipient"
-                    />
-                  </div>
+                  {canEdit && (
+                    <Button 
+                      onClick={handleSendSingleEmail}
+                      disabled={sendSingleEmailMutation.isPending || !sendTemplateCode || !sendRecipient}
+                      data-testid="button-send-single"
+                    >
+                      {sendSingleEmailMutation.isPending ? (
+                        <>Verzenden...</>
+                      ) : (
+                        <>
+                          <Send className="w-4 h-4 mr-2" />
+                          Verstuur E-mail
+                        </>
+                      )}
+                    </Button>
+                  )}
                 </div>
-                {canEdit && (
-                  <Button 
-                    onClick={handleSendSingleEmail}
-                    disabled={sendSingleEmailMutation.isPending || !sendTemplateCode || !sendRecipient}
-                    data-testid="button-send-single"
-                  >
-                    {sendSingleEmailMutation.isPending ? (
-                      <>Verzenden...</>
-                    ) : (
-                      <>
-                        <Send className="w-4 h-4 mr-2" />
-                        Verstuur E-mail
-                      </>
-                    )}
-                  </Button>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="w-5 h-5" />
+                  Bulk E-mail Verzending
+                </CardTitle>
+                <CardDescription>
+                  Verstuur een e-mail naar alle leden in een segment
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>Template</Label>
+                      <Select value={sendTemplateCode} onValueChange={setSendTemplateCode}>
+                        <SelectTrigger data-testid="select-template-bulk">
+                          <SelectValue placeholder="Selecteer template" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Array.isArray(templates) && templates.map((template: any) => (
+                            <SelectItem key={template.id} value={template.code}>
+                              {template.name} ({template.code})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label>Doelgroep Segment</Label>
+                      <Select value={selectedSegment} onValueChange={setSelectedSegment}>
+                        <SelectTrigger data-testid="select-segment-bulk">
+                          <SelectValue placeholder="Selecteer segment" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Array.isArray(segments) && segments.map((segment: any) => (
+                            <SelectItem key={segment.id} value={segment.id}>
+                              {segment.name} - {Object.keys(segment.rules || {}).length} regels
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  
+                  {selectedSegment && (
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <h4 className="font-medium text-blue-900 mb-2">📊 Segment Overzicht</h4>
+                      <p className="text-sm text-blue-700">
+                        Segment: {segments?.find((s: any) => s.id === selectedSegment)?.name}
+                      </p>
+                      <p className="text-xs text-blue-600 mt-1">
+                        Let op: De e-mail wordt verzonden naar alle leden die voldoen aan de segment criteria
+                      </p>
+                    </div>
+                  )}
+                  
+                  {canEdit && (
+                    <Button 
+                      onClick={() => {
+                        // TODO: Implement bulk send
+                        toast({
+                          title: "Bulk verzending",
+                          description: "Bulk verzending wordt binnenkort geïmplementeerd",
+                          variant: "default"
+                        });
+                      }}
+                      disabled={!sendTemplateCode || !selectedSegment}
+                      data-testid="button-send-bulk"
+                      className="w-full"
+                    >
+                      <Users className="w-4 h-4 mr-2" />
+                      Verstuur naar Segment
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
 
       </Tabs>
 
       {/* Template Dialog */}
       <Dialog open={showTemplateDialog} onOpenChange={setShowTemplateDialog}>
-        <DialogContent className="max-w-3xl">
+        <DialogContent className="max-w-6xl">
           <DialogHeader>
             <DialogTitle>{editingTemplate ? 'Template Bewerken' : 'Nieuwe Template'}</DialogTitle>
           </DialogHeader>
-          <Form {...templateForm}>
+          
+          <div className="flex gap-6">
+            <div className="flex-1">
+              <Form {...templateForm}>
             <form onSubmit={templateForm.handleSubmit(onTemplateSubmit)} className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
                 <FormField
@@ -778,6 +763,113 @@ export default function Berichten() {
               </div>
             </form>
           </Form>
+            </div>
+            
+            {/* Handlebars Mapping Tool */}
+            <div className="w-80 border-l pl-6">
+              <div className="sticky top-0">
+                <h3 className="text-lg font-semibold mb-4">Handlebars Variabelen</h3>
+                <div className="space-y-4 max-h-96 overflow-y-auto">
+                  
+                  <div className="space-y-2">
+                    <h4 className="font-medium text-sm text-gray-900">📝 Lid Informatie</h4>
+                    <div className="space-y-1 text-xs">
+                      <div className="flex justify-between">
+                        <code className="bg-gray-100 px-1 rounded">{"{{member.firstName}}"}</code>
+                        <span className="text-gray-500">Voornaam</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <code className="bg-gray-100 px-1 rounded">{"{{member.lastName}}"}</code>
+                        <span className="text-gray-500">Achternaam</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <code className="bg-gray-100 px-1 rounded">{"{{member.email}}"}</code>
+                        <span className="text-gray-500">E-mailadres</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <code className="bg-gray-100 px-1 rounded">{"{{member.memberNumber}}"}</code>
+                        <span className="text-gray-500">Lidnummer</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <code className="bg-gray-100 px-1 rounded">{"{{member.category}}"}</code>
+                        <span className="text-gray-500">Categorie</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <code className="bg-gray-100 px-1 rounded">{"{{member.city}}"}</code>
+                        <span className="text-gray-500">Stad</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <h4 className="font-medium text-sm text-gray-900">🏛️ Organisatie</h4>
+                    <div className="space-y-1 text-xs">
+                      <div className="flex justify-between">
+                        <code className="bg-gray-100 px-1 rounded">{"{{tenant.name}}"}</code>
+                        <span className="text-gray-500">Naam organisatie</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <code className="bg-gray-100 px-1 rounded">{"{{tenant.primaryColor}}"}</code>
+                        <span className="text-gray-500">Hoofdkleur</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <h4 className="font-medium text-sm text-gray-900">🪪 Lidkaart</h4>
+                    <div className="space-y-1 text-xs">
+                      <div className="flex justify-between">
+                        <code className="bg-gray-100 px-1 rounded">{"{{card.url}}"}</code>
+                        <span className="text-gray-500">Link naar lidkaart</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <code className="bg-gray-100 px-1 rounded">{"{{card.qrCode}}"}</code>
+                        <span className="text-gray-500">QR code URL</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <h4 className="font-medium text-sm text-gray-900">💰 Lidgelden</h4>
+                    <div className="space-y-1 text-xs">
+                      <div className="text-gray-600 mb-1">Loop door lidgelden:</div>
+                      <code className="bg-gray-100 px-1 rounded text-xs">{"{{#each fees}}"}</code>
+                      <div className="ml-2 space-y-1">
+                        <div className="flex justify-between">
+                          <code className="bg-gray-100 px-1 rounded">{"{{currency amount}}"}</code>
+                          <span className="text-gray-500">Bedrag</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <code className="bg-gray-100 px-1 rounded">{"{{date periodStart}}"}</code>
+                          <span className="text-gray-500">Start periode</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <code className="bg-gray-100 px-1 rounded">{"{{status}}"}</code>
+                          <span className="text-gray-500">Status</span>
+                        </div>
+                      </div>
+                      <code className="bg-gray-100 px-1 rounded text-xs">{"{{/each}}"}</code>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <h4 className="font-medium text-sm text-gray-900">📊 Tracking</h4>
+                    <div className="space-y-1 text-xs">
+                      <div className="flex justify-between">
+                        <code className="bg-gray-100 px-1 rounded">{"{{openUrl}}"}</code>
+                        <span className="text-gray-500">E-mail open tracking</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <code className="bg-gray-100 px-1 rounded">{"{{unsubscribeUrl}}"}</code>
+                        <span className="text-gray-500">Uitschrijf link</span>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
 
@@ -803,31 +895,142 @@ export default function Berichten() {
                 )}
               />
 
-              <div className="space-y-4">
-                <Label>Filter Regels</Label>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label>Alleen Actieve Leden</Label>
-                    <Select
-                      value={segmentForm.watch("rules.memberActive") ? "true" : "false"}
-                      onValueChange={(value) => segmentForm.setValue("rules.memberActive", value === "true")}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="true">Ja</SelectItem>
-                        <SelectItem value="false">Nee</SelectItem>
-                      </SelectContent>
-                    </Select>
+              <div className="space-y-6">
+                <div>
+                  <Label className="text-base font-medium">🎯 Filter Criteria</Label>
+                  <p className="text-sm text-gray-600 mt-1">Definieer wie dit segment moet ontvangen</p>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-6">
+                  {/* Status Filters */}
+                  <div className="space-y-4">
+                    <h4 className="font-medium text-sm">👤 Status & Rechten</h4>
+                    <div className="space-y-3">
+                      <div>
+                        <Label>Alleen Actieve Leden</Label>
+                        <Select
+                          value={segmentForm.watch("rules.memberActive") ? "true" : "false"}
+                          onValueChange={(value) => segmentForm.setValue("rules.memberActive", value === "true")}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="true">Ja</SelectItem>
+                            <SelectItem value="false">Nee</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div>
+                        <Label>Categorie</Label>
+                        <Select
+                          value={segmentForm.watch("rules.category")?.[0] || ""}
+                          onValueChange={(value) => {
+                            const current = segmentForm.watch("rules.category") || [];
+                            segmentForm.setValue("rules.category", value ? [value] : []);
+                          }}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Alle categorieën" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="">Alle categorieën</SelectItem>
+                            <SelectItem value="STUDENT">Student</SelectItem>
+                            <SelectItem value="SENIOR">Senior</SelectItem>
+                            <SelectItem value="REGULIER">Regulier</SelectItem>
+                            <SelectItem value="FAMILIE">Familie</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div>
+                        <Label>Geslacht</Label>
+                        <Select
+                          value={segmentForm.watch("rules.gender") || ""}
+                          onValueChange={(value) => segmentForm.setValue("rules.gender", value || undefined)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Alle geslachten" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="">Alle geslachten</SelectItem>
+                            <SelectItem value="M">Man</SelectItem>
+                            <SelectItem value="V">Vrouw</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div>
+                        <Label>Stemgerechtigden</Label>
+                        <Select
+                          value={segmentForm.watch("rules.hasVotingRights")?.toString() || ""}
+                          onValueChange={(value) => {
+                            segmentForm.setValue("rules.hasVotingRights", value === "true" ? true : value === "false" ? false : undefined);
+                          }}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Alle leden" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="">Alle leden</SelectItem>
+                            <SelectItem value="true">Alleen stemgerechtigden</SelectItem>
+                            <SelectItem value="false">Alleen niet-stemgerechtigden</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <Label>Stad</Label>
-                    <Input 
-                      value={segmentForm.watch("rules.city") || ""}
-                      onChange={(e) => segmentForm.setValue("rules.city", e.target.value)}
-                      placeholder="Bijv. Antwerpen"
-                    />
+                  
+                  {/* Location & Demographics */}
+                  <div className="space-y-4">
+                    <h4 className="font-medium text-sm">📍 Locatie & Leeftijd</h4>
+                    <div className="space-y-3">
+                      <div>
+                        <Label>Stad</Label>
+                        <Input 
+                          value={segmentForm.watch("rules.city") || ""}
+                          onChange={(e) => segmentForm.setValue("rules.city", e.target.value || undefined)}
+                          placeholder="Bijv. Antwerpen"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label>Postcode</Label>
+                        <Input 
+                          value={segmentForm.watch("rules.postalCode") || ""}
+                          onChange={(e) => segmentForm.setValue("rules.postalCode", e.target.value || undefined)}
+                          placeholder="Bijv. 2000"
+                        />
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <Label>Min Leeftijd</Label>
+                          <Input 
+                            type="number"
+                            value={segmentForm.watch("rules.minAge")?.toString() || ""}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              segmentForm.setValue("rules.minAge", val ? parseInt(val) : undefined);
+                            }}
+                            placeholder="18"
+                          />
+                        </div>
+                        <div>
+                          <Label>Max Leeftijd</Label>
+                          <Input 
+                            type="number"
+                            value={segmentForm.watch("rules.maxAge")?.toString() || ""}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              segmentForm.setValue("rules.maxAge", val ? parseInt(val) : undefined);
+                            }}
+                            placeholder="65"
+                          />
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -845,114 +1048,43 @@ export default function Berichten() {
         </DialogContent>
       </Dialog>
 
-      {/* Campaign Dialog */}
-      <Dialog open={showCampaignDialog} onOpenChange={setShowCampaignDialog}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Nieuwe Campagne</DialogTitle>
-          </DialogHeader>
-          <Form {...campaignForm}>
-            <form onSubmit={campaignForm.handleSubmit(onCampaignSubmit)} className="space-y-6">
-              <FormField
-                control={campaignForm.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Campagne Naam</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Bijv. Nieuwsbrief December" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={campaignForm.control}
-                  name="templateId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Template</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecteer template" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {Array.isArray(templates) && templates.map((template: any) => (
-                            <SelectItem key={template.id} value={template.id}>
-                              {template.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={campaignForm.control}
-                  name="segmentId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Segment</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecteer segment" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {Array.isArray(segments) && segments.map((segment: any) => (
-                            <SelectItem key={segment.id} value={segment.id}>
-                              {segment.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className="flex justify-end gap-3">
-                <Button type="button" variant="outline" onClick={() => setShowCampaignDialog(false)}>
-                  Annuleren
-                </Button>
-                <Button type="submit" disabled={createCampaignMutation.isPending}>
-                  Campagne Aanmaken
-                </Button>
-              </div>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
 
       {/* Preview Dialog */}
       <Dialog open={showPreviewDialog} onOpenChange={setShowPreviewDialog}>
-        <DialogContent className="max-w-4xl">
+        <DialogContent className="max-w-5xl">
           <DialogHeader>
-            <DialogTitle>Template Preview: {previewTemplate?.name}</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              <Eye className="w-5 h-5" />
+              Template Preview: {previewTemplate?.name}
+            </DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label>Onderwerp</Label>
-              <p className="text-sm text-gray-700 border rounded p-2">{previewTemplate?.subject}</p>
+          <div className="space-y-6">
+            {/* Subject Preview */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <Label className="text-blue-800 font-medium">📧 Onderwerp</Label>
+              <p className="text-lg font-semibold text-blue-900 mt-2">{previewTemplate?.subject}</p>
             </div>
-            <div>
-              <Label>HTML Preview</Label>
+            
+            {/* Email Preview */}
+            <div className="bg-white border rounded-lg overflow-hidden">
+              <div className="bg-gray-50 px-4 py-2 border-b flex items-center justify-between">
+                <Label className="font-medium text-gray-700">📱 E-mail Weergave</Label>
+                <Badge variant="outline">HTML</Badge>
+              </div>
               <div 
-                className="border rounded p-4 max-h-96 overflow-auto"
+                className="p-6 max-h-96 overflow-auto"
+                style={{ fontFamily: 'Arial, sans-serif' }}
                 dangerouslySetInnerHTML={{ __html: previewTemplate?.body_html || '' }}
               />
             </div>
-            <div>
-              <Label>Text Versie</Label>
-              <pre className="text-sm text-gray-700 border rounded p-2 max-h-32 overflow-auto whitespace-pre-wrap">
+            
+            {/* Text Version */}
+            <div className="bg-gray-50 border rounded-lg overflow-hidden">
+              <div className="bg-gray-100 px-4 py-2 border-b flex items-center justify-between">
+                <Label className="font-medium text-gray-700">📝 Tekst Versie</Label>
+                <Badge variant="outline">Plain Text</Badge>
+              </div>
+              <pre className="text-sm text-gray-700 p-4 max-h-48 overflow-auto whitespace-pre-wrap font-mono">
                 {previewTemplate?.body_text}
               </pre>
             </div>
@@ -960,38 +1092,6 @@ export default function Berichten() {
         </DialogContent>
       </Dialog>
 
-      {/* Test Dialog */}
-      <Dialog open={showTestDialog} onOpenChange={setShowTestDialog}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Test E-mail Verzenden</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label>Template</Label>
-              <p className="text-sm text-gray-700">{testTemplate?.name}</p>
-            </div>
-            <div>
-              <Label htmlFor="testEmail">Test E-mail Adres</Label>
-              <Input 
-                id="testEmail"
-                type="email" 
-                placeholder="test@example.com"
-                defaultValue={user?.email || ''}
-              />
-            </div>
-            <div className="flex justify-end gap-3">
-              <Button variant="outline" onClick={() => setShowTestDialog(false)}>
-                Annuleren
-              </Button>
-              <Button>
-                <Send className="w-4 h-4 mr-2" />
-                Verstuur Test
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
 
       </div>
     </main>

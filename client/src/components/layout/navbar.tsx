@@ -54,7 +54,7 @@ export default function Navbar() {
             <img 
               src={darahLogo} 
               alt="DARAH Logo" 
-              className="w-20 h-5 xs:w-24 xs:h-6 sm:w-28 sm:h-7 md:w-32 md:h-8 object-contain"
+              className="w-28 h-7 xs:w-32 xs:h-8 sm:w-36 sm:h-9 md:w-40 md:h-10 object-contain"
             />
           </Link>
         </div>

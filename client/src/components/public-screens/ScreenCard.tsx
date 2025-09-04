@@ -61,7 +61,7 @@ export function ScreenCard({ screen, onToggleStatus, onDelete }: ScreenCardProps
 
   return (
     <>
-      <Card className="hover:shadow-md transition-shadow">
+      <Card className="glass-card card-hover animate-fade-in group border-0">
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between">
             <div className="space-y-1 flex-1 min-w-0">

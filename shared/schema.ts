@@ -726,6 +726,8 @@ export const insertBoardMemberSchema = createInsertSchema(boardMembers).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+}).extend({
+  role: z.string().optional().default('BESTUURSLID'),
 });
 
 export const insertBoardTermSchema = createInsertSchema(boardTerms).omit({

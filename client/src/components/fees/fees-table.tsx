@@ -77,7 +77,7 @@ export function FeesTable({
 
   if (loading) {
     return (
-      <div className="border rounded-lg">
+      <div className="glass-card border-0">
         <div className="p-8 text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
           <p className="mt-2 text-gray-500">Laden...</p>
@@ -89,7 +89,7 @@ export function FeesTable({
   return (
     <div className="space-y-4">
       {/* Table */}
-      <div className="border rounded-lg overflow-hidden">
+      <div className="glass-card card-hover animate-fade-in group border-0 overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow>

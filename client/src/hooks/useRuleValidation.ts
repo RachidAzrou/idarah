@@ -59,7 +59,16 @@ export const useVotingRightsOverride = () => {
   });
 };
 
+// Hook for getting organizational rules from the database
+export const useOrganizationRules = () => {
+  return useQuery({
+    queryKey: ['/api/rules'],
+  });
+};
+
 export const useRuleValidation = () => {
+  const { data: rules = [] } = useOrganizationRules();
+  
   const validateVotingRights = (member: any): { 
     isValid: boolean; 
     warnings: string[]; 
@@ -69,36 +78,96 @@ export const useRuleValidation = () => {
     const reasons: string[] = [];
     let isValid = true;
 
-    // Age validation for voting rights
-    if (member.birthDate) {
-      const birthDate = new Date(member.birthDate);
-      const today = new Date();
-      let age = today.getFullYear() - birthDate.getFullYear();
-      const monthDiff = today.getMonth() - birthDate.getMonth();
-      
-      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-        age--;
+    // Get voting rules from the database
+    const votingRules = rules.filter((rule: any) => 
+      rule.scope === 'STEMRECHT' && rule.active
+    );
+
+    // If no custom rules exist, apply default validation
+    if (votingRules.length === 0) {
+      // Age validation for voting rights
+      if (member.birthDate) {
+        const birthDate = new Date(member.birthDate);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+          age--;
+        }
+
+        if (age < 18) {
+          isValid = false;
+          warnings.push('⚠️ Lid is jonger dan 18 jaar');
+          reasons.push('Minimumleeftijd voor stemrecht is 18 jaar');
+        }
       }
 
-      if (age < 18) {
+      // Category validation
+      if (member.category === 'STUDENT') {
         isValid = false;
-        warnings.push('⚠️ Lid is jonger dan 18 jaar');
-        reasons.push('Minimumleeftijd voor stemrecht is 18 jaar');
+        warnings.push(`⚠️ Categorie '${member.category}' heeft normaliter geen stemrecht`);
+        reasons.push('Studenten hebben volgens standaard regels geen stemrecht');
       }
-    }
 
-    // Category validation
-    if (member.category === 'STUDENT' || member.category === 'JEUGD') {
-      isValid = false;
-      warnings.push(`⚠️ Categorie '${member.category}' heeft normaliter geen stemrecht`);
-      reasons.push('Studenten en jeugdleden hebben volgens standaard regels geen stemrecht');
-    }
+      // Active membership check
+      if (!member.active) {
+        isValid = false;
+        warnings.push('⚠️ Lid is niet actief');
+        reasons.push('Alleen actieve leden hebben stemrecht');
+      }
+    } else {
+      // Apply custom rules from the database
+      for (const rule of votingRules) {
+        const params = rule.parameters || {};
+        
+        // Check minimum years (if rule exists)
+        if (params.minYears) {
+          const membershipYears = member.createdAt ? 
+            (Date.now() - new Date(member.createdAt).getTime()) / (1000 * 60 * 60 * 24 * 365) 
+            : 0;
+          
+          if (membershipYears < params.minYears) {
+            isValid = false;
+            warnings.push(`⚠️ ${rule.name || 'Regel overtreden'}`);
+            reasons.push(`Minimaal ${params.minYears} jaar lidmaatschap vereist`);
+          }
+        }
+        
+        // Check minimum age
+        if (params.minAge && member.birthDate) {
+          const birthDate = new Date(member.birthDate);
+          const today = new Date();
+          let age = today.getFullYear() - birthDate.getFullYear();
+          const monthDiff = today.getMonth() - birthDate.getMonth();
+          
+          if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+          }
 
-    // Active membership check
-    if (!member.active) {
-      isValid = false;
-      warnings.push('⚠️ Lid is niet actief');
-      reasons.push('Alleen actieve leden hebben stemrecht');
+          if (age < params.minAge) {
+            isValid = false;
+            warnings.push(`⚠️ ${rule.name || 'Regel overtreden'}`);
+            reasons.push(`Minimumleeftijd ${params.minAge} jaar vereist`);
+          }
+        }
+        
+        // Check categories (if restricted)
+        if (params.categories && params.categories.length > 0) {
+          if (!params.categories.includes(member.category)) {
+            isValid = false;
+            warnings.push(`⚠️ ${rule.name || 'Regel overtreden'}`);
+            reasons.push(`Categorie '${member.category}' komt niet voor in toegestane categorieën`);
+          }
+        }
+      }
+      
+      // Always check if member is active
+      if (!member.active) {
+        isValid = false;
+        warnings.push('⚠️ Lid is niet actief');
+        reasons.push('Alleen actieve leden hebben stemrecht');
+      }
     }
 
     return { isValid, warnings, reasons };

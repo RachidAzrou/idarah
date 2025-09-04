@@ -545,9 +545,9 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
                               onChange={(e) => setMemberSearch(e.target.value)}
                               data-testid="input-member-search"
                             />
-                            {memberSearch.length > 1 && members && members.length > 0 && (
+                            {memberSearch.length > 1 && filteredMembers && filteredMembers.length > 0 && (
                               <div className="absolute z-10 w-full bg-white border border-gray-200 rounded-md shadow-lg mt-1 max-h-40 overflow-y-auto">
-                                {members.map((member: any) => (
+                                {filteredMembers.map((member: any) => (
                                   <button
                                     key={member.id}
                                     type="button"
@@ -563,7 +563,7 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
                             )}
                           </div>
                         </div>
-                        {memberSearch.length > 1 && members && members.length === 0 && (
+                        {memberSearch.length > 1 && filteredMembers && filteredMembers.length === 0 && (
                           <div className="text-sm text-gray-500 italic">
                             Geen leden gevonden voor "{memberSearch}"
                           </div>

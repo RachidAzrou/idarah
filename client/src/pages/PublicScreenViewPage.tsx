@@ -12,8 +12,6 @@ export default function PublicScreenViewPage() {
   const publicToken = params?.publicToken;
   const [screen, setScreen] = useState<PublicScreen | null>(null);
   const [loading, setLoading] = useState(true);
-  const [forceRefresh, setForceRefresh] = useState(0);
-  const [hasInitialized, setHasInitialized] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showControls, setShowControls] = useState(true);
 
@@ -30,22 +28,30 @@ export default function PublicScreenViewPage() {
         console.log('Fetching URL:', url);
         
         const response = await fetch(url, {
-          cache: 'no-cache',
+          method: 'GET',
+          cache: 'no-store',
           headers: {
-            'Cache-Control': 'no-cache',
-            'Pragma': 'no-cache'
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
           }
         });
         
         console.log('Response status:', response.status);
         
         if (response.ok) {
-          const foundScreen = await response.json();
-          console.log('=== PublicScreenViewPage Debug ===');
-          console.log('API Response screen:', foundScreen);
-          console.log('Screen members:', foundScreen.members);
-          console.log('Screen members length:', foundScreen.members?.length || 0);
-          setScreen(foundScreen);
+          const screenData = await response.json();
+          console.log('=== Screen Data Received ===');
+          console.log('Screen:', screenData);
+          console.log('Members in response:', screenData.members?.length || 0);
+          
+          // Force a fresh screen object to trigger React re-renders
+          const freshScreen = {
+            ...screenData,
+            _loadTime: timestamp // Add unique property to force re-render
+          };
+          
+          setScreen(freshScreen);
         } else {
           console.log('Response not ok:', response.status, response.statusText);
           setScreen(null);
@@ -62,33 +68,13 @@ export default function PublicScreenViewPage() {
     }
   };
 
-  // Force immediate load on mount
+  // Immediate load when component mounts or publicToken changes
   useEffect(() => {
-    console.log('=== MOUNT useEffect ===');
-    console.log('publicToken:', publicToken);
-    if (!hasInitialized) {
-      setHasInitialized(true);
+    console.log('=== useEffect called ===', { publicToken });
+    if (publicToken) {
       loadScreen();
     }
-  }, []);
-  
-  // Also load when publicToken changes
-  useEffect(() => {
-    console.log('=== TOKEN useEffect ===');
-    console.log('publicToken changed to:', publicToken, 'hasInitialized:', hasInitialized);
-    if (hasInitialized && publicToken) {
-      loadScreen();
-    }
-  }, [publicToken, hasInitialized]);
-  
-  // Force refresh effect
-  useEffect(() => {
-    console.log('=== REFRESH useEffect ===');
-    console.log('forceRefresh changed to:', forceRefresh);
-    if (forceRefresh > 0) {
-      loadScreen();
-    }
-  }, [forceRefresh]);
+  }, [publicToken]);
 
   // Update document title when screen data is loaded
   useEffect(() => {
@@ -234,7 +220,7 @@ export default function PublicScreenViewPage() {
         onFullscreen={handleFullscreen}
         onRefresh={() => {
           console.log('Refreshing screen manually...');
-          setForceRefresh(prev => prev + 1);
+          loadScreen();
         }}
       />
     </div>

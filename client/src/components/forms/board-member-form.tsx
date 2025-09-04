@@ -58,11 +58,27 @@ interface BoardMemberFormProps {
   onSubmit: (data: BoardMemberFormData) => void;
   onCancel: () => void;
   isLoading?: boolean;
+  initialData?: Partial<BoardMemberFormData & {
+    memberId: string;
+    externalName: string;
+    email: string;
+    phone: string;
+    termStart: string;
+    termEnd: string;
+    orderIndex: number;
+  }>;
 }
 
-export function BoardMemberForm({ onSubmit, onCancel, isLoading = false }: BoardMemberFormProps) {
-  const [linkType, setLinkType] = useState<'EXISTING_MEMBER' | 'EXTERNAL_PERSON'>('EXISTING_MEMBER');
-  const [memberSearch, setMemberSearch] = useState("");
+export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, initialData }: BoardMemberFormProps) {
+  // Determine initial link type based on initialData
+  const getInitialLinkType = () => {
+    if (initialData?.memberId) return 'EXISTING_MEMBER';
+    if (initialData?.externalName) return 'EXTERNAL_PERSON';
+    return 'EXISTING_MEMBER';
+  };
+
+  const [linkType, setLinkType] = useState<'EXISTING_MEMBER' | 'EXTERNAL_PERSON'>(getInitialLinkType());
+  const [memberSearch, setMemberSearch] = useState(initialData?.externalName || "");
   const [selectedMember, setSelectedMember] = useState<any>(null);
 
   // Fetch members for autocomplete
@@ -75,8 +91,17 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false }: Board
   const form = useForm<BoardMemberFormData>({
     resolver: zodResolver(boardMemberSchema),
     defaultValues: {
-      linkType: 'EXISTING_MEMBER',
-      status: 'ACTIEF',
+      linkType: getInitialLinkType(),
+      status: initialData?.status || 'ACTIEF',
+      memberId: initialData?.memberId || '',
+      externalName: initialData?.externalName || '',
+      email: initialData?.email || '',
+      phone: initialData?.phone || '',
+      role: initialData?.role || '',
+      termStart: initialData?.termStart ? new Date(initialData.termStart) : undefined,
+      termEnd: initialData?.termEnd ? new Date(initialData.termEnd) : undefined,
+      responsibilities: initialData?.responsibilities || '',
+      orderIndex: initialData?.orderIndex || 0,
     },
   });
 

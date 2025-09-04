@@ -116,6 +116,67 @@ export default function Bestuur() {
     createBoardMemberMutation.mutate(formData);
   };
 
+  // Mutation for updating board member
+  const updateBoardMemberMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: any }) => {
+      return apiRequest(`/api/board/members/${id}`, 'PUT', data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/board/members"] });
+      setSelectedBoardMember(null);
+      toast({
+        title: "Bestuurslid bijgewerkt",
+        description: "Het bestuurslid is succesvol bijgewerkt.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fout",
+        description: error.message || "Er is een fout opgetreden bij het bijwerken van het bestuurslid.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Mutation for deactivating board member
+  const deactivateBoardMemberMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return apiRequest(`/api/board/members/${id}`, 'PUT', { 
+        status: 'INACTIEF',
+        termEnd: new Date().toISOString()
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/board/members"] });
+      toast({
+        title: "Bestuurslid gedeactiveerd",
+        description: "Het bestuurslid is succesvol gedeactiveerd en verplaatst naar de historiek.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fout",
+        description: error.message || "Er is een fout opgetreden bij het deactiveren van het bestuurslid.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleUpdateBoardMember = (formData: any) => {
+    if (selectedBoardMember) {
+      updateBoardMemberMutation.mutate({ 
+        id: selectedBoardMember.boardMember.id, 
+        data: formData 
+      });
+    }
+  };
+
+  const handleDeactivateBoardMember = (id: string) => {
+    if (confirm("Weet je zeker dat je dit bestuurslid wilt deactiveren? Het bestuurslid wordt verplaatst naar de historiek.")) {
+      deactivateBoardMemberMutation.mutate(id);
+    }
+  };
+
   const getName = (item: BoardMemberWithMember) => {
     if (item.member) {
       return `${item.member.firstName} ${item.member.lastName}`;
@@ -315,6 +376,8 @@ export default function Bestuur() {
                               <Button 
                                 size="sm" 
                                 variant="outline"
+                                onClick={() => handleDeactivateBoardMember(item.boardMember.id)}
+                                disabled={deactivateBoardMemberMutation.isPending}
                                 data-testid={`button-end-term-${item.boardMember.id}`}
                               >
                                 <CalendarX className="w-4 h-4" />
@@ -332,19 +395,139 @@ export default function Bestuur() {
         </TabsContent>
 
         <TabsContent value="historiek" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Bestuur Historiek</CardTitle>
-              <CardDescription>
-                Overzicht van alle voormalige bestuursleden en hun mandaten
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-500 text-center py-8" data-testid="history-placeholder">
-                Historiek functionaliteit wordt binnenkort toegevoegd
-              </p>
-            </CardContent>
-          </Card>
+          {/* Historiek Filters */}
+          <div className="flex gap-4 items-center">
+            <Input
+              placeholder="Zoek in historiek..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="max-w-xs"
+              data-testid="input-history-search"
+            />
+            <Select value={roleFilter} onValueChange={setRoleFilter}>
+              <SelectTrigger className="w-[160px]" data-testid="select-history-role-filter">
+                <SelectValue placeholder="Alle rollen" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Alle rollen</SelectItem>
+                <SelectItem value="VOORZITTER">Voorzitter</SelectItem>
+                <SelectItem value="ONDERVERZITTER">Ondervoorzitter</SelectItem>
+                <SelectItem value="SECRETARIS">Secretaris</SelectItem>
+                <SelectItem value="PENNINGMEESTER">Penningmeester</SelectItem>
+                <SelectItem value="BESTUURSLID">Bestuurslid</SelectItem>
+                <SelectItem value="ADVISEUR">Adviseur</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Historiek Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-testid="history-grid">
+            {isLoading ? (
+              Array.from({ length: 6 }).map((_, i) => (
+                <Card key={i} className="animate-pulse">
+                  <CardHeader>
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 bg-gray-200 rounded-full"></div>
+                      <div className="flex-1">
+                        <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                        <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                      </div>
+                    </div>
+                  </CardHeader>
+                </Card>
+              ))
+            ) : (
+              (() => {
+                // Filter for inactive members
+                const inactiveMembers = (boardMembers as BoardMemberWithMember[] || [])?.filter((item: BoardMemberWithMember) => {
+                  const name = getName(item);
+                  const matchesSearch = !searchTerm || 
+                    name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    item.boardMember.role.toLowerCase().includes(searchTerm.toLowerCase());
+                  
+                  const matchesRole = roleFilter === "all" || item.boardMember.role === roleFilter;
+                  const matchesStatus = item.boardMember.status === 'INACTIEF';
+
+                  return matchesSearch && matchesRole && matchesStatus;
+                }) || [];
+
+                if (inactiveMembers.length === 0) {
+                  return (
+                    <div className="col-span-full text-center py-12" data-testid="history-empty-state">
+                      <User className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">Geen historiek gevonden</h3>
+                      <p className="text-gray-500">Er zijn nog geen voormalige bestuursleden</p>
+                    </div>
+                  );
+                }
+
+                return inactiveMembers.map((item: BoardMemberWithMember) => {
+                  const name = getName(item);
+                  const { email, phone } = getContact(item);
+
+                  return (
+                    <Card key={item.boardMember.id} className="opacity-75 border-gray-300" data-testid={`history-card-${item.boardMember.id}`}>
+                      <CardHeader className="pb-3">
+                        <div className="flex items-center gap-3">
+                          <Avatar className="w-12 h-12">
+                            <AvatarImage src={item.boardMember.avatarUrl} />
+                            <AvatarFallback className="bg-gray-300 text-gray-600">
+                              {name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1">
+                            <h3 className="text-base font-semibold text-gray-700" data-testid={`history-name-${item.boardMember.id}`}>
+                              {name}
+                            </h3>
+                            <Badge 
+                              variant="secondary" 
+                              className={cn("text-xs", roleColors[item.boardMember.role as keyof typeof roleColors])}
+                              data-testid={`history-role-badge-${item.boardMember.id}`}
+                            >
+                              {roleLabels[item.boardMember.role as keyof typeof roleLabels]}
+                            </Badge>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="pt-0">
+                        <div className="space-y-2 text-sm">
+                          <div className="flex items-center gap-2 text-gray-500">
+                            <span className="font-medium">Periode:</span>
+                            <span data-testid={`history-period-${item.boardMember.id}`}>
+                              {format(new Date(item.boardMember.termStart), "dd MMM yyyy", { locale: nl })}
+                              {item.boardMember.termEnd && (
+                                <> - {format(new Date(item.boardMember.termEnd), "dd MMM yyyy", { locale: nl })}</>
+                              )}
+                            </span>
+                          </div>
+                          {email && (
+                            <div className="flex items-center gap-2 text-gray-500">
+                              <Mail className="w-4 h-4" />
+                              <span data-testid={`history-email-${item.boardMember.id}`}>{email}</span>
+                            </div>
+                          )}
+                          {phone && (
+                            <div className="flex items-center gap-2 text-gray-500">
+                              <Phone className="w-4 h-4" />
+                              <span data-testid={`history-phone-${item.boardMember.id}`}>{phone}</span>
+                            </div>
+                          )}
+                          {item.boardMember.responsibilities && (
+                            <div className="text-gray-500 text-xs mt-3 p-2 bg-gray-50 rounded">
+                              <strong>Verantwoordelijkheden:</strong>
+                              <p className="mt-1" data-testid={`history-responsibilities-${item.boardMember.id}`}>
+                                {item.boardMember.responsibilities}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                });
+              })()
+            )}
+          </div>
         </TabsContent>
       </Tabs>
 
@@ -371,19 +554,24 @@ export default function Bestuur() {
             <DialogHeader>
               <DialogTitle>Bestuurslid Bewerken</DialogTitle>
             </DialogHeader>
-            <div className="py-4">
-              <p className="text-gray-500 text-center" data-testid="edit-member-placeholder">
-                Bewerken formulier wordt binnenkort toegevoegd
-              </p>
-              <div className="flex justify-end gap-2 pt-4">
-                <Button variant="outline" onClick={() => setSelectedBoardMember(null)} data-testid="button-cancel-edit">
-                  Annuleren
-                </Button>
-                <Button data-testid="button-save-edit">
-                  Opslaan
-                </Button>
-              </div>
-            </div>
+            {selectedBoardMember && (
+              <BoardMemberForm
+                onSubmit={handleUpdateBoardMember}
+                onCancel={() => setSelectedBoardMember(null)}
+                isLoading={updateBoardMemberMutation.isPending}
+                initialData={{
+                  memberId: selectedBoardMember.boardMember.memberId || '',
+                  externalName: selectedBoardMember.boardMember.externalName || '',
+                  email: selectedBoardMember.boardMember.email || '',
+                  phone: selectedBoardMember.boardMember.phone || '',
+                  role: selectedBoardMember.boardMember.role,
+                  termStart: selectedBoardMember.boardMember.termStart,
+                  termEnd: selectedBoardMember.boardMember.termEnd || '',
+                  responsibilities: selectedBoardMember.boardMember.responsibilities || '',
+                  orderIndex: selectedBoardMember.boardMember.orderIndex
+                }}
+              />
+            )}
           </DialogContent>
         </Dialog>
       )}

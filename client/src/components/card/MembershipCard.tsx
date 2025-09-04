@@ -218,7 +218,7 @@ export function MembershipCard({
               <div className="flex flex-col items-center mr-8">
                 {/* Embossed Gold Icon Lines */}
                 <PiUserCircleCheckLight 
-                  className={`${isConstrained ? 'w-12 h-12' : 'w-16 h-16'}`}
+                  className={`${isConstrained ? 'w-16 h-16' : 'w-20 h-20'}`}
                   data-testid="voting-icon"
                   style={{
                     color: '#C0C0C0',

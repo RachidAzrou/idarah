@@ -16,8 +16,9 @@ export default function PublicScreenViewPage() {
   const [showControls, setShowControls] = useState(true);
   
   console.log('=== Component Render ===', { publicToken, loading, screen: !!screen });
+  
 
-  const loadScreen = async () => {
+  const loadScreen = React.useCallback(async () => {
     console.log('=== loadScreen called ===');
     console.log('publicToken:', publicToken);
     
@@ -75,25 +76,16 @@ export default function PublicScreenViewPage() {
       console.log('No publicToken provided');
       setLoading(false);
     }
-  };
+  }, [publicToken]);
 
-  // FORCE IMMEDIATE LOAD WITH DIFFERENT APPROACH
+  // FORCE DATA LOAD IMMEDIATELY WHEN TOKEN IS AVAILABLE
   useEffect(() => {
-    console.log('=== LAYOUT EFFECT TRIGGERED ===', publicToken);
+    console.log('=== useEffect FIRING ===', { publicToken, hasScreen: !!screen });
     if (publicToken) {
-      console.log('Calling loadScreen immediately...');
+      console.log('About to call loadScreen...');
       loadScreen();
     }
-  }, [publicToken]);
-  
-  // BACKUP EFFECT
-  useEffect(() => {
-    console.log('=== BACKUP useEffect ===', publicToken);
-    if (publicToken && !screen) {
-      console.log('Backup loadScreen call...');
-      setTimeout(() => loadScreen(), 100);
-    }
-  }, [publicToken, screen]);
+  }, [publicToken, loadScreen]);
 
   // Update document title when screen data is loaded
   useEffect(() => {

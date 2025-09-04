@@ -60,19 +60,18 @@ export default function MembersByCategoryCard() {
 
   return (
     <div 
-      className="bg-white rounded-2xl border border-gray-200 shadow-sm tabindex-0 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-40"
+      className="glass-card rounded-2xl card-hover animate-fade-in group tabindex-0 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-40"
       style={{ 
-        boxShadow: '0 6px 16px rgba(2,6,23,0.08)',
         padding: '24px 28px'
       }}
       tabIndex={0}
     >
       {/* Header */}
-      <div className="mb-6 pb-4" style={{ borderBottom: '1px solid #E2E8F0' }}>
-        <h3 className="text-lg font-semibold font-['Poppins']" style={{ color: '#0F172A' }}>
+      <div className="mb-6 pb-4 border-b border-gray-200">
+        <h3 className="text-lg font-semibold font-['Poppins'] text-foreground group-hover:text-primary transition-colors duration-300">
           Leden per Categorie
         </h3>
-        <p className="text-sm font-['Poppins']" style={{ color: '#64748B' }}>
+        <p className="text-sm font-['Poppins'] text-muted-foreground">
           Statistieken
         </p>
       </div>

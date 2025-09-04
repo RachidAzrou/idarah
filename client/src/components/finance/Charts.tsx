@@ -85,9 +85,9 @@ export function Charts() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Line Chart - Income vs Expenses */}
-      <Card className="col-span-1">
+      <Card className="col-span-1 glass-card card-hover animate-fade-in group">
         <CardHeader>
-          <CardTitle>Inkomsten vs Uitgaven</CardTitle>
+          <CardTitle className="group-hover:text-primary transition-colors duration-300">Inkomsten vs Uitgaven</CardTitle>
           <CardDescription>
             Maandelijkse ontwikkeling van financiële stromen
           </CardDescription>
@@ -133,9 +133,9 @@ export function Charts() {
       </Card>
 
       {/* Pie Chart - Expense Categories */}
-      <Card className="col-span-1">
+      <Card className="col-span-1 glass-card card-hover animate-fade-in group">
         <CardHeader>
-          <CardTitle>Uitgaven per Categorie</CardTitle>
+          <CardTitle className="group-hover:text-primary transition-colors duration-300">Uitgaven per Categorie</CardTitle>
           <CardDescription>
             Verdeling van uitgaven over verschillende categorieën
           </CardDescription>

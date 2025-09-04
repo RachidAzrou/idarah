@@ -262,7 +262,7 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
                         <div>
                           <Label className="text-sm font-medium text-gray-500">Status</Label>
                           <div className="mt-1 p-2 bg-gray-50 rounded border text-gray-700">
-                            {memberDetails?.status || 'Onbekend'}
+                            {memberDetails?.active ? 'Actief' : 'Inactief'}
                           </div>
                         </div>
                       </div>

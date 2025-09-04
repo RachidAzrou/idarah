@@ -472,72 +472,7 @@ export default function Berichten() {
                 )}
               </div>
             ) : (
-              <>
-                {/* Vervallen Lidgeld Template Card */}
-                {canEdit && (
-                  <Card className="hover:shadow-lg transition-shadow border-orange-200 bg-orange-50" data-testid="card-template-expired">
-                    <CardHeader>
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <AlertTriangle className="w-5 h-5 text-orange-600" />
-                            <CardTitle className="text-base text-orange-900" data-testid="text-template-name-expired">
-                              Vervallen Lidgeld Herinnering
-                            </CardTitle>
-                          </div>
-                          <CardDescription className="text-orange-700" data-testid="text-template-subject-expired">
-                            Template voor vervallen lidgelden
-                          </CardDescription>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex gap-2">
-                        <Button 
-                          size="sm" 
-                          className="bg-orange-600 hover:bg-orange-700 text-white"
-                          onClick={() => {
-                            setEditingTemplate(null);
-                            templateForm.reset({
-                              name: "Vervallen Lidgeld Herinnering",
-                              code: "EXPIRED_FEES",
-                              subject: "Herinnering: Vervallen lidgelden voor {{member.firstName}} {{member.lastName}}",
-                              content: `Beste {{member.firstName}} {{member.lastName}},
-
-We willen je eraan herinneren dat er nog openstaande lidgelden zijn die inmiddels vervallen zijn.
-
-Je openstaande vervallen lidgelden:
-{{#each member.fees.expired}}
-- €{{amount}} voor {{period}} (vervaldatum: {{dueDate}})
-{{/each}}
-
-Totaal vervallen bedrag: €{{member.fees.totalExpiredAmount}}
-
-Graag zouden we je willen vragen om deze bedragen zo spoedig mogelijk te voldoen. Je kunt betalen via:
-
-- Bankoverschrijving naar rekeningnummer: [REKENINGNUMMER]
-- Bancontact ter plaatse tijdens openingsuren
-- Contant tijdens openingsuren
-
-Heb je vragen over je lidgelden of wil je een betalingsregeling bespreken? Neem dan contact met ons op.
-
-Met vriendelijke groet,
-Het bestuur`
-                            });
-                            setShowTemplateDialog(true);
-                          }}
-                          data-testid="button-create-expired-template"
-                        >
-                          <Plus className="w-4 h-4 mr-1" />
-                          Aanmaken
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-                
-                {/* Regular Templates */}
-                {Array.isArray(templates) && templates.map((template: any) => (
+              Array.isArray(templates) && templates.map((template: any) => (
                   <Card key={template.id} className="hover:shadow-lg transition-shadow" data-testid={`card-template-${template.id}`}>
                     <CardHeader>
                       <div className="flex items-start justify-between">
@@ -566,8 +501,7 @@ Het bestuur`
                       </div>
                     </CardContent>
                   </Card>
-                ))}
-              </>
+                ))
             )}
           </div>
         </TabsContent>

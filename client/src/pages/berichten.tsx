@@ -493,41 +493,177 @@ export default function Berichten() {
         {/* Templates Tab */}
         <TabsContent value="templates" className="space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-medium">E-mail Templates</h2>
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900">E-mail Templates</h2>
+              <p className="text-sm text-gray-600 mt-1">Beheer en bewerk je e-mail templates voor automatische berichten</p>
+            </div>
             {canEdit && (
-              <Button onClick={handleNewTemplate} className="flex items-center gap-2" data-testid="button-new-template">
+              <Button onClick={handleNewTemplate} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700" data-testid="button-new-template">
                 <Plus className="w-4 h-4" />
                 Nieuwe Template
               </Button>
             )}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-testid="templates-grid">
+          {/* Quick Template Info Card */}
+          <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+            <CardContent className="p-4">
+              <div className="flex items-start gap-3">
+                <div className="bg-blue-100 p-2 rounded-lg">
+                  <Mail className="w-5 h-5 text-blue-600" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-medium text-gray-900 mb-1">Handlebars Variabelen</h3>
+                  <p className="text-sm text-gray-600 mb-2">Gebruik deze variabelen in je templates:</p>
+                  <div className="flex flex-wrap gap-2 text-xs">
+                    <Badge variant="outline" className="bg-white/80">{'{{member.firstName}}'}</Badge>
+                    <Badge variant="outline" className="bg-white/80">{'{{member.lastName}}'}</Badge>
+                    <Badge variant="outline" className="bg-white/80">{'{{tenant.name}}'}</Badge>
+                    <Badge variant="outline" className="bg-white/80">{'{{tenant.email}}'}</Badge>
+                    <Badge variant="outline" className="bg-white/80">{'{{card.url}}'}</Badge>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6" data-testid="templates-grid">
             {templatesLoading ? (
-              Array.from({ length: 3 }).map((_, i) => (
+              Array.from({ length: 6 }).map((_, i) => (
                 <Card key={i} className="animate-pulse">
-                  <CardHeader>
+                  <CardHeader className="pb-3">
                     <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
                     <div className="h-3 bg-gray-200 rounded w-1/2"></div>
                   </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      <div className="h-3 bg-gray-200 rounded w-full"></div>
+                      <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+                    </div>
+                  </CardContent>
                 </Card>
               ))
             ) : !templates || !Array.isArray(templates) || templates.length === 0 ? (
-              <div className="col-span-full text-center py-12" data-testid="templates-empty-state">
-                <Mail className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Nog geen templates</h3>
-                <p className="text-gray-500 mb-4">Maak je eerste e-mail template</p>
-                {canEdit && (
-                  <Button onClick={handleNewTemplate} data-testid="button-add-first-template">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Template Toevoegen
-                  </Button>
-                )}
+              <div className="col-span-full">
+                <Card className="border-dashed border-2 border-gray-300 bg-gray-50/50">
+                  <CardContent className="text-center py-12">
+                    <div className="bg-gray-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                      <Mail className="w-8 h-8 text-gray-400" />
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">Nog geen templates</h3>
+                    <p className="text-gray-500 mb-6 max-w-sm mx-auto">Begin met het aanmaken van je eerste e-mail template voor automatische berichten</p>
+                    {canEdit && (
+                      <Button onClick={handleNewTemplate} className="bg-blue-600 hover:bg-blue-700" data-testid="button-add-first-template">
+                        <Plus className="w-4 h-4 mr-2" />
+                        Eerste Template Aanmaken
+                      </Button>
+                    )}
+                  </CardContent>
+                </Card>
               </div>
             ) : (
               <>
-                {/* Template Voorbeelden Cards */}
-                {canEdit && (
+                {/* Actual Templates */}
+                {templates.map((template: any) => {
+                  // Determine template icon and color based on name/code
+                  let templateIcon = Mail;
+                  let iconColor = "text-gray-600";
+                  let cardColor = "border-gray-200";
+                  
+                  if (template.name?.toLowerCase().includes('welkom') || template.name?.toLowerCase().includes('nieuw')) {
+                    templateIcon = Users;
+                    iconColor = "text-green-600";
+                    cardColor = "border-green-200 bg-green-50/30";
+                  } else if (template.name?.toLowerCase().includes('herinnering') || template.name?.toLowerCase().includes('vervallen')) {
+                    templateIcon = AlertTriangle;
+                    iconColor = "text-red-600";
+                    cardColor = "border-red-200 bg-red-50/30";
+                  } else if (template.name?.toLowerCase().includes('vergadering') || template.name?.toLowerCase().includes('uitnodiging')) {
+                    templateIcon = Calendar;
+                    iconColor = "text-blue-600";
+                    cardColor = "border-blue-200 bg-blue-50/30";
+                  } else if (template.name?.toLowerCase().includes('activiteit') || template.name?.toLowerCase().includes('evenement')) {
+                    templateIcon = Settings;
+                    iconColor = "text-purple-600";
+                    cardColor = "border-purple-200 bg-purple-50/30";
+                  } else if (template.name?.toLowerCase().includes('feest') || template.name?.toLowerCase().includes('groet')) {
+                    templateIcon = PartyPopper;
+                    iconColor = "text-yellow-600";
+                    cardColor = "border-yellow-200 bg-yellow-50/30";
+                  }
+                  
+                  const TemplateIcon = templateIcon;
+                  
+                  return (
+                    <Card key={template.id} className={`hover:shadow-lg transition-all duration-200 ${cardColor} hover:scale-[1.02]`} data-testid={`card-template-${template.id}`}>
+                      <CardHeader className="pb-3">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <TemplateIcon className={`w-5 h-5 ${iconColor}`} />
+                              <CardTitle className="text-base font-semibold text-gray-900 line-clamp-1" data-testid={`text-template-name-${template.id}`}>
+                                {template.name}
+                              </CardTitle>
+                            </div>
+                            <div className="flex items-center gap-2 mb-2">
+                              <Badge variant="outline" className="text-xs px-2 py-0.5">
+                                {template.code}
+                              </Badge>
+                              <Badge variant={template.kind === 'TRANSACTIONEEL' ? 'default' : 'secondary'} className="text-xs px-2 py-0.5">
+                                {template.kind === 'TRANSACTIONEEL' ? 'Transactioneel' : 'Marketing'}
+                              </Badge>
+                            </div>
+                            <CardDescription className="text-sm text-gray-600 line-clamp-2" data-testid={`text-template-subject-${template.id}`}>
+                              {template.subject}
+                            </CardDescription>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-3">
+                          {/* Content Preview */}
+                          <div className="bg-gray-50 rounded-lg p-3">
+                            <p className="text-xs text-gray-500 mb-1">Preview:</p>
+                            <p className="text-sm text-gray-700 line-clamp-3">
+                              {template.content ? template.content.substring(0, 120) + '...' : 
+                               template.body_text ? template.body_text.substring(0, 120) + '...' : 
+                               'Geen content beschikbaar'}
+                            </p>
+                          </div>
+                          
+                          {/* Action Buttons */}
+                          <div className="flex gap-2">
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              onClick={() => handlePreviewTemplate(template)} 
+                              className="flex-1"
+                              data-testid={`button-preview-${template.id}`}
+                            >
+                              <Eye className="w-4 h-4 mr-1" />
+                              Preview
+                            </Button>
+                            {canEdit && (
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                onClick={() => handleEditTemplate(template)}
+                                className="flex-1"
+                                data-testid={`button-edit-${template.id}`}
+                              >
+                                <Edit className="w-4 h-4 mr-1" />
+                                Bewerken
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+                
+                {/* Template Voorbeelden Cards - alleen tonen als er geen templates zijn */}
+                {canEdit && templates.length === 0 && (
                   <>
                     {/* Welkomstmail Nieuw Lid Template Card */}
                     <Card className="hover:shadow-lg transition-shadow border-gray-200 bg-gray-50" data-testid="card-template-welcome">
@@ -1342,15 +1478,28 @@ Het organisatieteam van {{tenant.name}}`
 
       {/* Template Dialog */}
       <Dialog open={showTemplateDialog} onOpenChange={setShowTemplateDialog}>
-        <DialogContent className="max-w-6xl">
-          <DialogHeader>
-            <DialogTitle>{editingTemplate ? 'Template Bewerken' : 'Nieuwe Template'}</DialogTitle>
+        <DialogContent className="max-w-7xl max-h-[90vh] overflow-hidden">
+          <DialogHeader className="border-b pb-4">
+            <div className="flex items-center gap-3">
+              <div className="bg-blue-100 p-2 rounded-lg">
+                <Mail className="w-5 h-5 text-blue-600" />
+              </div>
+              <div>
+                <DialogTitle className="text-xl font-semibold">
+                  {editingTemplate ? 'Template Bewerken' : 'Nieuwe Template Aanmaken'}
+                </DialogTitle>
+                <p className="text-sm text-gray-600 mt-1">
+                  {editingTemplate ? 'Bewerk de template details en inhoud' : 'Maak een nieuwe e-mail template voor automatische berichten'}
+                </p>
+              </div>
+            </div>
           </DialogHeader>
           
-          <div className="flex gap-6">
-            <div className="flex-1">
+          <div className="flex gap-6 overflow-hidden" style={{ height: 'calc(90vh - 120px)' }}>
+            {/* Form Section */}
+            <div className="flex-1 overflow-y-auto pr-2">
               <Form {...templateForm}>
-            <form onSubmit={templateForm.handleSubmit(onTemplateSubmit)} className="space-y-6">
+                <form onSubmit={templateForm.handleSubmit(onTemplateSubmit)} className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
                 <FormField
                   control={templateForm.control}

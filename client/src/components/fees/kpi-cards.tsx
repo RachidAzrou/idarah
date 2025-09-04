@@ -44,24 +44,33 @@ function KpiCard({ title, value, delta, icon, iconBgColor }: KpiCardProps) {
   const colors = getColorClasses();
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow">
-      <div className="flex items-center justify-between">
+    <div className="glass-card rounded-2xl p-6 card-hover animate-fade-in group relative overflow-hidden">
+      {/* Dynamic gradient overlay based on card type */}
+      <div className={`absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${
+        title === 'Betaald' ? 'bg-gradient-to-br from-green-500/5 to-transparent' :
+        title === 'Vervallen' ? 'bg-gradient-to-br from-red-500/5 to-transparent' :
+        title === 'Openstaand' ? 'bg-gradient-to-br from-orange-500/5 to-transparent' :
+        'bg-gradient-to-br from-blue-500/5 to-transparent'
+      }`}></div>
+      
+      <div className="flex items-center justify-between relative z-10">
         <div className="flex-1">
-          <p className="text-xs font-medium text-gray-500 mb-1">{title}</p>
-          <p className="text-lg font-bold text-gray-900 mb-1">{value}</p>
-          <div className="flex items-center space-x-1">
+          <p className="text-sm font-semibold text-muted-foreground mb-2 tracking-wide">{title}</p>
+          <p className="text-3xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors duration-300 tabular-nums">{value}</p>
+          <div className="flex items-center space-x-2">
             {delta.positive ? (
-              <TrendingUp className={`h-3 w-3 ${colors.iconClass}`} />
+              <TrendingUp className={`h-4 w-4 ${colors.iconClass} group-hover:scale-110 transition-transform duration-300`} />
             ) : (
-              <TrendingDown className={`h-3 w-3 ${colors.iconClass}`} />
+              <TrendingDown className={`h-4 w-4 ${colors.iconClass} group-hover:scale-110 transition-transform duration-300`} />
             )}
-            <span className={`text-xs font-medium ${colors.textClass}`}>
+            <span className={`text-sm font-semibold ${colors.textClass} group-hover:text-opacity-80 transition-all duration-300`}>
               {delta.value}
             </span>
           </div>
         </div>
-        <div className={`w-8 h-8 ${iconBgColor} rounded-full flex items-center justify-center`}>
-          {icon}
+        <div className={`w-14 h-14 ${iconBgColor} rounded-2xl flex items-center justify-center shadow-xl ring-4 ring-white/20 group-hover:scale-110 group-hover:shadow-2xl transition-all duration-300 relative`}>
+          <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-2xl"></div>
+          <div className="relative">{icon}</div>
         </div>
       </div>
     </div>

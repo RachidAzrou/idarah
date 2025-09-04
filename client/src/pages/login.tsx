@@ -55,24 +55,28 @@ export default function Login() {
       <div className="absolute inset-0 bg-black/30"></div>
       
       {/* Left side - Branding and welcome text */}
-      <div className="flex-1 flex flex-col justify-start items-center pt-20 px-8 sm:px-12 lg:px-16 relative z-10">
-        <div className="max-w-md text-center">
-          {/* Logo */}
-          <div className="flex items-center justify-center mb-4">
+      <div className="flex-1 flex flex-col px-8 sm:px-12 lg:px-16 relative z-10">
+        {/* Logo at top */}
+        <div className="pt-8 mb-auto">
+          <div className="flex items-center justify-center">
             <img 
               src={idarahLogo} 
               alt="IDARAH" 
-              className="w-full h-auto max-w-none scale-[1.33]"
+              className="h-16 w-auto"
             />
           </div>
-          
-          {/* Welcome text */}
-          <h1 className="text-4xl font-bold text-white mb-6 leading-tight text-center">
-            Inloggen bij uw account
-          </h1>
-          <p className="text-xl text-gray-200 text-center">
-            Beheersysteem voor uw moskee gemeenschap
-          </p>
+        </div>
+        
+        {/* Welcome text positioned at middle */}
+        <div className="flex-1 flex items-center justify-start">
+          <div className="max-w-md">
+            <h1 className="text-4xl font-bold text-white mb-6 leading-tight">
+              Inloggen bij uw account
+            </h1>
+            <p className="text-xl text-gray-200">
+              Beheersysteem voor uw moskee gemeenschap
+            </p>
+          </div>
         </div>
       </div>
 

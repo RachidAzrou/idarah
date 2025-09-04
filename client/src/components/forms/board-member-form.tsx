@@ -761,59 +761,24 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
                               onChange={(e) => {
                                 const inputValue = e.target.value.trim();
                                 
-                                // Handle numeric input with automatic formatting
-                                if (/^\d+$/.test(inputValue)) {
-                                  // Auto-format as user types: 04061993 -> 04/06/1993
-                                  if (inputValue.length === 8) {
-                                    const day = inputValue.substring(0, 2);
-                                    const month = inputValue.substring(2, 4);
-                                    const year = inputValue.substring(4, 8);
-                                    
-                                    // Validate date components
-                                    const dayNum = parseInt(day);
-                                    const monthNum = parseInt(month);
-                                    const yearNum = parseInt(year);
-                                    
-                                    if (dayNum >= 1 && dayNum <= 31 && monthNum >= 1 && monthNum <= 12 && yearNum >= 1900 && yearNum <= 2100) {
-                                      const date = new Date(yearNum, monthNum - 1, dayNum);
-                                      if (!isNaN(date.getTime()) && date.getDate() === dayNum) {
-                                        field.onChange(date);
-                                        return;
-                                      }
+                                // Handle 8-digit numeric input: 04061993 -> 04/06/1993
+                                if (/^\d{8}$/.test(inputValue)) {
+                                  const day = inputValue.substring(0, 2);
+                                  const month = inputValue.substring(2, 4);
+                                  const year = inputValue.substring(4, 8);
+                                  
+                                  const dayNum = parseInt(day);
+                                  const monthNum = parseInt(month);
+                                  const yearNum = parseInt(year);
+                                  
+                                  // Validate date components
+                                  if (dayNum >= 1 && dayNum <= 31 && monthNum >= 1 && monthNum <= 12 && yearNum >= 1900 && yearNum <= 2100) {
+                                    const date = new Date(yearNum, monthNum - 1, dayNum);
+                                    // Check if the date is valid (handles things like Feb 30)
+                                    if (date.getFullYear() === yearNum && date.getMonth() === monthNum - 1 && date.getDate() === dayNum) {
+                                      field.onChange(date);
+                                      return;
                                     }
-                                  }
-                                  // Allow partial input for progressive typing
-                                  return;
-                                }
-                                
-                                // Handle text input (natural language)
-                                if (/[a-zA-Z]/.test(inputValue)) {
-                                  // Try to parse natural date formats
-                                  const today = new Date();
-                                  const lowerInput = inputValue.toLowerCase();
-                                  
-                                  if (lowerInput.includes('vandaag')) {
-                                    field.onChange(today);
-                                    return;
-                                  }
-                                  if (lowerInput.includes('morgen')) {
-                                    const tomorrow = new Date(today);
-                                    tomorrow.setDate(today.getDate() + 1);
-                                    field.onChange(tomorrow);
-                                    return;
-                                  }
-                                  if (lowerInput.includes('gisteren')) {
-                                    const yesterday = new Date(today);
-                                    yesterday.setDate(today.getDate() - 1);
-                                    field.onChange(yesterday);
-                                    return;
-                                  }
-                                  
-                                  // Try to parse with native Date constructor
-                                  const parsedDate = new Date(inputValue);
-                                  if (!isNaN(parsedDate.getTime())) {
-                                    field.onChange(parsedDate);
-                                    return;
                                   }
                                 }
                                 
@@ -823,9 +788,15 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
                                   if (parts.length === 3) {
                                     const [day, month, year] = parts;
                                     if (day && month && year && year.length === 4) {
-                                      const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-                                      if (!isNaN(date.getTime())) {
-                                        field.onChange(date);
+                                      const dayNum = parseInt(day);
+                                      const monthNum = parseInt(month);
+                                      const yearNum = parseInt(year);
+                                      
+                                      if (dayNum >= 1 && dayNum <= 31 && monthNum >= 1 && monthNum <= 12) {
+                                        const date = new Date(yearNum, monthNum - 1, dayNum);
+                                        if (date.getFullYear() === yearNum && date.getMonth() === monthNum - 1 && date.getDate() === dayNum) {
+                                          field.onChange(date);
+                                        }
                                       }
                                     }
                                   }
@@ -948,59 +919,24 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
                               onChange={(e) => {
                                 const inputValue = e.target.value.trim();
                                 
-                                // Handle numeric input with automatic formatting
-                                if (/^\d+$/.test(inputValue)) {
-                                  // Auto-format as user types: 31122025 -> 31/12/2025
-                                  if (inputValue.length === 8) {
-                                    const day = inputValue.substring(0, 2);
-                                    const month = inputValue.substring(2, 4);
-                                    const year = inputValue.substring(4, 8);
-                                    
-                                    // Validate date components
-                                    const dayNum = parseInt(day);
-                                    const monthNum = parseInt(month);
-                                    const yearNum = parseInt(year);
-                                    
-                                    if (dayNum >= 1 && dayNum <= 31 && monthNum >= 1 && monthNum <= 12 && yearNum >= 1900 && yearNum <= 2100) {
-                                      const date = new Date(yearNum, monthNum - 1, dayNum);
-                                      if (!isNaN(date.getTime()) && date.getDate() === dayNum) {
-                                        field.onChange(date);
-                                        return;
-                                      }
+                                // Handle 8-digit numeric input: 31122025 -> 31/12/2025
+                                if (/^\d{8}$/.test(inputValue)) {
+                                  const day = inputValue.substring(0, 2);
+                                  const month = inputValue.substring(2, 4);
+                                  const year = inputValue.substring(4, 8);
+                                  
+                                  const dayNum = parseInt(day);
+                                  const monthNum = parseInt(month);
+                                  const yearNum = parseInt(year);
+                                  
+                                  // Validate date components
+                                  if (dayNum >= 1 && dayNum <= 31 && monthNum >= 1 && monthNum <= 12 && yearNum >= 1900 && yearNum <= 2100) {
+                                    const date = new Date(yearNum, monthNum - 1, dayNum);
+                                    // Check if the date is valid (handles things like Feb 30)
+                                    if (date.getFullYear() === yearNum && date.getMonth() === monthNum - 1 && date.getDate() === dayNum) {
+                                      field.onChange(date);
+                                      return;
                                     }
-                                  }
-                                  // Allow partial input for progressive typing
-                                  return;
-                                }
-                                
-                                // Handle text input (natural language)
-                                if (/[a-zA-Z]/.test(inputValue)) {
-                                  // Try to parse natural date formats
-                                  const today = new Date();
-                                  const lowerInput = inputValue.toLowerCase();
-                                  
-                                  if (lowerInput.includes('vandaag')) {
-                                    field.onChange(today);
-                                    return;
-                                  }
-                                  if (lowerInput.includes('morgen')) {
-                                    const tomorrow = new Date(today);
-                                    tomorrow.setDate(today.getDate() + 1);
-                                    field.onChange(tomorrow);
-                                    return;
-                                  }
-                                  if (lowerInput.includes('gisteren')) {
-                                    const yesterday = new Date(today);
-                                    yesterday.setDate(today.getDate() - 1);
-                                    field.onChange(yesterday);
-                                    return;
-                                  }
-                                  
-                                  // Try to parse with native Date constructor
-                                  const parsedDate = new Date(inputValue);
-                                  if (!isNaN(parsedDate.getTime())) {
-                                    field.onChange(parsedDate);
-                                    return;
                                   }
                                 }
                                 
@@ -1010,9 +946,15 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
                                   if (parts.length === 3) {
                                     const [day, month, year] = parts;
                                     if (day && month && year && year.length === 4) {
-                                      const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-                                      if (!isNaN(date.getTime())) {
-                                        field.onChange(date);
+                                      const dayNum = parseInt(day);
+                                      const monthNum = parseInt(month);
+                                      const yearNum = parseInt(year);
+                                      
+                                      if (dayNum >= 1 && dayNum <= 31 && monthNum >= 1 && monthNum <= 12) {
+                                        const date = new Date(yearNum, monthNum - 1, dayNum);
+                                        if (date.getFullYear() === yearNum && date.getMonth() === monthNum - 1 && date.getDate() === dayNum) {
+                                          field.onChange(date);
+                                        }
                                       }
                                     }
                                   }

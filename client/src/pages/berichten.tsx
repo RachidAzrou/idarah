@@ -1739,9 +1739,9 @@ Het organisatieteam van {{tenant.name}}`
                       <div>
                         <Label>Stemrecht</Label>
                         <Select
-                          value={segmentForm.watch("rules.hasVotingRights") !== undefined ? (segmentForm.watch("rules.hasVotingRights") ? "true" : "false") : ""}
+                          value={segmentForm.watch("rules.hasVotingRights") !== undefined ? (segmentForm.watch("rules.hasVotingRights") ? "true" : "false") : "ALL"}
                           onValueChange={(value) => {
-                            if (value === "") {
+                            if (value === "ALL") {
                               segmentForm.setValue("rules.hasVotingRights" as any, undefined);
                             } else {
                               segmentForm.setValue("rules.hasVotingRights" as any, value === "true");
@@ -1752,7 +1752,7 @@ Het organisatieteam van {{tenant.name}}`
                             <SelectValue placeholder="Alle leden" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="">Alle leden</SelectItem>
+                            <SelectItem value="ALL">Alle leden</SelectItem>
                             <SelectItem value="true">Alleen stemgerechtigde leden</SelectItem>
                             <SelectItem value="false">Alleen niet-stemgerechtigde leden</SelectItem>
                           </SelectContent>
@@ -1762,9 +1762,9 @@ Het organisatieteam van {{tenant.name}}`
                       <div>
                         <Label>Status</Label>
                         <Select
-                          value={segmentForm.watch("rules.memberActive") !== undefined ? (segmentForm.watch("rules.memberActive") ? "true" : "false") : ""}
+                          value={segmentForm.watch("rules.memberActive") !== undefined ? (segmentForm.watch("rules.memberActive") ? "true" : "false") : "ALL"}
                           onValueChange={(value) => {
-                            if (value === "") {
+                            if (value === "ALL") {
                               segmentForm.setValue("rules.memberActive", undefined);
                             } else {
                               segmentForm.setValue("rules.memberActive", value === "true");
@@ -1775,7 +1775,7 @@ Het organisatieteam van {{tenant.name}}`
                             <SelectValue placeholder="Alle statussen" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="">Alle statussen</SelectItem>
+                            <SelectItem value="ALL">Alle statussen</SelectItem>
                             <SelectItem value="true">Alleen actieve leden</SelectItem>
                             <SelectItem value="false">Alleen inactieve leden</SelectItem>
                           </SelectContent>
@@ -1785,16 +1785,16 @@ Het organisatieteam van {{tenant.name}}`
                       <div>
                         <Label>Categorie</Label>
                         <Select
-                          value={segmentForm.watch("rules.category")?.[0] || ""}
+                          value={segmentForm.watch("rules.category")?.[0] || "ALL"}
                           onValueChange={(value) => {
-                            segmentForm.setValue("rules.category" as any, value ? [value] : []);
+                            segmentForm.setValue("rules.category" as any, value === "ALL" ? [] : [value]);
                           }}
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="Alle categorieën" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="">Alle categorieën</SelectItem>
+                            <SelectItem value="ALL">Alle categorieën</SelectItem>
                             <SelectItem value="STUDENT">Student</SelectItem>
                             <SelectItem value="SENIOR">Senior</SelectItem>
                             <SelectItem value="REGULIER">Regulier</SelectItem>
@@ -2126,10 +2126,7 @@ Het organisatieteam van {{tenant.name}}`
             </div>
           </div>
           
-          <div className="flex justify-end gap-3 pt-4">
-            <Button variant="outline" onClick={() => setShowSegmentPreviewDialog(false)}>
-              Sluiten
-            </Button>
+          <div className="flex justify-end pt-4">
             <Button onClick={() => {
               setShowSegmentPreviewDialog(false);
               handleEditSegment(previewSegment);

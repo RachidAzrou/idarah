@@ -1820,49 +1820,13 @@ Het organisatieteam van {{tenant.name}}`
                         </Select>
                       </div>
                       
-                      <div>
-                        <Label>Stemgerechtigden</Label>
-                        <Select
-                          value={segmentForm.watch("rules.hasVotingRights" as any)?.toString() || ""}
-                          onValueChange={(value) => {
-                            segmentForm.setValue("rules.hasVotingRights" as any, value === "true" ? true : value === "false" ? false : undefined);
-                          }}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Alle leden" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="ALL">Alle leden</SelectItem>
-                            <SelectItem value="true">Alleen stemgerechtigden</SelectItem>
-                            <SelectItem value="false">Alleen niet-stemgerechtigden</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
                     </div>
                   </div>
                   
-                  {/* Location & Demographics */}
+                  {/* Demographics */}
                   <div className="space-y-4">
-                    <h4 className="font-medium text-sm">Locatie & Leeftijd</h4>
+                    <h4 className="font-medium text-sm">Leeftijd</h4>
                     <div className="space-y-3">
-                      <div>
-                        <Label>Stad</Label>
-                        <Input 
-                          value={segmentForm.watch("rules.city") || ""}
-                          onChange={(e) => segmentForm.setValue("rules.city" as any, e.target.value || undefined)}
-                          placeholder="Bijv. Antwerpen"
-                        />
-                      </div>
-                      
-                      <div>
-                        <Label>Postcode</Label>
-                        <Input 
-                          value={segmentForm.watch("rules.postalCode") || ""}
-                          onChange={(e) => segmentForm.setValue("rules.postalCode" as any, e.target.value || undefined)}
-                          placeholder="Bijv. 2000"
-                        />
-                      </div>
-                      
                       <div className="grid grid-cols-2 gap-3">
                         <div>
                           <Label>Min Leeftijd</Label>

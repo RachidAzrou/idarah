@@ -244,8 +244,8 @@ export default function Bestuur() {
         <div className="border-b border-gray-200 pb-5 mb-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900" data-testid="page-title">Mijn Bestuur</h1>
-              <p className="mt-1 text-sm text-gray-700" data-testid="page-description">
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent tracking-tight" data-testid="page-title">Mijn Bestuur</h1>
+              <p className="mt-2 text-sm text-gray-600 font-medium" data-testid="page-description">
                 Beheer bestuursleden en hun mandaten
               </p>
             </div>

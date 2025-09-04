@@ -770,6 +770,10 @@ export const insertMemberFinancialSettingsSchema = createInsertSchema(memberFina
   id: true,
 });
 
+export const insertMemberPermissionsSchema = createInsertSchema(memberPermissions).omit({
+  id: true,
+});
+
 export const insertMandateSchema = createInsertSchema(mandates).omit({
   id: true,
 });
@@ -931,6 +935,9 @@ export type InsertMember = z.infer<typeof insertMemberSchema>;
 
 export type MemberFinancialSettings = typeof memberFinancialSettings.$inferSelect;
 export type InsertMemberFinancialSettings = z.infer<typeof insertMemberFinancialSettingsSchema>;
+
+export type MemberPermissions = typeof memberPermissions.$inferSelect;
+export type InsertMemberPermissions = z.infer<typeof insertMemberPermissionsSchema>;
 
 export type Mandate = typeof mandates.$inferSelect;
 export type InsertMandate = z.infer<typeof insertMandateSchema>;

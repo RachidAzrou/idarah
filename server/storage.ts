@@ -23,6 +23,7 @@ import {
   type User,
   type Member,
   type MemberFinancialSettings,
+  type MemberPermissions,
   type MembershipFee,
   type Transaction,
   type Rule,

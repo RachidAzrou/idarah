@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Users, UserCheck, Euro, Clock, TrendingUp, TrendingDown, Vote } from "lucide-react";
+import { Users, UserCheck, Euro, Clock, Vote } from "lucide-react";
 import { HiInboxArrowDown } from "react-icons/hi2";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -26,11 +26,6 @@ function KpiCard({ title, value, delta, icon, iconBgColor, deltaColor }: KpiCard
           <p className="text-xs font-medium text-muted-foreground mb-1">{title}</p>
           <p className="text-lg font-bold text-foreground mb-2 group-hover:text-primary transition-colors duration-300 tabular-nums">{value}</p>
           <div className="flex items-center space-x-1">
-            {delta.positive ? (
-              <TrendingUp className={`h-3 w-3 group-hover:scale-110 transition-transform duration-300 ${deltaColor ? deltaColor.replace('text-', 'text-') : 'text-green-600'}`} />
-            ) : (
-              <TrendingDown className={`h-3 w-3 group-hover:scale-110 transition-transform duration-300 ${deltaColor ? deltaColor.replace('text-', 'text-') : 'text-red-500'}`} />
-            )}
             <span className={`text-xs font-medium ${deltaColor || (delta.positive ? 'text-green-600' : 'text-red-500')} group-hover:text-opacity-80 transition-all duration-300`}>
               {delta.value}
             </span>

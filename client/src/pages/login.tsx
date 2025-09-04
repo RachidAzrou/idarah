@@ -54,35 +54,30 @@ export default function Login() {
       {/* Background overlay */}
       <div className="absolute inset-0 bg-black/30"></div>
       
-      {/* Left side - Branding and welcome text */}
-      <div className="flex-1 flex flex-col px-8 sm:px-12 lg:px-16 relative z-10">
-        {/* Logo at top */}
-        <div className="pt-4 -ml-16">
-          <div className="flex items-start justify-start">
-            <img 
-              src={idarahLogo} 
-              alt="IDARAH" 
-              className="h-24 w-auto scale-[5] origin-top-left"
-            />
-          </div>
-        </div>
-        
-        {/* Welcome text positioned at middle */}
-        <div className="mt-8 flex-1 flex items-center justify-start">
-          <div className="max-w-md ml-0">
-            <h1 className="text-4xl font-bold text-white mb-6 leading-tight">
-              Inloggen bij uw account
-            </h1>
-            <p className="text-xl text-gray-200">
-              Beheersysteem voor uw moskee gemeenschap
-            </p>
-          </div>
+      {/* Left side - Logo */}
+      <div className="flex-1 flex flex-col justify-center items-end pr-8 relative z-10">
+        <div className="flex items-center justify-center">
+          <img 
+            src={idarahLogo} 
+            alt="IDARAH" 
+            className="h-96 w-auto"
+          />
         </div>
       </div>
 
       {/* Right side - Login form */}
       <div className="flex-1 flex flex-col justify-center pl-4 pr-8 sm:pl-6 sm:pr-12 lg:pl-8 lg:pr-16 relative z-10">
-        <div className="max-w-md mx-auto w-full">
+        {/* Welcome text above login form */}
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-white mb-4 leading-tight">
+            Inloggen bij uw account
+          </h1>
+          <p className="text-xl text-gray-200">
+            Beheersysteem voor uw moskee gemeenschap
+          </p>
+        </div>
+        
+        <div className="max-w-md w-full">
           <div className="bg-white rounded-3xl shadow-2xl p-8">
             <form onSubmit={handleSubmit} className="space-y-6" data-testid="login-form">
               {error && (

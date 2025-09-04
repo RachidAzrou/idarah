@@ -18,7 +18,12 @@ export default function PublicScreenViewPage() {
   const loadScreen = async () => {
     if (publicToken) {
       try {
-        const response = await fetch(`/api/public-screens/token/${publicToken}`);
+        const response = await fetch(`/api/public-screens/token/${publicToken}`, {
+          cache: 'no-cache',
+          headers: {
+            'Cache-Control': 'no-cache'
+          }
+        });
         if (response.ok) {
           const foundScreen = await response.json();
           console.log('=== PublicScreenViewPage Debug ===');
@@ -154,12 +159,18 @@ export default function PublicScreenViewPage() {
   return (
     <div className="min-h-screen relative">
       {/* Main Content */}
-      {screen.type === 'LEDENLIJST' && (
-        <LedenlijstView 
-          config={screen.config as LedenlijstConfig} 
-          members={(screen as any).members || []}
-        />
-      )}
+      {screen.type === 'LEDENLIJST' && (() => {
+        console.log('=== Rendering LedenlijstView ===');
+        console.log('Screen object:', screen);
+        console.log('Members from screen:', (screen as any).members);
+        console.log('Members length:', (screen as any).members?.length || 0);
+        return (
+          <LedenlijstView 
+            config={screen.config as LedenlijstConfig} 
+            members={(screen as any).members || []}
+          />
+        );
+      })()}
       
       {screen.type === 'MEDEDELINGEN' && (
         <AnnouncementsView config={screen.config as MededelingenConfig} />

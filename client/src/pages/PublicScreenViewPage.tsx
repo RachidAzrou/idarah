@@ -18,10 +18,13 @@ export default function PublicScreenViewPage() {
   const loadScreen = async () => {
     if (publicToken) {
       try {
-        const response = await fetch(`/api/public-screens/token/${publicToken}`, {
+        // Add timestamp to force cache bypass
+        const timestamp = new Date().getTime();
+        const response = await fetch(`/api/public-screens/token/${publicToken}?t=${timestamp}`, {
           cache: 'no-cache',
           headers: {
-            'Cache-Control': 'no-cache'
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
           }
         });
         if (response.ok) {
@@ -166,6 +169,7 @@ export default function PublicScreenViewPage() {
         console.log('Members length:', (screen as any).members?.length || 0);
         return (
           <LedenlijstView 
+            key={`${screen.id}-${(screen as any).members?.length || 0}`}
             config={screen.config as LedenlijstConfig} 
             members={(screen as any).members || []}
           />

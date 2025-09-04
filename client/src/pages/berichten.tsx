@@ -610,112 +610,56 @@ export default function Berichten() {
               <>
                 {/* Actual Templates */}
                 {templates.map((template: any) => {
-                  // Determine template icon and color based on name/code
+                  // Set icon based on template type
                   let templateIcon = Mail;
-                  let iconColor = "text-gray-600";
-                  let cardColor = "border-gray-200";
                   
-                  if (template.name?.toLowerCase().includes('welkom') || template.name?.toLowerCase().includes('nieuw')) {
-                    templateIcon = Users;
-                    iconColor = "text-green-600";
-                    cardColor = "border-green-200 bg-green-50/30";
-                  } else if (template.name?.toLowerCase().includes('herinnering') || template.name?.toLowerCase().includes('vervallen')) {
-                    templateIcon = AlertTriangle;
-                    iconColor = "text-red-600";
-                    cardColor = "border-red-200 bg-red-50/30";
-                  } else if (template.name?.toLowerCase().includes('vergadering') || template.name?.toLowerCase().includes('uitnodiging')) {
-                    templateIcon = Calendar;
-                    iconColor = "text-blue-600";
-                    cardColor = "border-blue-200 bg-blue-50/30";
-                  } else if (template.name?.toLowerCase().includes('activiteit') || template.name?.toLowerCase().includes('evenement')) {
-                    templateIcon = Settings;
-                    iconColor = "text-purple-600";
-                    cardColor = "border-purple-200 bg-purple-50/30";
-                  } else if (template.name?.toLowerCase().includes('feest') || template.name?.toLowerCase().includes('groet')) {
-                    templateIcon = PartyPopper;
-                    iconColor = "text-yellow-600";
-                    cardColor = "border-yellow-200 bg-yellow-50/30";
+                  if (template.name?.toLowerCase().includes('welkom') || template.name?.toLowerCase().includes('nieuw') || template.name?.toLowerCase().includes('verwelkoming')) {
+                    templateIcon = PiHandWaving;
+                  } else if (template.name?.toLowerCase().includes('vergadering') || template.name?.toLowerCase().includes('algemene')) {
+                    templateIcon = GrGroup;
                   }
                   
                   const TemplateIcon = templateIcon;
                   
                   return (
-                    <Card key={template.id} className={`hover:shadow-md transition-shadow ${cardColor}`} data-testid={`card-template-${template.id}`}>
+                    <Card key={template.id} className="hover:shadow-lg transition-shadow border-gray-200 bg-gray-50" data-testid={`card-template-${template.id}`}>
                       <CardHeader className="pb-4">
-                        <div className="flex items-start gap-3">
-                          <div className={`p-2 rounded-lg ${cardColor.includes('green') ? 'bg-green-100' : cardColor.includes('red') ? 'bg-red-100' : cardColor.includes('blue') ? 'bg-blue-100' : cardColor.includes('purple') ? 'bg-purple-100' : cardColor.includes('yellow') ? 'bg-yellow-100' : 'bg-gray-100'}`}>
-                            <TemplateIcon className={`w-5 h-5 ${iconColor}`} />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <CardTitle className="text-lg font-semibold text-gray-900 truncate" data-testid={`text-template-name-${template.id}`}>
-                              {template.name}
-                            </CardTitle>
-                            <div className="flex items-center gap-2 mt-2">
-                              <Badge variant="outline" className="text-xs">
-                                {template.code}
-                              </Badge>
-                              <Badge variant={template.kind === 'TRANSACTIONEEL' ? 'default' : 'secondary'} className="text-xs">
-                                {template.kind === 'TRANSACTIONEEL' ? 'Transactioneel' : 'Marketing'}
-                              </Badge>
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <TemplateIcon className="w-5 h-5 text-gray-600" />
+                              <CardTitle className="text-base text-gray-900" data-testid={`text-template-name-${template.id}`}>
+                                {template.name}
+                              </CardTitle>
                             </div>
                           </div>
                         </div>
                       </CardHeader>
-                      <CardContent className="pt-0">
-                        <div className="space-y-4">
-                          <div>
-                            <p className="text-sm font-medium text-gray-700 mb-1">Onderwerp:</p>
-                            <p className="text-sm text-gray-600 line-clamp-2" data-testid={`text-template-subject-${template.id}`}>
-                              {template.subject}
-                            </p>
-                          </div>
-                          
-                          <div>
-                            <p className="text-sm font-medium text-gray-700 mb-1">Preview:</p>
-                            <div className="bg-gray-50 rounded-md p-3">
-                              <p className="text-sm text-gray-600 line-clamp-3">
-                                {template.content ? template.content.substring(0, 150) + '...' : 
-                                 template.body_text ? template.body_text.substring(0, 150) + '...' : 
-                                 'Geen content beschikbaar'}
-                              </p>
-                            </div>
-                          </div>
-                          
-                          <div className="flex gap-2 pt-2">
+                      <CardContent>
+                        <CardDescription className="text-gray-700 mb-4" data-testid={`text-template-subject-${template.id}`}>
+                          {template.subject}
+                        </CardDescription>
+                        <div className="flex gap-2">
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            onClick={() => handlePreviewTemplate(template)} 
+                            data-testid={`button-preview-${template.id}`}
+                          >
+                            <Eye className="w-4 h-4 mr-1" />
+                            Preview
+                          </Button>
+                          {canEdit && (
                             <Button 
                               size="sm" 
-                              variant="outline" 
-                              onClick={() => handlePreviewTemplate(template)} 
-                              className="flex-1"
-                              data-testid={`button-preview-${template.id}`}
+                              variant="outline"
+                              onClick={() => handleEditTemplate(template)}
+                              data-testid={`button-edit-${template.id}`}
                             >
-                              <Eye className="w-4 h-4 mr-2" />
-                              Preview
+                              <Edit className="w-4 h-4 mr-1" />
+                              Bewerk
                             </Button>
-                            {canEdit && (
-                              <>
-                                <Button 
-                                  size="sm" 
-                                  variant="outline"
-                                  onClick={() => handleEditTemplate(template)}
-                                  className="flex-1"
-                                  data-testid={`button-edit-${template.id}`}
-                                >
-                                  <Edit className="w-4 h-4 mr-2" />
-                                  Bewerken
-                                </Button>
-                                <Button 
-                                  size="sm" 
-                                  variant="outline"
-                                  onClick={() => handleDeleteTemplate(template)}
-                                  className="text-red-600 hover:text-red-700 hover:border-red-200 hover:bg-red-50"
-                                  data-testid={`button-delete-${template.id}`}
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </Button>
-                              </>
-                            )}
-                          </div>
+                          )}
                         </div>
                       </CardContent>
                     </Card>

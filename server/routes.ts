@@ -1,4 +1,4 @@
-import type { Express } from "express";
+import type { Express, Request } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { authMiddleware } from "./middleware/auth";
@@ -12,6 +12,20 @@ import { cardService } from "./services/card";
 import { ruleService } from "./services/ruleService";
 import { boardService } from "./services/board";
 import { insertUserSchema, insertMemberSchema, insertMembershipFeeSchema, cardMeta, insertBoardMemberSchema, emailSegments, emailSuppresses } from "@shared/schema";
+
+// Define AuthenticatedRequest type
+interface AuthenticatedRequest extends Request {
+  user: {
+    id: string;
+    tenantId: string;
+    name: string;
+    email: string;
+    role: 'SUPERADMIN' | 'BEHEERDER' | 'MEDEWERKER';
+    active: boolean;
+    createdAt: Date;
+  };
+  tenantId: string;
+}
 import { eq } from "drizzle-orm";
 import { db } from "./db";
 import { generateFeesHandler } from "./api/jobs/fees/generate";
@@ -323,12 +337,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // If member is being deactivated, automatically mark their card as expired
         try {
           await db
-            .update(membershipCards)
+            .update(cardMeta)
             .set({ 
-              status: 'VERLOPEN',
-              updatedAt: new Date()
+              status: 'VERLOPEN'
             })
-            .where(eq(membershipCards.memberId, req.params.id));
+            .where(eq(cardMeta.memberId, req.params.id));
           console.log("PUT: Automatically set card status to VERLOPEN for deactivated member:", req.params.id);
         } catch (cardError) {
           console.error("PUT: Error updating card status for deactivated member:", cardError);
@@ -398,12 +411,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // If member is being deactivated, automatically mark their card as expired
         try {
           await db
-            .update(membershipCards)
+            .update(cardMeta)
             .set({ 
-              status: 'VERLOPEN',
-              updatedAt: new Date()
+              status: 'VERLOPEN'
             })
-            .where(eq(membershipCards.memberId, req.params.id));
+            .where(eq(cardMeta.memberId, req.params.id));
           console.log("PATCH: Automatically set card status to VERLOPEN for deactivated member:", req.params.id);
         } catch (cardError) {
           console.error("PATCH: Error updating card status for deactivated member:", cardError);

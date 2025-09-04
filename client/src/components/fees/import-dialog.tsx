@@ -244,14 +244,14 @@ export function ImportDialog({ open, onClose, fees, onImport }: ImportDialogProp
                       </TableCell>
                       <TableCell>
                         <Select
-                          value={match.match?.id || ""}
-                          onValueChange={(value) => updateMatch(index, value || null)}
+                          value={match.match?.id || "none"}
+                          onValueChange={(value) => updateMatch(index, value === "none" ? null : value)}
                         >
                           <SelectTrigger className="w-48">
                             <SelectValue placeholder="Selecteer lidgeld" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="">Geen koppeling</SelectItem>
+                            <SelectItem value="none">Geen koppeling</SelectItem>
                             {fees
                               .filter(fee => fee.status === "OPEN" && Math.abs(fee.amount - match.transaction.amount) < 1)
                               .map(fee => (

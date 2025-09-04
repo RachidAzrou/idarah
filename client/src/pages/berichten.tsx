@@ -173,6 +173,9 @@ export default function Berichten() {
   const [recipientInput, setRecipientInput] = useState("");
   const [showRecipientSuggestions, setShowRecipientSuggestions] = useState(false);
   const [originalTemplateData, setOriginalTemplateData] = useState<any>(null);
+  // Send Template State (missing variables)
+  const [sendTemplateCode, setSendTemplateCode] = useState("");
+  const [sendRecipient, setSendRecipient] = useState("");
 
   // Fetch data for each tab
   const { data: templatesData, isLoading: templatesLoading } = useQuery({
@@ -182,9 +185,9 @@ export default function Berichten() {
     refetchOnMount: 'always',
     staleTime: 0,
     gcTime: 0,
-    select: (rows) => {
+    select: (rows: any[]) => {
       const seen = new Set<string>();
-      return rows.filter(r => {
+      return rows.filter((r: any) => {
         const k = `${r.tenantId}:${r.id}`;
         if (seen.has(k)) return false;
         seen.add(k);
@@ -473,7 +476,7 @@ export default function Berichten() {
     onSuccess: (result) => {
       toast({
         title: "E-mail verzonden",
-        description: result.message || `E-mail verzonden naar ${result.totalRecipients} geadresseerd(en)`,
+        description: (result as any).message || `E-mail verzonden naar ${(result as any).totalRecipients} geadresseerd(en)`,
         variant: "default"
       });
       // Reset form

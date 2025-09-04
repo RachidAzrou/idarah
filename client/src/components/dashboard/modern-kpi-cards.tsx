@@ -27,9 +27,9 @@ function KpiCard({ title, value, delta, icon, iconBgColor, deltaColor }: KpiCard
           <p className="text-lg font-bold text-foreground mb-2 group-hover:text-primary transition-colors duration-300 tabular-nums">{value}</p>
           <div className="flex items-center space-x-1">
             {delta.positive ? (
-              <TrendingUp className="h-3 w-3 text-green-600 group-hover:scale-110 transition-transform duration-300" />
+              <TrendingUp className={`h-3 w-3 group-hover:scale-110 transition-transform duration-300 ${deltaColor ? deltaColor.replace('text-', 'text-') : 'text-green-600'}`} />
             ) : (
-              <TrendingDown className="h-3 w-3 text-red-500 group-hover:scale-110 transition-transform duration-300" />
+              <TrendingDown className={`h-3 w-3 group-hover:scale-110 transition-transform duration-300 ${deltaColor ? deltaColor.replace('text-', 'text-') : 'text-red-500'}`} />
             )}
             <span className={`text-xs font-medium ${deltaColor || (delta.positive ? 'text-green-600' : 'text-red-500')} group-hover:text-opacity-80 transition-all duration-300`}>
               {delta.value}

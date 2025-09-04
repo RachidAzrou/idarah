@@ -166,8 +166,14 @@ export default function Berichten() {
   // Fetch data for each tab
   const { data: templates, isLoading: templatesLoading } = useQuery({
     queryKey: ["/api/messages/templates"],
-    staleTime: 10000,
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
+
+  // Debug: Log templates to see what's being rendered
+  console.log("Templates data:", templates, "Length:", templates?.length);
 
   const { data: segments, isLoading: segmentsLoading } = useQuery({
     queryKey: ["/api/messages/segments"],

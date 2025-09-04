@@ -120,7 +120,7 @@ export default function Berichten() {
       return apiRequest("POST", "/api/messages/templates", {
         name: data.name,
         code: data.code,
-        kind: data.kind,
+        kind: "TRANSACTIONEEL", // Standaard waarde sinds type niet meer relevant is
         subject: data.subject,
         body_html: data.bodyHtml,
         body_text: data.bodyText
@@ -146,7 +146,7 @@ export default function Berichten() {
       return apiRequest("PUT", `/api/messages/templates/${id}`, {
         name: data.name,
         code: data.code,
-        kind: data.kind,
+        kind: "TRANSACTIONEEL", // Standaard waarde sinds type niet meer relevant is
         subject: data.subject,
         body_html: data.bodyHtml,
         body_text: data.bodyText

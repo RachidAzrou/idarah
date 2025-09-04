@@ -16,18 +16,28 @@ export function LedenlijstView({ config, members = [] }: LedenlijstViewProps) {
   const [filteredMembers, setFilteredMembers] = useState<Member[]>([]);
 
   useEffect(() => {
+    
     // Convert real member data to the format expected by getFilteredMembers
-    const convertedMembers: Member[] = members.map((member: any) => ({
-      id: member.id,
-      lidnummer: member.memberNumber,
-      voornaam: member.firstName,
-      achternaam: member.lastName,
-      initialen: member.firstName.charAt(0) + member.lastName.charAt(0),
-      categorie: member.category,
-      actief: member.active,
-      stemrecht: member.votingRights,
-      betaalstatus: [] // Will be filled with actual payment data if needed
-    }));
+    const convertedMembers: Member[] = members.map((member: any) => {
+      // Map database categories to display categories
+      let displayCategory = member.category;
+      if (member.category === 'STUDENT') displayCategory = 'Student';
+      else if (member.category === 'SENIOR') displayCategory = 'Senior';  
+      else if (member.category === 'STANDAARD') displayCategory = 'Standaard';
+      
+      return {
+        id: member.id,
+        lidnummer: member.memberNumber,
+        voornaam: member.firstName,
+        achternaam: member.lastName,
+        initialen: member.firstName.charAt(0) + member.lastName.charAt(0),
+        categorie: displayCategory,
+        actief: member.active,
+        stemrecht: member.votingRights,
+        betaalstatus: [] // Will be filled with actual payment data if needed
+      };
+    });
+    
     
     const filtered = getFilteredMembers(convertedMembers, {
       categories: config.categories,
@@ -37,6 +47,7 @@ export function LedenlijstView({ config, members = [] }: LedenlijstViewProps) {
       showVotingRights: config.display.showVotingRights,
       actieveLedenOnly: true
     });
+    
     setFilteredMembers(filtered);
     setCurrentPage(0);
   }, [config, members]);

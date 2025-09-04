@@ -340,7 +340,10 @@ export default function Bestuur() {
                         </div>
                         <div className="text-gray-600">
                           <strong>Mandaat:</strong> {format(new Date(item.boardMember.termStart), 'dd MMM yyyy', { locale: nl })}
-                          {item.boardMember.termEnd && ` - ${format(new Date(item.boardMember.termEnd), 'dd MMM yyyy', { locale: nl })}`}
+                          {item.boardMember.termEnd ? 
+                            ` - ${format(new Date(item.boardMember.termEnd), 'dd MMM yyyy', { locale: nl })}` : 
+                            ' - heden'
+                          }
                         </div>
                         {email && (
                           <div className="flex items-center gap-2 text-gray-600">

@@ -30,12 +30,12 @@ export function FiltersToolbar({
     <div className="space-y-4">
       {/* First Row: Category, Method, Member */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Select value={filters.category || ""} onValueChange={(value) => updateFilter('category', value || undefined)}>
+        <Select value={filters.category || "ALL_CATEGORIES"} onValueChange={(value) => updateFilter('category', value === 'ALL_CATEGORIES' ? undefined : value)}>
           <SelectTrigger data-testid="select-category-filter">
             <SelectValue placeholder="Alle categorieën" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Alle categorieën</SelectItem>
+            <SelectItem value="ALL_CATEGORIES">Alle categorieën</SelectItem>
             {allCategories.map((category) => (
               <SelectItem key={category} value={category}>
                 {category}
@@ -57,12 +57,12 @@ export function FiltersToolbar({
           </SelectContent>
         </Select>
         
-        <Select value={filters.memberId || ""} onValueChange={(value) => updateFilter('memberId', value || undefined)}>
+        <Select value={filters.memberId || "ALL_MEMBERS"} onValueChange={(value) => updateFilter('memberId', value === 'ALL_MEMBERS' ? undefined : value)}>
           <SelectTrigger data-testid="select-member-filter">
             <SelectValue placeholder="Alle leden" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Alle leden</SelectItem>
+            <SelectItem value="ALL_MEMBERS">Alle leden</SelectItem>
             {mockMembers.map((member) => (
               <SelectItem key={member.id} value={member.id}>
                 {member.name}

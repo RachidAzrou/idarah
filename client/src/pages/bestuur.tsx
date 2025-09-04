@@ -307,7 +307,7 @@ export default function Bestuur() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-testid="board-members-grid">
             {isLoading ? (
               Array.from({ length: 6 }).map((_, i) => (
-                <Card key={i} className="animate-pulse">
+                <Card key={i} className="glass-card animate-pulse">
                   <CardHeader>
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 bg-gray-200 rounded-full"></div>
@@ -335,7 +335,7 @@ export default function Bestuur() {
                 const name = getName(item);
                 
                 return (
-                  <Card key={item.boardMember.id} className="hover:shadow-lg transition-shadow" data-testid={`card-board-member-${item.boardMember.id}`}>
+                  <Card key={item.boardMember.id} className="glass-card card-hover animate-fade-in group border-0" data-testid={`card-board-member-${item.boardMember.id}`}>
                     <CardHeader>
                       <div className="flex items-center gap-3">
                         <Avatar className="w-12 h-12">
@@ -385,7 +385,7 @@ export default function Bestuur() {
                           </div>
                         )}
                         {item.boardMember.responsibilities && (
-                          <div className="text-gray-600 text-xs mt-3 p-2 bg-gray-50 rounded">
+                          <div className="text-gray-600 text-xs mt-3 p-2 glass-card border-0 rounded">
                             <strong>Verantwoordelijkheden:</strong>
                             <p className="mt-1" data-testid={`text-responsibilities-${item.boardMember.id}`}>
                               {item.boardMember.responsibilities}
@@ -475,7 +475,7 @@ export default function Bestuur() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-testid="history-grid">
             {isLoading ? (
               Array.from({ length: 6 }).map((_, i) => (
-                <Card key={i} className="animate-pulse">
+                <Card key={i} className="glass-card animate-pulse">
                   <CardHeader>
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 bg-gray-200 rounded-full"></div>
@@ -517,7 +517,7 @@ export default function Bestuur() {
                   const { email, phone } = getContact(item);
 
                   return (
-                    <Card key={item.boardMember.id} className="opacity-75 border-gray-300" data-testid={`history-card-${item.boardMember.id}`}>
+                    <Card key={item.boardMember.id} className="glass-card card-hover animate-fade-in group border-0 opacity-75" data-testid={`history-card-${item.boardMember.id}`}>
                       <CardHeader className="pb-3">
                         <div className="flex items-center gap-3">
                           <Avatar className="w-12 h-12">
@@ -564,7 +564,7 @@ export default function Bestuur() {
                             </div>
                           )}
                           {item.boardMember.responsibilities && (
-                            <div className="text-gray-500 text-xs mt-3 p-2 bg-gray-50 rounded">
+                            <div className="text-gray-500 text-xs mt-3 p-2 glass-card border-0 rounded">
                               <strong>Verantwoordelijkheden:</strong>
                               <p className="mt-1" data-testid={`history-responsibilities-${item.boardMember.id}`}>
                                 {item.boardMember.responsibilities}

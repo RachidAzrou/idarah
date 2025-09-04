@@ -95,12 +95,23 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
   const [selectedMember, setSelectedMember] = useState<any>(null);
   const [activeTab, setActiveTab] = useState(isEditMode ? "personal" : "linking");
 
-  // Fetch members for autocomplete (search by name or member number)
-  const { data: members } = useQuery<any[]>({
-    queryKey: ["/api/members", { q: memberSearch }],
+  // Fetch all members for search
+  const { data: allMembers = [] } = useQuery<any[]>({
+    queryKey: ["/api/members"],
     staleTime: 10000,
-    enabled: linkType === 'EXISTING_MEMBER' && memberSearch.length > 1,
+    enabled: linkType === 'EXISTING_MEMBER',
   });
+
+  // Filter members based on search locally
+  const filteredMembers = allMembers.filter((member: any) => {
+    if (!memberSearch || memberSearch.length < 2) return false;
+    const searchLower = memberSearch.toLowerCase();
+    const fullName = `${member.firstName} ${member.lastName}`.toLowerCase();
+    return (
+      fullName.includes(searchLower) ||
+      member.memberNumber.toString().includes(searchLower)
+    );
+  }).slice(0, 10); // Limit to 10 results
 
   // Fetch member details for edit mode
   const { data: memberDetails } = useQuery<any>({
@@ -263,8 +274,8 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
                               
                               {memberSearch && memberSearch.length > 1 && (
                                 <div className="max-h-40 overflow-y-auto border border-gray-200 rounded-md bg-white">
-                                  {members && members.length > 0 ? (
-                                    members.map((member) => (
+                                  {filteredMembers && filteredMembers.length > 0 ? (
+                                    filteredMembers.map((member) => (
                                       <div
                                         key={member.id}
                                         className="p-2 hover:bg-gray-50 cursor-pointer border-b last:border-b-0"

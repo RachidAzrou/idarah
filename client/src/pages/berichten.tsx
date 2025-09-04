@@ -22,7 +22,7 @@ import { Mail, Plus, Send, Users, Eye, Settings, Ban, Edit, Play, TestTube, Chev
 import { PiPuzzlePiece, PiHandWaving } from "react-icons/pi";
 import { CgTemplate } from "react-icons/cg";
 import { MdEvent } from "react-icons/md";
-import { LuSend, LuLogs, LuPartyPopper } from "react-icons/lu";
+import { LuSend, LuLogs, LuPartyPopper, LuBellRing } from "react-icons/lu";
 import { TbHandStop, TbClockExclamation } from "react-icons/tb";
 import { GrGroup } from "react-icons/gr";
 import { FaArrowsDownToPeople } from "react-icons/fa6";

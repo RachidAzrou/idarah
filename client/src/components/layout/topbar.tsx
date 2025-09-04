@@ -1,4 +1,5 @@
-import { Search, Bell, Menu, Command, HelpCircle } from "lucide-react";
+import { Search, Menu, Command, HelpCircle } from "lucide-react";
+import { LuBellRing } from "react-icons/lu";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -51,7 +52,7 @@ export default function Topbar() {
 
         {/* Notifications */}
         <Button variant="ghost" size="sm" className="relative h-9 w-9 focus-ring" data-testid="notifications-button">
-          <Bell className="h-4 w-4" />
+          <LuBellRing className="h-4 w-4" />
           <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 w-5 text-xs flex items-center justify-center p-0 border-2 border-background" data-testid="notification-count">
             3
           </Badge>

@@ -59,10 +59,10 @@ export default function Sidebar() {
                       <Link
                         href={item.href}
                         className={cn(
-                          "group relative flex gap-x-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 focus-ring",
+                          "group relative flex gap-x-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-300 ease-out focus-ring",
                           isActive
-                            ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-sm"
-                            : "text-sidebar-foreground hover:text-sidebar-foreground hover:bg-sidebar-accent"
+                            ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-lg shadow-blue-500/20 scale-105 border border-blue-400/30"
+                            : "text-sidebar-foreground hover:text-sidebar-foreground hover:bg-sidebar-accent hover:shadow-md hover:scale-102 hover:-translate-y-0.5"
                         )}
                         data-testid={`nav-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
                       >
@@ -83,15 +83,15 @@ export default function Sidebar() {
         {/* User Profile */}
         {user && (
           <div className="mt-auto pt-4 border-t border-sidebar-border">
-            <div className="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-sidebar-accent cursor-pointer transition-colors duration-200" data-testid="user-profile">
-              <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                <span className="text-sm font-medium text-primary-foreground">
+            <div className="flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-sidebar-accent cursor-pointer transition-all duration-300 ease-out hover:shadow-md hover:scale-102 hover:-translate-y-0.5" data-testid="user-profile">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg ring-2 ring-blue-400/20">
+                <span className="text-sm font-semibold text-white">
                   {getUserInitials(user.name)}
                 </span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-sidebar-foreground truncate" data-testid="user-name">{user.name}</p>
-                <p className="text-xs text-sidebar-foreground/70" data-testid="user-role">{user.role}</p>
+                <p className="text-sm font-semibold text-sidebar-foreground truncate" data-testid="user-name">{user.name}</p>
+                <p className="text-xs text-sidebar-foreground/70 font-medium" data-testid="user-role">{user.role}</p>
               </div>
             </div>
           </div>

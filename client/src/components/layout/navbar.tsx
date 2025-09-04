@@ -71,10 +71,10 @@ export default function Navbar() {
                   key={item.name}
                   href={item.href}
                   className={cn(
-                    "flex items-center gap-x-1 px-2 py-1.5 text-sm font-medium rounded-md transition-all duration-200",
+                    "flex items-center gap-x-2 px-3 py-2 text-sm font-medium rounded-xl transition-all duration-300 ease-out",
                     isActive
-                      ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-sm"
-                      : "text-sidebar-foreground hover:text-sidebar-foreground hover:bg-sidebar-accent"
+                      ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-lg shadow-blue-500/20 scale-105"
+                      : "text-sidebar-foreground hover:text-sidebar-foreground hover:bg-sidebar-accent hover:shadow-md hover:scale-102 hover:-translate-y-0.5"
                   )}
                   data-testid={`nav-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
                 >
@@ -114,9 +114,9 @@ export default function Navbar() {
           {user && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="flex items-center gap-x-3 h-9 px-3 text-sidebar-foreground hover:bg-sidebar-accent focus-ring" data-testid="profile-button">
-                  <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                    <span className="text-sm font-medium text-primary-foreground">
+                <Button variant="ghost" size="sm" className="flex items-center gap-x-3 h-11 px-4 text-sidebar-foreground hover:bg-sidebar-accent focus-ring rounded-xl transition-all duration-300 ease-out hover:shadow-md hover:scale-102" data-testid="profile-button">
+                  <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg ring-2 ring-blue-400/20">
+                    <span className="text-sm font-semibold text-white">
                       {getUserInitials(user.name)}
                     </span>
                   </div>

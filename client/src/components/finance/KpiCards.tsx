@@ -21,23 +21,23 @@ interface KpiCardProps {
 
 function KpiCard({ title, value, delta, icon, iconBgColor = "bg-blue-50" }: KpiCardProps) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow">
+    <div className="glass-card rounded-2xl p-6 card-hover animate-fade-in group">
       <div className="flex items-center justify-between">
         <div className="flex-1">
-          <p className="text-xs font-medium text-gray-500 mb-1">{title}</p>
-          <p className="text-lg font-bold text-gray-900 mb-1">{value}</p>
-          <div className="flex items-center space-x-1">
+          <p className="text-sm font-medium text-muted-foreground mb-2">{title}</p>
+          <p className="text-2xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors duration-300">{value}</p>
+          <div className="flex items-center space-x-2">
             {delta.positive ? (
-              <TrendingUp className="h-3 w-3 text-blue-600" />
+              <TrendingUp className="h-4 w-4 text-green-600" />
             ) : (
-              <TrendingDown className="h-3 w-3 text-red-500" />
+              <TrendingDown className="h-4 w-4 text-red-500" />
             )}
-            <span className={`text-xs font-medium ${delta.positive ? 'text-green-600' : 'text-red-500'}`}>
+            <span className={`text-sm font-medium ${delta.positive ? 'text-green-600' : 'text-red-500'}`}>
               {delta.value}
             </span>
           </div>
         </div>
-        <div className={`w-8 h-8 ${iconBgColor} rounded-full flex items-center justify-center`}>
+        <div className={`w-12 h-12 ${iconBgColor} rounded-2xl flex items-center justify-center shadow-lg ring-2 ring-white/10 group-hover:scale-110 transition-transform duration-300`}>
           {icon}
         </div>
       </div>

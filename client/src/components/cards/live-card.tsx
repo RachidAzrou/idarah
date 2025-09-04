@@ -238,7 +238,10 @@ export function LiveCard({
                     className="h-6 w-auto mb-2 opacity-90"
                   />
                 )}
-                <h1 className="embossed-text text-3xl font-bold uppercase tracking-wider">
+                <h1 className={`embossed-text font-bold uppercase tracking-wider ${
+                  tenant.name.length > 15 ? 'text-xl' : 
+                  tenant.name.length > 10 ? 'text-2xl' : 'text-3xl'
+                }`}>
                   Lidkaart {tenant.name.toUpperCase()}
                 </h1>
               </div>

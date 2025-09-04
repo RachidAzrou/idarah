@@ -182,7 +182,7 @@ export function MembershipCard({
                   className="h-6 w-auto mb-2 opacity-90"
                 />
               )}
-              <h1 className={`embossed-text font-bold uppercase tracking-wider ${isConstrained ? 'text-xl' : 'text-3xl'}`}>
+              <h1 className={`embossed-text font-bold uppercase tracking-wider ${isConstrained ? 'text-xl' : cardData.tenant.name.length > 15 ? 'text-xl' : cardData.tenant.name.length > 10 ? 'text-2xl' : 'text-3xl'}`}>
                 Lidkaart {cardData.tenant.name.toUpperCase()}
               </h1>
             </div>

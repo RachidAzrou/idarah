@@ -25,6 +25,7 @@ import { MdEvent } from "react-icons/md";
 import { LuSend, LuLogs } from "react-icons/lu";
 import { TbHandStop, TbClockExclamation } from "react-icons/tb";
 import { GrGroup } from "react-icons/gr";
+import { FaArrowsDownToPeople } from "react-icons/fa6";
 
 // Function to convert plain text to professional HTML
 function convertToHTML(plainText: string): string {
@@ -526,8 +527,8 @@ export default function Berichten() {
             Templates
           </TabsTrigger>
           <TabsTrigger value="segments" data-testid="tab-segments">
-            <Users className="w-4 h-4 mr-2" />
-            Segmenten
+            <FaArrowsDownToPeople className="w-4 h-4 mr-2" />
+            Verzendgroepen
           </TabsTrigger>
           <TabsTrigger value="send" data-testid="tab-send">
             <Send className="w-4 h-4 mr-2" />
@@ -1166,14 +1167,17 @@ Het organisatieteam van {{tenant.name}}`
           </div>
         </TabsContent>
 
-        {/* Segments Tab */}
+        {/* Verzendgroepen Tab */}
         <TabsContent value="segments" className="space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-medium">Segmenten</h2>
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900">Verzendgroepen</h2>
+              <p className="text-sm text-gray-600 mt-1">Maak groepen op basis van criteria zoals stemrecht, status, categorie, leeftijd en geslacht</p>
+            </div>
             {canEdit && (
-              <Button onClick={handleNewSegment} className="flex items-center gap-2" data-testid="button-new-segment">
+              <Button onClick={handleNewSegment} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700" data-testid="button-new-segment">
                 <Plus className="w-4 h-4" />
-                Nieuw Segment
+                Nieuwe Verzendgroep
               </Button>
             )}
           </div>
@@ -1190,13 +1194,13 @@ Het organisatieteam van {{tenant.name}}`
               ))
             ) : !segments || !Array.isArray(segments) || segments.length === 0 ? (
               <div className="col-span-full text-center py-12" data-testid="segments-empty-state">
-                <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Nog geen segmenten</h3>
-                <p className="text-gray-500 mb-4">Maak je eerste lid segment</p>
+                <FaArrowsDownToPeople className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Nog geen verzendgroepen</h3>
+                <p className="text-gray-500 mb-4">Maak je eerste verzendgroep op basis van criteria zoals stemrecht, categorie of leeftijd</p>
                 {canEdit && (
-                  <Button data-testid="button-add-first-segment">
+                  <Button onClick={handleNewSegment} data-testid="button-add-first-segment">
                     <Plus className="w-4 h-4 mr-2" />
-                    Segment Toevoegen
+                    Verzendgroep Toevoegen
                   </Button>
                 )}
               </div>
@@ -1681,7 +1685,7 @@ Het organisatieteam van {{tenant.name}}`
       <Dialog open={showSegmentDialog} onOpenChange={setShowSegmentDialog}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>{editingSegment ? 'Segment Bewerken' : 'Nieuw Segment'}</DialogTitle>
+            <DialogTitle>{editingSegment ? 'Verzendgroep Bewerken' : 'Nieuwe Verzendgroep'}</DialogTitle>
           </DialogHeader>
           <Form {...segmentForm}>
             <form onSubmit={segmentForm.handleSubmit(onSegmentSubmit)} className="space-y-6">
@@ -1690,9 +1694,9 @@ Het organisatieteam van {{tenant.name}}`
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Segment Naam</FormLabel>
+                    <FormLabel>Verzendgroep Naam</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Bijv. Actieve Leden" />
+                      <Input {...field} placeholder="Bijv. Stemgerechtigde Leden, Senioren 65+, Families" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -1701,8 +1705,8 @@ Het organisatieteam van {{tenant.name}}`
 
               <div className="space-y-6">
                 <div>
-                  <Label className="text-base font-medium">Filter Criteria</Label>
-                  <p className="text-sm text-gray-600 mt-1">Definieer wie dit segment moet ontvangen</p>
+                  <Label className="text-base font-medium">Selectie Criteria</Label>
+                  <p className="text-sm text-gray-600 mt-1">Selecteer leden op basis van stemrecht, status, categorie, leeftijd en geslacht</p>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-6">
@@ -1711,17 +1715,47 @@ Het organisatieteam van {{tenant.name}}`
                     <h4 className="font-medium text-sm">Status & Rechten</h4>
                     <div className="space-y-3">
                       <div>
-                        <Label>Alleen Actieve Leden</Label>
+                        <Label>Stemrecht</Label>
                         <Select
-                          value={segmentForm.watch("rules.memberActive") ? "true" : "false"}
-                          onValueChange={(value) => segmentForm.setValue("rules.memberActive", value === "true")}
+                          value={segmentForm.watch("rules.hasVotingRights") !== undefined ? (segmentForm.watch("rules.hasVotingRights") ? "true" : "false") : ""}
+                          onValueChange={(value) => {
+                            if (value === "") {
+                              segmentForm.setValue("rules.hasVotingRights" as any, undefined);
+                            } else {
+                              segmentForm.setValue("rules.hasVotingRights" as any, value === "true");
+                            }
+                          }}
                         >
                           <SelectTrigger>
-                            <SelectValue />
+                            <SelectValue placeholder="Alle leden" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="true">Ja</SelectItem>
-                            <SelectItem value="false">Nee</SelectItem>
+                            <SelectItem value="">Alle leden</SelectItem>
+                            <SelectItem value="true">Alleen stemgerechtigde leden</SelectItem>
+                            <SelectItem value="false">Alleen niet-stemgerechtigde leden</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div>
+                        <Label>Status</Label>
+                        <Select
+                          value={segmentForm.watch("rules.memberActive") !== undefined ? (segmentForm.watch("rules.memberActive") ? "true" : "false") : ""}
+                          onValueChange={(value) => {
+                            if (value === "") {
+                              segmentForm.setValue("rules.memberActive", undefined);
+                            } else {
+                              segmentForm.setValue("rules.memberActive", value === "true");
+                            }
+                          }}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Alle statussen" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="">Alle statussen</SelectItem>
+                            <SelectItem value="true">Alleen actieve leden</SelectItem>
+                            <SelectItem value="false">Alleen inactieve leden</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>

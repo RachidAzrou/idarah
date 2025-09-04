@@ -149,7 +149,7 @@ export function LedenlijstView({ config, members = [] }: LedenlijstViewProps) {
       <div className="absolute inset-0 bg-gray-100/80"></div>
       {/* Header */}
       <div className="text-center mb-12 relative z-10">
-        <div className="bg-white rounded-2xl p-8 border border-gray-200 mx-auto max-w-4xl" style={{ boxShadow: '0 6px 16px rgba(2,6,23,0.08)' }}>
+        <div className="bg-white rounded-2xl p-8 border border-gray-200" style={{ boxShadow: '0 6px 16px rgba(2,6,23,0.08)' }}>
           <h1
             style={{
               fontSize: `${config.title.fontSize}px`,

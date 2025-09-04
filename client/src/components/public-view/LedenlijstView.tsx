@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { LedenlijstConfig } from "@/lib/mock/public-screens";
 import { monthNames, getFilteredMembers, getMemberDisplayName, Member } from "@/lib/mock/members-data";
 import { Check, X, Vote } from "lucide-react";
@@ -13,12 +13,9 @@ interface LedenlijstViewProps {
 
 export function LedenlijstView({ config, members = [] }: LedenlijstViewProps) {
   const [currentPage, setCurrentPage] = useState(0);
-  const [filteredMembers, setFilteredMembers] = useState<Member[]>([]);
 
-  useEffect(() => {
-    
-    // Convert real member data to the format expected by getFilteredMembers
-    const convertedMembers: Member[] = members.map((member: any) => {
+  const convertedMembers = useMemo(() => {
+    return members.map((member: any) => {
       // Map database categories to display categories
       let displayCategory = member.category;
       if (member.category === 'STUDENT') displayCategory = 'Student';
@@ -38,8 +35,9 @@ export function LedenlijstView({ config, members = [] }: LedenlijstViewProps) {
         betalingen: {} // Payment data by year
       };
     });
-    
-    
+  }, [members]);
+  
+  const filteredMembers = useMemo(() => {
     const filtered = getFilteredMembers(convertedMembers, {
       categories: config.categories,
       useFullNames: config.display.useFullNames,
@@ -48,15 +46,18 @@ export function LedenlijstView({ config, members = [] }: LedenlijstViewProps) {
       showVotingRights: config.display.showVotingRights,
       actieveLedenOnly: true
     });
-    
-    setFilteredMembers(filtered);
+    return filtered;
+  }, [convertedMembers, config.categories, config.display.filterByCategories, config.display.useFullNames, config.display.useInitials, config.display.showVotingRights]);
+  
+  useEffect(() => {
     setCurrentPage(0);
-  }, [config, members]);
+  }, [filteredMembers.length]);
 
   const totalPages = Math.ceil(filteredMembers.length / config.display.rowsPerPage);
   const startIndex = currentPage * config.display.rowsPerPage;
   const endIndex = startIndex + config.display.rowsPerPage;
   const currentMembers = filteredMembers.slice(startIndex, endIndex);
+  
   
 
   // Auto-advance pages

@@ -2079,6 +2079,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.delete('/api/messages/segments/:id', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      // Check permissions - only BEHEERDER and SUPERADMIN can delete
+      if (req.user!.role === 'MEDEWERKER') {
+        return res.status(403).json({ error: "Geen toegang" });
+      }
+
+      await emailService.deleteSegment(req.user!.tenantId, req.params.id);
+      res.status(204).send();
+    } catch (error) {
+      console.error('Error deleting segment:', error);
+      res.status(500).json({ error: "Fout bij verwijderen segment" });
+    }
+  });
+
   app.post('/api/messages/segments/:id/preview', authMiddleware, async (req: AuthenticatedRequest, res) => {
     try {
       const segment = await db.select()

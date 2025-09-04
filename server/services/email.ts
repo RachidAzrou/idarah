@@ -239,6 +239,14 @@ export class EmailService {
     return segment;
   }
 
+  async deleteSegment(tenantId: string, id: string) {
+    await db.delete(emailSegments)
+      .where(and(
+        eq(emailSegments.tenantId, tenantId),
+        eq(emailSegments.id, id)
+      ));
+  }
+
   async resolveSegment(tenantId: string, rules: any): Promise<Array<{memberId: string, email: string}>> {
     // Apply filters based on rules
     const conditions: any[] = [eq(members.tenantId, tenantId)];

@@ -323,6 +323,26 @@ export default function Berichten() {
     }
   });
 
+  const deleteSegmentMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return apiRequest("DELETE", `/api/messages/segments/${id}`);
+    },
+    onSuccess: () => {
+      // Invalidate and refetch segments
+      queryClient.invalidateQueries({ queryKey: ["/api/messages/segments"] });
+      toast({ title: "Verzendgroep verwijderd", description: "De verzendgroep is succesvol verwijderd." });
+      setShowDeleteSegmentDialog(false);
+      setSegmentToDelete(null);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fout bij verwijderen verzendgroep",
+        description: error.message || "Er is een fout opgetreden",
+        variant: "destructive"
+      });
+    }
+  });
+
   const createSegmentMutation = useMutation({
     mutationFn: async (data: z.infer<typeof segmentSchema>) => {
       return apiRequest("POST", "/api/messages/segments", data);
@@ -458,14 +478,7 @@ export default function Berichten() {
 
   const confirmDeleteSegment = () => {
     if (segmentToDelete) {
-      // TODO: Implement delete segment API call
-      toast({
-        title: "Verzendgroep verwijderd",
-        description: `"${segmentToDelete.name}" is succesvol verwijderd.`,
-        variant: "default"
-      });
-      setShowDeleteSegmentDialog(false);
-      setSegmentToDelete(null);
+      deleteSegmentMutation.mutate(segmentToDelete.id);
     }
   };
 

@@ -445,7 +445,8 @@ export function NewTransactionDialog({
                 )}
                 <Button 
                   type="submit" 
-                  disabled={loading}
+                  disabled={loading || activeTab !== 'overzicht'}
+                  variant={activeTab === 'overzicht' ? 'default' : 'outline'}
                   data-testid="button-save-transaction"
                 >
                   {loading ? 'Bezig...' : (isEditing ? 'Wijzigingen opslaan' : 'Transactie toevoegen')}

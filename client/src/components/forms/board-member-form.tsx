@@ -32,7 +32,8 @@ const boardMemberSchema = z.object({
   phone: z.string().optional(),
   
   // Board role info
-  role: z.string().min(1, "Rol is verplicht").default('BESTUURSLID'),
+  role: z.enum(['VOORZITTER', 'VICE_VOORZITTER', 'SECRETARIS', 'PENNINGMEESTER', 'BESTUURSLID', 'ANDERS']).default('BESTUURSLID'),
+  customRole: z.string().optional(),
   status: z.enum(['ACTIEF', 'INACTIEF']).default('ACTIEF'),
   termStart: z.union([
     z.date(),
@@ -62,6 +63,14 @@ const boardMemberSchema = z.object({
 }, {
   message: "Selecteer een lid of voer externe naam in",
   path: ["memberId"]
+}).refine((data) => {
+  if (data.role === 'ANDERS') {
+    return data.customRole && data.customRole.trim().length > 0;
+  }
+  return true;
+}, {
+  message: "Aangepaste rol is verplicht wanneer 'Anders' is geselecteerd",
+  path: ["customRole"]
 });
 
 type BoardMemberFormData = z.infer<typeof boardMemberSchema>;
@@ -130,6 +139,7 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
       email: initialData?.email || '',
       phone: initialData?.phone || '',
       role: initialData?.role || 'BESTUURSLID',
+      customRole: initialData?.customRole || '',
       termStart: initialData?.termStart ? new Date(initialData.termStart) : undefined,
       termEnd: initialData?.termEnd ? new Date(initialData.termEnd) : undefined,
       responsibilities: initialData?.responsibilities || '',
@@ -654,17 +664,50 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Rol</FormLabel>
-                      <FormControl>
-                        <Input 
-                          {...field} 
-                          placeholder="Voorzitter, Secretaris, Bestuurslid, etc."
-                          data-testid="input-role"
-                        />
-                      </FormControl>
+                      <Select 
+                        onValueChange={field.onChange} 
+                        defaultValue={field.value}
+                        data-testid="select-role"
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecteer een rol" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="BESTUURSLID">Gewoon Bestuurslid</SelectItem>
+                          <SelectItem value="VOORZITTER">Voorzitter</SelectItem>
+                          <SelectItem value="VICE_VOORZITTER">Vice-voorzitter</SelectItem>
+                          <SelectItem value="SECRETARIS">Secretaris</SelectItem>
+                          <SelectItem value="PENNINGMEESTER">Penningmeester</SelectItem>
+                          <SelectItem value="ANDERS">Anders</SelectItem>
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+
+                {/* Custom role field when "ANDERS" is selected */}
+                {form.watch("role") === "ANDERS" && (
+                  <FormField
+                    control={form.control}
+                    name="customRole"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Aangepaste rol</FormLabel>
+                        <FormControl>
+                          <Input 
+                            {...field} 
+                            placeholder="Bijv. Coördinator, Adviseur, ..."
+                            data-testid="input-custom-role"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
 
                 <div className="grid grid-cols-2 gap-4">
                   <FormField

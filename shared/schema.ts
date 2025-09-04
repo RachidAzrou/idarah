@@ -27,7 +27,7 @@ export const companyTypeEnum = pgEnum('company_type', ['VZW', 'BVBA', 'NV', 'VOF
 export const reconcileStatusEnum = pgEnum('reconcile_status', ['ONTVANGEN', 'VOORGESTELD', 'GEDEELTELIJK_GEMATCHT', 'GEMATCHT', 'AFGEKEURD', 'GEBOEKT']);
 export const statementTypeEnum = pgEnum('statement_type', ['BANK', 'CSV', 'MT940', 'CODA']);
 export const txnSideEnum = pgEnum('txn_side', ['CREDIT', 'DEBET']);
-export const boardRoleEnum = pgEnum('board_role', ['VOORZITTER', 'ONDERVERZITTER', 'SECRETARIS', 'PENNINGMEESTER', 'BESTUURSLID', 'ADVISEUR']);
+export const boardRoleEnum = pgEnum('board_role', ['VOORZITTER', 'VICE_VOORZITTER', 'SECRETARIS', 'PENNINGMEESTER', 'BESTUURSLID', 'ANDERS']);
 export const boardStatusEnum = pgEnum('board_status', ['ACTIEF', 'INACTIEF']);
 export const emailKindEnum = pgEnum('email_kind', ['TRANSACTIONEEL', 'MARKETING']);
 export const emailStatusEnum = pgEnum('email_status', ['DRAFT', 'QUEUED', 'SENDING', 'SENT', 'PARTIAL', 'FAILED', 'CANCELLED']);
@@ -246,6 +246,7 @@ export const boardMembers = pgTable("board_members", {
   email: text("email"),
   phone: text("phone"),
   role: boardRoleEnum("role").notNull(),
+  customRole: text("custom_role"), // custom role text when role is 'ANDERS'
   status: boardStatusEnum("status").default('ACTIEF').notNull(),
   termStart: timestamp("term_start").notNull(),
   termEnd: timestamp("term_end"),

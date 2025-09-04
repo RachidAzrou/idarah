@@ -550,27 +550,6 @@ export default function Berichten() {
             )}
           </div>
 
-          {/* Quick Template Info Card */}
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-start gap-4">
-                <div className="bg-blue-100 p-3 rounded-lg">
-                  <Mail className="w-6 h-6 text-blue-600" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Handlebars Variabelen</h3>
-                  <p className="text-sm text-gray-600 mb-4">Gebruik deze variabelen in je templates voor personalisatie:</p>
-                  <div className="flex flex-wrap gap-2">
-                    <Badge variant="outline">{'{{member.firstName}}'}</Badge>
-                    <Badge variant="outline">{'{{member.lastName}}'}</Badge>
-                    <Badge variant="outline">{'{{tenant.name}}'}</Badge>
-                    <Badge variant="outline">{'{{tenant.email}}'}</Badge>
-                    <Badge variant="outline">{'{{card.url}}'}</Badge>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-testid="templates-grid">
             {templatesLoading ? (

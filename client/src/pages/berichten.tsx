@@ -370,9 +370,12 @@ export default function Berichten() {
 
 
   const onTemplateSubmit = (data: z.infer<typeof templateSchema>) => {
+    console.log('Submitting template with data:', data);
     if (editingTemplate) {
+      console.log('Updating existing template:', editingTemplate.id);
       updateTemplateMutation.mutate({ id: editingTemplate.id, data });
     } else {
+      console.log('Creating new template');
       createTemplateMutation.mutate(data);
     }
   };

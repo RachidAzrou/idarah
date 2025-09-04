@@ -146,9 +146,9 @@ export default function Bestuur() {
   // Mutation for deactivating board member
   const deactivateBoardMemberMutation = useMutation({
     mutationFn: async (id: string) => {
-      return apiRequest('PUT', `/api/board/members/${id}`, { 
-        status: 'INACTIEF',
-        termEnd: new Date().toISOString()
+      return apiRequest('POST', `/api/board/members/${id}/end-term`, { 
+        endDate: new Date().toISOString(),
+        note: "Beëindigd via bestuurspagina"
       });
     },
     onSuccess: () => {

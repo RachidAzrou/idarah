@@ -17,27 +17,27 @@ interface KpiCardProps {
 
 function KpiCard({ title, value, delta, icon, iconBgColor, deltaColor }: KpiCardProps) {
   return (
-    <div className="glass-card rounded-2xl p-6 card-hover animate-fade-in group relative overflow-hidden">
+    <div className="glass-card rounded-xl p-4 card-hover animate-fade-in group relative overflow-hidden">
       {/* Subtle gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
       
       <div className="flex items-center justify-between relative z-10">
         <div className="flex-1">
-          <p className="text-sm font-semibold text-muted-foreground mb-2 tracking-wide">{title}</p>
-          <p className="text-3xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors duration-300 tabular-nums">{value}</p>
-          <div className="flex items-center space-x-2">
+          <p className="text-xs font-medium text-muted-foreground mb-1">{title}</p>
+          <p className="text-lg font-bold text-foreground mb-2 group-hover:text-primary transition-colors duration-300 tabular-nums">{value}</p>
+          <div className="flex items-center space-x-1">
             {delta.positive ? (
-              <TrendingUp className="h-4 w-4 text-green-600 group-hover:scale-110 transition-transform duration-300" />
+              <TrendingUp className="h-3 w-3 text-green-600 group-hover:scale-110 transition-transform duration-300" />
             ) : (
-              <TrendingDown className="h-4 w-4 text-red-500 group-hover:scale-110 transition-transform duration-300" />
+              <TrendingDown className="h-3 w-3 text-red-500 group-hover:scale-110 transition-transform duration-300" />
             )}
-            <span className={`text-sm font-semibold ${deltaColor || (delta.positive ? 'text-green-600' : 'text-red-500')} group-hover:text-opacity-80 transition-all duration-300`}>
+            <span className={`text-xs font-medium ${deltaColor || (delta.positive ? 'text-green-600' : 'text-red-500')} group-hover:text-opacity-80 transition-all duration-300`}>
               {delta.value}
             </span>
           </div>
         </div>
-        <div className={`w-14 h-14 ${iconBgColor} rounded-2xl flex items-center justify-center shadow-xl ring-4 ring-white/20 group-hover:scale-110 group-hover:shadow-2xl transition-all duration-300 relative`}>
-          <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-2xl"></div>
+        <div className={`w-10 h-10 ${iconBgColor} rounded-xl flex items-center justify-center shadow-md ring-2 ring-white/10 group-hover:scale-110 transition-all duration-300 relative`}>
+          <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-xl"></div>
           <div className="relative">{icon}</div>
         </div>
       </div>

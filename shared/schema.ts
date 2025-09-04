@@ -728,6 +728,19 @@ export const insertBoardMemberSchema = createInsertSchema(boardMembers).omit({
   updatedAt: true,
 }).extend({
   role: z.string().optional().default('BESTUURSLID'),
+  // Allow string dates to be converted to Date objects
+  termStart: z.union([
+    z.date(),
+    z.string().transform((val) => new Date(val))
+  ]).refine((date) => date instanceof Date && !isNaN(date.getTime()), {
+    message: "Ongeldige startdatum"
+  }),
+  termEnd: z.union([
+    z.date(),
+    z.string().transform((val) => new Date(val))
+  ]).refine((date) => date instanceof Date && !isNaN(date.getTime()), {
+    message: "Ongeldige einddatum"
+  }),
 });
 
 export const insertBoardTermSchema = createInsertSchema(boardTerms).omit({

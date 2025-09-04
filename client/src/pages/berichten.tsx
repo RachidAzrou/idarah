@@ -366,7 +366,7 @@ export default function Berichten() {
         </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid grid-cols-6 w-auto" data-testid="message-tabs">
+        <TabsList className="grid grid-cols-4 w-auto" data-testid="message-tabs">
           <TabsTrigger value="templates" data-testid="tab-templates">
             <CgTemplate className="w-4 h-4 mr-2" />
             Templates
@@ -382,14 +382,6 @@ export default function Berichten() {
           <TabsTrigger value="send" data-testid="tab-send">
             <LuSend className="w-4 h-4 mr-2" />
             Verzenden
-          </TabsTrigger>
-          <TabsTrigger value="logs" data-testid="tab-logs">
-            <LuLogs className="w-4 h-4 mr-2" />
-            Logs
-          </TabsTrigger>
-          <TabsTrigger value="unsubscribe" data-testid="tab-unsubscribe">
-            <TbHandStop className="w-4 h-4 mr-2" />
-            Uitschrijvingen
           </TabsTrigger>
         </TabsList>
 
@@ -672,41 +664,6 @@ export default function Berichten() {
           </Card>
         </TabsContent>
 
-        {/* Logs Tab */}
-        <TabsContent value="logs" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>E-mail Logs</CardTitle>
-              <CardDescription>
-                Overzicht van alle verzonden e-mails en hun status
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8" data-testid="logs-placeholder">
-                <Eye className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500">E-mail logs functionaliteit wordt binnenkort toegevoegd</p>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Unsubscribe Tab */}
-        <TabsContent value="unsubscribe" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Uitschrijvingen</CardTitle>
-              <CardDescription>
-                Beheer uitschrijvingen van marketing e-mails
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8" data-testid="unsubscribe-placeholder">
-                <Ban className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500">Uitschrijving functionaliteit wordt binnenkort toegevoegd</p>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
       </Tabs>
 
       {/* Template Dialog */}

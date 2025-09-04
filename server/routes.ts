@@ -10,7 +10,9 @@ import { feeService } from "./services/fee";
 import { financialService } from "./services/financial";
 import { cardService } from "./services/card";
 import { ruleService } from "./services/ruleService";
-import { insertUserSchema, insertMemberSchema, insertMembershipFeeSchema, membershipCards, eq } from "@shared/schema";
+import { boardService } from "./services/board";
+import { insertUserSchema, insertMemberSchema, insertMembershipFeeSchema, cardMeta, insertBoardMemberSchema } from "@shared/schema";
+import { eq } from "drizzle-orm";
 import { db } from "./db";
 import { generateFeesHandler } from "./api/jobs/fees/generate";
 import { createMemberHandler } from "./api/members/create";
@@ -1811,6 +1813,136 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error creating voting rights override:', error);
       res.status(500).json({ error: "Fout bij aanmaken stemrecht override" });
+    }
+  });
+
+  // Board member endpoints
+  app.get('/api/board/members', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      const tenantId = req.user!.tenantId;
+      
+      // Special case: lookup by memberId for crown highlighting
+      if (req.query.memberId) {
+        const boardMember = await boardService.getBoardMemberByMemberId(tenantId, req.query.memberId as string);
+        return res.json(boardMember ? [boardMember] : []);
+      }
+
+      const filters = {
+        status: req.query.status as 'ACTIEF' | 'INACTIEF' | undefined,
+        role: req.query.role as string | undefined,
+        q: req.query.q as string | undefined,
+      };
+
+      const boardMembers = await boardService.listBoardMembers(tenantId, filters);
+      res.json(boardMembers);
+    } catch (error) {
+      console.error('Error fetching board members:', error);
+      res.status(500).json({ error: "Fout bij ophalen bestuursleden" });
+    }
+  });
+
+  app.get('/api/board/members/:id', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      const tenantId = req.user!.tenantId;
+      const boardMember = await boardService.getBoardMember(tenantId, req.params.id);
+      
+      if (!boardMember) {
+        return res.status(404).json({ error: "Bestuurslid niet gevonden" });
+      }
+
+      res.json(boardMember);
+    } catch (error) {
+      console.error('Error fetching board member:', error);
+      res.status(500).json({ error: "Fout bij ophalen bestuurslid" });
+    }
+  });
+
+  app.post('/api/board/members', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      // Check permissions - only BEHEERDER and SUPERADMIN can create
+      if (req.user!.role === 'MEDEWERKER') {
+        return res.status(403).json({ error: "Geen toegang" });
+      }
+
+      const tenantId = req.user!.tenantId;
+      const validatedData = insertBoardMemberSchema.parse(req.body);
+
+      const boardMember = await boardService.createBoardMember(tenantId, validatedData);
+      res.json(boardMember);
+    } catch (error) {
+      console.error('Error creating board member:', error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Ongeldige gegevens", details: error.errors });
+      }
+      res.status(500).json({ error: "Fout bij aanmaken bestuurslid" });
+    }
+  });
+
+  app.put('/api/board/members/:id', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      // Check permissions - only BEHEERDER and SUPERADMIN can update
+      if (req.user!.role === 'MEDEWERKER') {
+        return res.status(403).json({ error: "Geen toegang" });
+      }
+
+      const tenantId = req.user!.tenantId;
+      const validatedData = insertBoardMemberSchema.partial().parse(req.body);
+
+      const boardMember = await boardService.updateBoardMember(tenantId, req.params.id, validatedData);
+      
+      if (!boardMember) {
+        return res.status(404).json({ error: "Bestuurslid niet gevonden" });
+      }
+
+      res.json(boardMember);
+    } catch (error) {
+      console.error('Error updating board member:', error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Ongeldige gegevens", details: error.errors });
+      }
+      res.status(500).json({ error: "Fout bij bijwerken bestuurslid" });
+    }
+  });
+
+  app.post('/api/board/members/:id/end-term', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      // Check permissions - only BEHEERDER and SUPERADMIN can end terms
+      if (req.user!.role === 'MEDEWERKER') {
+        return res.status(403).json({ error: "Geen toegang" });
+      }
+
+      const tenantId = req.user!.tenantId;
+      const { endDate, note } = req.body;
+
+      const result = await boardService.endActiveTerm(
+        tenantId, 
+        req.params.id, 
+        new Date(endDate), 
+        note
+      );
+
+      res.json({ success: result });
+    } catch (error) {
+      console.error('Error ending board term:', error);
+      res.status(500).json({ error: "Fout bij beëindigen mandaat" });
+    }
+  });
+
+  app.post('/api/board/reorder', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      // Check permissions - only BEHEERDER and SUPERADMIN can reorder
+      if (req.user!.role === 'MEDEWERKER') {
+        return res.status(403).json({ error: "Geen toegang" });
+      }
+
+      const tenantId = req.user!.tenantId;
+      const orderData = req.body; // { id: string; orderIndex: number }[]
+
+      const result = await boardService.reorderBoard(tenantId, orderData);
+      res.json({ success: result });
+    } catch (error) {
+      console.error('Error reordering board:', error);
+      res.status(500).json({ error: "Fout bij herordenen bestuur" });
     }
   });
 

@@ -15,7 +15,8 @@ import {
   Menu,
   ChevronDown,
   IdCard,
-  User
+  User,
+  Crown
 } from "lucide-react";
 import { RiMoneyEuroCircleLine } from "react-icons/ri";
 import { PiHandCoinsFill } from "react-icons/pi";
@@ -33,6 +34,7 @@ const navigation = [
   { name: "Lidkaarten", href: "/lidkaarten", icon: IdCard },
   { name: "Lidgelden", href: "/lidgelden", icon: PiHandCoinsFill },
   { name: "Financiën", href: "/financien", icon: RiMoneyEuroCircleLine },
+  { name: "Mijn Bestuur", href: "/bestuur", icon: Crown },
   { name: "Publieke Schermen", href: "/publieke-schermen", icon: Monitor },
   { name: "Instellingen", href: "/instellingen", icon: Settings },
 ];

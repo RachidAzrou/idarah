@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { StatusBadge } from "@/components/ui/status-badge";
 import { RowActions } from "./row-actions";
 import { ChevronUp, ChevronDown, Users, UserX } from "lucide-react";
+import { BoardMemberBadge } from "@/components/ui/board-member-badge";
 import { CiExport } from "react-icons/ci";
 import { formatDate, getMemberCategoryLabel } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -253,8 +254,9 @@ export function MembersTable({
                   {member.memberNumber}
                 </TableCell>
                 <TableCell>
-                  <div className="font-medium">
+                  <div className="font-medium flex items-center gap-2">
                     {member.lastName}
+                    <BoardMemberBadge memberId={member.id} size="sm" />
                   </div>
                   <div className="text-sm text-gray-500 lg:hidden">
                     {member.firstName}

@@ -18,7 +18,7 @@ import {
   type User,
   type Member,
   type MemberFinancialSettings,
-  type MemberPermissions,
+  memberPermissions,
   type MembershipFee,
   type Transaction,
   type Rule,

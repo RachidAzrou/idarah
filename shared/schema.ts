@@ -27,6 +27,8 @@ export const companyTypeEnum = pgEnum('company_type', ['VZW', 'BVBA', 'NV', 'VOF
 export const reconcileStatusEnum = pgEnum('reconcile_status', ['ONTVANGEN', 'VOORGESTELD', 'GEDEELTELIJK_GEMATCHT', 'GEMATCHT', 'AFGEKEURD', 'GEBOEKT']);
 export const statementTypeEnum = pgEnum('statement_type', ['BANK', 'CSV', 'MT940', 'CODA']);
 export const txnSideEnum = pgEnum('txn_side', ['CREDIT', 'DEBET']);
+export const boardRoleEnum = pgEnum('board_role', ['VOORZITTER', 'ONDERVERZITTER', 'SECRETARIS', 'PENNINGMEESTER', 'BESTUURSLID', 'ADVISEUR']);
+export const boardStatusEnum = pgEnum('board_status', ['ACTIEF', 'INACTIEF']);
 
 // Tables
 export const tenants = pgTable("tenants", {
@@ -232,6 +234,35 @@ export const notifications = pgTable("notifications", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const boardMembers = pgTable("board_members", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tenantId: varchar("tenant_id").notNull(),
+  memberId: varchar("member_id"), // link naar Member indien intern
+  externalName: text("external_name"), // naam indien extern
+  email: text("email"),
+  phone: text("phone"),
+  role: boardRoleEnum("role").notNull(),
+  status: boardStatusEnum("status").default('ACTIEF').notNull(),
+  termStart: timestamp("term_start").notNull(),
+  termEnd: timestamp("term_end"),
+  responsibilities: text("responsibilities"),
+  orderIndex: integer("order_index").default(100).notNull(),
+  avatarUrl: text("avatar_url"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const boardTerms = pgTable("board_terms", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tenantId: varchar("tenant_id").notNull(),
+  boardMemberId: varchar("board_member_id").notNull(),
+  role: boardRoleEnum("role").notNull(),
+  start: timestamp("start").notNull(),
+  end: timestamp("end"),
+  note: text("note"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 export const sepaExports = pgTable("sepa_exports", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   tenantId: varchar("tenant_id").notNull(),
@@ -323,6 +354,8 @@ export const tenantsRelations = relations(tenants, ({ many }) => ({
   expenseCategories: many(expenseCategories),
   vendors: many(vendors),
   matchRules: many(matchRules),
+  boardMembers: many(boardMembers),
+  boardTerms: many(boardTerms),
 }));
 
 export const usersRelations = relations(users, ({ one }) => ({
@@ -350,6 +383,10 @@ export const membersRelations = relations(members, ({ one, many }) => ({
   mandates: many(mandates),
   transactions: many(transactions),
   ruleOutcomes: many(ruleOutcomes),
+  boardMember: one(boardMembers, {
+    fields: [members.id],
+    references: [boardMembers.memberId],
+  }),
 }));
 
 export const memberFinancialSettingsRelations = relations(memberFinancialSettings, ({ one }) => ({
@@ -464,6 +501,29 @@ export const notificationsRelations = relations(notifications, ({ one }) => ({
   user: one(users, {
     fields: [notifications.userId],
     references: [users.id],
+  }),
+}));
+
+export const boardMembersRelations = relations(boardMembers, ({ one, many }) => ({
+  tenant: one(tenants, {
+    fields: [boardMembers.tenantId],
+    references: [tenants.id],
+  }),
+  member: one(members, {
+    fields: [boardMembers.memberId],
+    references: [members.id],
+  }),
+  terms: many(boardTerms),
+}));
+
+export const boardTermsRelations = relations(boardTerms, ({ one }) => ({
+  tenant: one(tenants, {
+    fields: [boardTerms.tenantId],
+    references: [tenants.id],
+  }),
+  boardMember: one(boardMembers, {
+    fields: [boardTerms.boardMemberId],
+    references: [boardMembers.id],
   }),
 }));
 
@@ -658,6 +718,17 @@ export const insertMatchRuleSchema = createInsertSchema(matchRules).omit({
   createdAt: true,
 });
 
+export const insertBoardMemberSchema = createInsertSchema(boardMembers).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertBoardTermSchema = createInsertSchema(boardTerms).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type Tenant = typeof tenants.$inferSelect;
 export type InsertTenant = z.infer<typeof insertTenantSchema>;
@@ -718,6 +789,12 @@ export type InsertVendor = z.infer<typeof insertVendorSchema>;
 
 export type MatchRule = typeof matchRules.$inferSelect;
 export type InsertMatchRule = z.infer<typeof insertMatchRuleSchema>;
+
+export type BoardMember = typeof boardMembers.$inferSelect;
+export type InsertBoardMember = z.infer<typeof insertBoardMemberSchema>;
+
+export type BoardTerm = typeof boardTerms.$inferSelect;
+export type InsertBoardTerm = z.infer<typeof insertBoardTermSchema>;
 
 export type CardVerifyResponse = z.infer<typeof cardVerifyResponseSchema>;
 

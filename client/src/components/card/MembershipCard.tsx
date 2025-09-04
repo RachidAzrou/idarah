@@ -6,11 +6,13 @@ import { Badge } from "@/components/ui/badge";
 import { RefreshCw, Wifi, WifiOff, Clock } from "lucide-react";
 import { PiUserCircleCheckLight } from "react-icons/pi";
 import { cn } from "@/lib/utils";
+import { BoardMemberBadge } from "@/components/ui/board-member-badge";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 import fadingBlueBackground from "@assets/fading-blue-background_1756897101831.jpg";
 
 interface CardData {
+  memberId?: string;
   firstName: string;
   lastName: string;
   memberNumber: string;
@@ -269,6 +271,32 @@ export function MembershipCard({
               <h2 className="embossed-text text-[clamp(20px,2.4vmin,22px)] font-semibold uppercase tracking-wide leading-tight" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.9), -1px -1px 2px rgba(255,255,255,0.3), 0 0 8px rgba(255,255,255,0.1)', filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))'}}>
                 {cardData.firstName} {cardData.lastName}
               </h2>
+              {cardData.memberId && (
+                <div className="flex items-center gap-2 mt-2">
+                  <BoardMemberBadge 
+                    memberId={cardData.memberId} 
+                    variant="embossed"
+                    size="md"
+                    className="text-yellow-400"
+                  />
+                  <span 
+                    className="embossed-text text-[clamp(12px,1.6vmin,14px)] uppercase tracking-wide font-medium"
+                    style={{
+                      color: '#FFD700',
+                      textShadow: `
+                        2px 2px 0 rgba(255,255,255,0.3),
+                        -2px -2px 0 rgba(0,0,0,0.8),
+                        -3px -3px 0 rgba(0,0,0,0.6),
+                        inset 2px 2px 4px rgba(0,0,0,0.6),
+                        0 0 8px rgba(255,215,0,0.4)
+                      `,
+                      filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.5))'
+                    }}
+                  >
+                    BESTUURSLID
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Lidnummer and Category - side by side */}

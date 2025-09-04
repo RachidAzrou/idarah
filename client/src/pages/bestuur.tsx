@@ -270,7 +270,8 @@ export default function Bestuur() {
 
         <TabsContent value="overzicht" className="space-y-6">
           {/* Filters */}
-          <div className="flex gap-4 items-center">
+          <div className="glass-card card-hover animate-fade-in group border-0 p-6 rounded-xl">
+            <div className="flex gap-4 items-center">
             <Input
               placeholder="Zoek op naam of rol..."
               value={searchTerm}
@@ -301,6 +302,7 @@ export default function Bestuur() {
                 <SelectItem value="ADVISEUR">Adviseur</SelectItem>
               </SelectContent>
             </Select>
+            </div>
           </div>
 
           {/* Board Members Grid */}
@@ -447,7 +449,8 @@ export default function Bestuur() {
 
         <TabsContent value="historiek" className="space-y-6">
           {/* Historiek Filters */}
-          <div className="flex gap-4 items-center">
+          <div className="glass-card card-hover animate-fade-in group border-0 p-6 rounded-xl">
+            <div className="flex gap-4 items-center">
             <Input
               placeholder="Zoek in historiek..."
               value={searchTerm}
@@ -469,6 +472,7 @@ export default function Bestuur() {
                 <SelectItem value="ADVISEUR">Adviseur</SelectItem>
               </SelectContent>
             </Select>
+            </div>
           </div>
 
           {/* Historiek Grid */}

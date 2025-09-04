@@ -520,7 +520,7 @@ export default function Berichten() {
         </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
-        <TabsList className="grid grid-cols-3 w-fit" data-testid="message-tabs">
+        <TabsList className="grid grid-cols-3 w-full" data-testid="message-tabs">
           <TabsTrigger value="templates" data-testid="tab-templates">
             <Mail className="w-4 h-4 mr-2" />
             Templates

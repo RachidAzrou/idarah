@@ -551,36 +551,135 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Startdatum *</FormLabel>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <FormControl>
-                              <Button
-                                variant="outline"
-                                className={cn(
-                                  "w-full pl-3 text-left font-normal",
-                                  !field.value && "text-muted-foreground"
-                                )}
-                                data-testid="button-term-start"
-                              >
-                                {field.value ? (
-                                  format(field.value, "PPP", { locale: nl })
-                                ) : (
-                                  <span>Selecteer datum</span>
-                                )}
-                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                              </Button>
-                            </FormControl>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={field.value}
-                              onSelect={field.onChange}
-                              disabled={(date) => date > new Date()}
-                              initialFocus
+                        <FormControl>
+                          <div className="relative">
+                            <Input
+                              value={field.value ? format(field.value, "dd/MM/yyyy", { locale: nl }) : ""}
+                              onChange={(e) => {
+                                const inputValue = e.target.value;
+                                
+                                // Handle numeric input (e.g., 01012024 -> 01/01/2024)
+                                if (/^\d+$/.test(inputValue)) {
+                                  if (inputValue.length === 8) {
+                                    const day = inputValue.substring(0, 2);
+                                    const month = inputValue.substring(2, 4);
+                                    const year = inputValue.substring(4, 8);
+                                    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+                                    if (!isNaN(date.getTime()) && parseInt(month) >= 1 && parseInt(month) <= 12 && parseInt(day) >= 1 && parseInt(day) <= 31) {
+                                      field.onChange(date);
+                                      return;
+                                    }
+                                  }
+                                }
+                                
+                                // Handle formatted input (DD/MM/YYYY)
+                                if (inputValue.length === 10 && inputValue.includes('/')) {
+                                  const [day, month, year] = inputValue.split('/');
+                                  if (day && month && year) {
+                                    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+                                    if (!isNaN(date.getTime())) {
+                                      field.onChange(date);
+                                    }
+                                  }
+                                }
+                              }}
+                              placeholder="DD/MM/YYYY"
+                              className="pr-10 border-gray-200"
+                              data-testid="input-term-start"
+                              maxLength={10}
                             />
-                          </PopoverContent>
-                        </Popover>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  type="button"
+                                  className="absolute right-2 top-2 h-6 w-6 p-1 hover:bg-transparent hover:scale-100 focus:bg-transparent active:bg-transparent transition-none transform-none"
+                                >
+                                  <CalendarIcon className="h-4 w-4" />
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-auto p-0" align="start" side="bottom">
+                                <div className="p-3 border-b">
+                                  <div className="flex items-center justify-between space-x-2">
+                                    <Select
+                                      value={field.value ? field.value.getMonth().toString() : ""}
+                                      onValueChange={(month) => {
+                                        const currentDate = field.value || new Date();
+                                        const newDate = new Date(currentDate.getFullYear(), parseInt(month), currentDate.getDate());
+                                        field.onChange(newDate);
+                                      }}
+                                    >
+                                      <SelectTrigger className="w-[120px] h-8">
+                                        <SelectValue placeholder="Maand" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        {Array.from({ length: 12 }, (_, i) => (
+                                          <SelectItem key={i} value={i.toString()}>
+                                            {format(new Date(2000, i, 1), "MMMM", { locale: nl })}
+                                          </SelectItem>
+                                        ))}
+                                      </SelectContent>
+                                    </Select>
+                                    <Select
+                                      value={field.value ? field.value.getFullYear().toString() : ""}
+                                      onValueChange={(year) => {
+                                        const currentDate = field.value || new Date();
+                                        const newDate = new Date(parseInt(year), currentDate.getMonth(), currentDate.getDate());
+                                        field.onChange(newDate);
+                                      }}
+                                    >
+                                      <SelectTrigger className="w-[80px] h-8">
+                                        <SelectValue placeholder="Jaar" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        {Array.from({ length: 100 }, (_, i) => {
+                                          const year = new Date().getFullYear() + 10 - i;
+                                          return (
+                                            <SelectItem key={year} value={year.toString()}>
+                                              {year}
+                                            </SelectItem>
+                                          );
+                                        })}
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                </div>
+                                <Calendar
+                                  mode="single"
+                                  selected={field.value}
+                                  onSelect={field.onChange}
+                                  initialFocus
+                                  classNames={{
+                                    months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
+                                    month: "space-y-4",
+                                    caption: "flex justify-center pt-1 relative items-center",
+                                    caption_label: "text-sm font-medium",
+                                    nav: "space-x-1 flex items-center",
+                                    nav_button: cn(
+                                      "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
+                                    ),
+                                    nav_button_previous: "absolute left-1",
+                                    nav_button_next: "absolute right-1",
+                                    table: "w-full border-collapse space-y-1",
+                                    head_row: "flex",
+                                    head_cell: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
+                                    row: "flex w-full mt-2",
+                                    cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
+                                    day: cn("h-9 w-9 p-0 font-normal aria-selected:opacity-100"),
+                                    day_range_end: "day-range-end",
+                                    day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
+                                    day_today: "bg-accent text-accent-foreground",
+                                    day_outside: "day-outside text-muted-foreground opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground aria-selected:opacity-30",
+                                    day_disabled: "text-muted-foreground opacity-50",
+                                    day_range_middle: "aria-selected:bg-accent aria-selected:text-accent-foreground",
+                                    day_hidden: "invisible",
+                                  }}
+                                />
+                              </PopoverContent>
+                            </Popover>
+                          </div>
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -592,36 +691,135 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Einddatum *</FormLabel>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <FormControl>
-                              <Button
-                                variant="outline"
-                                className={cn(
-                                  "w-full pl-3 text-left font-normal",
-                                  !field.value && "text-muted-foreground"
-                                )}
-                                data-testid="button-term-end"
-                              >
-                                {field.value ? (
-                                  format(field.value, "PPP", { locale: nl })
-                                ) : (
-                                  <span>Selecteer datum</span>
-                                )}
-                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                              </Button>
-                            </FormControl>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={field.value}
-                              onSelect={field.onChange}
-                              disabled={(date) => date < new Date()}
-                              initialFocus
+                        <FormControl>
+                          <div className="relative">
+                            <Input
+                              value={field.value ? format(field.value, "dd/MM/yyyy", { locale: nl }) : ""}
+                              onChange={(e) => {
+                                const inputValue = e.target.value;
+                                
+                                // Handle numeric input (e.g., 31122025 -> 31/12/2025)
+                                if (/^\d+$/.test(inputValue)) {
+                                  if (inputValue.length === 8) {
+                                    const day = inputValue.substring(0, 2);
+                                    const month = inputValue.substring(2, 4);
+                                    const year = inputValue.substring(4, 8);
+                                    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+                                    if (!isNaN(date.getTime()) && parseInt(month) >= 1 && parseInt(month) <= 12 && parseInt(day) >= 1 && parseInt(day) <= 31) {
+                                      field.onChange(date);
+                                      return;
+                                    }
+                                  }
+                                }
+                                
+                                // Handle formatted input (DD/MM/YYYY)
+                                if (inputValue.length === 10 && inputValue.includes('/')) {
+                                  const [day, month, year] = inputValue.split('/');
+                                  if (day && month && year) {
+                                    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+                                    if (!isNaN(date.getTime())) {
+                                      field.onChange(date);
+                                    }
+                                  }
+                                }
+                              }}
+                              placeholder="DD/MM/YYYY"
+                              className="pr-10 border-gray-200"
+                              data-testid="input-term-end"
+                              maxLength={10}
                             />
-                          </PopoverContent>
-                        </Popover>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  type="button"
+                                  className="absolute right-2 top-2 h-6 w-6 p-1 hover:bg-transparent hover:scale-100 focus:bg-transparent active:bg-transparent transition-none transform-none"
+                                >
+                                  <CalendarIcon className="h-4 w-4" />
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-auto p-0" align="start" side="bottom">
+                                <div className="p-3 border-b">
+                                  <div className="flex items-center justify-between space-x-2">
+                                    <Select
+                                      value={field.value ? field.value.getMonth().toString() : ""}
+                                      onValueChange={(month) => {
+                                        const currentDate = field.value || new Date();
+                                        const newDate = new Date(currentDate.getFullYear(), parseInt(month), currentDate.getDate());
+                                        field.onChange(newDate);
+                                      }}
+                                    >
+                                      <SelectTrigger className="w-[120px] h-8">
+                                        <SelectValue placeholder="Maand" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        {Array.from({ length: 12 }, (_, i) => (
+                                          <SelectItem key={i} value={i.toString()}>
+                                            {format(new Date(2000, i, 1), "MMMM", { locale: nl })}
+                                          </SelectItem>
+                                        ))}
+                                      </SelectContent>
+                                    </Select>
+                                    <Select
+                                      value={field.value ? field.value.getFullYear().toString() : ""}
+                                      onValueChange={(year) => {
+                                        const currentDate = field.value || new Date();
+                                        const newDate = new Date(parseInt(year), currentDate.getMonth(), currentDate.getDate());
+                                        field.onChange(newDate);
+                                      }}
+                                    >
+                                      <SelectTrigger className="w-[80px] h-8">
+                                        <SelectValue placeholder="Jaar" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        {Array.from({ length: 100 }, (_, i) => {
+                                          const year = new Date().getFullYear() + 10 - i;
+                                          return (
+                                            <SelectItem key={year} value={year.toString()}>
+                                              {year}
+                                            </SelectItem>
+                                          );
+                                        })}
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                </div>
+                                <Calendar
+                                  mode="single"
+                                  selected={field.value}
+                                  onSelect={field.onChange}
+                                  initialFocus
+                                  classNames={{
+                                    months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
+                                    month: "space-y-4",
+                                    caption: "flex justify-center pt-1 relative items-center",
+                                    caption_label: "text-sm font-medium",
+                                    nav: "space-x-1 flex items-center",
+                                    nav_button: cn(
+                                      "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
+                                    ),
+                                    nav_button_previous: "absolute left-1",
+                                    nav_button_next: "absolute right-1",
+                                    table: "w-full border-collapse space-y-1",
+                                    head_row: "flex",
+                                    head_cell: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
+                                    row: "flex w-full mt-2",
+                                    cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
+                                    day: cn("h-9 w-9 p-0 font-normal aria-selected:opacity-100"),
+                                    day_range_end: "day-range-end",
+                                    day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
+                                    day_today: "bg-accent text-accent-foreground",
+                                    day_outside: "day-outside text-muted-foreground opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground aria-selected:opacity-30",
+                                    day_disabled: "text-muted-foreground opacity-50",
+                                    day_range_middle: "aria-selected:bg-accent aria-selected:text-accent-foreground",
+                                    day_hidden: "invisible",
+                                  }}
+                                />
+                              </PopoverContent>
+                            </Popover>
+                          </div>
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}

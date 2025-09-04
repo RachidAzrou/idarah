@@ -937,19 +937,6 @@ export default function Berichten() {
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <h4 className="font-medium text-sm text-gray-900">Tracking</h4>
-                    <div className="space-y-1 text-xs">
-                      <div className="flex justify-between">
-                        <code className="bg-gray-100 px-1 rounded">{"{{openUrl}}"}</code>
-                        <span className="text-gray-500">E-mail open tracking</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <code className="bg-gray-100 px-1 rounded">{"{{unsubscribeUrl}}"}</code>
-                        <span className="text-gray-500">Uitschrijf link</span>
-                      </div>
-                    </div>
-                  </div>
 
                 </div>
               </div>

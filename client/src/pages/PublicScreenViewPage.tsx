@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useRoute } from "wouter";
 import { PublicScreen, LedenlijstConfig, MededelingenConfig, MultimediaConfig } from "@/lib/mock/public-screens";
 import { LedenlijstView } from "@/components/public-view/LedenlijstView";
@@ -18,7 +18,7 @@ export default function PublicScreenViewPage() {
   console.log('=== Component Render ===', { publicToken, loading, screen: !!screen });
   
 
-  const loadScreen = React.useCallback(async () => {
+  const loadScreen = async () => {
     console.log('=== loadScreen called ===');
     console.log('publicToken:', publicToken);
     
@@ -76,16 +76,16 @@ export default function PublicScreenViewPage() {
       console.log('No publicToken provided');
       setLoading(false);
     }
-  }, [publicToken]);
+  };
 
-  // FORCE DATA LOAD IMMEDIATELY WHEN TOKEN IS AVAILABLE
+  // IMMEDIATE DATA LOADING
   useEffect(() => {
-    console.log('=== useEffect FIRING ===', { publicToken, hasScreen: !!screen });
+    console.log('=== useEffect TRIGGERED ===', publicToken);
     if (publicToken) {
-      console.log('About to call loadScreen...');
+      console.log('Starting loadScreen...');
       loadScreen();
     }
-  }, [publicToken, loadScreen]);
+  }, [publicToken]);
 
   // Update document title when screen data is loaded
   useEffect(() => {

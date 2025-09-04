@@ -809,8 +809,36 @@ export default function Berichten() {
                         <span className="text-gray-500">Naam organisatie</span>
                       </div>
                       <div className="flex justify-between">
-                        <code className="bg-gray-100 px-1 rounded">{"{{tenant.primaryColor}}"}</code>
-                        <span className="text-gray-500">Hoofdkleur</span>
+                        <code className="bg-gray-100 px-1 rounded">{"{{tenant.email}}"}</code>
+                        <span className="text-gray-500">E-mailadres</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <code className="bg-gray-100 px-1 rounded">{"{{tenant.phone}}"}</code>
+                        <span className="text-gray-500">Telefoonnummer</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <code className="bg-gray-100 px-1 rounded">{"{{tenant.website}}"}</code>
+                        <span className="text-gray-500">Website</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <code className="bg-gray-100 px-1 rounded">{"{{tenant.street}}"}</code>
+                        <span className="text-gray-500">Straat</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <code className="bg-gray-100 px-1 rounded">{"{{tenant.number}}"}</code>
+                        <span className="text-gray-500">Huisnummer</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <code className="bg-gray-100 px-1 rounded">{"{{tenant.postalCode}}"}</code>
+                        <span className="text-gray-500">Postcode</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <code className="bg-gray-100 px-1 rounded">{"{{tenant.city}}"}</code>
+                        <span className="text-gray-500">Stad</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <code className="bg-gray-100 px-1 rounded">{"{{tenant.country}}"}</code>
+                        <span className="text-gray-500">Land</span>
                       </div>
                     </div>
                   </div>

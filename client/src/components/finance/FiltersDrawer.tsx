@@ -110,7 +110,7 @@ export function FiltersToolbar({
 
       {/* Clear Filters Button */}
       {hasActiveFilters && (
-        <div className="flex justify-end">
+        <div className="flex justify-start">
           <Button variant="outline" size="sm" onClick={onClearFilters} data-testid="button-clear-filters">
             Wis alle filters
           </Button>

@@ -95,7 +95,7 @@ export default function Bestuur() {
   // Mutation for creating new board member
   const createBoardMemberMutation = useMutation({
     mutationFn: async (data: any) => {
-      return apiRequest('/api/board/members', 'POST', data);
+      return apiRequest('POST', '/api/board/members', data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/board/members"] });
@@ -121,7 +121,7 @@ export default function Bestuur() {
   // Mutation for updating board member
   const updateBoardMemberMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: any }) => {
-      return apiRequest(`/api/board/members/${id}`, 'PUT', data);
+      return apiRequest('PUT', `/api/board/members/${id}`, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/board/members"] });
@@ -143,7 +143,7 @@ export default function Bestuur() {
   // Mutation for deactivating board member
   const deactivateBoardMemberMutation = useMutation({
     mutationFn: async (id: string) => {
-      return apiRequest(`/api/board/members/${id}`, 'PUT', { 
+      return apiRequest('PUT', `/api/board/members/${id}`, { 
         status: 'INACTIEF',
         termEnd: new Date().toISOString()
       });

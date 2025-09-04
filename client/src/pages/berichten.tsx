@@ -28,7 +28,6 @@ import { TbHandStop } from "react-icons/tb";
 const templateSchema = z.object({
   name: z.string().min(1, "Naam is verplicht"),
   code: z.string().min(1, "Code is verplicht"),
-  kind: z.enum(["TRANSACTIONEEL", "MARKETING"]),
   subject: z.string().min(1, "Onderwerp is verplicht"),
   bodyHtml: z.string().min(1, "HTML body is verplicht"),
   bodyText: z.string().min(1, "Text body is verplicht")
@@ -91,7 +90,6 @@ export default function Berichten() {
     defaultValues: {
       name: "",
       code: "",
-      kind: "TRANSACTIONEEL" as const,
       subject: "",
       bodyHtml: "",
       bodyText: ""
@@ -216,7 +214,6 @@ export default function Berichten() {
     templateForm.reset({
       name: template.name,
       code: template.code,
-      kind: template.kind,
       subject: template.subject,
       bodyHtml: template.body_html,
       bodyText: template.body_text
@@ -384,12 +381,6 @@ export default function Berichten() {
                           {template.subject}
                         </CardDescription>
                       </div>
-                      <Badge 
-                        variant={template.kind === 'MARKETING' ? 'default' : 'secondary'}
-                        data-testid={`badge-template-kind-${template.id}`}
-                      >
-                        {template.kind === 'MARKETING' ? 'Marketing' : 'Transactioneel'}
-                      </Badge>
                     </div>
                   </CardHeader>
                   <CardContent>
@@ -691,42 +682,19 @@ export default function Berichten() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={templateForm.control}
-                  name="kind"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Type</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecteer type" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="TRANSACTIONEEL">Transactioneel</SelectItem>
-                          <SelectItem value="MARKETING">Marketing</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={templateForm.control}
-                  name="subject"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Onderwerp</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="E-mail onderwerp" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+              <FormField
+                control={templateForm.control}
+                name="subject"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Onderwerp</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="E-mail onderwerp" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               {/* HTML Body - Collapsible */}
               <Collapsible open={htmlBodyExpanded} onOpenChange={setHtmlBodyExpanded}>

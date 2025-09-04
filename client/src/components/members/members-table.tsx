@@ -115,7 +115,7 @@ export function MembersTable({
   }
 
   return (
-    <Card className="shadow-sm border border-gray-200">
+    <Card className="glass-card card-hover animate-fade-in group border-0">
       {selectedIds.length > 0 && (
         <div className="px-6 py-4 bg-blue-50 border-b border-blue-200">
           <div className="flex items-center justify-between">

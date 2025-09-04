@@ -109,7 +109,7 @@ export function Toolbar({
     }
   };
   return (
-    <Card className={cn("mb-6", className)}>
+    <Card className={cn("glass-card card-hover animate-fade-in group mb-6", className)}>
       <CardContent className="p-6">
         <div className="space-y-4">
           {/* Search and Action Buttons */}

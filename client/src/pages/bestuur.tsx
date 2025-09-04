@@ -142,25 +142,29 @@ export default function Bestuur() {
   }) || [];
 
   return (
-    <div className="px-4 sm:px-6 lg:px-8 w-full space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900" data-testid="page-title">Mijn Bestuur</h1>
-          <p className="text-sm text-gray-600 mt-1" data-testid="page-description">
-            Beheer bestuursleden en hun mandaten
-          </p>
+    <main className="flex-1 py-4">
+      <div className="px-4 sm:px-6 lg:px-8 w-full">
+        {/* Page Header */}
+        <div className="border-b border-gray-200 pb-5 mb-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900" data-testid="page-title">Mijn Bestuur</h1>
+              <p className="mt-1 text-sm text-gray-700" data-testid="page-description">
+                Beheer bestuursleden en hun mandaten
+              </p>
+            </div>
+            {canEdit && (
+              <Button
+                onClick={() => setShowNewMemberDialog(true)}
+                className="flex items-center gap-2"
+                data-testid="button-new-board-member"
+              >
+                <Plus className="w-4 h-4" />
+                Nieuw Bestuurslid
+              </Button>
+            )}
+          </div>
         </div>
-{canEdit && (
-          <Button
-            onClick={() => setShowNewMemberDialog(true)}
-            className="flex items-center gap-2"
-            data-testid="button-new-board-member"
-          >
-            <Plus className="w-4 h-4" />
-            Nieuw Bestuurslid
-          </Button>
-        )}
-      </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid grid-cols-2 w-auto" data-testid="board-tabs">
@@ -383,6 +387,7 @@ export default function Bestuur() {
           </DialogContent>
         </Dialog>
       )}
-    </div>
+      </div>
+    </main>
   );
 }

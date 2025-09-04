@@ -7,8 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Building2, Mail, Lock, Eye, EyeOff } from "lucide-react";
-import backgroundImage from "@assets/Luxury Navy Background_1757015851301.jpg";
 import { useToast } from "@/hooks/use-toast";
+import backgroundImage from "@assets/Luxury Navy Background_1757015851301.jpg";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -42,7 +42,7 @@ export default function Login() {
 
   return (
     <div 
-      className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8"
+      className="min-h-screen flex"
       style={{
         backgroundImage: `url("${backgroundImage}")`,
         backgroundSize: 'cover',
@@ -51,27 +51,35 @@ export default function Login() {
       }}
     >
       {/* Background overlay */}
-      <div className="absolute inset-0 bg-black/20"></div>
-      <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10">
-        <div className="flex justify-center">
-          <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center">
-            <Building2 className="w-6 h-6 text-primary-foreground" />
+      <div className="absolute inset-0 bg-black/30"></div>
+      
+      {/* Left side - Branding and welcome text */}
+      <div className="flex-1 flex flex-col justify-center px-8 sm:px-12 lg:px-16 relative z-10">
+        <div className="max-w-md">
+          {/* Logo */}
+          <div className="flex items-center mb-12">
+            <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center mr-3">
+              <Building2 className="w-6 h-6 text-white" />
+            </div>
+            <span className="text-2xl font-bold text-white">Ledenbeheer</span>
           </div>
+          
+          {/* Welcome text */}
+          <h1 className="text-5xl font-bold text-white mb-6 leading-tight">
+            Inloggen bij
+            <br />
+            uw account
+          </h1>
+          <p className="text-xl text-gray-200">
+            Beheersysteem voor uw moskee gemeenschap
+          </p>
         </div>
-        <h2 className="mt-6 text-center text-3xl font-bold text-white">
-          Inloggen bij Ledenbeheer
-        </h2>
-        <p className="mt-2 text-center text-sm text-gray-200">
-          Moskee management platform
-        </p>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md relative z-10">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-center">Welkom terug</CardTitle>
-          </CardHeader>
-          <CardContent>
+      {/* Right side - Login form */}
+      <div className="flex-1 flex flex-col justify-center px-8 sm:px-12 lg:px-16 relative z-10">
+        <div className="max-w-md mx-auto w-full">
+          <div className="bg-white rounded-3xl shadow-2xl p-8">
             <form onSubmit={handleSubmit} className="space-y-6" data-testid="login-form">
               {error && (
                 <Alert variant="destructive" data-testid="login-error">
@@ -80,18 +88,15 @@ export default function Login() {
               )}
 
               <div>
-                <Label htmlFor="email">E-mailadres</Label>
-                <div className="mt-1 relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-gray-400" />
-                  </div>
+                <Label htmlFor="email" className="text-gray-700 font-medium">E-mailadres</Label>
+                <div className="mt-2">
                   <Input
                     id="email"
                     name="email"
                     type="email"
                     autoComplete="email"
                     required
-                    className="pl-10"
+                    className="h-12 px-4 bg-gray-50 border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-blue-500"
                     placeholder="naam@moskee.be"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -101,26 +106,23 @@ export default function Login() {
               </div>
 
               <div>
-                <Label htmlFor="password">Wachtwoord</Label>
-                <div className="mt-1 relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-400" />
-                  </div>
+                <Label htmlFor="password" className="text-gray-700 font-medium">Wachtwoord</Label>
+                <div className="mt-2 relative">
                   <Input
                     id="password"
                     name="password"
                     type={showPassword ? "text" : "password"}
                     autoComplete="current-password"
                     required
-                    className="pl-10 pr-10"
-                    placeholder="••••••••"
+                    className="h-12 px-4 pr-12 bg-gray-50 border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-blue-500"
+                    placeholder="Uw wachtwoord"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     data-testid="input-password"
                   />
                   <button
                     type="button"
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    className="absolute inset-y-0 right-0 pr-4 flex items-center"
                     onClick={() => setShowPassword(!showPassword)}
                     data-testid="toggle-password"
                   >
@@ -133,17 +135,24 @@ export default function Login() {
                 </div>
               </div>
 
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-600">Geen account?</span>
+                <a href="#" className="text-blue-600 hover:text-blue-700 font-medium">
+                  Account aanvragen
+                </a>
+              </div>
+
               <Button
                 type="submit"
-                className="w-full"
+                className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-lg transition-all duration-200"
                 disabled={isLoading}
                 data-testid="button-login"
               >
                 {isLoading ? "Bezig met inloggen..." : "Inloggen"}
               </Button>
             </form>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   );

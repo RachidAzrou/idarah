@@ -32,10 +32,20 @@ const boardMemberSchema = z.object({
   phone: z.string().optional(),
   
   // Board role info
-  role: z.string().min(1, "Rol is verplicht"),
+  role: z.enum(['VOORZITTER', 'ONDERVERZITTER', 'SECRETARIS', 'PENNINGMEESTER', 'BESTUURSLID', 'ADVISEUR'], { required_error: "Rol is verplicht" }),
   status: z.enum(['ACTIEF', 'INACTIEF']).default('ACTIEF'),
-  termStart: z.date({ required_error: "Startdatum is verplicht" }),
-  termEnd: z.date().optional(),
+  termStart: z.union([
+    z.date(),
+    z.string().transform((val) => new Date(val))
+  ]).refine((date) => date instanceof Date && !isNaN(date.getTime()), {
+    message: "Ongeldige startdatum"
+  }),
+  termEnd: z.union([
+    z.date(),
+    z.string().transform((val) => new Date(val))
+  ]).optional().refine((date) => !date || (date instanceof Date && !isNaN(date.getTime())), {
+    message: "Ongeldige einddatum"
+  }),
   
   // Additional info
   responsibilities: z.string().optional(),
@@ -60,6 +70,7 @@ interface BoardMemberFormProps {
   onSubmit: (data: BoardMemberFormData) => void;
   onCancel: () => void;
   isLoading?: boolean;
+  isEditMode?: boolean;
   initialData?: Partial<BoardMemberFormData & {
     memberId: string;
     externalName: string;
@@ -71,7 +82,7 @@ interface BoardMemberFormProps {
   }>;
 }
 
-export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, initialData }: BoardMemberFormProps) {
+export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditMode = false, initialData }: BoardMemberFormProps) {
   // Determine initial link type based on initialData
   const getInitialLinkType = () => {
     if (initialData?.memberId) return 'EXISTING_MEMBER';
@@ -82,13 +93,20 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, initial
   const [linkType, setLinkType] = useState<'EXISTING_MEMBER' | 'EXTERNAL_PERSON'>(getInitialLinkType());
   const [memberSearch, setMemberSearch] = useState(initialData?.externalName || "");
   const [selectedMember, setSelectedMember] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState("linking");
+  const [activeTab, setActiveTab] = useState(isEditMode ? "personal" : "linking");
 
   // Fetch members for autocomplete
   const { data: members } = useQuery<any[]>({
     queryKey: ["/api/members", { q: memberSearch }],
     staleTime: 10000,
     enabled: linkType === 'EXISTING_MEMBER' && memberSearch.length > 0,
+  });
+
+  // Fetch member details for edit mode
+  const { data: memberDetails } = useQuery<any>({
+    queryKey: ["/api/members", initialData?.memberId],
+    staleTime: 10000,
+    enabled: !!(isEditMode && initialData?.memberId),
   });
 
   const form = useForm<BoardMemberFormData>({
@@ -134,11 +152,13 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, initial
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="linking" data-testid="tab-linking" className="flex items-center gap-2">
-              <Link className="h-4 w-4" />
-              Koppeling
-            </TabsTrigger>
+          <TabsList className={`grid w-full ${isEditMode ? 'grid-cols-3' : 'grid-cols-4'}`}>
+            {!isEditMode && (
+              <TabsTrigger value="linking" data-testid="tab-linking" className="flex items-center gap-2">
+                <Link className="h-4 w-4" />
+                Koppeling
+              </TabsTrigger>
+            )}
             <TabsTrigger value="personal" data-testid="tab-personal" className="flex items-center gap-2">
               <MdOutlinePermIdentity className="h-4 w-4" />
               Persoonlijk
@@ -199,123 +219,188 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, initial
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">Persoonsgegevens</CardTitle>
+                <CardDescription>
+                  {isEditMode ? "Persoonlijke informatie (alleen bekijken)" : "Vul de persoonlijke gegevens in"}
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {linkType === 'EXISTING_MEMBER' ? (
-                  <>
-                    {/* Member Search */}
-                    <div className="space-y-2">
-                      <Label htmlFor="member-search">Zoek lid</Label>
-                      <div className="relative">
-                        <Input
-                          id="member-search"
-                          placeholder="Typ naam om te zoeken..."
-                          value={memberSearch}
-                          onChange={(e) => setMemberSearch(e.target.value)}
-                          data-testid="input-member-search"
-                        />
-                        {memberSearch.length > 0 && members && members.length > 0 && !selectedMember && (
-                          <div className="absolute z-10 w-full bg-white border border-gray-200 rounded-md shadow-lg mt-1 max-h-40 overflow-y-auto">
-                            {members.map((member: any) => (
-                              <button
-                                key={member.id}
-                                type="button"
-                                className="w-full px-3 py-2 text-left hover:bg-gray-50 border-b last:border-b-0"
-                                onClick={() => handleMemberSelect(member)}
-                                data-testid={`option-member-${member.id}`}
-                              >
-                                <div className="font-medium">{member.firstName} {member.lastName}</div>
-                                <div className="text-sm text-gray-500">#{member.memberNumber}</div>
-                              </button>
-                            ))}
-                          </div>
-                        )}
+                {isEditMode ? (
+                  /* Edit Mode: Read-only display */
+                  <div className="space-y-4 text-gray-600">
+                    {/* Member Info */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-sm font-medium text-gray-500">Naam</Label>
+                        <div className="mt-1 p-2 bg-gray-50 rounded border text-gray-700">
+                          {initialData?.memberId 
+                            ? `${memberDetails?.firstName || 'Onbekend'} ${memberDetails?.lastName || 'Lid'}` 
+                            : (initialData?.externalName || 'Externe persoon')}
+                        </div>
+                      </div>
+                      <div>
+                        <Label className="text-sm font-medium text-gray-500">Type</Label>
+                        <div className="mt-1 p-2 bg-gray-50 rounded border text-gray-700">
+                          {initialData?.memberId ? 'Intern lid' : 'Externe persoon'}
+                        </div>
                       </div>
                     </div>
-
-                    {/* Selected Member Preview */}
-                    {selectedMember && (
-                      <div className="p-4 bg-gray-50 rounded-lg" data-testid="member-preview">
-                        <h4 className="font-medium mb-2">Geselecteerd lid</h4>
-                        <div className="space-y-2 text-sm">
-                          <div className="flex items-center gap-2">
-                            <User className="w-4 h-4" />
-                            <span>{selectedMember.firstName} {selectedMember.lastName}</span>
+                    
+                    {initialData?.memberId && (
+                      <div className="grid grid-cols-3 gap-4">
+                        <div>
+                          <Label className="text-sm font-medium text-gray-500">Lidnummer</Label>
+                          <div className="mt-1 p-2 bg-gray-50 rounded border text-gray-700">
+                            #{memberDetails?.memberNumber || 'Onbekend'}
                           </div>
-                          {selectedMember.email && (
-                            <div className="flex items-center gap-2">
-                              <Mail className="w-4 h-4" />
-                              <span>{selectedMember.email}</span>
-                            </div>
-                          )}
-                          {selectedMember.phone && (
-                            <div className="flex items-center gap-2">
-                              <Phone className="w-4 h-4" />
-                              <span>{selectedMember.phone}</span>
+                        </div>
+                        <div>
+                          <Label className="text-sm font-medium text-gray-500">Categorie</Label>
+                          <div className="mt-1 p-2 bg-gray-50 rounded border text-gray-700">
+                            {memberDetails?.category || 'Onbekend'}
+                          </div>
+                        </div>
+                        <div>
+                          <Label className="text-sm font-medium text-gray-500">Status</Label>
+                          <div className="mt-1 p-2 bg-gray-50 rounded border text-gray-700">
+                            {memberDetails?.status || 'Onbekend'}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-sm font-medium text-gray-500">E-mail</Label>
+                        <div className="mt-1 p-2 bg-gray-50 rounded border text-gray-700">
+                          {(initialData?.memberId ? memberDetails?.email : initialData?.email) || 'Niet opgegeven'}
+                        </div>
+                      </div>
+                      <div>
+                        <Label className="text-sm font-medium text-gray-500">Telefoon</Label>
+                        <div className="mt-1 p-2 bg-gray-50 rounded border text-gray-700">
+                          {(initialData?.memberId ? memberDetails?.phone : initialData?.phone) || 'Niet opgegeven'}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  /* Add Mode: Normal form fields */
+                  linkType === 'EXISTING_MEMBER' ? (
+                    <>
+                      {/* Member Search */}
+                      <div className="space-y-2">
+                        <Label htmlFor="member-search">Zoek lid</Label>
+                        <div className="relative">
+                          <Input
+                            id="member-search"
+                            placeholder="Typ naam om te zoeken..."
+                            value={memberSearch}
+                            onChange={(e) => setMemberSearch(e.target.value)}
+                            data-testid="input-member-search"
+                          />
+                          {memberSearch.length > 0 && members && members.length > 0 && !selectedMember && (
+                            <div className="absolute z-10 w-full bg-white border border-gray-200 rounded-md shadow-lg mt-1 max-h-40 overflow-y-auto">
+                              {members.map((member: any) => (
+                                <button
+                                  key={member.id}
+                                  type="button"
+                                  className="w-full px-3 py-2 text-left hover:bg-gray-50 border-b last:border-b-0"
+                                  onClick={() => handleMemberSelect(member)}
+                                  data-testid={`option-member-${member.id}`}
+                                >
+                                  <div className="font-medium">{member.firstName} {member.lastName}</div>
+                                  <div className="text-sm text-gray-500">#{member.memberNumber}</div>
+                                </button>
+                              ))}
                             </div>
                           )}
                         </div>
                       </div>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    {/* External Person Fields */}
-                    <FormField
-                      control={form.control}
-                      name="externalName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Naam *</FormLabel>
-                          <FormControl>
-                            <Input 
-                              {...field} 
-                              placeholder="Volledige naam"
-                              data-testid="input-external-name"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
 
-                    <FormField
-                      control={form.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>E-mail</FormLabel>
-                          <FormControl>
-                            <Input 
-                              {...field} 
-                              type="email"
-                              placeholder="naam@voorbeeld.com"
-                              data-testid="input-external-email"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
+                      {/* Selected Member Preview */}
+                      {selectedMember && (
+                        <div className="p-4 bg-gray-50 rounded-lg" data-testid="member-preview">
+                          <h4 className="font-medium mb-2">Geselecteerd lid</h4>
+                          <div className="space-y-2 text-sm">
+                            <div className="flex items-center gap-2">
+                              <User className="w-4 h-4" />
+                              <span>{selectedMember.firstName} {selectedMember.lastName}</span>
+                            </div>
+                            {selectedMember.email && (
+                              <div className="flex items-center gap-2">
+                                <Mail className="w-4 h-4" />
+                                <span>{selectedMember.email}</span>
+                              </div>
+                            )}
+                            {selectedMember.phone && (
+                              <div className="flex items-center gap-2">
+                                <Phone className="w-4 h-4" />
+                                <span>{selectedMember.phone}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
                       )}
-                    />
+                    </>
+                  ) : (
+                    <>
+                      {/* External Person Fields */}
+                      <FormField
+                        control={form.control}
+                        name="externalName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Naam *</FormLabel>
+                            <FormControl>
+                              <Input 
+                                {...field} 
+                                placeholder="Volledige naam"
+                                data-testid="input-external-name"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                    <FormField
-                      control={form.control}
-                      name="phone"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Telefoon</FormLabel>
-                          <FormControl>
-                            <Input 
-                              {...field} 
-                              placeholder="+32 123 456 789"
-                              data-testid="input-external-phone"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </>
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>E-mail</FormLabel>
+                            <FormControl>
+                              <Input 
+                                {...field} 
+                                type="email"
+                                placeholder="naam@voorbeeld.com"
+                                data-testid="input-external-email"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="phone"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Telefoon</FormLabel>
+                            <FormControl>
+                              <Input 
+                                {...field} 
+                                placeholder="+32 123 456 789"
+                                data-testid="input-external-phone"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </>
+                  )
                 )}
               </CardContent>
             </Card>

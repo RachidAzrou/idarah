@@ -568,6 +568,7 @@ export default function Bestuur() {
                 onSubmit={handleUpdateBoardMember}
                 onCancel={() => setSelectedBoardMember(null)}
                 isLoading={updateBoardMemberMutation.isPending}
+                isEditMode={true}
                 initialData={{
                   memberId: selectedBoardMember.boardMember.memberId || '',
                   externalName: selectedBoardMember.boardMember.externalName || '',

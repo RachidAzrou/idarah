@@ -73,12 +73,6 @@ function convertToHTML(plainText: string): string {
   
   const footer = `
       </div>
-      <div class="footer">
-        <p>{{tenant.name}}<br/>
-        {{tenant.street}} {{tenant.number}}<br/>
-        {{tenant.postalCode}} {{tenant.city}}<br/>
-        <a href="mailto:{{tenant.email}}">{{tenant.email}}</a></p>
-      </div>
     </div>
   </body>
   </html>`;
@@ -95,13 +89,7 @@ function convertToPlainText(content: string): string {
     .filter(p => p.trim())
     .join('\n\n');
     
-  return `${lines}
-
----
-{{tenant.name}}
-{{tenant.street}} {{tenant.number}}
-{{tenant.postalCode}} {{tenant.city}}
-{{tenant.email}}`;
+  return lines;
 }
 
 // Form schemas

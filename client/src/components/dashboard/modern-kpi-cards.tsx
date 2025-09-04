@@ -59,7 +59,8 @@ export default function ModernKpiCards() {
       value: isLoading ? "..." : ((stats as any)?.totalMembers?.toString() || "0"),
       delta: { value: "Totaal aantal leden", positive: true },
       icon: <Users className="h-4 w-4 text-blue-600" />,
-      iconBgColor: "bg-blue-50"
+      iconBgColor: "bg-blue-50",
+      deltaColor: "text-blue-600"
     },
     {
       title: "Actieve Leden", 

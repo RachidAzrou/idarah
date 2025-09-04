@@ -199,7 +199,8 @@ export default function Berichten() {
         kind: "TRANSACTIONEEL", // Standaard waarde sinds type niet meer relevant is
         subject: data.subject,
         body_html: convertToHTML(data.content),
-        body_text: convertToPlainText(data.content)
+        body_text: convertToPlainText(data.content),
+        content: data.content
       });
     },
     onSuccess: () => {
@@ -225,7 +226,8 @@ export default function Berichten() {
         kind: "TRANSACTIONEEL", // Standaard waarde sinds type niet meer relevant is
         subject: data.subject,
         body_html: convertToHTML(data.content),
-        body_text: convertToPlainText(data.content)
+        body_text: convertToPlainText(data.content),
+        content: data.content
       };
       return apiRequest("PUT", `/api/messages/templates/${id}`, payload);
     },
@@ -288,18 +290,26 @@ export default function Berichten() {
   // Handler functions
   const handleEditTemplate = (template: any) => {
     setEditingTemplate(template);
-    // Extract plain text from HTML or use text content
-    const htmlContent = template.bodyHtml || template.body_html || "";
-    const textContent = template.bodyText || template.body_text || "";
     
-    // Use text content if available, otherwise strip HTML tags from HTML content
-    let content = textContent;
-    if (!content && htmlContent) {
-      // Simple HTML tag removal for editing
-      content = htmlContent
-        .replace(/<[^>]*>/g, '') // Remove HTML tags
-        .replace(/\s+/g, ' ') // Normalize whitespace
-        .trim();
+    let content = "";
+    
+    // Priority: content field (new format) > text content > simplified HTML
+    if (template.content) {
+      content = template.content;
+    } else {
+      const textContent = template.bodyText || template.body_text || "";
+      const htmlContent = template.bodyHtml || template.body_html || "";
+      
+      // Use text content if available, otherwise strip HTML tags from HTML content
+      if (textContent) {
+        content = textContent;
+      } else if (htmlContent) {
+        // Simple HTML tag removal for editing
+        content = htmlContent
+          .replace(/<[^>]*>/g, '') // Remove HTML tags
+          .replace(/\s+/g, ' ') // Normalize whitespace
+          .trim();
+      }
     }
     
     templateForm.reset({

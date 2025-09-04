@@ -351,6 +351,7 @@ export const emailTemplates = pgTable("email_templates", {
   subject: text("subject").notNull(),
   bodyHtml: text("body_html"),
   bodyText: text("body_text"),
+  content: text("content"), // New simplified content field
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 }, (table) => ({

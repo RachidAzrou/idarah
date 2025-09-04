@@ -312,14 +312,6 @@ export default function Bestuur() {
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
                             <CardTitle className="text-base" data-testid={`text-name-${item.boardMember.id}`}>{name}</CardTitle>
-                            {item.boardMember.status === 'ACTIEF' && (
-                              <Crown 
-                                className="w-4 h-4 text-yellow-500" 
-                                style={{ color: '#FFD700' }}
-                                aria-label="Actief bestuurslid"
-                                data-testid={`crown-${item.boardMember.id}`}
-                              />
-                            )}
                           </div>
                           <Badge 
                             className={`text-xs ${roleColors[item.boardMember.role as keyof typeof roleColors] || 'bg-gray-100 text-gray-800'}`}
@@ -333,7 +325,7 @@ export default function Bestuur() {
                     <CardContent>
                       <div className="space-y-2 text-sm">
                         <div className="flex items-center gap-2 text-gray-600">
-                          <User className="w-4 h-4" />
+                          <Crown className="w-4 h-4" />
                           <span data-testid={`text-status-${item.boardMember.id}`}>
                             {item.boardMember.status === 'ACTIEF' ? 'Actief mandaat' : 'Beëindigd mandaat'}
                           </span>

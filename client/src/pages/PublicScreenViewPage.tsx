@@ -15,27 +15,20 @@ export default function PublicScreenViewPage() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showControls, setShowControls] = useState(true);
 
-  console.log('=== COMPONENT RENDERED ===', { publicToken, loading, hasScreen: !!screen });
 
-  // FETCH DATA IMMEDIATELY WHEN COMPONENT MOUNTS OR TOKEN CHANGES
+  // FETCH DATA WHEN COMPONENT MOUNTS OR TOKEN CHANGES
   React.useEffect(() => {
-    console.log('=== useEffect TRIGGERED ===', publicToken);
-    
     if (!publicToken) {
-      console.log('No publicToken, stopping');
       setLoading(false);
       return;
     }
 
-    console.log('Starting data fetch...');
     setLoading(true);
 
     const fetchData = async () => {
       try {
         const timestamp = new Date().getTime();
         const url = `/api/public-screens/token/${publicToken}?t=${timestamp}`;
-        
-        console.log('=== FETCHING API ===', url);
         
         const response = await fetch(url, {
           method: 'GET',
@@ -47,27 +40,17 @@ export default function PublicScreenViewPage() {
           }
         });
 
-        console.log('=== API RESPONSE ===', response.status);
-
         if (response.ok) {
           const data = await response.json();
-          console.log('=== RAW API DATA ===');
-          console.log('Full response:', JSON.stringify(data, null, 2));
-          console.log('Has members?', 'members' in data);
-          console.log('Members count:', data.members?.length || 0);
-          
           setScreen(data);
-          console.log('Screen state updated with:', data.members?.length || 0, 'members');
         } else {
-          console.error('API response not ok:', response.status);
           setScreen(null);
         }
       } catch (error) {
-        console.error('=== FETCH ERROR ===', error);
+        console.error('Error loading screen:', error);
         setScreen(null);
       } finally {
         setLoading(false);
-        console.log('Loading complete');
       }
     };
 
@@ -174,9 +157,6 @@ export default function PublicScreenViewPage() {
     );
   }
 
-  console.log('=== RENDERING SCREEN ===');
-  console.log('Screen type:', screen.type);
-  console.log('Screen members:', (screen as any).members?.length || 0);
 
   return (
     <div className="min-h-screen relative">

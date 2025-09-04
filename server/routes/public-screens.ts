@@ -49,9 +49,6 @@ router.get('/token/:token', async (req, res) => {
           ...screen,
           members: activeMembers
         } as any;
-        console.log('=== FINAL SCREEN DATA ===');
-        console.log('screenData.members length:', screenData.members?.length);
-        console.log('screenData keys:', Object.keys(screenData));
       } catch (error) {
         console.error('Error fetching members for public screen:', error);
         // Continue without member data rather than failing the whole request

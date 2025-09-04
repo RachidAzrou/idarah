@@ -14,6 +14,8 @@ export default function PublicScreenViewPage() {
   const [loading, setLoading] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showControls, setShowControls] = useState(true);
+  
+  console.log('=== Component Render ===', { publicToken, loading, screen: !!screen });
 
   const loadScreen = async () => {
     console.log('=== loadScreen called ===');
@@ -41,15 +43,22 @@ export default function PublicScreenViewPage() {
         
         if (response.ok) {
           const screenData = await response.json();
-          console.log('=== Screen Data Received ===');
-          console.log('Screen:', screenData);
-          console.log('Members in response:', screenData.members?.length || 0);
+          console.log('=== RAW API RESPONSE ===');
+          console.log('Full response data:', JSON.stringify(screenData, null, 2));
+          console.log('Response keys:', Object.keys(screenData));
+          console.log('Members key exists:', 'members' in screenData);
+          console.log('Members value:', screenData.members);
+          console.log('Members length:', screenData.members?.length || 'undefined');
           
           // Force a fresh screen object to trigger React re-renders
           const freshScreen = {
             ...screenData,
             _loadTime: timestamp // Add unique property to force re-render
           };
+          
+          console.log('=== PROCESSED SCREEN OBJECT ===');
+          console.log('Fresh screen members:', freshScreen.members);
+          console.log('Fresh screen members length:', freshScreen.members?.length || 'undefined');
           
           setScreen(freshScreen);
         } else {
@@ -68,13 +77,23 @@ export default function PublicScreenViewPage() {
     }
   };
 
-  // Immediate load when component mounts or publicToken changes
+  // FORCE IMMEDIATE LOAD WITH DIFFERENT APPROACH
   useEffect(() => {
-    console.log('=== useEffect called ===', { publicToken });
+    console.log('=== LAYOUT EFFECT TRIGGERED ===', publicToken);
     if (publicToken) {
+      console.log('Calling loadScreen immediately...');
       loadScreen();
     }
   }, [publicToken]);
+  
+  // BACKUP EFFECT
+  useEffect(() => {
+    console.log('=== BACKUP useEffect ===', publicToken);
+    if (publicToken && !screen) {
+      console.log('Backup loadScreen call...');
+      setTimeout(() => loadScreen(), 100);
+    }
+  }, [publicToken, screen]);
 
   // Update document title when screen data is loaded
   useEffect(() => {

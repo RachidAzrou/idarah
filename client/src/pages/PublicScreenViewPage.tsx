@@ -38,6 +38,17 @@ export default function PublicScreenViewPage() {
     loadScreen();
   }, [publicToken]);
 
+  // Update document title when screen data is loaded
+  useEffect(() => {
+    if (screen?.name) {
+      document.title = screen.name;
+    }
+    // Reset title when component unmounts
+    return () => {
+      document.title = 'Ledenbeheer';
+    };
+  }, [screen?.name]);
+
   useEffect(() => {
     // Auto-hide controls after 3 seconds
     const timer = setTimeout(() => {

@@ -1877,26 +1877,77 @@ Het organisatieteam van {{tenant.name}}`
       <Dialog open={showPreviewDialog} onOpenChange={setShowPreviewDialog}>
         <DialogContent className="max-w-4xl w-full max-h-[90vh] overflow-auto">
           <DialogHeader>
-            <DialogTitle>Template Preview: {previewTemplate?.name}</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              <Mail className="w-5 h-5 text-blue-600" />
+              E-mail Preview
+            </DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label className="text-sm font-medium text-gray-700">Onderwerp</Label>
-              <div className="mt-1 p-3 bg-gray-50 border rounded-md">
-                <p className="font-medium text-gray-900">{previewTemplate?.subject}</p>
+          
+          {/* Email Interface Mock */}
+          <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+            {/* Email Header */}
+            <div className="border-b border-gray-200 bg-gray-50 px-6 py-4">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                      <Mail className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">Uw Moskee</p>
+                      <p className="text-sm text-gray-600">info@uwmoskee.nl</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm text-gray-600">Aan: lid@email.nl</p>
+                    <p className="text-xs text-gray-500">Nu</p>
+                  </div>
+                </div>
+                
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900">
+                    {previewTemplate?.subject || 'E-mail onderwerp'}
+                  </h2>
+                </div>
               </div>
             </div>
             
-            <div>
-              <Label className="text-sm font-medium text-gray-700">E-mail Inhoud</Label>
-              <div className="mt-1 border rounded-md overflow-hidden">
+            {/* Email Body */}
+            <div className="bg-white">
+              <div className="px-6 py-6">
                 <div 
-                  className="p-4 bg-white max-h-96 overflow-auto"
-                  dangerouslySetInnerHTML={{ __html: previewTemplate?.bodyHtml || previewTemplate?.body_html || '' }}
+                  className="prose prose-sm max-w-none text-gray-800 leading-relaxed"
+                  style={{
+                    fontFamily: 'system-ui, -apple-system, sans-serif',
+                    lineHeight: '1.6'
+                  }}
+                  dangerouslySetInnerHTML={{ 
+                    __html: previewTemplate?.bodyHtml || previewTemplate?.body_html || 
+                    '<p class="text-gray-500 italic">Geen e-mail inhoud beschikbaar</p>' 
+                  }}
                 />
               </div>
+              
+              {/* Email Footer */}
+              <div className="border-t border-gray-100 bg-gray-50 px-6 py-4">
+                <div className="text-center">
+                  <p className="text-xs text-gray-500 mb-2">
+                    Dit bericht is verzonden vanuit uw ledenbeheer systeem
+                  </p>
+                  <div className="flex justify-center items-center gap-4 text-xs text-gray-400">
+                    <span>© 2024 Uw Moskee</span>
+                    <span>•</span>
+                    <span>Lidmaatschap & Communicatie</span>
+                  </div>
+                </div>
+              </div>
             </div>
-            
+          </div>
+          
+          <div className="flex justify-end pt-4">
+            <Button variant="outline" onClick={() => setShowPreviewDialog(false)}>
+              Sluiten
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

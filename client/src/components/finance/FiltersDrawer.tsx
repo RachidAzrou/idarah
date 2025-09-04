@@ -16,12 +16,14 @@ interface FiltersToolbarProps {
   filters: FilterData;
   onFiltersChange: (filters: FilterData) => void;
   onClearFilters: () => void;
+  typeFilter?: string; // Type filter from main toolbar
 }
 
 export function FiltersToolbar({
   filters,
   onFiltersChange,
-  onClearFilters
+  onClearFilters,
+  typeFilter
 }: FiltersToolbarProps) {
   const [fromDateInput, setFromDateInput] = useState("");
   const [toDateInput, setToDateInput] = useState("");
@@ -78,7 +80,18 @@ export function FiltersToolbar({
     }
   };
 
-  const allCategories = [...categories.INCOME, ...categories.EXPENSE].sort();
+  // Filter categories based on selected type
+  const getAvailableCategories = () => {
+    if (typeFilter === 'INCOME') {
+      return categories.INCOME.sort();
+    } else if (typeFilter === 'EXPENSE') {
+      return categories.EXPENSE.sort();
+    }
+    // Show all categories if no type is selected or ALL is selected
+    return [...categories.INCOME, ...categories.EXPENSE].sort();
+  };
+
+  const availableCategories = getAvailableCategories();
 
   const hasActiveFilters = filters.category || filters.method !== "ALL" || filters.memberId || 
                           filters.dateFrom || filters.dateTo || filters.amountMin || filters.amountMax;
@@ -93,7 +106,7 @@ export function FiltersToolbar({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="ALL_CATEGORIES">Alle categorieën</SelectItem>
-            {allCategories.map((category) => (
+            {availableCategories.map((category) => (
               <SelectItem key={category} value={category}>
                 {category}
               </SelectItem>

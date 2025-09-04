@@ -124,6 +124,7 @@ export function Toolbar({
               filters={advancedFilters}
               onFiltersChange={onAdvancedFiltersChange}
               onClearFilters={onClearAdvancedFilters}
+              typeFilter={typeFilter}
             />
           </div>
         )}

@@ -1,0 +1,87 @@
+Ik heb een probleem met dubbele e-mailtemplates: in de database staan er maar 5 records, maar in de UI zie ik dubbele templates (10). Verwijderen werkt ook niet goed, want de UI blijft de tweede kopie renderen.  
+
+⚡️ Wat je moet doen om dit op te lossen:  
+
+1. **React Strict Mode uitzetten in dev**  
+   - In `next.config.js` zet `reactStrictMode: false`.  
+   - In `app/layout.tsx` geen `<React.StrictMode>` rond de children.  
+   - Dit voorkomt dat fetch en effects 2× lopen.  
+
+2. **API fixen**  
+   - In `app/api/messages/templates/route.ts` zet:
+     ```ts
+     export const dynamic = 'force-dynamic';
+     export const revalidate = 0;
+     ```
+   - Zorg dat de Prisma-query tenant-specifiek en distinct is:
+     ```ts
+     const rows = await prisma.emailTemplate.findMany({
+       where: { tenantId },
+       orderBy: { name: 'asc' },
+       distinct: ['id'],
+     });
+     return NextResponse.json(rows, { headers: { 'Cache-Control': 'no-store' } });
+     ```
+   - Gebruik GEEN `include`/JOIN die rows verdubbelt.  
+
+3. **Client fixen (React Query/tRPC)**  
+   - Query configureren zonder append:
+     ```ts
+     const { data = [] } = useQuery({
+       queryKey: ['emailTemplates', tenantId],
+       queryFn: () => fetch('/api/messages/templates', { cache: 'no-store' })
+                       .then(r => r.json()),
+       refetchOnWindowFocus: false,
+       refetchOnReconnect: false,
+       refetchOnMount: 'always',
+       select: (rows) => {
+         const seen = new Set<string>();
+         return rows.filter(r => {
+           const k = `${r.tenantId}:${r.id}`;
+           if (seen.has(k)) return false;
+           seen.add(k);
+           return true;
+         });
+       },
+     });
+     ```
+   - In de render: altijd `key={t.id}`, nooit index.  
+   - State updaten met `setTemplates(fetched)` in plaats van `prev => [...prev, ...fetched]`.  
+
+4. **Database constraints + seed**  
+   - In Prisma schema:
+     ```prisma
+     @@unique([tenantId, code], name: "emailtemplate_tenant_code_unique")
+     ```
+   - In seed script:
+     ```ts
+     await prisma.emailTemplate.upsert({
+       where: { emailtemplate_tenant_code_unique: { tenantId, code } },
+       update: { subject, bodyHtml, bodyText, kind },
+       create: { tenantId, code, name, subject, bodyHtml, bodyText, kind },
+     });
+     ```
+
+5. **Service Worker bypassen**  
+   - In `sw.js`, laat `/api/messages/templates` altijd naar netwerk gaan:
+     ```js
+     if (url.pathname.startsWith('/api/messages/templates')) {
+       return; // niet cachen
+     }
+     ```
+   - Of in dev: unregister de SW in Chrome DevTools → Application → Service Workers → Unregister.  
+
+6. **Debug toevoegen**  
+   - Log éénmalig in de client om te bewijzen dat API maar 5 teruggeeft:
+     ```ts
+     useEffect(() => {
+       fetch('/api/messages/templates', { cache: 'no-store' })
+         .then(r => r.json())
+         .then(rows => console.log('API count:', rows.length, rows));
+     }, []);
+     ```
+
+✅ Verwachte resultaat:  
+- UI toont exact 5 templates (geen dubbele).  
+- Delete werkt correct (verdwijnt direct uit UI en DB).  
+- Geen cache of Strict Mode issues meer.  

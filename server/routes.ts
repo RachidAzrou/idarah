@@ -1967,6 +1967,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/messages/templates', authMiddleware, async (req: AuthenticatedRequest, res) => {
     try {
       const templates = await emailService.listTemplates(req.user!.tenantId);
+      // Add no-cache headers to prevent duplicates
+      res.set({
+        'Cache-Control': 'no-store, no-cache, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      });
       res.json(templates);
     } catch (error) {
       console.error('Error fetching templates:', error);

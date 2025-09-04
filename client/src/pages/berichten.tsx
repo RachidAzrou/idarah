@@ -19,16 +19,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Mail, Plus, Send, Users, Eye, Settings, Ban, Edit, Play, TestTube, ChevronDown, ChevronRight, AlertTriangle, Calendar, PartyPopper, Megaphone } from "lucide-react";
 
-// Utility function to deduplicate templates by tenantId:code
-function uniqueBy<T>(arr: T[], key: (x: T) => string) {
-  const seen = new Set<string>();
-  return arr.filter((x) => {
-    const k = key(x);
-    if (seen.has(k)) return false;
-    seen.add(k);
-    return true;
-  });
-}
 import { PiPuzzlePiece, PiHandWaving } from "react-icons/pi";
 import { CgTemplate } from "react-icons/cg";
 import { MdEvent } from "react-icons/md";
@@ -177,14 +167,24 @@ export default function Berichten() {
   // Fetch data for each tab
   const { data: templatesData, isLoading: templatesLoading } = useQuery({
     queryKey: ["/api/messages/templates"],
-    staleTime: 10000, // 10 seconds
-    gcTime: 300000, // 5 minutes
-    refetchOnMount: false,
     refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchOnMount: 'always',
+    staleTime: 0,
+    gcTime: 0,
+    select: (rows) => {
+      const seen = new Set<string>();
+      return rows.filter(r => {
+        const k = `${r.tenantId}:${r.id}`;
+        if (seen.has(k)) return false;
+        seen.add(k);
+        return true;
+      });
+    },
   });
 
-  // Deduplicate templates to prevent double rendering and ensure uniqueness
-  const templates = uniqueBy(templatesData ?? [], (t) => `${t.tenantId || user?.tenantId}:${t.code}`);
+  // Use templates directly from query select deduplication
+  const templates = templatesData ?? [];
 
 
   const { data: segments, isLoading: segmentsLoading } = useQuery({

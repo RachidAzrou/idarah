@@ -57,10 +57,20 @@ export class EmailService {
 
   // Templates
   async listTemplates(tenantId: string) {
-    return await db.select()
+    const templates = await db.select()
       .from(emailTemplates)
       .where(eq(emailTemplates.tenantId, tenantId))
       .orderBy(desc(emailTemplates.createdAt));
+    
+    // Ensure uniqueness by ID to prevent duplicates
+    const seen = new Set<string>();
+    return templates.filter(template => {
+      if (seen.has(template.id)) {
+        return false;
+      }
+      seen.add(template.id);
+      return true;
+    });
   }
 
   async getTemplate(tenantId: string, id: string) {

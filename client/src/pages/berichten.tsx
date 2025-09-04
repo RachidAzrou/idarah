@@ -712,7 +712,7 @@ Het organisatieteam van {{tenant.name}}`
                       </div>
                     </CardContent>
                   </Card>
-                ))
+                ))}
               </>
             )}
           </div>
@@ -923,7 +923,7 @@ Het organisatieteam van {{tenant.name}}`
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                       <h4 className="font-medium text-blue-900 mb-2">Segment Overzicht</h4>
                       <p className="text-sm text-blue-700">
-                        Segment: {segments?.find((s: any) => s.id === selectedSegment)?.name}
+                        Segment: {Array.isArray(segments) ? segments.find((s: any) => s.id === selectedSegment)?.name : ''}
                       </p>
                       <p className="text-xs text-blue-600 mt-1">
                         Let op: De e-mail wordt verzonden naar alle leden die voldoen aan de segment criteria
@@ -1256,8 +1256,7 @@ Het organisatieteam van {{tenant.name}}`
                         <Select
                           value={segmentForm.watch("rules.category")?.[0] || ""}
                           onValueChange={(value) => {
-                            const current = segmentForm.watch("rules.category") || [];
-                            segmentForm.setValue("rules.category", value ? [value] : []);
+                            segmentForm.setValue("rules.category" as any, value ? [value] : []);
                           }}
                         >
                           <SelectTrigger>
@@ -1277,7 +1276,7 @@ Het organisatieteam van {{tenant.name}}`
                         <Label>Geslacht</Label>
                         <Select
                           value={segmentForm.watch("rules.gender") || ""}
-                          onValueChange={(value) => segmentForm.setValue("rules.gender", value || undefined)}
+                          onValueChange={(value) => segmentForm.setValue("rules.gender" as any, value || undefined)}
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="Alle geslachten" />
@@ -1293,9 +1292,9 @@ Het organisatieteam van {{tenant.name}}`
                       <div>
                         <Label>Stemgerechtigden</Label>
                         <Select
-                          value={segmentForm.watch("rules.hasVotingRights")?.toString() || ""}
+                          value={segmentForm.watch("rules.hasVotingRights" as any)?.toString() || ""}
                           onValueChange={(value) => {
-                            segmentForm.setValue("rules.hasVotingRights", value === "true" ? true : value === "false" ? false : undefined);
+                            segmentForm.setValue("rules.hasVotingRights" as any, value === "true" ? true : value === "false" ? false : undefined);
                           }}
                         >
                           <SelectTrigger>
@@ -1319,7 +1318,7 @@ Het organisatieteam van {{tenant.name}}`
                         <Label>Stad</Label>
                         <Input 
                           value={segmentForm.watch("rules.city") || ""}
-                          onChange={(e) => segmentForm.setValue("rules.city", e.target.value || undefined)}
+                          onChange={(e) => segmentForm.setValue("rules.city" as any, e.target.value || undefined)}
                           placeholder="Bijv. Antwerpen"
                         />
                       </div>
@@ -1328,7 +1327,7 @@ Het organisatieteam van {{tenant.name}}`
                         <Label>Postcode</Label>
                         <Input 
                           value={segmentForm.watch("rules.postalCode") || ""}
-                          onChange={(e) => segmentForm.setValue("rules.postalCode", e.target.value || undefined)}
+                          onChange={(e) => segmentForm.setValue("rules.postalCode" as any, e.target.value || undefined)}
                           placeholder="Bijv. 2000"
                         />
                       </div>
@@ -1338,10 +1337,10 @@ Het organisatieteam van {{tenant.name}}`
                           <Label>Min Leeftijd</Label>
                           <Input 
                             type="number"
-                            value={segmentForm.watch("rules.minAge")?.toString() || ""}
+                            value={segmentForm.watch("rules.minAge" as any)?.toString() || ""}
                             onChange={(e) => {
                               const val = e.target.value;
-                              segmentForm.setValue("rules.minAge", val ? parseInt(val) : undefined);
+                              segmentForm.setValue("rules.minAge" as any, val ? parseInt(val) : undefined);
                             }}
                             placeholder="18"
                           />
@@ -1350,10 +1349,10 @@ Het organisatieteam van {{tenant.name}}`
                           <Label>Max Leeftijd</Label>
                           <Input 
                             type="number"
-                            value={segmentForm.watch("rules.maxAge")?.toString() || ""}
+                            value={segmentForm.watch("rules.maxAge" as any)?.toString() || ""}
                             onChange={(e) => {
                               const val = e.target.value;
-                              segmentForm.setValue("rules.maxAge", val ? parseInt(val) : undefined);
+                              segmentForm.setValue("rules.maxAge" as any, val ? parseInt(val) : undefined);
                             }}
                             placeholder="65"
                           />

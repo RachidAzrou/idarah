@@ -230,18 +230,6 @@ export class EmailService {
   }
 
   async resolveSegment(tenantId: string, rules: any): Promise<Array<{memberId: string, email: string}>> {
-    let query = db.select({
-      id: members.id,
-      email: members.email,
-      firstName: members.firstName,
-      lastName: members.lastName,
-      category: members.category,
-      active: members.active,
-      city: members.city,
-      postalCode: members.postalCode,
-      createdAt: members.createdAt,
-    }).from(members).where(eq(members.tenantId, tenantId));
-
     // Apply filters based on rules
     const conditions: any[] = [eq(members.tenantId, tenantId)];
 
@@ -269,11 +257,23 @@ export class EmailService {
       conditions.push(lte(members.createdAt, new Date(rules.createdTo)));
     }
 
-    const results = await query.where(and(...conditions));
+    const results = await db.select({
+      id: members.id,
+      email: members.email,
+      firstName: members.firstName,
+      lastName: members.lastName,
+      category: members.category,
+      active: members.active,
+      city: members.city,
+      postalCode: members.postalCode,
+      createdAt: members.createdAt,
+    })
+    .from(members)
+    .where(and(...conditions));
 
     return results
-      .filter(member => member.email) // Only members with email
-      .map(member => ({
+      .filter((member: any) => member.email) // Only members with email
+      .map((member: any) => ({
         memberId: member.id,
         email: member.email!,
       }));
@@ -499,6 +499,10 @@ export class EmailService {
       const context = await this.buildMemberContext(tenantId, recipient.memberId);
       const tokens = this.generateTokens();
       
+      if (!campaign.template) {
+        throw new Error('Campaign template not found');
+      }
+
       const rendered = await this.renderTemplate(campaign.template.id, {
         ...context,
         openUrl: `${process.env.APP_BASE_URL}/api/messages/track/open/{{messageId}}/${tokens.openToken}.png`,
@@ -606,7 +610,7 @@ export class EmailService {
       .from(emailMessages)
       .where(eq(emailMessages.id, messageId));
 
-    if (!message || message.tokens.openToken !== openToken) {
+    if (!message || (message.tokens as any)?.openToken !== openToken) {
       return false;
     }
 
@@ -628,7 +632,7 @@ export class EmailService {
       .from(emailMessages)
       .where(eq(emailMessages.id, messageId));
 
-    if (!message || message.tokens.clickToken !== clickToken) {
+    if (!message || (message.tokens as any)?.clickToken !== clickToken) {
       return null;
     }
 

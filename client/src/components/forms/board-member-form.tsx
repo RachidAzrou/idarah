@@ -14,7 +14,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { CalendarIcon, User, Mail, Phone, Link, Crown, FileText } from "lucide-react";
+import { CalendarIcon, User, Mail, Phone, Link, Crown, FileText, Search } from "lucide-react";
 import { MdOutlinePermIdentity } from "react-icons/md";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
@@ -247,6 +247,75 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
                             <RadioGroupItem value="EXISTING_MEMBER" id="existing" />
                             <Label htmlFor="existing">Bestaand lid</Label>
                           </div>
+                          
+                          {linkType === 'EXISTING_MEMBER' && (
+                            <div className="ml-6 mt-3 space-y-3">
+                              <div className="relative">
+                                <Input
+                                  placeholder="Zoek op naam of lidnummer..."
+                                  value={memberSearch}
+                                  onChange={(e) => setMemberSearch(e.target.value)}
+                                  className="pr-10"
+                                  data-testid="input-member-search"
+                                />
+                                <Search className="absolute right-3 top-2.5 h-4 w-4 text-gray-400" />
+                              </div>
+                              
+                              {memberSearch && memberSearch.length > 1 && (
+                                <div className="max-h-40 overflow-y-auto border border-gray-200 rounded-md bg-white">
+                                  {members && members.length > 0 ? (
+                                    members.map((member) => (
+                                      <div
+                                        key={member.id}
+                                        className="p-2 hover:bg-gray-50 cursor-pointer border-b last:border-b-0"
+                                        onClick={() => handleMemberSelect(member)}
+                                        data-testid={`member-option-${member.id}`}
+                                      >
+                                        <div className="font-medium">
+                                          {member.firstName} {member.lastName}
+                                        </div>
+                                        <div className="text-sm text-gray-500">
+                                          #{member.memberNumber} • {member.email}
+                                        </div>
+                                      </div>
+                                    ))
+                                  ) : (
+                                    <div className="p-3 text-gray-500 text-center">
+                                      Geen leden gevonden
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                              
+                              {selectedMember && (
+                                <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
+                                  <div className="flex items-center justify-between">
+                                    <div>
+                                      <div className="font-medium text-blue-900">
+                                        {selectedMember.firstName} {selectedMember.lastName}
+                                      </div>
+                                      <div className="text-sm text-blue-700">
+                                        #{selectedMember.memberNumber} • {selectedMember.email}
+                                      </div>
+                                    </div>
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => {
+                                        setSelectedMember(null);
+                                        setMemberSearch('');
+                                        form.setValue('memberId', '');
+                                      }}
+                                      data-testid="button-clear-member"
+                                    >
+                                      ✕
+                                    </Button>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
                           <div className="flex items-center space-x-2">
                             <RadioGroupItem value="EXTERNAL_PERSON" id="external" />
                             <Label htmlFor="external">Externe persoon</Label>

@@ -17,7 +17,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Mail, Plus, Send, Users, Eye, Settings, Ban, Edit, Play, TestTube, ChevronDown, ChevronRight } from "lucide-react";
+import { Mail, Plus, Send, Users, Eye, Settings, Ban, Edit, Play, TestTube, ChevronDown, ChevronRight, AlertTriangle } from "lucide-react";
 import { PiPuzzlePiece } from "react-icons/pi";
 import { CgTemplate } from "react-icons/cg";
 import { MdEvent } from "react-icons/md";
@@ -36,8 +36,6 @@ function convertToHTML(plainText: string): string {
     <style>
       body { font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9; }
       .email-container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-      .header { text-align: center; padding-bottom: 20px; border-bottom: 2px solid #e0e0e0; margin-bottom: 25px; }
-      .header h1 { color: #2c3e50; margin: 0; font-size: 28px; font-weight: 300; }
       .content p { margin: 0 0 15px 0; }
       .highlight { background-color: #f8f9fa; padding: 15px; border-left: 4px solid #007bff; margin: 20px 0; border-radius: 0 4px 4px 0; }
       .footer { text-align: center; padding-top: 20px; border-top: 1px solid #e0e0e0; margin-top: 25px; color: #666; font-size: 14px; }
@@ -46,9 +44,6 @@ function convertToHTML(plainText: string): string {
   </head>
   <body>
     <div class="email-container">
-      <div class="header">
-        <h1>{{tenant.name}}</h1>
-      </div>
       <div class="content">
 `;
   
@@ -447,10 +442,49 @@ export default function Berichten() {
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-medium">E-mail Templates</h2>
             {canEdit && (
-              <Button onClick={handleNewTemplate} className="flex items-center gap-2" data-testid="button-new-template">
-                <Plus className="w-4 h-4" />
-                Nieuwe Template
-              </Button>
+              <div className="flex gap-2">
+                <Button onClick={handleNewTemplate} className="flex items-center gap-2" data-testid="button-new-template">
+                  <Plus className="w-4 h-4" />
+                  Nieuwe Template
+                </Button>
+                <Button 
+                  onClick={() => {
+                    setEditingTemplate(null);
+                    templateForm.reset({
+                      name: "Vervallen Lidgeld Herinnering",
+                      code: "EXPIRED_FEES",
+                      subject: "Herinnering: Vervallen lidgelden voor {{member.firstName}} {{member.lastName}}",
+                      content: `Beste {{member.firstName}} {{member.lastName}},
+
+We willen je eraan herinneren dat er nog openstaande lidgelden zijn die inmiddels vervallen zijn.
+
+Je openstaande vervallen lidgelden:
+{{#each member.fees.expired}}
+- €{{amount}} voor {{period}} (vervaldatum: {{dueDate}})
+{{/each}}
+
+Totaal vervallen bedrag: €{{member.fees.totalExpiredAmount}}
+
+Graag zouden we je willen vragen om deze bedragen zo spoedig mogelijk te voldoen. Je kunt betalen via:
+
+- Bankoverschrijving naar rekeningnummer: [REKENINGNUMMER]
+- Bancontact ter plaatse tijdens openingsuren
+- Contant tijdens openingsuren
+
+Heb je vragen over je lidgelden of wil je een betalingsregeling bespreken? Neem dan contact met ons op.
+
+Met vriendelijke groet,
+Het bestuur`
+                    });
+                    setShowTemplateDialog(true);
+                  }}
+                  className="bg-orange-600 hover:bg-orange-700 text-white flex items-center gap-2" 
+                  data-testid="button-create-expired-template"
+                >
+                  <AlertTriangle className="w-4 h-4" />
+                  Vervallen Lidgeld
+                </Button>
+              </div>
             )}
           </div>
 
@@ -1173,7 +1207,7 @@ export default function Berichten() {
 
       {/* Preview Dialog */}
       <Dialog open={showPreviewDialog} onOpenChange={setShowPreviewDialog}>
-        <DialogContent className="max-w-4xl">
+        <DialogContent className="max-w-4xl w-full max-h-[90vh] overflow-auto">
           <DialogHeader>
             <DialogTitle>Template Preview: {previewTemplate?.name}</DialogTitle>
           </DialogHeader>

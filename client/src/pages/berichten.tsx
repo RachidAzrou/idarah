@@ -17,7 +17,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Mail, Plus, Send, Users, Eye, Settings, Ban, Edit, Play, TestTube, ChevronDown, ChevronRight, AlertTriangle, Calendar, PartyPopper, Megaphone } from "lucide-react";
+import { Mail, Plus, Send, Users, Eye, Settings, Ban, Edit, Play, TestTube, ChevronDown, ChevronRight, AlertTriangle, Calendar, PartyPopper, Megaphone, Trash2 } from "lucide-react";
 
 import { PiPuzzlePiece, PiHandWaving } from "react-icons/pi";
 import { CgTemplate } from "react-icons/cg";
@@ -155,9 +155,11 @@ export default function Berichten() {
   const [showSegmentDialog, setShowSegmentDialog] = useState(false);
   const [showPreviewDialog, setShowPreviewDialog] = useState(false);
   const [showMappingTool, setShowMappingTool] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<any>(null);
   const [editingSegment, setEditingSegment] = useState<any>(null);
   const [previewTemplate, setPreviewTemplate] = useState<any>(null);
+  const [templateToDelete, setTemplateToDelete] = useState<any>(null);
   const [sendTemplateCode, setSendTemplateCode] = useState("");
   const [sendRecipient, setSendRecipient] = useState("");
   const [sendMode, setSendMode] = useState<"single" | "bulk">("single");
@@ -283,6 +285,26 @@ export default function Berichten() {
     }
   });
 
+  const deleteTemplateMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return apiRequest("DELETE", `/api/messages/templates/${id}`);
+    },
+    onSuccess: () => {
+      // Invalidate and refetch templates
+      queryClient.invalidateQueries({ queryKey: ["/api/messages/templates"] });
+      toast({ title: "Template verwijderd", description: "De template is succesvol verwijderd." });
+      setShowDeleteDialog(false);
+      setTemplateToDelete(null);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fout bij verwijderen template",
+        description: error.message || "Er is een fout opgetreden",
+        variant: "destructive"
+      });
+    }
+  });
+
   const createSegmentMutation = useMutation({
     mutationFn: async (data: z.infer<typeof segmentSchema>) => {
       return apiRequest("POST", "/api/messages/segments", data);
@@ -388,6 +410,17 @@ export default function Berichten() {
     
     setPreviewTemplate(previewData);
     setShowPreviewDialog(true);
+  };
+
+  const handleDeleteTemplate = (template: any) => {
+    setTemplateToDelete(template);
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDeleteTemplate = () => {
+    if (templateToDelete) {
+      deleteTemplateMutation.mutate(templateToDelete.id);
+    }
   };
 
 
@@ -660,16 +693,27 @@ export default function Berichten() {
                               Preview
                             </Button>
                             {canEdit && (
-                              <Button 
-                                size="sm" 
-                                variant="outline"
-                                onClick={() => handleEditTemplate(template)}
-                                className="flex-1"
-                                data-testid={`button-edit-${template.id}`}
-                              >
-                                <Edit className="w-4 h-4 mr-2" />
-                                Bewerken
-                              </Button>
+                              <>
+                                <Button 
+                                  size="sm" 
+                                  variant="outline"
+                                  onClick={() => handleEditTemplate(template)}
+                                  className="flex-1"
+                                  data-testid={`button-edit-${template.id}`}
+                                >
+                                  <Edit className="w-4 h-4 mr-2" />
+                                  Bewerken
+                                </Button>
+                                <Button 
+                                  size="sm" 
+                                  variant="outline"
+                                  onClick={() => handleDeleteTemplate(template)}
+                                  className="text-red-600 hover:text-red-700 hover:border-red-200 hover:bg-red-50"
+                                  data-testid={`button-delete-${template.id}`}
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </>
                             )}
                           </div>
                         </div>
@@ -1963,6 +2007,43 @@ Het organisatieteam van {{tenant.name}}`
               </div>
             </div>
             
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-red-600" />
+              Template verwijderen
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-gray-600">
+              Weet je zeker dat je de template "<strong>{templateToDelete?.name}</strong>" wilt verwijderen? 
+              Deze actie kan niet ongedaan worden gemaakt.
+            </p>
+            <div className="flex justify-end gap-3">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => setShowDeleteDialog(false)}
+                data-testid="button-cancel-delete"
+              >
+                Annuleren
+              </Button>
+              <Button 
+                type="button"
+                variant="destructive"
+                onClick={confirmDeleteTemplate}
+                disabled={deleteTemplateMutation.isPending}
+                data-testid="button-confirm-delete"
+              >
+                {deleteTemplateMutation.isPending ? 'Verwijderen...' : 'Verwijderen'}
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>

@@ -12,6 +12,7 @@ export default function PublicScreenViewPage() {
   const publicToken = params?.publicToken;
   const [screen, setScreen] = useState<PublicScreen | null>(null);
   const [loading, setLoading] = useState(true);
+  const [forceRefresh, setForceRefresh] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showControls, setShowControls] = useState(true);
 
@@ -47,8 +48,9 @@ export default function PublicScreenViewPage() {
   };
 
   useEffect(() => {
+    console.log('useEffect triggered with publicToken:', publicToken, 'forceRefresh:', forceRefresh);
     loadScreen();
-  }, [publicToken]);
+  }, [publicToken, forceRefresh]);
 
   // Update document title when screen data is loaded
   useEffect(() => {
@@ -192,7 +194,10 @@ export default function PublicScreenViewPage() {
         isFullscreen={isFullscreen}
         showControls={showControls}
         onFullscreen={handleFullscreen}
-        onRefresh={() => window.location.reload()}
+        onRefresh={() => {
+          console.log('Refreshing screen manually...');
+          setForceRefresh(prev => prev + 1);
+        }}
       />
     </div>
   );

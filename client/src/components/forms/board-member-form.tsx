@@ -539,7 +539,7 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, initial
             disabled={isLoading}
             data-testid="button-submit-form"
           >
-            {isLoading ? "Opslaan..." : "Bestuurslid Opslaan"}
+{isLoading ? "Opslaan..." : (initialData ? "Opslaan" : "Bestuurslid Toevoegen")}
           </Button>
         </div>
       </form>

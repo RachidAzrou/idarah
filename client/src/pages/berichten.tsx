@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
@@ -24,20 +24,93 @@ import { MdEvent } from "react-icons/md";
 import { LuSend, LuLogs } from "react-icons/lu";
 import { TbHandStop } from "react-icons/tb";
 
+// Function to convert plain text to professional HTML
+function convertToHTML(plainText: string): string {
+  if (!plainText?.trim()) return "";
+  
+  const baseStyle = `
+  <html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+      body { font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9; }
+      .email-container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+      .header { text-align: center; padding-bottom: 20px; border-bottom: 2px solid #e0e0e0; margin-bottom: 25px; }
+      .header h1 { color: #2c3e50; margin: 0; font-size: 28px; font-weight: 300; }
+      .content p { margin: 0 0 15px 0; }
+      .highlight { background-color: #f8f9fa; padding: 15px; border-left: 4px solid #007bff; margin: 20px 0; border-radius: 0 4px 4px 0; }
+      .footer { text-align: center; padding-top: 20px; border-top: 1px solid #e0e0e0; margin-top: 25px; color: #666; font-size: 14px; }
+      .button { display: inline-block; background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; margin: 10px 0; }
+    </style>
+  </head>
+  <body>
+    <div class="email-container">
+      <div class="header">
+        <h1>{{tenant.name}}</h1>
+      </div>
+      <div class="content">
+`;
+  
+  // Convert plain text to HTML paragraphs
+  const htmlContent = plainText
+    .split('\n\n') // Split into paragraphs
+    .filter(p => p.trim()) // Remove empty paragraphs
+    .map(paragraph => {
+      const trimmed = paragraph.trim();
+      // Handle Handlebars variables and links
+      if (trimmed.includes('{{') || trimmed.includes('http')) {
+        // Special formatting for links or variables
+        if (trimmed.includes('http') || trimmed.includes('{{card.url}}')) {
+          return `        <div class="highlight">
+          <p>${trimmed}</p>
+        </div>`;
+        }
+      }
+      return `        <p>${trimmed}</p>`;
+    })
+    .join('\n');
+  
+  const footer = `
+      </div>
+      <div class="footer">
+        <p>{{tenant.name}}<br/>
+        {{tenant.street}} {{tenant.number}}<br/>
+        {{tenant.postalCode}} {{tenant.city}}<br/>
+        <a href="mailto:{{tenant.email}}">{{tenant.email}}</a></p>
+      </div>
+    </div>
+  </body>
+  </html>`;
+  
+  return baseStyle + htmlContent + footer;
+}
+
+function convertToPlainText(content: string): string {
+  if (!content?.trim()) return "";
+  
+  // Add professional plain text formatting
+  const lines = content
+    .split('\n\n')
+    .filter(p => p.trim())
+    .join('\n\n');
+    
+  return `${lines}
+
+---
+{{tenant.name}}
+{{tenant.street}} {{tenant.number}}
+{{tenant.postalCode}} {{tenant.city}}
+{{tenant.email}}`;
+}
+
 // Form schemas
 const templateSchema = z.object({
   name: z.string().min(1, "Naam is verplicht"),
   code: z.string().min(1, "Code is verplicht"),
   subject: z.string().min(1, "Onderwerp is verplicht"),
-  bodyHtml: z.string().optional(),
-  bodyText: z.string().optional()
-}).refine(
-  (data) => data.bodyHtml || data.bodyText,
-  {
-    message: "HTML body of Text body moet ingevuld zijn",
-    path: ["bodyHtml"]
-  }
-);
+  content: z.string().min(1, "Inhoud is verplicht")
+});
 
 const segmentSchema = z.object({
   name: z.string().min(1, "Naam is verplicht"),
@@ -75,8 +148,6 @@ export default function Berichten() {
   const [sendRecipient, setSendRecipient] = useState("");
   const [sendMode, setSendMode] = useState<"single" | "bulk">("single");
   const [selectedSegment, setSelectedSegment] = useState("");
-  const [htmlBodyExpanded, setHtmlBodyExpanded] = useState(false);
-  const [textBodyExpanded, setTextBodyExpanded] = useState(false);
 
   // Fetch data for each tab
   const { data: templates, isLoading: templatesLoading } = useQuery({
@@ -97,8 +168,7 @@ export default function Berichten() {
       name: "",
       code: "",
       subject: "",
-      bodyHtml: "",
-      bodyText: ""
+      content: ""
     }
   });
 
@@ -128,8 +198,8 @@ export default function Berichten() {
         code: data.code,
         kind: "TRANSACTIONEEL", // Standaard waarde sinds type niet meer relevant is
         subject: data.subject,
-        body_html: data.bodyHtml || "",
-        body_text: data.bodyText || ""
+        body_html: convertToHTML(data.content),
+        body_text: convertToPlainText(data.content)
       });
     },
     onSuccess: () => {
@@ -154,8 +224,8 @@ export default function Berichten() {
         code: data.code,
         kind: "TRANSACTIONEEL", // Standaard waarde sinds type niet meer relevant is
         subject: data.subject,
-        body_html: data.bodyHtml || "",
-        body_text: data.bodyText || ""
+        body_html: convertToHTML(data.content),
+        body_text: convertToPlainText(data.content)
       };
       return apiRequest("PUT", `/api/messages/templates/${id}`, payload);
     },
@@ -218,12 +288,25 @@ export default function Berichten() {
   // Handler functions
   const handleEditTemplate = (template: any) => {
     setEditingTemplate(template);
+    // Extract plain text from HTML or use text content
+    const htmlContent = template.bodyHtml || template.body_html || "";
+    const textContent = template.bodyText || template.body_text || "";
+    
+    // Use text content if available, otherwise strip HTML tags from HTML content
+    let content = textContent;
+    if (!content && htmlContent) {
+      // Simple HTML tag removal for editing
+      content = htmlContent
+        .replace(/<[^>]*>/g, '') // Remove HTML tags
+        .replace(/\s+/g, ' ') // Normalize whitespace
+        .trim();
+    }
+    
     templateForm.reset({
       name: template.name,
       code: template.code,
       subject: template.subject,
-      bodyHtml: template.bodyHtml || template.body_html || "",
-      bodyText: template.bodyText || template.body_text || ""
+      content: content
     });
     setShowTemplateDialog(true);
   };
@@ -703,53 +786,27 @@ export default function Berichten() {
                 )}
               />
 
-              {/* HTML Body - Collapsible */}
-              <Collapsible open={htmlBodyExpanded} onOpenChange={setHtmlBodyExpanded}>
-                <CollapsibleTrigger asChild>
-                  <Button variant="ghost" className="w-full justify-between p-0 h-auto">
-                    <Label className="cursor-pointer">HTML Body</Label>
-                    {htmlBodyExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-                  </Button>
-                </CollapsibleTrigger>
-                <CollapsibleContent className="mt-2">
-                  <FormField
-                    control={templateForm.control}
-                    name="bodyHtml"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <Textarea {...field} placeholder="HTML inhoud van de e-mail" rows={8} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </CollapsibleContent>
-              </Collapsible>
-
-              {/* Text Body - Collapsible */}
-              <Collapsible open={textBodyExpanded} onOpenChange={setTextBodyExpanded}>
-                <CollapsibleTrigger asChild>
-                  <Button variant="ghost" className="w-full justify-between p-0 h-auto">
-                    <Label className="cursor-pointer">Text Body</Label>
-                    {textBodyExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-                  </Button>
-                </CollapsibleTrigger>
-                <CollapsibleContent className="mt-2">
-                  <FormField
-                    control={templateForm.control}
-                    name="bodyText"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <Textarea {...field} placeholder="Platte tekst versie" rows={6} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </CollapsibleContent>
-              </Collapsible>
+              <FormField
+                control={templateForm.control}
+                name="content"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Inhoud</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        {...field}
+                        placeholder="Schrijf hier de inhoud van je e-mail. Deze wordt automatisch omgezet naar een professionele layout."
+                        rows={8}
+                        className="resize-none"
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Gebruik Handlebars variabelen zoals {"{{member.firstName}}"} voor personalisatie. De layout wordt automatisch toegepast.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               <div className="flex justify-end gap-3">
                 <Button type="button" variant="outline" onClick={() => setShowTemplateDialog(false)}>

@@ -581,7 +581,7 @@ export default function Instellingen() {
                 <Card className="glass-card card-hover animate-fade-in group border-0">
                   <CardHeader>
                     <CardTitle>Organisatie Informatie</CardTitle>
-                    <p className="text-sm text-gray-500">Basis informatie over uw moskee organisatie</p>
+                    <p className="mt-2 text-sm text-gray-500">Basis informatie over uw moskee organisatie</p>
                   </CardHeader>
                   <CardContent>
                     <Form {...organizationForm}>
@@ -825,7 +825,7 @@ export default function Instellingen() {
                 <Card className="glass-card card-hover animate-fade-in group border-0">
                   <CardHeader>
                     <CardTitle>Standaard Lidgeld Tarieven</CardTitle>
-                    <p className="text-sm text-gray-500">Configureer de standaard bijdragen per lidcategorie</p>
+                    <p className="mt-2 text-sm text-gray-500">Configureer de standaard bijdragen per lidcategorie</p>
                   </CardHeader>
                   <CardContent>
                     <Form {...feeForm}>
@@ -955,7 +955,7 @@ export default function Instellingen() {
                   <CardHeader className="flex flex-row items-center justify-between">
                     <div>
                       <CardTitle>Gebruikersbeheer</CardTitle>
-                      <p className="text-sm text-gray-500">Beheer toegang en gebruikersrollen</p>
+                      <p className="mt-2 text-sm text-gray-500">Beheer toegang en gebruikersrollen</p>
                     </div>
                     <Dialog open={showNewUserDialog} onOpenChange={setShowNewUserDialog}>
                       <DialogTrigger asChild>
@@ -1204,7 +1204,7 @@ export default function Instellingen() {
                   <CardHeader className="flex flex-row items-center justify-between">
                     <div>
                       <CardTitle>Organisatieregels</CardTitle>
-                      <p className="text-sm text-gray-500">Configureer regels voor stemrecht, verkiesbaarheid en functies</p>
+                      <p className="mt-2 text-sm text-gray-500">Configureer regels voor stemrecht, verkiesbaarheid en functies</p>
                     </div>
                     <Dialog open={showNewRuleDialog} onOpenChange={setShowNewRuleDialog}>
                       <DialogTrigger asChild>

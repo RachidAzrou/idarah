@@ -230,27 +230,26 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
               </CardHeader>
               <CardContent className="space-y-4">
                 {isEditMode ? (
-                  /* Edit Mode: Read-only display */
-                  <div className="space-y-4 text-gray-600">
-                    {/* Member Info */}
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label className="text-sm font-medium text-gray-500">Naam</Label>
-                        <div className="mt-1 p-2 bg-gray-50 rounded border text-gray-700">
-                          {initialData?.memberId 
-                            ? `${memberDetails?.firstName || 'Onbekend'} ${memberDetails?.lastName || 'Lid'}` 
-                            : (initialData?.externalName || 'Externe persoon')}
+                  /* Edit Mode: Different handling for internal vs external members */
+                  initialData?.memberId ? (
+                    /* Internal member - Read-only display */
+                    <div className="space-y-4 text-gray-600">
+                      {/* Member Info */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label className="text-sm font-medium text-gray-500">Naam</Label>
+                          <div className="mt-1 p-2 bg-gray-50 rounded border text-gray-700">
+                            {`${memberDetails?.firstName || 'Onbekend'} ${memberDetails?.lastName || 'Lid'}`}
+                          </div>
+                        </div>
+                        <div>
+                          <Label className="text-sm font-medium text-gray-500">Type</Label>
+                          <div className="mt-1 p-2 bg-gray-50 rounded border text-gray-700">
+                            Intern lid
+                          </div>
                         </div>
                       </div>
-                      <div>
-                        <Label className="text-sm font-medium text-gray-500">Type</Label>
-                        <div className="mt-1 p-2 bg-gray-50 rounded border text-gray-700">
-                          {initialData?.memberId ? 'Intern lid' : 'Externe persoon'}
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {initialData?.memberId && (
+                      
                       <div className="grid grid-cols-3 gap-4">
                         <div>
                           <Label className="text-sm font-medium text-gray-500">Lidnummer</Label>
@@ -271,23 +270,87 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
                           </div>
                         </div>
                       </div>
-                    )}
-                    
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label className="text-sm font-medium text-gray-500">E-mail</Label>
-                        <div className="mt-1 p-2 bg-gray-50 rounded border text-gray-700">
-                          {(initialData?.memberId ? memberDetails?.email : initialData?.email) || 'Niet opgegeven'}
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label className="text-sm font-medium text-gray-500">E-mail</Label>
+                          <div className="mt-1 p-2 bg-gray-50 rounded border text-gray-700">
+                            {memberDetails?.email || 'Niet opgegeven'}
+                          </div>
+                        </div>
+                        <div>
+                          <Label className="text-sm font-medium text-gray-500">Telefoon</Label>
+                          <div className="mt-1 p-2 bg-gray-50 rounded border text-gray-700">
+                            {memberDetails?.phone || 'Niet opgegeven'}
+                          </div>
                         </div>
                       </div>
-                      <div>
-                        <Label className="text-sm font-medium text-gray-500">Telefoon</Label>
-                        <div className="mt-1 p-2 bg-gray-50 rounded border text-gray-700">
-                          {(initialData?.memberId ? memberDetails?.phone : initialData?.phone) || 'Niet opgegeven'}
-                        </div>
+                      
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                        <p className="text-sm text-blue-800">
+                          💡 Persoonlijke gegevens van interne leden kunnen alleen via het lidmaatschap worden aangepast.
+                        </p>
                       </div>
                     </div>
-                  </div>
+                  ) : (
+                    /* External person - Editable fields */
+                    <div className="space-y-4">
+                      <FormField
+                        control={form.control}
+                        name="externalName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Naam *</FormLabel>
+                            <FormControl>
+                              <Input 
+                                {...field} 
+                                placeholder="Volledige naam"
+                                data-testid="input-external-name-edit"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>E-mail</FormLabel>
+                            <FormControl>
+                              <Input 
+                                {...field} 
+                                type="email"
+                                placeholder="naam@voorbeeld.com"
+                                data-testid="input-external-email-edit"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="phone"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Telefoon</FormLabel>
+                            <FormControl>
+                              <Input 
+                                {...field} 
+                                placeholder="+32 123 456 789"
+                                data-testid="input-external-phone-edit"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  )
                 ) : (
                   /* Add Mode: Normal form fields */
                   linkType === 'EXISTING_MEMBER' ? (

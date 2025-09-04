@@ -99,6 +99,69 @@ export class EmailService {
       ));
   }
 
+  // Convert plain text to professional HTML
+  private convertToHTML(plainText: string): string {
+    if (!plainText?.trim()) return "";
+    
+    const baseStyle = `
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9; }
+        .email-container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .content p { margin: 0 0 15px 0; }
+        .highlight { background-color: #f8f9fa; padding: 15px; border-left: 4px solid #007bff; margin: 20px 0; border-radius: 0 4px 4px 0; }
+        .footer { text-align: center; padding-top: 20px; border-top: 1px solid #e0e0e0; margin-top: 25px; color: #666; font-size: 14px; }
+        .button { display: inline-block; background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; margin: 10px 0; }
+      </style>
+    </head>
+    <body>
+      <div class="email-container">
+        <div class="content">
+    `;
+    
+    // Convert plain text to HTML paragraphs
+    const htmlContent = plainText
+      .split('\n\n') // Split into paragraphs
+      .filter(p => p.trim()) // Remove empty paragraphs
+      .map(paragraph => {
+        const trimmed = paragraph.trim();
+        // Handle Handlebars variables and links
+        if (trimmed.includes('{{') || trimmed.includes('http')) {
+          // Special formatting for links or variables
+          if (trimmed.includes('http') || trimmed.includes('{{card.url}}')) {
+            return `        <div class="highlight">
+            <p>${trimmed}</p>
+          </div>`;
+          }
+        }
+        return `        <p>${trimmed}</p>`;
+      })
+      .join('\n');
+    
+    const footer = `
+        </div>
+      </div>
+    </body>
+    </html>`;
+    
+    return baseStyle + htmlContent + footer;
+  }
+
+  private convertToPlainText(content: string): string {
+    if (!content?.trim()) return "";
+    
+    // Add professional plain text formatting
+    const lines = content
+      .split('\n\n')
+      .filter(p => p.trim())
+      .join('\n\n');
+      
+    return lines;
+  }
+
   // Render template with context
   async renderTemplate(templateId: string, context: any) {
     const template = await db.select()
@@ -109,8 +172,23 @@ export class EmailService {
     if (!template[0]) throw new Error('Template not found');
 
     const subjectTemplate = Handlebars.compile(template[0].subject);
-    const htmlTemplate = Handlebars.compile(template[0].bodyHtml);
-    const textTemplate = template[0].bodyText ? Handlebars.compile(template[0].bodyText) : null;
+    
+    // Use content field if available (new format), otherwise fall back to old fields
+    let htmlContent: string;
+    let textContent: string;
+    
+    if (template[0].content) {
+      // Generate HTML and text from content field
+      htmlContent = this.convertToHTML(template[0].content);
+      textContent = this.convertToPlainText(template[0].content);
+    } else {
+      // Fall back to old bodyHtml and bodyText fields
+      htmlContent = template[0].bodyHtml || '';
+      textContent = template[0].bodyText || '';
+    }
+    
+    const htmlTemplate = Handlebars.compile(htmlContent);
+    const textTemplate = textContent ? Handlebars.compile(textContent) : null;
 
     // Add tracking if needed
     const enrichedContext = {

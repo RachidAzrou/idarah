@@ -43,7 +43,7 @@ export default function Login() {
 
   return (
     <div 
-      className="min-h-screen flex"
+      className="min-h-screen flex flex-col lg:flex-row"
       style={{
         backgroundImage: `url("${backgroundImage}")`,
         backgroundSize: 'cover',
@@ -54,26 +54,26 @@ export default function Login() {
       {/* Background overlay */}
       <div className="absolute inset-0 bg-black/30"></div>
       
-      {/* Left side - Logo */}
-      <div className="flex-1 flex flex-col justify-center items-center relative z-10">
+      {/* Logo section - Top on mobile, Left on desktop */}
+      <div className="flex-1 flex flex-col justify-center items-center relative z-10 py-8 lg:py-0">
         <div className="">
           <img 
             src={idarahLogo} 
             alt="IDARAH" 
-            className="h-40 w-auto scale-[7]"
+            className="h-20 w-auto scale-[3] sm:h-32 sm:scale-[5] lg:h-40 lg:scale-[7]"
           />
         </div>
       </div>
 
-      {/* Right side - Login form */}
-      <div className="flex-1 flex flex-col justify-center pl-8 pr-8 sm:pl-12 sm:pr-12 lg:pl-16 lg:pr-16 relative z-10">
+      {/* Login form section - Bottom on mobile, Right on desktop */}
+      <div className="flex-1 flex flex-col justify-center px-6 sm:px-8 lg:pl-8 lg:pr-16 relative z-10">
         <div className="max-w-md mx-auto w-full">
           {/* Title above login container */}
-          <h1 className="text-4xl font-bold text-white mb-6 leading-tight text-center">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-6 leading-tight text-center">
             Inloggen bij uw account
           </h1>
           
-          <div className="bg-white rounded-3xl shadow-2xl p-8">
+          <div className="bg-white rounded-3xl shadow-2xl p-6 sm:p-8">
             <form onSubmit={handleSubmit} className="space-y-6" data-testid="login-form">
               {error && (
                 <Alert variant="destructive" data-testid="login-error">

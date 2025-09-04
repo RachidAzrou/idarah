@@ -70,20 +70,6 @@ export function Toolbar({
                 <SelectItem value="EXPENSE">Uitgaven</SelectItem>
               </SelectContent>
             </Select>
-            
-            {/* Period Filter */}
-            <Select value={periodFilter} onValueChange={onPeriodFilter}>
-              <SelectTrigger className="w-full sm:w-40 h-10 border-gray-200" data-testid="select-period-filter">
-                <SelectValue placeholder="Alle periodes" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ALL">Alle periodes</SelectItem>
-                <SelectItem value="THIS_MONTH">Deze maand</SelectItem>
-                <SelectItem value="LAST_MONTH">Vorige maand</SelectItem>
-                <SelectItem value="THIS_YEAR">Dit jaar</SelectItem>
-                <SelectItem value="LAST_YEAR">Vorig jaar</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
           
           {/* Action Buttons */}

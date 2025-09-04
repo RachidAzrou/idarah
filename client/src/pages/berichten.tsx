@@ -883,7 +883,7 @@ export default function Berichten() {
                   <div className="space-y-2">
                     <h4 className="font-medium text-sm text-gray-900">Lidgelden</h4>
                     <div className="space-y-1 text-xs">
-                      <div className="text-gray-600 mb-1">Loop door lidgelden:</div>
+                      <div className="text-gray-600 mb-1">Loop door alle lidgelden:</div>
                       <code className="bg-gray-100 px-1 rounded text-xs">{"{{#each fees}}"}</code>
                       <div className="ml-2 space-y-1">
                         <div className="flex justify-between">
@@ -895,11 +895,45 @@ export default function Berichten() {
                           <span className="text-gray-500">Start periode</span>
                         </div>
                         <div className="flex justify-between">
+                          <code className="bg-gray-100 px-1 rounded">{"{{date periodEnd}}"}</code>
+                          <span className="text-gray-500">Eind periode</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <code className="bg-gray-100 px-1 rounded">{"{{date dueDate}}"}</code>
+                          <span className="text-gray-500">Vervaldatum</span>
+                        </div>
+                        <div className="flex justify-between">
                           <code className="bg-gray-100 px-1 rounded">{"{{status}}"}</code>
-                          <span className="text-gray-500">Status</span>
+                          <span className="text-gray-500">Status (BETAALD/OPENSTAAND/VERVALLEN)</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <code className="bg-gray-100 px-1 rounded">{"{{paymentMethod}}"}</code>
+                          <span className="text-gray-500">Betaalmethode</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <code className="bg-gray-100 px-1 rounded">{"{{category}}"}</code>
+                          <span className="text-gray-500">Lidgeld categorie</span>
                         </div>
                       </div>
                       <code className="bg-gray-100 px-1 rounded text-xs">{"{{/each}}"}</code>
+                      
+                      <div className="mt-3 pt-2 border-t">
+                        <div className="text-gray-600 mb-1">Gefilterde lidgelden:</div>
+                        <div className="space-y-1">
+                          <div className="flex justify-between">
+                            <code className="bg-blue-100 px-1 rounded">{"{{#each openstaandeFees}}"}</code>
+                            <span className="text-gray-500">Alleen openstaande</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <code className="bg-red-100 px-1 rounded">{"{{#each vervallenFees}}"}</code>
+                            <span className="text-gray-500">Alleen vervallen</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <code className="bg-green-100 px-1 rounded">{"{{#each betaaldeFees}}"}</code>
+                            <span className="text-gray-500">Alleen betaalde</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
 

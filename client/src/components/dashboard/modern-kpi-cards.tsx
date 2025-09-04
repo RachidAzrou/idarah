@@ -75,7 +75,7 @@ export default function ModernKpiCards() {
     },
     {
       title: "Openstaande Betalingen",
-      value: isLoading ? "..." : `€${(((stats as any)?.openPayments || 0)).toFixed(2)}`,
+      value: isLoading ? "..." : `€${(((stats as any)?.outstanding || 0)).toFixed(2)}`,
       delta: { value: "Te betalen bedragen", positive: false },
       icon: <Clock className="h-4 w-4 text-orange-500" />,
       iconBgColor: "bg-orange-50"

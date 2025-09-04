@@ -33,7 +33,7 @@ export function Toolbar({
   periodFilter
 }: ToolbarProps) {
   return (
-    <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between bg-white dark:bg-gray-900 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+    <div className="glass-card card-hover animate-fade-in group flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between p-4 rounded-lg border-0">
       {/* Search and Quick Filters */}
       <div className="flex flex-col sm:flex-row gap-3 flex-1 w-full sm:w-auto">
         {/* Search Bar */}

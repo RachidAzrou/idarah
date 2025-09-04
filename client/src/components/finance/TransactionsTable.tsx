@@ -166,7 +166,7 @@ const TransactionsTable = React.memo(function TransactionsTable({
   return (
     <div className="space-y-4">
       {/* Table */}
-      <div className="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+      <div className="glass-card card-hover animate-fade-in group rounded-lg border-0 overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow>

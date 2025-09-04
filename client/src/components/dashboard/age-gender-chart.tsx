@@ -67,21 +67,20 @@ export default function AgeGenderCard() {
 
   return (
     <div 
-      className="bg-white rounded-2xl border border-gray-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-40"
+      className="glass-card rounded-2xl card-hover animate-fade-in group focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-40"
       style={{ 
-        boxShadow: '0 6px 16px rgba(2,6,23,0.08)',
         padding: '20px 24px'
       }}
       tabIndex={0}
     >
       {/* Header with Total */}
-      <div className="mb-4 pb-3" style={{ borderBottom: '1px solid #E2E8F0' }}>
+      <div className="mb-4 pb-3 border-b border-gray-200">
         <div className="flex items-start justify-between">
           <div>
-            <h3 className="text-lg font-semibold font-['Poppins']" style={{ color: '#0F172A' }}>
+            <h3 className="text-lg font-semibold font-['Poppins'] text-foreground group-hover:text-primary transition-colors duration-300">
               Leeftijd en Geslacht
             </h3>
-            <p className="text-sm font-['Poppins']" style={{ color: '#64748B' }}>
+            <p className="text-sm font-['Poppins'] text-muted-foreground">
               Statistieken
             </p>
           </div>

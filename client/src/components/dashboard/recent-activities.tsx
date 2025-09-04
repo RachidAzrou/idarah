@@ -39,10 +39,10 @@ const RecentActivities = React.memo(function RecentActivities() {
   }, [transactions]);
   
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+    <div className="glass-card rounded-2xl p-6 card-hover animate-fade-in group">
       <div className="mb-6 pb-4 border-b border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900">Recente Activiteiten</h3>
-        <p className="text-sm text-gray-500">Laatste wijzigingen en acties</p>
+        <h3 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors duration-300">Recente Activiteiten</h3>
+        <p className="text-sm text-muted-foreground">Laatste wijzigingen en acties</p>
       </div>
       
       <div className="space-y-4">

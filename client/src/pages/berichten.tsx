@@ -1913,7 +1913,7 @@ Het organisatieteam van {{tenant.name}}`
         <DialogContent className="max-w-4xl w-full max-h-[90vh] overflow-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Mail className="w-5 h-5 text-blue-600" />
+              <Mail className="w-5 h-5 text-gray-600" />
               E-mail Preview
             </DialogTitle>
           </DialogHeader>
@@ -1925,8 +1925,8 @@ Het organisatieteam van {{tenant.name}}`
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                      <Mail className="w-5 h-5 text-blue-600" />
+                    <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+                      <Mail className="w-5 h-5 text-gray-600" />
                     </div>
                     <div>
                       <p className="font-medium text-gray-900">Uw Moskee</p>
@@ -2029,23 +2029,23 @@ Het organisatieteam van {{tenant.name}}`
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <FaArrowsDownToPeople className="w-5 h-5 text-blue-600" />
+              <FaArrowsDownToPeople className="w-5 h-5 text-gray-600" />
               Verzendgroep Preview: {previewSegment?.name}
             </DialogTitle>
           </DialogHeader>
           
           <div className="space-y-6">
             {/* Segment Info */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h3 className="font-medium text-blue-900 mb-2">Verzendgroep Details</h3>
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+              <h3 className="font-medium text-gray-900 mb-2">Verzendgroep Details</h3>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-blue-700">Naam:</span>
-                  <span className="font-medium text-blue-900">{previewSegment?.name}</span>
+                  <span className="text-gray-600">Naam:</span>
+                  <span className="font-medium text-gray-900">{previewSegment?.name}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-blue-700">Aantal criteria:</span>
-                  <span className="font-medium text-blue-900">
+                  <span className="text-gray-600">Aantal criteria:</span>
+                  <span className="font-medium text-gray-900">
                     {previewSegment?.rules ? Object.keys(previewSegment.rules).filter(key => previewSegment.rules[key] !== undefined && previewSegment.rules[key] !== null && previewSegment.rules[key] !== "").length : 0}
                   </span>
                 </div>
@@ -2118,9 +2118,9 @@ Het organisatieteam van {{tenant.name}}`
             </div>
             
             {/* Usage Info */}
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-              <h4 className="font-medium text-green-900 mb-2">Gebruik</h4>
-              <p className="text-sm text-green-700">
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+              <h4 className="font-medium text-gray-900 mb-2">Gebruik</h4>
+              <p className="text-sm text-gray-600">
                 Deze verzendgroep kan gebruikt worden bij het verzenden van emails naar specifieke groepen leden die voldoen aan de bovenstaande criteria.
               </p>
             </div>

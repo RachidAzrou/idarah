@@ -55,7 +55,7 @@ export default function Login() {
       <div className="absolute inset-0 bg-black/30"></div>
       
       {/* Left side - Logo */}
-      <div className="flex-1 flex flex-col justify-center items-end pr-8 relative z-10">
+      <div className="flex-1 flex flex-col justify-center items-center relative z-10">
         <div className="">
           <img 
             src={idarahLogo} 

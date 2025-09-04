@@ -79,13 +79,15 @@ export default function Bestuur() {
   const canEdit = user?.role !== 'MEDEWERKER';
 
   const { data: boardMembers, isLoading } = useQuery({
-    queryKey: ["/api/board/members", { status: statusFilter, role: roleFilter, q: searchTerm }],
+    queryKey: ["/api/board/members", { status: activeTab === "historiek" ? "INACTIEF" : statusFilter, role: roleFilter, q: searchTerm }],
     staleTime: 30000, // 30 seconds - longer caching for stability
     gcTime: 300000, // 5 minutes - keep data in cache longer
     refetchOnWindowFocus: false,
     queryFn: async () => {
       const params = new URLSearchParams();
-      if (statusFilter && statusFilter !== 'all') params.append('status', statusFilter);
+      // For history tab, always fetch inactive members
+      const currentStatus = activeTab === "historiek" ? "INACTIEF" : statusFilter;
+      if (currentStatus && currentStatus !== 'all') params.append('status', currentStatus);
       if (roleFilter && roleFilter !== 'all') params.append('role', roleFilter);
       if (searchTerm) params.append('q', searchTerm);
       

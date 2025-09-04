@@ -684,7 +684,7 @@ export default function Berichten() {
             </DialogTitle>
           </DialogHeader>
           <Form {...templateForm}>
-            <form onSubmit={templateForm.handleSubmit(handleTemplateSubmit)} className="space-y-6">
+            <form onSubmit={templateForm.handleSubmit(onTemplateSubmit)} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                   control={templateForm.control}
@@ -725,7 +725,7 @@ export default function Berichten() {
                       <Input placeholder="Welkom bij {{tenant.name}}" {...field} data-testid="input-template-subject" />
                     </FormControl>
                     <FormDescription>
-                      Gebruik variabelen zoals: {{member.firstName}}, {{tenant.name}}, {{member.email}}
+                      Gebruik variabelen zoals: {"{{member.firstName}}"}, {"{{tenant.name}}"}, {"{{member.email}}"}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -752,7 +752,7 @@ Het bestuur"
                       />
                     </FormControl>
                     <FormDescription>
-                      Ondersteunde variabelen: {{member.firstName}}, {{member.lastName}}, {{member.email}}, {{tenant.name}}, {{tenant.email}}, {{tenant.phone}}
+                      Ondersteunde variabelen: {"{{member.firstName}}"}, {"{{member.lastName}}"}, {"{{member.email}}"}, {"{{tenant.name}}"}, {"{{tenant.email}}"}, {"{{tenant.phone}}"}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -765,10 +765,10 @@ Het bestuur"
                 </Button>
                 <Button 
                   type="submit" 
-                  disabled={createTemplateMutation.isPending || updateTemplateMutation.isPending || !hasUnsavedChanges()}
+                  disabled={createTemplateMutation.isPending || updateTemplateMutation.isPending || !hasTemplateChanges()}
                   data-testid="button-save-template"
                 >
-                  {hasUnsavedChanges() ? (editingTemplate ? 'Wijzigingen opslaan' : 'Template aanmaken') : 'Geen wijzigingen'}
+                  {hasTemplateChanges() ? (editingTemplate ? 'Wijzigingen opslaan' : 'Template aanmaken') : 'Geen wijzigingen'}
                 </Button>
               </div>
             </form>
@@ -776,8 +776,20 @@ Het bestuur"
         </DialogContent>
       </Dialog>
 
-      {/* Segment Dialog */}
-      <Dialog open={showSegmentDialog} onOpenChange={setShowSegmentDialog}>
+                    {/* Vervallen Lidgeld Template Card */}
+                    <Card className="hover:shadow-lg transition-shadow border-gray-200 bg-gray-50" data-testid="card-template-expired">
+                      <CardHeader>
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <TbClockExclamation className="w-5 h-5 text-gray-600" />
+                              <CardTitle className="text-base text-gray-900" data-testid="text-template-name-expired">
+                                Herinnering Vervallen Lidgeld
+                              </CardTitle>
+                            </div>
+                            <CardDescription className="text-gray-700" data-testid="text-template-subject-expired">
+                              Voor leden met vervallen betalingen
+                            </CardDescription>
                           </div>
                         </div>
                       </CardHeader>
@@ -1279,7 +1291,7 @@ Het organisatieteam van {{tenant.name}}`
                 <h3 className="text-lg font-medium text-gray-900 mb-2">Nog geen segmenten</h3>
                 <p className="text-gray-500 mb-4">Maak je eerste lid segment</p>
                 {canEdit && (
-                  <Button data-testid="button-add-first-segment">
+                  <Button onClick={handleNewSegment} data-testid="button-add-first-segment">
                     <Plus className="w-4 h-4 mr-2" />
                     Segment Toevoegen
                   </Button>

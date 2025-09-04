@@ -328,28 +328,28 @@ export default function LidkaartenPage() {
 
         {/* KPI Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow">
+          <div className="glass-card rounded-xl p-4 card-hover animate-fade-in group">
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <p className="text-xs font-medium text-gray-500 mb-1">Actieve Lidkaarten</p>
-              <p className="text-lg font-bold text-gray-900 mb-1">{stats?.totalActive || 0}</p>
+              <p className="text-xs font-medium text-muted-foreground mb-1">Actieve Lidkaarten</p>
+              <p className="text-lg font-bold text-foreground mb-2 group-hover:text-primary transition-colors duration-300">{stats?.totalActive || 0}</p>
               <div className="flex items-center space-x-1">
                 <span className="text-xs font-medium text-green-600">
                   kaarten met status 'Actueel'
                 </span>
               </div>
             </div>
-            <div className="w-8 h-8 bg-green-50 rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center shadow-md ring-2 ring-white/10 group-hover:scale-110 transition-transform duration-300">
               <CreditCard className="h-4 w-4 text-green-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow">
+        <div className="glass-card rounded-xl p-4 card-hover animate-fade-in group">
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <p className="text-xs font-medium text-gray-500 mb-1">Verlopen Kaarten</p>
-              <p className="text-lg font-bold text-gray-900 mb-1">
+              <p className="text-xs font-medium text-muted-foreground mb-1">Verlopen Kaarten</p>
+              <p className="text-lg font-bold text-foreground mb-2 group-hover:text-primary transition-colors duration-300">
                 {filteredCards.filter(({ cardMeta }) => 
                   cardMeta?.status === 'VERLOPEN'
                 ).length}
@@ -360,17 +360,17 @@ export default function LidkaartenPage() {
                 </span>
               </div>
             </div>
-            <div className="w-8 h-8 bg-red-50 rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center shadow-md ring-2 ring-white/10 group-hover:scale-110 transition-transform duration-300">
               <AlertTriangle className="h-4 w-4 text-red-500" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow">
+        <div className="glass-card rounded-xl p-4 card-hover animate-fade-in group">
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <p className="text-xs font-medium text-gray-500 mb-1">Geen Kaart</p>
-              <p className="text-lg font-bold text-gray-900 mb-1">
+              <p className="text-xs font-medium text-muted-foreground mb-1">Geen Kaart</p>
+              <p className="text-lg font-bold text-foreground mb-2 group-hover:text-primary transition-colors duration-300">
                 {filteredCards.filter(({ cardMeta }) => 
                   !cardMeta
                 ).length}
@@ -381,17 +381,17 @@ export default function LidkaartenPage() {
                 </span>
               </div>
             </div>
-            <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center shadow-md ring-2 ring-white/10 group-hover:scale-110 transition-transform duration-300">
               <CiCreditCardOff className="h-4 w-4 text-gray-400" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow">
+        <div className="glass-card rounded-xl p-4 card-hover animate-fade-in group">
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <p className="text-xs font-medium text-gray-500 mb-1">Laatst Bijgewerkt</p>
-              <p className="text-lg font-bold text-gray-900 mb-1">
+              <p className="text-xs font-medium text-muted-foreground mb-1">Laatst Bijgewerkt</p>
+              <p className="text-lg font-bold text-foreground mb-2 group-hover:text-primary transition-colors duration-300">
                 {stats?.lastUpdated 
                   ? format(new Date(stats.lastUpdated), 'dd MMM', { locale: nl })
                   : 'N.v.t.'
@@ -403,7 +403,7 @@ export default function LidkaartenPage() {
                 </span>
               </div>
             </div>
-            <div className="w-8 h-8 bg-amber-50 rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center shadow-md ring-2 ring-white/10 group-hover:scale-110 transition-transform duration-300">
               <MdOutlineBrowserUpdated className="h-4 w-4 text-amber-500" />
             </div>
           </div>

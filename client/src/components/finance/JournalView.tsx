@@ -71,68 +71,68 @@ export function JournalView({ transactions }: JournalViewProps) {
     <div className="space-y-6">
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 shadow-sm hover:shadow-md transition-shadow">
+        <div className="glass-card rounded-xl p-4 card-hover animate-fade-in group">
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Debet</p>
-              <p className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1">{formatCurrencyBE(totals.debit)}</p>
+              <p className="text-xs font-medium text-muted-foreground mb-1">Debet</p>
+              <p className="text-lg font-bold text-foreground mb-2 group-hover:text-primary transition-colors duration-300">{formatCurrencyBE(totals.debit)}</p>
               <div className="flex items-center space-x-1">
-                <span className="text-xs font-medium text-red-600 dark:text-red-400">
+                <span className="text-xs font-medium text-red-600">
                   {debitTransactions.length} transacties
                 </span>
               </div>
             </div>
-            <div className="w-8 h-8 bg-red-50 dark:bg-red-900/20 rounded-full flex items-center justify-center">
-              <MdOutbox className="h-4 w-4 text-red-600 dark:text-red-400" />
+            <div className="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center shadow-md ring-2 ring-white/10 group-hover:scale-110 transition-transform duration-300">
+              <MdOutbox className="h-4 w-4 text-red-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 shadow-sm hover:shadow-md transition-shadow">
+        <div className="glass-card rounded-xl p-4 card-hover animate-fade-in group">
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Credit</p>
-              <p className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1">{formatCurrencyBE(totals.credit)}</p>
+              <p className="text-xs font-medium text-muted-foreground mb-1">Credit</p>
+              <p className="text-lg font-bold text-foreground mb-2 group-hover:text-primary transition-colors duration-300">{formatCurrencyBE(totals.credit)}</p>
               <div className="flex items-center space-x-1">
-                <span className="text-xs font-medium text-green-600 dark:text-green-400">
+                <span className="text-xs font-medium text-green-600">
                   {creditTransactions.length} transacties
                 </span>
               </div>
             </div>
-            <div className="w-8 h-8 bg-green-50 dark:bg-green-900/20 rounded-full flex items-center justify-center">
-              <HiInboxIn className="h-4 w-4 text-green-600 dark:text-green-400" />
+            <div className="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center shadow-md ring-2 ring-white/10 group-hover:scale-110 transition-transform duration-300">
+              <HiInboxIn className="h-4 w-4 text-green-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 shadow-sm hover:shadow-md transition-shadow">
+        <div className="glass-card rounded-xl p-4 card-hover animate-fade-in group">
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Saldo</p>
-              <p className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1">{formatCurrencyBE(Math.abs(totals.balance))}</p>
+              <p className="text-xs font-medium text-muted-foreground mb-1">Saldo</p>
+              <p className="text-lg font-bold text-foreground mb-2 group-hover:text-primary transition-colors duration-300">{formatCurrencyBE(Math.abs(totals.balance))}</p>
               <div className="flex items-center space-x-1">
                 <span className={`text-xs font-medium ${
                   totals.balance >= 0 
-                    ? 'text-green-600 dark:text-green-400' 
-                    : 'text-red-600 dark:text-red-400'
+                    ? 'text-green-600' 
+                    : 'text-red-600'
                 }`}>
                   {totals.balance >= 0 ? 'Overschot' : 'Tekort'}
                 </span>
               </div>
             </div>
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-md ring-2 ring-white/10 group-hover:scale-110 transition-transform duration-300 ${
               totals.balance > 0 
-                ? 'bg-green-50 dark:bg-green-900/20' 
+                ? 'bg-green-50' 
                 : totals.balance < 0
-                ? 'bg-red-50 dark:bg-red-900/20'
-                : 'bg-gray-50 dark:bg-gray-900/20'
+                ? 'bg-red-50'
+                : 'bg-gray-50'
             }`}>
               <HiInbox className={`h-4 w-4 ${
                 totals.balance > 0 
-                  ? 'text-green-600 dark:text-green-400' 
+                  ? 'text-green-600' 
                   : totals.balance < 0
-                  ? 'text-red-600 dark:text-red-400'
-                  : 'text-gray-600 dark:text-gray-400'
+                  ? 'text-red-600'
+                  : 'text-gray-600'
               }`} />
             </div>
           </div>

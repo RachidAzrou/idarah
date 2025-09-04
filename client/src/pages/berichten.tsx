@@ -1203,14 +1203,6 @@ export default function Berichten() {
               </div>
             </div>
             
-            <div>
-              <Label className="text-sm font-medium text-gray-700">Tekst Versie</Label>
-              <div className="mt-1 p-3 bg-gray-50 border rounded-md max-h-32 overflow-auto">
-                <pre className="text-sm text-gray-700 whitespace-pre-wrap">
-                  {previewTemplate?.bodyText || previewTemplate?.body_text}
-                </pre>
-              </div>
-            </div>
           </div>
         </DialogContent>
       </Dialog>

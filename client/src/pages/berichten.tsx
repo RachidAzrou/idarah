@@ -38,6 +38,8 @@ function convertToHTML(plainText: string): string {
       .email-container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
       .content p { margin: 0 0 15px 0; }
       .highlight { background-color: #f8f9fa; padding: 15px; border-left: 4px solid #007bff; margin: 20px 0; border-radius: 0 4px 4px 0; }
+      .expired-amount { background-color: #fef2f2; padding: 15px; border-left: 4px solid #dc2626; margin: 20px 0; border-radius: 0 4px 4px 0; }
+      .expired-amount p { color: #991b1b; font-weight: 500; }
       .footer { text-align: center; padding-top: 20px; border-top: 1px solid #e0e0e0; margin-top: 25px; color: #666; font-size: 14px; }
       .button { display: inline-block; background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; margin: 10px 0; }
     </style>
@@ -61,6 +63,12 @@ function convertToHTML(plainText: string): string {
           <p>${trimmed}</p>
         </div>`;
         }
+      }
+      // Red highlighting for expired fee amounts and totals
+      if (trimmed.includes('€') && (trimmed.includes('{{#each member.fees.expired}}') || trimmed.includes('{{member.fees.totalExpiredAmount}}') || trimmed.includes('Totaal vervallen bedrag'))) {
+        return `        <div class="expired-amount">
+        <p>${trimmed}</p>
+      </div>`;
       }
       return `        <p>${trimmed}</p>`;
     })

@@ -1946,6 +1946,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get('/api/board/members/by-member/:memberId', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      const tenantId = req.user!.tenantId;
+      const memberId = req.params.memberId;
+
+      const boardMember = await boardService.getBoardMemberByMemberId(tenantId, memberId);
+      res.json(boardMember);
+    } catch (error) {
+      console.error('Error fetching board member by member ID:', error);
+      res.status(500).json({ error: "Fout bij ophalen bestuurslid" });
+    }
+  });
+
   // Email Messaging Routes
   const { EmailService } = await import('./services/email.js');
   const emailService = new EmailService();

@@ -6,7 +6,8 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Member, MemberFinancialSettings } from "@shared/schema";
 import { formatCurrencyBE, formatDateBE, getMemberCategoryLabel } from "@/lib/format";
-import { User, Calendar, CreditCard, Phone, Mail, MapPin, FileText, Edit, X, UserCircle, Contact, Shield, Settings, Home, Building2, CheckSquare } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { User, Calendar, CreditCard, Phone, Mail, MapPin, FileText, Edit, X, UserCircle, Contact, Shield, Settings, Home, Building2, CheckSquare, Crown } from "lucide-react";
 
 // Extended member type that includes related data
 interface MemberWithDetails extends Member {
@@ -31,6 +32,13 @@ interface MemberDetailDialogProps {
 export function MemberDetailDialog({ member, open, onClose, onEdit }: MemberDetailDialogProps) {
   const [activeTab, setActiveTab] = useState('personal');
   
+  // Check if member is a board member
+  const { data: boardMembership } = useQuery<any>({
+    queryKey: ["/api/board/members/by-member", member?.id],
+    enabled: open && !!member?.id,
+    staleTime: 10000,
+  });
+  
   if (!member) return null;
 
   return (
@@ -51,9 +59,17 @@ export function MemberDetailDialog({ member, open, onClose, onEdit }: MemberDeta
               {member.active ? 'Actief' : 'Inactief'}
             </Badge>
           </div>
-          <h3 className="font-semibold text-base">
-            {member.firstName} {member.lastName}
-          </h3>
+          <div className="flex items-center gap-2">
+            <h3 className="font-semibold text-base">
+              {member.firstName} {member.lastName}
+            </h3>
+            {boardMembership && (
+              <div className="flex items-center gap-1 text-amber-600">
+                <Crown className="h-4 w-4" />
+                <span className="text-xs font-medium">Bestuurslid</span>
+              </div>
+            )}
+          </div>
           <p className="text-gray-600 dark:text-gray-400 text-sm">
             {getMemberCategoryLabel(member.category)}
           </p>

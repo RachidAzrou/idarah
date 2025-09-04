@@ -47,14 +47,14 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-sidebar-border bg-sidebar backdrop-blur supports-[backdrop-filter]:bg-sidebar/95">
-      <div className="w-full flex h-12 items-center px-4 sm:px-6 lg:px-8">
+      <div className="w-full flex h-12 items-center pl-2 pr-4 sm:pr-6 lg:pr-8">
         {/* Logo - helemaal links */}
         <div className="flex items-center">
-          <Link href="/dashboard" className="flex items-center space-x-3">
+          <Link href="/dashboard" className="flex items-center">
             <img 
               src={darahLogo} 
               alt="DARAH Logo" 
-              className="w-48 h-12 xs:w-52 xs:h-13 sm:w-56 sm:h-14 md:w-60 md:h-15 lg:w-64 lg:h-16 object-contain"
+              className="w-56 h-14 xs:w-60 xs:h-15 sm:w-64 sm:h-16 md:w-72 md:h-18 lg:w-80 lg:h-20 object-contain"
             />
           </Link>
         </div>

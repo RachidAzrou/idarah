@@ -17,6 +17,11 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Mail, Plus, Send, Users, Eye, Settings, Ban, Edit, Play, TestTube } from "lucide-react";
+import { PiPuzzlePiece } from "react-icons/pi";
+import { CgTemplate } from "react-icons/cg";
+import { MdEvent } from "react-icons/md";
+import { LuSend, LuLogs } from "react-icons/lu";
+import { TbHandStop } from "react-icons/tb";
 
 // Form schemas
 const templateSchema = z.object({
@@ -363,27 +368,27 @@ export default function Berichten() {
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid grid-cols-6 w-auto" data-testid="message-tabs">
           <TabsTrigger value="templates" data-testid="tab-templates">
-            <Mail className="w-4 h-4 mr-2" />
+            <CgTemplate className="w-4 h-4 mr-2" />
             Templates
           </TabsTrigger>
           <TabsTrigger value="segments" data-testid="tab-segments">
-            <Users className="w-4 h-4 mr-2" />
+            <PiPuzzlePiece className="w-4 h-4 mr-2" />
             Segmenten
           </TabsTrigger>
           <TabsTrigger value="campaigns" data-testid="tab-campaigns">
-            <Send className="w-4 h-4 mr-2" />
+            <MdEvent className="w-4 h-4 mr-2" />
             Campagnes
           </TabsTrigger>
           <TabsTrigger value="send" data-testid="tab-send">
-            <Mail className="w-4 h-4 mr-2" />
+            <LuSend className="w-4 h-4 mr-2" />
             Verzenden
           </TabsTrigger>
           <TabsTrigger value="logs" data-testid="tab-logs">
-            <Eye className="w-4 h-4 mr-2" />
+            <LuLogs className="w-4 h-4 mr-2" />
             Logs
           </TabsTrigger>
           <TabsTrigger value="unsubscribe" data-testid="tab-unsubscribe">
-            <Ban className="w-4 h-4 mr-2" />
+            <TbHandStop className="w-4 h-4 mr-2" />
             Uitschrijvingen
           </TabsTrigger>
         </TabsList>

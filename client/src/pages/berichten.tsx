@@ -1796,9 +1796,8 @@ Het organisatieteam van {{tenant.name}}`
                           <SelectContent>
                             <SelectItem value="ALL">Alle categorieën</SelectItem>
                             <SelectItem value="STUDENT">Student</SelectItem>
+                            <SelectItem value="STANDAARD">Standaard</SelectItem>
                             <SelectItem value="SENIOR">Senior</SelectItem>
-                            <SelectItem value="REGULIER">Regulier</SelectItem>
-                            <SelectItem value="FAMILIE">Familie</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>

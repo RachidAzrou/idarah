@@ -210,8 +210,10 @@ export default function Berichten() {
       return apiRequest("DELETE", `/api/messages/templates/${templateId}`);
     },
     onSuccess: () => {
+      // Force immediate cache invalidation and refetch
+      queryClient.removeQueries({ queryKey: ["/api/messages/templates"] });
       queryClient.invalidateQueries({ queryKey: ["/api/messages/templates"] });
-      queryClient.refetchQueries({ queryKey: ["/api/messages/templates"] });
+      queryClient.refetchQueries({ queryKey: ["/api/messages/templates"], type: 'active' });
       toast({ title: "Template verwijderd", description: "De template is succesvol verwijderd." });
     },
     onError: (error: any) => {

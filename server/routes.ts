@@ -2004,6 +2004,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.delete('/api/messages/templates/:id', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      // Check permissions - only BEHEERDER and SUPERADMIN can delete
+      if (req.user!.role === 'MEDEWERKER') {
+        return res.status(403).json({ error: "Geen toegang" });
+      }
+
+      await emailService.deleteTemplate(req.user!.tenantId, req.params.id);
+      res.json({ message: "Template verwijderd" });
+    } catch (error) {
+      console.error('Error deleting template:', error);
+      res.status(500).json({ error: "Fout bij verwijderen template" });
+    }
+  });
+
   app.post('/api/messages/templates/:id/test', authMiddleware, async (req: AuthenticatedRequest, res) => {
     try {
       // Check permissions - only BEHEERDER and SUPERADMIN can send test

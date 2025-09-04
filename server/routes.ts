@@ -11,7 +11,7 @@ import { financialService } from "./services/financial";
 import { cardService } from "./services/card";
 import { ruleService } from "./services/ruleService";
 import { boardService } from "./services/board";
-import { insertUserSchema, insertMemberSchema, insertMembershipFeeSchema, cardMeta, insertBoardMemberSchema } from "@shared/schema";
+import { insertUserSchema, insertMemberSchema, insertMembershipFeeSchema, cardMeta, insertBoardMemberSchema, emailSegments, emailSuppress } from "@shared/schema";
 import { eq } from "drizzle-orm";
 import { db } from "./db";
 import { generateFeesHandler } from "./api/jobs/fees/generate";
@@ -1943,6 +1943,183 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error reordering board:', error);
       res.status(500).json({ error: "Fout bij herordenen bestuur" });
+    }
+  });
+
+  // Email Messaging Routes
+  const { EmailService } = await import('./services/email.js');
+  const emailService = new EmailService();
+
+  // Templates
+  app.get('/api/messages/templates', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      const templates = await emailService.listTemplates(req.user!.tenantId);
+      res.json(templates);
+    } catch (error) {
+      console.error('Error fetching templates:', error);
+      res.status(500).json({ error: "Fout bij ophalen templates" });
+    }
+  });
+
+  app.post('/api/messages/templates', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      // Check permissions - only BEHEERDER and SUPERADMIN can create
+      if (req.user!.role === 'MEDEWERKER') {
+        return res.status(403).json({ error: "Geen toegang" });
+      }
+
+      const template = await emailService.createTemplate(req.user!.tenantId, req.body);
+      res.json(template);
+    } catch (error) {
+      console.error('Error creating template:', error);
+      res.status(500).json({ error: "Fout bij aanmaken template" });
+    }
+  });
+
+  app.put('/api/messages/templates/:id', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      // Check permissions - only BEHEERDER and SUPERADMIN can update
+      if (req.user!.role === 'MEDEWERKER') {
+        return res.status(403).json({ error: "Geen toegang" });
+      }
+
+      const template = await emailService.updateTemplate(req.user!.tenantId, req.params.id, req.body);
+      res.json(template);
+    } catch (error) {
+      console.error('Error updating template:', error);
+      res.status(500).json({ error: "Fout bij bijwerken template" });
+    }
+  });
+
+  app.post('/api/messages/templates/:id/test', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      // Check permissions - only BEHEERDER and SUPERADMIN can send test
+      if (req.user!.role === 'MEDEWERKER') {
+        return res.status(403).json({ error: "Geen toegang" });
+      }
+
+      const { toEmail, sampleContext } = req.body;
+      await emailService.sendTestEmail(req.user!.tenantId, req.params.id, toEmail, sampleContext);
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error sending test email:', error);
+      res.status(500).json({ error: "Fout bij verzenden testmail" });
+    }
+  });
+
+  // Segments
+  app.get('/api/messages/segments', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      const segments = await emailService.listSegments(req.user!.tenantId);
+      res.json(segments);
+    } catch (error) {
+      console.error('Error fetching segments:', error);
+      res.status(500).json({ error: "Fout bij ophalen segmenten" });
+    }
+  });
+
+  app.post('/api/messages/segments', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      // Check permissions - only BEHEERDER and SUPERADMIN can create
+      if (req.user!.role === 'MEDEWERKER') {
+        return res.status(403).json({ error: "Geen toegang" });
+      }
+
+      const segment = await emailService.createSegment(req.user!.tenantId, req.body);
+      res.json(segment);
+    } catch (error) {
+      console.error('Error creating segment:', error);
+      res.status(500).json({ error: "Fout bij aanmaken segment" });
+    }
+  });
+
+  app.post('/api/messages/segments/:id/preview', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      const segment = await db.select()
+        .from(emailSegments)
+        .where(and(
+          eq(emailSegments.tenantId, req.user!.tenantId),
+          eq(emailSegments.id, req.params.id)
+        ))
+        .limit(1);
+
+      if (!segment[0]) {
+        return res.status(404).json({ error: "Segment niet gevonden" });
+      }
+
+      const preview = await emailService.previewSegment(req.user!.tenantId, segment[0].rules);
+      res.json(preview);
+    } catch (error) {
+      console.error('Error previewing segment:', error);
+      res.status(500).json({ error: "Fout bij preview segment" });
+    }
+  });
+
+  // Campaigns
+  app.get('/api/messages/campaigns', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      const campaigns = await emailService.listCampaigns(req.user!.tenantId);
+      res.json(campaigns);
+    } catch (error) {
+      console.error('Error fetching campaigns:', error);
+      res.status(500).json({ error: "Fout bij ophalen campagnes" });
+    }
+  });
+
+
+  // Single transactional send
+  app.post('/api/messages/send', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      // Check permissions - only BEHEERDER and SUPERADMIN can send
+      if (req.user!.role === 'MEDEWERKER') {
+        return res.status(403).json({ error: "Geen toegang" });
+      }
+
+      const { templateCode, memberId, email, context } = req.body;
+      
+      const message = await emailService.sendTransactional(req.user!.tenantId, templateCode, {
+        memberId,
+        email,
+        context,
+      });
+      
+      res.json(message);
+    } catch (error) {
+      console.error('Error sending transactional email:', error);
+      res.status(500).json({ error: "Fout bij verzenden e-mail" });
+    }
+  });
+
+  // Unsubscribe route
+  app.get('/email/unsubscribe', async (req, res) => {
+    try {
+      const token = req.query.token as string;
+      
+      // In a real implementation, you would decode the token to get tenant and email
+      // For now, we'll create a simple unsubscribe page
+      res.send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Uitschrijven</title>
+          <meta charset="utf-8">
+          <style>
+            body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; }
+            .container { text-align: center; }
+            .success { color: #10b981; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <h1>Uitschrijven</h1>
+            <p class="success">Je bent succesvol uitgeschreven van marketing e-mails.</p>
+            <p>Je ontvangt nog steeds belangrijke transactionele berichten zoals betalingsherinneringen.</p>
+          </div>
+        </body>
+        </html>
+      `);
+    } catch (error) {
+      res.status(500).send('Er is een fout opgetreden');
     }
   });
 

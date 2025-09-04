@@ -29,6 +29,10 @@ export const statementTypeEnum = pgEnum('statement_type', ['BANK', 'CSV', 'MT940
 export const txnSideEnum = pgEnum('txn_side', ['CREDIT', 'DEBET']);
 export const boardRoleEnum = pgEnum('board_role', ['VOORZITTER', 'ONDERVERZITTER', 'SECRETARIS', 'PENNINGMEESTER', 'BESTUURSLID', 'ADVISEUR']);
 export const boardStatusEnum = pgEnum('board_status', ['ACTIEF', 'INACTIEF']);
+export const emailKindEnum = pgEnum('email_kind', ['TRANSACTIONEEL', 'MARKETING']);
+export const emailStatusEnum = pgEnum('email_status', ['DRAFT', 'QUEUED', 'SENDING', 'SENT', 'PARTIAL', 'FAILED', 'CANCELLED']);
+export const recipientStatusEnum = pgEnum('recipient_status', ['QUEUED', 'SENT', 'FAILED', 'OPENED', 'CLICKED', 'UNSUBSCRIBED']);
+export const suppressReasonEnum = pgEnum('suppress_reason', ['UNSUB_REQUEST', 'BOUNCE', 'SPAM_COMPLAINT', 'MANUAL']);
 
 // Tables
 export const tenants = pgTable("tenants", {
@@ -837,3 +841,82 @@ export type MethodSlice = {
   amount: number;
   count: number;
 };
+
+// Email Messaging Tables
+export const emailTemplates = pgTable("email_templates", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tenantId: varchar("tenant_id").notNull(),
+  name: text("name").notNull(),
+  code: text("code").notNull(), // e.g. "nieuw_lid", "vervallen_lidgeld"
+  kind: emailKindEnum("kind").notNull(),
+  subject: text("subject").notNull(),
+  bodyHtml: text("body_html").notNull(),
+  bodyText: text("body_text"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const emailSegments = pgTable("email_segments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tenantId: varchar("tenant_id").notNull(),
+  name: text("name").notNull(),
+  rules: json("rules").notNull(), // JSON filter rules
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const emailCampaigns = pgTable("email_campaigns", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tenantId: varchar("tenant_id").notNull(),
+  name: text("name").notNull(),
+  templateId: varchar("template_id").notNull(),
+  segmentId: varchar("segment_id"),
+  kind: emailKindEnum("kind").notNull(),
+  status: emailStatusEnum("status").default('DRAFT').notNull(),
+  scheduledAt: timestamp("scheduled_at"),
+  startedAt: timestamp("started_at"),
+  finishedAt: timestamp("finished_at"),
+  createdById: varchar("created_by_id"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const emailMessages = pgTable("email_messages", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tenantId: varchar("tenant_id").notNull(),
+  campaignId: varchar("campaign_id"),
+  templateId: varchar("template_id").notNull(),
+  memberId: varchar("member_id"),
+  email: text("email").notNull(),
+  subject: text("subject").notNull(),
+  bodyHtml: text("body_html").notNull(),
+  bodyText: text("body_text"),
+  status: recipientStatusEnum("status").default('QUEUED').notNull(),
+  lastError: text("last_error"),
+  tokens: json("tokens").notNull(), // { openToken, clickToken, unsubToken }
+  sentAt: timestamp("sent_at"),
+  openedAt: timestamp("opened_at"),
+  clickedAt: timestamp("clicked_at"),
+  retryCount: integer("retry_count").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const emailSuppress = pgTable("email_suppress", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tenantId: varchar("tenant_id").notNull(),
+  email: text("email").notNull(),
+  memberId: varchar("member_id"),
+  reason: suppressReasonEnum("reason").default('UNSUB_REQUEST').notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Email messaging types
+export type EmailTemplate = typeof emailTemplates.$inferSelect;
+export type InsertEmailTemplate = typeof emailTemplates.$inferInsert;
+export type EmailSegment = typeof emailSegments.$inferSelect;
+export type InsertEmailSegment = typeof emailSegments.$inferInsert;
+export type EmailCampaign = typeof emailCampaigns.$inferSelect;
+export type InsertEmailCampaign = typeof emailCampaigns.$inferInsert;
+export type EmailMessage = typeof emailMessages.$inferSelect;
+export type InsertEmailMessage = typeof emailMessages.$inferInsert;
+export type EmailSuppress = typeof emailSuppress.$inferSelect;
+export type InsertEmailSuppress = typeof emailSuppress.$inferInsert;

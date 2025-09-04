@@ -21,6 +21,7 @@ import { CardPage } from "@/pages/card";
 import CardVerifyPage from "@/pages/card-verify";
 import Lidkaarten from "@/pages/lidkaarten";
 import Bestuur from "@/pages/bestuur";
+import Berichten from "@/pages/berichten";
 import { InstallPrompt } from "@/components/pwa/install-prompt";
 import { OfflineIndicator } from "@/components/pwa/offline-indicator";
 
@@ -69,6 +70,7 @@ function Router() {
       <Route path="/card/:memberId" component={CardPage} />
       <Route path="/card/verify/:qrToken" component={CardVerifyPage} />
       <Route path="/bestuur" component={() => <ProtectedRoute component={Bestuur} />} />
+      <Route path="/berichten" component={() => <ProtectedRoute component={Berichten} />} />
       <Route path="/instellingen" component={() => <ProtectedRoute component={Instellingen} />} />
       <Route path="/profiel" component={() => <ProtectedRoute component={Profiel} />} />
       <Route component={NotFound} />

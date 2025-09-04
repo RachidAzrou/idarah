@@ -8,7 +8,8 @@ import {
   Monitor, 
   Settings,
   Building2,
-  IdCard
+  IdCard,
+  Mail
 } from "lucide-react";
 import darahLogo from "@assets/DARAH_1756909309495.png";
 import { getUserInitials } from "@/lib/auth";
@@ -20,6 +21,8 @@ const navigation = [
   { name: "Lidkaarten", href: "/lidkaarten", icon: IdCard },
   { name: "Lidgelden", href: "/lidgelden", icon: CreditCard },
   { name: "Financiën", href: "/financien", icon: BarChart3 },
+  { name: "Mijn Bestuur", href: "/bestuur", icon: Building2 },
+  { name: "Berichten", href: "/berichten", icon: Mail },
   { name: "Publieke Schermen", href: "/publieke-schermen", icon: Monitor },
   { name: "Instellingen", href: "/instellingen", icon: Settings },
 ];

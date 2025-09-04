@@ -1806,14 +1806,14 @@ Het organisatieteam van {{tenant.name}}`
                       <div>
                         <Label>Geslacht</Label>
                         <Select
-                          value={segmentForm.watch("rules.gender") || ""}
-                          onValueChange={(value) => segmentForm.setValue("rules.gender" as any, value || undefined)}
+                          value={segmentForm.watch("rules.gender") || "ALL"}
+                          onValueChange={(value) => segmentForm.setValue("rules.gender" as any, value === "ALL" ? undefined : value)}
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="Alle geslachten" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="">Alle geslachten</SelectItem>
+                            <SelectItem value="ALL">Alle geslachten</SelectItem>
                             <SelectItem value="M">Man</SelectItem>
                             <SelectItem value="V">Vrouw</SelectItem>
                           </SelectContent>
@@ -1832,7 +1832,7 @@ Het organisatieteam van {{tenant.name}}`
                             <SelectValue placeholder="Alle leden" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="">Alle leden</SelectItem>
+                            <SelectItem value="ALL">Alle leden</SelectItem>
                             <SelectItem value="true">Alleen stemgerechtigden</SelectItem>
                             <SelectItem value="false">Alleen niet-stemgerechtigden</SelectItem>
                           </SelectContent>

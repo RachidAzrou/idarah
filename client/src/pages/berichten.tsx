@@ -967,36 +967,59 @@ Het organisatieteam van {{tenant.name}}`
                 )}
                 
                 {/* Regular Templates */}
-                {Array.isArray(templates) && templates.map((template: any) => (
-                  <Card key={template.id} className="hover:shadow-lg transition-shadow" data-testid={`card-template-${template.id}`}>
-                    <CardHeader>
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <CardTitle className="text-base" data-testid={`text-template-name-${template.id}`}>
-                            {template.name}
-                          </CardTitle>
-                          <CardDescription data-testid={`text-template-subject-${template.id}`}>
-                            {template.subject}
-                          </CardDescription>
+                {Array.isArray(templates) && templates.map((template: any) => {
+                  // Function to get icon based on template name
+                  const getTemplateIcon = (name: string) => {
+                    const lowerName = name.toLowerCase();
+                    if (lowerName.includes('welkomstmail') || lowerName.includes('welkom')) {
+                      return <PiHandWaving className="w-5 h-5 text-gray-600" />;
+                    } else if (lowerName.includes('vervallen') || lowerName.includes('lidgeld') || lowerName.includes('herinnering')) {
+                      return <TbClockExclamation className="w-5 h-5 text-gray-600" />;
+                    } else if (lowerName.includes('algemene vergadering') || lowerName.includes('vergadering')) {
+                      return <GrGroup className="w-5 h-5 text-gray-600" />;
+                    } else if (lowerName.includes('festiviteit') || lowerName.includes('feest')) {
+                      return <PartyPopper className="w-5 h-5 text-gray-600" />;
+                    } else if (lowerName.includes('activiteit') || lowerName.includes('evenement')) {
+                      return <Megaphone className="w-5 h-5 text-gray-600" />;
+                    } else {
+                      return <Mail className="w-5 h-5 text-gray-600" />;
+                    }
+                  };
+
+                  return (
+                    <Card key={template.id} className="hover:shadow-lg transition-shadow border-gray-200 bg-gray-50" data-testid={`card-template-${template.id}`}>
+                      <CardHeader>
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              {getTemplateIcon(template.name)}
+                              <CardTitle className="text-base text-gray-900" data-testid={`text-template-name-${template.id}`}>
+                                {template.name}
+                              </CardTitle>
+                            </div>
+                            <CardDescription className="text-gray-700" data-testid={`text-template-subject-${template.id}`}>
+                              {template.subject}
+                            </CardDescription>
+                          </div>
                         </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex gap-2">
-                        <Button size="sm" variant="outline" onClick={() => handlePreviewTemplate(template)} data-testid={`button-preview-${template.id}`}>
-                          <Eye className="w-4 h-4 mr-1" />
-                          Preview
-                        </Button>
-                        {canEdit && (
-                          <Button size="sm" variant="outline" onClick={() => handleEditTemplate(template)} data-testid={`button-edit-template-${template.id}`}>
-                            <Edit className="w-4 h-4 mr-1" />
-                            Bewerk
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex gap-2">
+                          <Button size="sm" variant="outline" onClick={() => handlePreviewTemplate(template)} data-testid={`button-preview-${template.id}`}>
+                            <Eye className="w-4 h-4 mr-1" />
+                            Preview
                           </Button>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                          {canEdit && (
+                            <Button size="sm" variant="outline" onClick={() => handleEditTemplate(template)} data-testid={`button-edit-template-${template.id}`}>
+                              <Edit className="w-4 h-4 mr-1" />
+                              Bewerk
+                            </Button>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </>
             )}
           </div>

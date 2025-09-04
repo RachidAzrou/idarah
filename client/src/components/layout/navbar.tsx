@@ -59,8 +59,8 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* Navigation - in het midden */}
-        <div className="flex-1 flex justify-center overflow-x-auto">
+        {/* Navigation - naar links */}
+        <div className="flex-1 flex justify-start ml-8 overflow-x-auto">
           <nav className="hidden lg:flex items-center space-x-2 xl:space-x-3">
             {navigation.map((item) => {
               const isActive = location === item.href || (item.href !== "/dashboard" && location.startsWith(item.href));
@@ -109,8 +109,8 @@ export default function Navbar() {
           </DropdownMenu>
         </div>
 
-        {/* Profiel - helemaal rechts */}
-        <div className="flex items-center">
+        {/* Profiel - helemaal rechts met meer ruimte */}
+        <div className="flex items-center ml-8">
           {user && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

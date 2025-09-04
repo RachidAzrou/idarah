@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { KpiCards } from "@/components/finance/KpiCards";
 import { Toolbar } from "@/components/finance/Toolbar";
-import { FiltersDrawer } from "@/components/finance/FiltersDrawer";
+import { FiltersToolbar } from "@/components/finance/FiltersDrawer";
 import { TransactionsTable } from "@/components/finance/TransactionsTable";
 import { DetailSlideOver } from "@/components/finance/DetailSlideOver";
 import { TransactionDetailDialog } from "@/components/finance/TransactionDetailDialog";
@@ -35,7 +35,7 @@ export default function FinancePage() {
   const [showNewTransactionDialog, setShowNewTransactionDialog] = useState(false);
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [showExportDialog, setShowExportDialog] = useState(false);
-  const [showFiltersDrawer, setShowFiltersDrawer] = useState(false);
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
   
@@ -277,7 +277,7 @@ export default function FinancePage() {
               onNewTransaction={() => setShowNewTransactionDialog(true)}
               onImport={() => setShowImportDialog(true)}
               onExport={() => setShowExportDialog(true)}
-              onAdvancedFilters={() => setShowFiltersDrawer(true)}
+              onAdvancedFilters={() => setShowAdvancedFilters(!showAdvancedFilters)}
             />
 
             {/* Transactions Table */}
@@ -385,14 +385,15 @@ export default function FinancePage() {
           transactions={filteredTransactions}
         />
 
-        <FiltersDrawer
-          open={showFiltersDrawer}
-          onClose={() => setShowFiltersDrawer(false)}
-          filters={filters}
-          onFiltersChange={handleFiltersChange}
-          onApplyFilters={() => {}}
-          onClearFilters={handleClearFilters}
-        />
+        {showAdvancedFilters && (
+          <div className="mb-6">
+            <FiltersToolbar
+              filters={filters}
+              onFiltersChange={handleFiltersChange}
+              onClearFilters={handleClearFilters}
+            />
+          </div>
+        )}
 
         <ConfirmDialog
           open={showDeleteConfirm}

@@ -165,10 +165,13 @@ export default function Berichten() {
   const [showDeleteSegmentDialog, setShowDeleteSegmentDialog] = useState(false);
   const [segmentToDelete, setSegmentToDelete] = useState<any>(null);
   const [templateToDelete, setTemplateToDelete] = useState<any>(null);
-  const [sendTemplateCode, setSendTemplateCode] = useState("");
-  const [sendRecipient, setSendRecipient] = useState("");
-  const [sendMode, setSendMode] = useState<"single" | "bulk">("single");
-  const [selectedSegment, setSelectedSegment] = useState("");
+  // Email Composer State
+  const [emailRecipients, setEmailRecipients] = useState<Array<{type: 'member' | 'segment' | 'email', label: string, value: string}>>([]);
+  const [emailSubject, setEmailSubject] = useState("");
+  const [emailContent, setEmailContent] = useState("");
+  const [selectedTemplateForComposer, setSelectedTemplateForComposer] = useState<any>(null);
+  const [recipientInput, setRecipientInput] = useState("");
+  const [showRecipientSuggestions, setShowRecipientSuggestions] = useState(false);
   const [originalTemplateData, setOriginalTemplateData] = useState<any>(null);
 
   // Fetch data for each tab
@@ -196,6 +199,13 @@ export default function Berichten() {
 
   const { data: segments, isLoading: segmentsLoading } = useQuery({
     queryKey: ["/api/messages/segments"],
+    staleTime: 10000,
+  });
+
+  // Fetch members for recipient autocomplete
+  const { data: members } = useQuery({
+    queryKey: ["/api/members"],
+    enabled: activeTab === "send",
     staleTime: 10000,
   });
 
@@ -454,6 +464,112 @@ export default function Berichten() {
       setShowDeleteSegmentDialog(false);
       setSegmentToDelete(null);
     }
+  };
+
+  const sendComposedEmailMutation = useMutation({
+    mutationFn: async (data: { recipients: any[], subject: string, content: string }) => {
+      return apiRequest("POST", "/api/messages/composer/send", data);
+    },
+    onSuccess: (result) => {
+      toast({
+        title: "E-mail verzonden",
+        description: result.message || `E-mail verzonden naar ${result.totalRecipients} geadresseerd(en)`,
+        variant: "default"
+      });
+      // Reset form
+      setEmailRecipients([]);
+      setEmailSubject("");
+      setEmailContent("");
+      setSelectedTemplateForComposer(null);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fout bij verzenden",
+        description: error.message || "Er is een fout opgetreden bij het verzenden van de e-mail",
+        variant: "destructive"
+      });
+    }
+  });
+
+  const handleSendComposedEmail = () => {
+    if (!emailSubject || !emailContent || emailRecipients.length === 0) {
+      toast({
+        title: "Vereiste velden",
+        description: "Vul alle velden in: geadresseerden, onderwerp en inhoud",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    sendComposedEmailMutation.mutate({
+      recipients: emailRecipients,
+      subject: emailSubject,
+      content: emailContent
+    });
+  };
+
+  // Autocomplete suggestions for recipients
+  const getRecipientSuggestions = () => {
+    if (!recipientInput.trim()) return [];
+    
+    const suggestions = [];
+    const input = recipientInput.toLowerCase();
+    
+    // Add member suggestions
+    if (members && Array.isArray(members)) {
+      members.forEach((member: any) => {
+        const fullName = `${member.firstName} ${member.lastName}`.toLowerCase();
+        const email = member.email?.toLowerCase() || '';
+        
+        if (fullName.includes(input) || email.includes(input)) {
+          suggestions.push({
+            type: 'member' as const,
+            label: `${member.firstName} ${member.lastName} (${member.email || 'Geen email'})`,
+            value: member.email || member.id,
+            member: member
+          });
+        }
+      });
+    }
+    
+    // Add segment suggestions
+    if (segments && Array.isArray(segments)) {
+      segments.forEach((segment: any) => {
+        if (segment.name.toLowerCase().includes(input)) {
+          suggestions.push({
+            type: 'segment' as const,
+            label: `📊 ${segment.name} (Verzendgroep)`,
+            value: segment.id,
+            segment: segment
+          });
+        }
+      });
+    }
+    
+    // Add email suggestion if it looks like an email
+    if (input.includes('@') && input.includes('.')) {
+      suggestions.push({
+        type: 'email' as const,
+        label: `📧 ${recipientInput} (Direct email)`,
+        value: recipientInput,
+      });
+    }
+    
+    return suggestions.slice(0, 10); // Limit to 10 suggestions
+  };
+
+  const addRecipient = (suggestion: any) => {
+    const isDuplicate = emailRecipients.some(r => r.value === suggestion.value);
+    if (!isDuplicate) {
+      setEmailRecipients([...emailRecipients, suggestion]);
+    }
+    setRecipientInput("");
+    setShowRecipientSuggestions(false);
+  };
+
+  const removeRecipient = (index: number) => {
+    const newRecipients = emailRecipients.filter((_, i) => i !== index);
+    setEmailRecipients(newRecipients);
   };
 
   const handlePreviewSegment = (segment: any) => {
@@ -1270,175 +1386,204 @@ Het organisatieteam van {{tenant.name}}`
         </TabsContent>
 
 
-        {/* Send Tab */}
+        {/* Email Composer Tab */}
         <TabsContent value="send" className="space-y-6">
           <div className="flex justify-between items-center">
             <div>
-              <h2 className="text-2xl font-semibold text-gray-900">E-mail Verzenden</h2>
+              <h2 className="text-xl font-semibold text-gray-900">E-mail Opstellen</h2>
               <p className="text-sm text-gray-600 mt-1">
-                Verstuur e-mails naar individuele leden of hele groepen
+                Stel een nieuwe e-mail op met mogelijkheid om templates te gebruiken
               </p>
             </div>
           </div>
 
-          {/* Send Mode Toggle */}
-          <div className="flex gap-2 p-1 bg-gray-100 rounded-lg w-fit">
-            <Button 
-              variant={sendMode === "single" ? "default" : "ghost"}
-              size="sm"
-              onClick={() => setSendMode("single")}
-              data-testid="button-mode-single"
-            >
-              💬 Enkel Lid
-            </Button>
-            <Button 
-              variant={sendMode === "bulk" ? "default" : "ghost"}
-              size="sm"
-              onClick={() => setSendMode("bulk")}
-              data-testid="button-mode-bulk"
-            >
-              📢 Bulk Verzending
-            </Button>
-          </div>
+          {/* Email Composer */}
+          <Card className="border border-gray-200">
+            <CardContent className="p-6">
+              <div className="space-y-6">
+                {/* Template Selector */}
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <Label className="text-sm font-medium text-gray-700">Template laden (optioneel)</Label>
+                    {selectedTemplateForComposer && (
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => {
+                          setSelectedTemplateForComposer(null);
+                          setEmailSubject("");
+                          setEmailContent("");
+                        }}
+                      >
+                        Template wissen
+                      </Button>
+                    )}
+                  </div>
+                  <Select 
+                    value={selectedTemplateForComposer?.id || ""} 
+                    onValueChange={(value) => {
+                      const template = templates?.find((t: any) => t.id === value);
+                      if (template) {
+                        setSelectedTemplateForComposer(template);
+                        setEmailSubject(template.subject || "");
+                        setEmailContent(template.content || template.body_text || "");
+                      }
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecteer een template om te laden" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Array.isArray(templates) && templates.map((template: any) => (
+                        <SelectItem key={template.id} value={template.id}>
+                          {template.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-          {sendMode === "single" ? (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Send className="w-5 h-5" />
-                  Enkelvoudige E-mail
-                </CardTitle>
-                <CardDescription>
-                  Verstuur een e-mail naar een specifiek lid of e-mailadres
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label>Template</Label>
-                      <Select value={sendTemplateCode} onValueChange={setSendTemplateCode}>
-                        <SelectTrigger data-testid="select-template-single">
-                          <SelectValue placeholder="Selecteer template" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {Array.isArray(templates) && templates.map((template: any) => (
-                            <SelectItem key={template.id} value={template.code}>
-                              {template.name} ({template.code})
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Ontvanger</Label>
+                {/* Recipients Field */}
+                <div className="relative">
+                  <Label className="text-sm font-medium text-gray-700 mb-2 block">Geadresseerden</Label>
+                  <div className="space-y-2">
+                    {/* Recipients Tags */}
+                    {emailRecipients.length > 0 && (
+                      <div className="flex flex-wrap gap-2 p-3 bg-gray-50 border border-gray-200 rounded-md">
+                        {emailRecipients.map((recipient, index) => (
+                          <div 
+                            key={index} 
+                            className={`flex items-center gap-1 px-2 py-1 rounded-md text-sm ${
+                              recipient.type === 'member' ? 'bg-green-100 text-green-800' :
+                              recipient.type === 'segment' ? 'bg-purple-100 text-purple-800' :
+                              'bg-blue-100 text-blue-800'
+                            }`}
+                          >
+                            {recipient.type === 'member' && <Users className="w-3 h-3" />}
+                            {recipient.type === 'segment' && <FaArrowsDownToPeople className="w-3 h-3" />}
+                            {recipient.type === 'email' && <Mail className="w-3 h-3" />}
+                            <span>{recipient.label}</span>
+                            <button 
+                              onClick={() => removeRecipient(index)}
+                              className="text-current hover:text-red-600 ml-1 font-bold"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {/* Add Recipients Input with Autocomplete */}
+                    <div className="relative">
                       <Input
-                        value={sendRecipient}
-                        onChange={(e) => setSendRecipient(e.target.value)}
-                        placeholder="E-mailadres of Lid ID"
-                        data-testid="input-recipient"
+                        value={recipientInput}
+                        onChange={(e) => {
+                          setRecipientInput(e.target.value);
+                          setShowRecipientSuggestions(e.target.value.length > 0);
+                        }}
+                        onFocus={() => {
+                          if (recipientInput.length > 0) {
+                            setShowRecipientSuggestions(true);
+                          }
+                        }}
+                        onBlur={() => {
+                          // Delay hiding suggestions to allow for clicks
+                          setTimeout(() => setShowRecipientSuggestions(false), 200);
+                        }}
+                        placeholder="Type om leden, verzendgroepen of e-mailadressen te zoeken..."
+                        className="flex-1"
+                        data-testid="input-recipients"
                       />
+                      
+                      {/* Autocomplete Suggestions */}
+                      {showRecipientSuggestions && recipientInput.length > 0 && (
+                        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                          {getRecipientSuggestions().map((suggestion, index) => (
+                            <button
+                              key={index}
+                              type="button"
+                              className="w-full px-3 py-2 text-left hover:bg-gray-50 flex items-center gap-2 border-b border-gray-100 last:border-b-0"
+                              onClick={() => addRecipient(suggestion)}
+                            >
+                              {suggestion.type === 'member' && <Users className="w-4 h-4 text-green-600" />}
+                              {suggestion.type === 'segment' && <FaArrowsDownToPeople className="w-4 h-4 text-purple-600" />}
+                              {suggestion.type === 'email' && <Mail className="w-4 h-4 text-blue-600" />}
+                              <span className="text-sm">{suggestion.label}</span>
+                            </button>
+                          ))}
+                          {getRecipientSuggestions().length === 0 && (
+                            <div className="px-3 py-2 text-sm text-gray-500">
+                              Geen resultaten gevonden
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
+                    
+                    {/* Helper Text */}
+                    <p className="text-xs text-gray-500">
+                      Type om te zoeken naar leden op naam of email, verzendgroepen, of voer direct een e-mailadres in
+                    </p>
+                  </div>
+                </div>
+
+                {/* Subject Field */}
+                <div>
+                  <Label htmlFor="email-subject" className="text-sm font-medium text-gray-700 mb-2 block">Onderwerp</Label>
+                  <Input
+                    id="email-subject"
+                    value={emailSubject}
+                    onChange={(e) => setEmailSubject(e.target.value)}
+                    placeholder="Voer het onderwerp van de e-mail in..."
+                    data-testid="input-subject"
+                  />
+                </div>
+
+                {/* Email Content */}
+                <div>
+                  <Label htmlFor="email-content" className="text-sm font-medium text-gray-700 mb-2 block">E-mail Inhoud</Label>
+                  <Textarea
+                    id="email-content"
+                    value={emailContent}
+                    onChange={(e) => setEmailContent(e.target.value)}
+                    placeholder="Typ hier de inhoud van je e-mail...&#10;&#10;Je kunt Handlebars variabelen gebruiken zoals:&#10;- {{member.firstName}} voor voornaam&#10;- {{member.lastName}} voor achternaam&#10;- {{tenant.name}} voor organisatie naam"
+                    className="min-h-[300px] font-mono text-sm"
+                    data-testid="textarea-content"
+                  />
+                  <p className="text-xs text-gray-500 mt-2">
+                    Tip: Gebruik handlebars variabelen zoals {"{{"} member.firstName {"}"} voor personalisatie
+                  </p>
+                </div>
+
+                {/* Send Button */}
+                <div className="flex justify-between items-center pt-4 border-t border-gray-200">
+                  <div className="text-sm text-gray-600">
+                    {emailRecipients.length > 0 && (
+                      <span>{emailRecipients.length} geadresseerd(en)</span>
+                    )}
                   </div>
                   {canEdit && (
                     <Button 
-                      onClick={handleSendSingleEmail}
-                      disabled={sendSingleEmailMutation.isPending || !sendTemplateCode || !sendRecipient}
-                      data-testid="button-send-single"
+                      onClick={handleSendComposedEmail}
+                      disabled={!emailSubject || !emailContent || emailRecipients.length === 0 || sendComposedEmailMutation.isPending}
+                      className="bg-blue-600 hover:bg-blue-700"
+                      data-testid="button-send-email"
                     >
-                      {sendSingleEmailMutation.isPending ? (
+                      {sendComposedEmailMutation.isPending ? (
                         <>Verzenden...</>
                       ) : (
                         <>
                           <Send className="w-4 h-4 mr-2" />
-                          Verstuur E-mail
+                          E-mail Verzenden
                         </>
                       )}
                     </Button>
                   )}
                 </div>
-              </CardContent>
-            </Card>
-          ) : (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="w-5 h-5" />
-                  Bulk E-mail Verzending
-                </CardTitle>
-                <CardDescription>
-                  Verstuur een e-mail naar alle leden in een segment
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label>Template</Label>
-                      <Select value={sendTemplateCode} onValueChange={setSendTemplateCode}>
-                        <SelectTrigger data-testid="select-template-bulk">
-                          <SelectValue placeholder="Selecteer template" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {Array.isArray(templates) && templates.map((template: any) => (
-                            <SelectItem key={template.id} value={template.code}>
-                              {template.name} ({template.code})
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Doelgroep Segment</Label>
-                      <Select value={selectedSegment} onValueChange={setSelectedSegment}>
-                        <SelectTrigger data-testid="select-segment-bulk">
-                          <SelectValue placeholder="Selecteer segment" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {Array.isArray(segments) && segments.map((segment: any) => (
-                            <SelectItem key={segment.id} value={segment.id}>
-                              {segment.name} - {Object.keys(segment.rules || {}).length} regels
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  
-                  {selectedSegment && (
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                      <h4 className="font-medium text-blue-900 mb-2">Segment Overzicht</h4>
-                      <p className="text-sm text-blue-700">
-                        Segment: {Array.isArray(segments) ? segments.find((s: any) => s.id === selectedSegment)?.name : ''}
-                      </p>
-                      <p className="text-xs text-blue-600 mt-1">
-                        Let op: De e-mail wordt verzonden naar alle leden die voldoen aan de segment criteria
-                      </p>
-                    </div>
-                  )}
-                  
-                  {canEdit && (
-                    <Button 
-                      onClick={() => {
-                        // TODO: Implement bulk send
-                        toast({
-                          title: "Bulk verzending",
-                          description: "Bulk verzending wordt binnenkort geïmplementeerd",
-                          variant: "default"
-                        });
-                      }}
-                      disabled={!sendTemplateCode || !selectedSegment}
-                      data-testid="button-send-bulk"
-                      className="w-full"
-                    >
-                      <Users className="w-4 h-4 mr-2" />
-                      Verstuur naar Segment
-                    </Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          )}
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
       </Tabs>

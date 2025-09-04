@@ -2204,6 +2204,143 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Composer send - sends to multiple recipients of different types
+  app.post('/api/messages/composer/send', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      // Check permissions - only BEHEERDER and SUPERADMIN can send
+      if (req.user!.role === 'MEDEWERKER') {
+        return res.status(403).json({ error: "Geen toegang" });
+      }
+
+      const { recipients, subject, content } = req.body;
+      
+      if (!recipients || !Array.isArray(recipients) || recipients.length === 0) {
+        return res.status(400).json({ error: "Geadresseerden zijn vereist" });
+      }
+      
+      if (!subject || !content) {
+        return res.status(400).json({ error: "Onderwerp en inhoud zijn vereist" });
+      }
+
+      let totalRecipients = 0;
+      const results = [];
+
+      // Process each recipient based on type
+      for (const recipient of recipients) {
+        if (recipient.type === 'member') {
+          // Send to individual member
+          try {
+            const context = await emailService.buildMemberContext(req.user!.tenantId, recipient.value);
+            
+            // Create a temporary template for this message
+            const tempTemplate = {
+              subject,
+              body_html: emailService.convertToHTML(content),
+              body_text: content,
+            };
+            
+            const rendered = await emailService.renderTemplate(tempTemplate, context);
+            
+            // Send directly via transporter
+            await emailService.transporter.sendMail({
+              from: process.env.SMTP_FROM,
+              to: context.member.email,
+              subject: rendered.subject,
+              html: rendered.html,
+              text: rendered.text,
+            });
+            
+            totalRecipients++;
+            results.push({ type: 'member', recipient: context.member.email, status: 'sent' });
+          } catch (error) {
+            console.error('Error sending to member:', error);
+            results.push({ type: 'member', recipient: recipient.value, status: 'failed', error: error.message });
+          }
+        } else if (recipient.type === 'segment') {
+          // Send to all members in segment
+          try {
+            const segment = await emailService.getSegment(req.user!.tenantId, recipient.value);
+            if (segment) {
+              const preview = await emailService.previewSegment(req.user!.tenantId, segment.rules);
+              
+              for (const member of preview.sample) {
+                try {
+                  const context = await emailService.buildMemberContext(req.user!.tenantId, member.id);
+                  
+                  const tempTemplate = {
+                    subject,
+                    body_html: emailService.convertToHTML(content),
+                    body_text: content,
+                  };
+                  
+                  const rendered = await emailService.renderTemplate(tempTemplate, context);
+                  
+                  await emailService.transporter.sendMail({
+                    from: process.env.SMTP_FROM,
+                    to: context.member.email,
+                    subject: rendered.subject,
+                    html: rendered.html,
+                    text: rendered.text,
+                  });
+                  
+                  totalRecipients++;
+                  results.push({ type: 'segment', recipient: context.member.email, status: 'sent' });
+                } catch (error) {
+                  console.error('Error sending to segment member:', error);
+                  results.push({ type: 'segment', recipient: member.email, status: 'failed', error: error.message });
+                }
+              }
+            }
+          } catch (error) {
+            console.error('Error processing segment:', error);
+            results.push({ type: 'segment', recipient: recipient.value, status: 'failed', error: error.message });
+          }
+        } else if (recipient.type === 'email') {
+          // Send to direct email
+          try {
+            const context = {
+              member: { firstName: 'Geachte', lastName: 'heer/mevrouw', email: recipient.value },
+              tenant: { name: 'Organisatie' },
+              card: { url: '#' },
+              fees: [],
+            };
+            
+            const tempTemplate = {
+              subject,
+              body_html: emailService.convertToHTML(content),
+              body_text: content,
+            };
+            
+            const rendered = await emailService.renderTemplate(tempTemplate, context);
+            
+            await emailService.transporter.sendMail({
+              from: process.env.SMTP_FROM,
+              to: recipient.value,
+              subject: rendered.subject,
+              html: rendered.html,
+              text: rendered.text,
+            });
+            
+            totalRecipients++;
+            results.push({ type: 'email', recipient: recipient.value, status: 'sent' });
+          } catch (error) {
+            console.error('Error sending to email:', error);
+            results.push({ type: 'email', recipient: recipient.value, status: 'failed', error: error.message });
+          }
+        }
+      }
+      
+      res.json({ 
+        message: `E-mail verzonden naar ${totalRecipients} geadresseerd(en)`,
+        totalRecipients,
+        results 
+      });
+    } catch (error) {
+      console.error('Error sending composer email:', error);
+      res.status(500).json({ error: "Fout bij verzenden e-mail" });
+    }
+  });
+
   // Unsubscribe route
   app.get('/email/unsubscribe', async (req, res) => {
     try {

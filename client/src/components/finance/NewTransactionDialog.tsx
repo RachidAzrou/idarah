@@ -422,7 +422,16 @@ export function NewTransactionDialog({
               </TabsContent>
             </Tabs>
 
-            <DialogFooter className="flex justify-between mt-6">
+            <DialogFooter className="flex justify-between items-center mt-6">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={handleClose}
+                data-testid="button-cancel-transaction"
+              >
+                Annuleren
+              </Button>
+              
               <div className="flex gap-2">
                 {activeTab !== 'basis' && (
                   <Button type="button" variant="outline" onClick={prevTab}>
@@ -434,17 +443,6 @@ export function NewTransactionDialog({
                     Volgende
                   </Button>
                 )}
-              </div>
-              
-              <div className="flex gap-2">
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={handleClose}
-                  data-testid="button-cancel-transaction"
-                >
-                  Annuleren
-                </Button>
                 <Button 
                   type="submit" 
                   disabled={loading}

@@ -73,12 +73,9 @@ export default function Login() {
       <div className="flex-1 flex flex-col justify-center pl-4 pr-8 sm:pl-6 sm:pr-12 lg:pl-8 lg:pr-16 relative z-10">
         <div className="max-w-md mx-auto w-full">
           {/* Title above login container */}
-          <div className="flex items-center justify-center mb-6">
-            <Lock className="h-8 w-8 text-white mr-3" />
-            <h1 className="text-4xl font-bold text-white leading-tight">
-              Inloggen bij uw account
-            </h1>
-          </div>
+          <h1 className="text-4xl font-bold text-white mb-6 leading-tight text-center">
+            Inloggen bij uw account
+          </h1>
           
           <div className="bg-white rounded-3xl shadow-2xl p-8">
             <form onSubmit={handleSubmit} className="space-y-6" data-testid="login-form">

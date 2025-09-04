@@ -13,21 +13,32 @@ export default function PublicScreenViewPage() {
   const [screen, setScreen] = useState<PublicScreen | null>(null);
   const [loading, setLoading] = useState(true);
   const [forceRefresh, setForceRefresh] = useState(0);
+  const [hasInitialized, setHasInitialized] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showControls, setShowControls] = useState(true);
 
   const loadScreen = async () => {
+    console.log('=== loadScreen called ===');
+    console.log('publicToken:', publicToken);
+    
     if (publicToken) {
+      setLoading(true);
       try {
         // Add timestamp to force cache bypass
         const timestamp = new Date().getTime();
-        const response = await fetch(`/api/public-screens/token/${publicToken}?t=${timestamp}`, {
+        const url = `/api/public-screens/token/${publicToken}?t=${timestamp}`;
+        console.log('Fetching URL:', url);
+        
+        const response = await fetch(url, {
           cache: 'no-cache',
           headers: {
             'Cache-Control': 'no-cache',
             'Pragma': 'no-cache'
           }
         });
+        
+        console.log('Response status:', response.status);
+        
         if (response.ok) {
           const foundScreen = await response.json();
           console.log('=== PublicScreenViewPage Debug ===');
@@ -36,6 +47,7 @@ export default function PublicScreenViewPage() {
           console.log('Screen members length:', foundScreen.members?.length || 0);
           setScreen(foundScreen);
         } else {
+          console.log('Response not ok:', response.status, response.statusText);
           setScreen(null);
         }
       } catch (error) {
@@ -44,13 +56,39 @@ export default function PublicScreenViewPage() {
       } finally {
         setLoading(false);
       }
+    } else {
+      console.log('No publicToken provided');
+      setLoading(false);
     }
   };
 
+  // Force immediate load on mount
   useEffect(() => {
-    console.log('useEffect triggered with publicToken:', publicToken, 'forceRefresh:', forceRefresh);
-    loadScreen();
-  }, [publicToken, forceRefresh]);
+    console.log('=== MOUNT useEffect ===');
+    console.log('publicToken:', publicToken);
+    if (!hasInitialized) {
+      setHasInitialized(true);
+      loadScreen();
+    }
+  }, []);
+  
+  // Also load when publicToken changes
+  useEffect(() => {
+    console.log('=== TOKEN useEffect ===');
+    console.log('publicToken changed to:', publicToken, 'hasInitialized:', hasInitialized);
+    if (hasInitialized && publicToken) {
+      loadScreen();
+    }
+  }, [publicToken, hasInitialized]);
+  
+  // Force refresh effect
+  useEffect(() => {
+    console.log('=== REFRESH useEffect ===');
+    console.log('forceRefresh changed to:', forceRefresh);
+    if (forceRefresh > 0) {
+      loadScreen();
+    }
+  }, [forceRefresh]);
 
   // Update document title when screen data is loaded
   useEffect(() => {

@@ -1,0 +1,42 @@
+not available
+﻿
+chunk-RPCDYKBN.js?v=bafc6474:21551 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+main.tsx:36 [PWA] Service worker disabled in development mode
+pwa.ts:213 [PWA] Initializing PWA features...
+pwa.ts:221 [PWA] Running in development mode - service worker disabled
+pwa.ts:225 [PWA] App is running as installed PWA
+pwa.ts:228 [PWA] PWA features initialized
+LedenlijstView.tsx:15 === LedenlijstView Props Debug ===
+LedenlijstView.tsx:16 members prop: 
+[]
+LedenlijstView.tsx:17 members length: 0
+LedenlijstView.tsx:18 config: 
+{description: 'test', title: {…}, subtitle: {…}, display: {…}, year: 2025, …}
+LedenlijstView.tsx:46 === useMemo filteredMembers ===
+LedenlijstView.tsx:47 convertedMembers: 
+[]
+LedenlijstView.tsx:48 convertedMembers length: 0
+members-data.ts:167 === getFilteredMembers Debug ===
+members-data.ts:168 Input members count: 0
+members-data.ts:169 Input members: 
+[]
+members-data.ts:170 Config: 
+{categories: Array(2), useFullNames: true, useInitials: false, filterByCategories: true, showVotingRights: false, …}
+members-data.ts:179 Filtering by categories: 
+(2) ['Student', 'Standaard']
+members-data.ts:180 Member categories: 
+[]
+members-data.ts:183 Category filter: 0 -> 0
+members-data.ts:186 Final result count: 0
+LedenlijstView.tsx:59 filtered result: 
+[]
+LedenlijstView.tsx:60 filtered length: 0
+screen-gq0n8v1kl0o:1 Error while trying to use the following icon from the Manifest: https://3d4c5ce5-e595-4447-afbd-e830450332bf-00-26rzswrf5l18h.spock.replit.dev/icon-192.svg (Download error or resource isn't a valid image)
+screen-gq0n8v1kl0o:1 Error in event handler: TypeError: Cannot read properties of null (reading 'tagName')
+    at Readability._grabArticle (chrome-extension://llimhhconnjiflfimocjggfjdlmlhblm/js/plugins/readability.js:1140:37)
+    at Readability.parse (chrome-extension://llimhhconnjiflfimocjggfjdlmlhblm/js/plugins/readability.js:2248:31)
+    at Object.original_article (chrome-extension://llimhhconnjiflfimocjggfjdlmlhblm/content-script.js:94:61)
+    at Object.article (chrome-extension://llimhhconnjiflfimocjggfjdlmlhblm/content-script.js:148:44)
+    at Object.article (chrome-extension://llimhhconnjiflfimocjggfjdlmlhblm/content-script.js:198:23)
+    at Object.init (chrome-extension://llimhhconnjiflfimocjggfjdlmlhblm/content-script.js:570:19)
+    at chrome-extension://llimhhconnjiflfimocjggfjdlmlhblm/content-script.js:514:23

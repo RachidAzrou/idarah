@@ -73,13 +73,13 @@ export default function PublicScreensPage() {
     <main className="flex-1 py-4">
       <div className="px-4 sm:px-6 lg:px-8 w-full">
         {/* Page Header */}
-        <div className="border-b border-gray-200 pb-5 mb-8">
+        <div className="border-b border-gray-200 pb-6 mb-8">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900" data-testid="page-title">
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent tracking-tight" data-testid="page-title">
                 Publieke Schermen
               </h1>
-              <p className="mt-1 text-sm text-gray-700">
+              <p className="mt-3 text-sm text-gray-700">
                 Genereer & beheer schermen voor betaalstatus en mededelingen
               </p>
             </div>

@@ -223,12 +223,9 @@ export default function Financien() {
               </TabsList>
 
               <TabsContent value="transactions" className="space-y-6">
-                {/* Search and Filters */}
+                {/* Search */}
                 <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Filters & Zoeken</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent className="px-6 py-4">
                     <div className="flex flex-col sm:flex-row gap-4">
                       <div className="relative flex-1">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -247,20 +244,26 @@ export default function Financien() {
                         </Button>
                       </div>
                     </div>
-                    
-                    <FiltersToolbar
-                      filters={filters}
-                      onFiltersChange={setFilters}
-                      onClearFilters={handleClearFilters}
-                    />
                   </CardContent>
                 </Card>
 
                 {/* Transactions Table */}
                 <Card>
                   <CardHeader className="px-6 py-6 border-b border-gray-200">
-                    <CardTitle>Transactie Overzicht</CardTitle>
-                    <p className="text-sm text-gray-500">{filteredTransactions.length} transacties gevonden</p>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle>Transactie Overzicht</CardTitle>
+                        <p className="text-sm text-gray-500">{filteredTransactions.length} transacties gevonden</p>
+                      </div>
+                    </div>
+                    
+                    <div className="mt-4">
+                      <FiltersToolbar
+                        filters={filters}
+                        onFiltersChange={setFilters}
+                        onClearFilters={handleClearFilters}
+                      />
+                    </div>
                   </CardHeader>
                   
                   <CardContent className="p-0">

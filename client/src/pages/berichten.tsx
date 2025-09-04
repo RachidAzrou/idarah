@@ -161,6 +161,7 @@ export default function Berichten() {
   const [sendRecipient, setSendRecipient] = useState("");
   const [sendMode, setSendMode] = useState<"single" | "bulk">("single");
   const [selectedSegment, setSelectedSegment] = useState("");
+  const [originalTemplateData, setOriginalTemplateData] = useState<any>(null);
 
   // Fetch data for each tab
   const { data: templates, isLoading: templatesLoading } = useQuery({
@@ -222,6 +223,7 @@ export default function Berichten() {
       queryClient.refetchQueries({ queryKey: ["/api/messages/templates"] });
       toast({ title: "Template aangemaakt", description: "De template is succesvol aangemaakt." });
       setShowTemplateDialog(false);
+      setOriginalTemplateData(null);
       templateForm.reset();
     },
     onError: (error: any) => {
@@ -253,6 +255,7 @@ export default function Berichten() {
       toast({ title: "Template bijgewerkt", description: "De template is succesvol bijgewerkt." });
       setShowTemplateDialog(false);
       setEditingTemplate(null);
+      setOriginalTemplateData(null);
       templateForm.reset();
     },
     onError: (error: any) => {
@@ -304,6 +307,18 @@ export default function Berichten() {
   });
 
 
+  // Check if template form has changes
+  const hasTemplateChanges = () => {
+    if (!editingTemplate || !originalTemplateData) return false;
+    const currentData = templateForm.getValues();
+    return (
+      currentData.name !== originalTemplateData.name ||
+      currentData.code !== originalTemplateData.code ||
+      currentData.subject !== originalTemplateData.subject ||
+      currentData.content !== originalTemplateData.content
+    );
+  };
+
   // Handler functions
   const handleEditTemplate = (template: any) => {
     setEditingTemplate(template);
@@ -329,12 +344,15 @@ export default function Berichten() {
       }
     }
     
-    templateForm.reset({
+    const formData = {
       name: template.name,
       code: template.code,
       subject: template.subject,
       content: content
-    });
+    };
+    
+    templateForm.reset(formData);
+    setOriginalTemplateData(formData); // Store original data for comparison
     setShowTemplateDialog(true);
   };
 
@@ -375,6 +393,7 @@ export default function Berichten() {
 
   const handleNewTemplate = () => {
     setEditingTemplate(null);
+    setOriginalTemplateData(null);
     templateForm.reset();
     setShowTemplateDialog(true);
   };
@@ -1394,11 +1413,25 @@ Het organisatieteam van {{tenant.name}}`
               />
 
               <div className="flex justify-end gap-3">
-                <Button type="button" variant="outline" onClick={() => setShowTemplateDialog(false)}>
+                <Button type="button" variant="outline" onClick={() => {
+                  setShowTemplateDialog(false);
+                  setOriginalTemplateData(null);
+                }}>
                   Annuleren
                 </Button>
-                <Button type="submit" disabled={createTemplateMutation.isPending || updateTemplateMutation.isPending}>
-                  {editingTemplate ? 'Bijwerken' : 'Aanmaken'}
+                <Button 
+                  type="submit" 
+                  disabled={
+                    createTemplateMutation.isPending || 
+                    updateTemplateMutation.isPending ||
+                    (editingTemplate && !hasTemplateChanges())
+                  }
+                  variant={editingTemplate && !hasTemplateChanges() ? "secondary" : "default"}
+                >
+                  {editingTemplate ? 
+                    (hasTemplateChanges() ? 'Wijzigingen opslaan' : 'Opslaan') : 
+                    'Aanmaken'
+                  }
                 </Button>
               </div>
             </form>

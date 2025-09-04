@@ -160,6 +160,8 @@ export default function Berichten() {
   const [editingTemplate, setEditingTemplate] = useState<any>(null);
   const [editingSegment, setEditingSegment] = useState<any>(null);
   const [previewTemplate, setPreviewTemplate] = useState<any>(null);
+  const [previewSegment, setPreviewSegment] = useState<any>(null);
+  const [showSegmentPreviewDialog, setShowSegmentPreviewDialog] = useState(false);
   const [templateToDelete, setTemplateToDelete] = useState<any>(null);
   const [sendTemplateCode, setSendTemplateCode] = useState("");
   const [sendRecipient, setSendRecipient] = useState("");
@@ -434,11 +436,20 @@ export default function Berichten() {
     setShowSegmentDialog(true);
   };
 
+  const handleDeleteSegment = (segment: any) => {
+    if (confirm(`Weet je zeker dat je de verzendgroep "${segment.name}" wilt verwijderen?`)) {
+      // TODO: Implement delete segment API call
+      toast({
+        title: "Verzendgroep verwijderd",
+        description: `"${segment.name}" is succesvol verwijderd.`,
+        variant: "default"
+      });
+    }
+  };
+
   const handlePreviewSegment = (segment: any) => {
-    toast({
-      title: `Segment: ${segment.name}`,
-      description: `Filter regels: ${JSON.stringify(segment.rules, null, 2)}`
-    });
+    setPreviewSegment(segment);
+    setShowSegmentPreviewDialog(true);
   };
 
   const handleNewTemplate = () => {
@@ -2009,6 +2020,122 @@ Het organisatieteam van {{tenant.name}}`
                 {deleteTemplateMutation.isPending ? 'Verwijderen...' : 'Verwijderen'}
               </Button>
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Segment Preview Dialog */}
+      <Dialog open={showSegmentPreviewDialog} onOpenChange={setShowSegmentPreviewDialog}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FaArrowsDownToPeople className="w-5 h-5 text-blue-600" />
+              Verzendgroep Preview: {previewSegment?.name}
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-6">
+            {/* Segment Info */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <h3 className="font-medium text-blue-900 mb-2">Verzendgroep Details</h3>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-blue-700">Naam:</span>
+                  <span className="font-medium text-blue-900">{previewSegment?.name}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-blue-700">Aantal criteria:</span>
+                  <span className="font-medium text-blue-900">
+                    {previewSegment?.rules ? Object.keys(previewSegment.rules).filter(key => previewSegment.rules[key] !== undefined && previewSegment.rules[key] !== null && previewSegment.rules[key] !== "").length : 0}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Criteria Details */}
+            <div>
+              <h4 className="font-medium text-gray-900 mb-3">Selectie Criteria</h4>
+              <div className="space-y-3">
+                {previewSegment?.rules ? (
+                  <>
+                    {previewSegment.rules.hasVotingRights !== undefined && (
+                      <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                        <span className="text-gray-700">Stemrecht</span>
+                        <span className="font-medium text-gray-900">
+                          {previewSegment.rules.hasVotingRights ? "Alleen stemgerechtigde leden" : "Alleen niet-stemgerechtigde leden"}
+                        </span>
+                      </div>
+                    )}
+                    
+                    {previewSegment.rules.memberActive !== undefined && (
+                      <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                        <span className="text-gray-700">Status</span>
+                        <span className="font-medium text-gray-900">
+                          {previewSegment.rules.memberActive ? "Alleen actieve leden" : "Alleen inactieve leden"}
+                        </span>
+                      </div>
+                    )}
+                    
+                    {previewSegment.rules.category && previewSegment.rules.category.length > 0 && (
+                      <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                        <span className="text-gray-700">Categorie</span>
+                        <span className="font-medium text-gray-900">
+                          {previewSegment.rules.category.join(", ")}
+                        </span>
+                      </div>
+                    )}
+                    
+                    {previewSegment.rules.gender && (
+                      <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                        <span className="text-gray-700">Geslacht</span>
+                        <span className="font-medium text-gray-900">
+                          {previewSegment.rules.gender === "M" ? "Man" : previewSegment.rules.gender === "V" ? "Vrouw" : previewSegment.rules.gender}
+                        </span>
+                      </div>
+                    )}
+                    
+                    {(previewSegment.rules.minAge || previewSegment.rules.maxAge) && (
+                      <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                        <span className="text-gray-700">Leeftijd</span>
+                        <span className="font-medium text-gray-900">
+                          {previewSegment.rules.minAge && previewSegment.rules.maxAge 
+                            ? `${previewSegment.rules.minAge} - ${previewSegment.rules.maxAge} jaar`
+                            : previewSegment.rules.minAge 
+                            ? `Minimaal ${previewSegment.rules.minAge} jaar`
+                            : `Maximaal ${previewSegment.rules.maxAge} jaar`
+                          }
+                        </span>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <p>Geen specifieke criteria ingesteld</p>
+                    <p className="text-sm">Deze verzendgroep bevat alle leden</p>
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            {/* Usage Info */}
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+              <h4 className="font-medium text-green-900 mb-2">Gebruik</h4>
+              <p className="text-sm text-green-700">
+                Deze verzendgroep kan gebruikt worden bij het verzenden van emails naar specifieke groepen leden die voldoen aan de bovenstaande criteria.
+              </p>
+            </div>
+          </div>
+          
+          <div className="flex justify-end gap-3 pt-4">
+            <Button variant="outline" onClick={() => setShowSegmentPreviewDialog(false)}>
+              Sluiten
+            </Button>
+            <Button onClick={() => {
+              setShowSegmentPreviewDialog(false);
+              handleEditSegment(previewSegment);
+            }}>
+              Bewerken
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

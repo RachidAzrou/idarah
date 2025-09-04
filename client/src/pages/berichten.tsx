@@ -143,16 +143,20 @@ export default function Berichten() {
 
   const updateTemplateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: z.infer<typeof templateSchema> }) => {
-      return apiRequest("PUT", `/api/messages/templates/${id}`, {
+      console.log('updateTemplateMutation called with:', { id, data });
+      const payload = {
         name: data.name,
         code: data.code,
         kind: "TRANSACTIONEEL", // Standaard waarde sinds type niet meer relevant is
         subject: data.subject,
         body_html: data.bodyHtml,
         body_text: data.bodyText
-      });
+      };
+      console.log('API payload:', payload);
+      return apiRequest("PUT", `/api/messages/templates/${id}`, payload);
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
+      console.log('updateTemplateMutation success:', result);
       queryClient.invalidateQueries({ queryKey: ["/api/messages/templates"] });
       toast({ title: "Template bijgewerkt", description: "De template is succesvol bijgewerkt." });
       setShowTemplateDialog(false);
@@ -160,6 +164,7 @@ export default function Berichten() {
       templateForm.reset();
     },
     onError: (error: any) => {
+      console.error('updateTemplateMutation error:', error);
       toast({
         title: "Fout bij bijwerken template",
         description: error.message || "Er is een fout opgetreden",
@@ -257,9 +262,14 @@ export default function Berichten() {
 
 
   const onTemplateSubmit = (data: z.infer<typeof templateSchema>) => {
+    console.log('onTemplateSubmit called with data:', data);
+    console.log('editingTemplate:', editingTemplate);
+    
     if (editingTemplate) {
+      console.log('Calling updateTemplateMutation.mutate');
       updateTemplateMutation.mutate({ id: editingTemplate.id, data });
     } else {
+      console.log('Calling createTemplateMutation.mutate');
       createTemplateMutation.mutate(data);
     }
   };
@@ -652,7 +662,9 @@ export default function Berichten() {
           <div className="flex gap-6">
             <div className="flex-1">
               <Form {...templateForm}>
-            <form onSubmit={templateForm.handleSubmit(onTemplateSubmit)} className="space-y-6">
+            <form onSubmit={templateForm.handleSubmit(onTemplateSubmit, (errors) => {
+              console.log('Form validation errors:', errors);
+            })} className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
                 <FormField
                   control={templateForm.control}

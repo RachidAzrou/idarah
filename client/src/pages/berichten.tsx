@@ -174,6 +174,11 @@ export default function Berichten() {
 
   // Debug: Log templates to see what's being rendered
   console.log("Templates data:", templates, "Length:", templates?.length);
+  
+  // Ensure unique templates by ID to prevent duplicates
+  const uniqueTemplates = templates ? templates.filter((template: any, index: number, arr: any[]) => 
+    arr.findIndex((t: any) => t.id === template.id) === index
+  ) : [];
 
   const { data: segments, isLoading: segmentsLoading } = useQuery({
     queryKey: ["/api/messages/segments"],
@@ -1045,7 +1050,7 @@ Het organisatieteam van {{tenant.name}}`
                 )}
                 
                 {/* Regular Templates */}
-                {Array.isArray(templates) && templates.map((template: any) => {
+                {Array.isArray(uniqueTemplates) && uniqueTemplates.map((template: any) => {
                   // Function to get icon based on template name
                   const getTemplateIcon = (name: string) => {
                     const lowerName = name.toLowerCase();
@@ -1221,7 +1226,7 @@ Het organisatieteam van {{tenant.name}}`
                           <SelectValue placeholder="Selecteer template" />
                         </SelectTrigger>
                         <SelectContent>
-                          {Array.isArray(templates) && templates.map((template: any) => (
+                          {Array.isArray(uniqueTemplates) && uniqueTemplates.map((template: any) => (
                             <SelectItem key={template.id} value={template.code}>
                               {template.name} ({template.code})
                             </SelectItem>
@@ -1279,7 +1284,7 @@ Het organisatieteam van {{tenant.name}}`
                           <SelectValue placeholder="Selecteer template" />
                         </SelectTrigger>
                         <SelectContent>
-                          {Array.isArray(templates) && templates.map((template: any) => (
+                          {Array.isArray(uniqueTemplates) && uniqueTemplates.map((template: any) => (
                             <SelectItem key={template.id} value={template.code}>
                               {template.name} ({template.code})
                             </SelectItem>

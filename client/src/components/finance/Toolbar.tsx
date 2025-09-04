@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, Plus, Filter } from "lucide-react";
 import { CiExport, CiImport } from "react-icons/ci";
+import { FiltersToolbar } from "./FiltersDrawer";
+import { FilterData } from "@/lib/zod/transaction";
 
 interface ToolbarProps {
   onSearch: (search: string) => void;
@@ -18,6 +20,9 @@ interface ToolbarProps {
   searchValue: string;
   typeFilter: string;
   periodFilter: string;
+  advancedFilters?: FilterData;
+  onAdvancedFiltersChange?: (filters: FilterData) => void;
+  onClearAdvancedFilters?: () => void;
 }
 
 export function Toolbar({
@@ -30,8 +35,17 @@ export function Toolbar({
   onAdvancedFilters,
   searchValue,
   typeFilter,
-  periodFilter
+  periodFilter,
+  advancedFilters,
+  onAdvancedFiltersChange,
+  onClearAdvancedFilters
 }: ToolbarProps) {
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+
+  const handleAdvancedFiltersToggle = () => {
+    setShowAdvancedFilters(!showAdvancedFilters);
+    onAdvancedFilters();
+  };
   return (
     <div className="glass-card card-hover animate-fade-in group flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between p-4 rounded-lg border-0">
       {/* Search and Quick Filters */}
@@ -76,8 +90,8 @@ export function Toolbar({
         
         {/* Advanced Filters Button */}
         <Button
-          variant="outline"
-          onClick={onAdvancedFilters}
+          variant={showAdvancedFilters ? "default" : "outline"}
+          onClick={handleAdvancedFiltersToggle}
           className="gap-2"
           data-testid="button-advanced-filters"
         >
@@ -115,6 +129,17 @@ export function Toolbar({
           Nieuwe transactie
         </Button>
       </div>
+      
+      {/* Advanced Filters Toolbar */}
+      {showAdvancedFilters && advancedFilters && onAdvancedFiltersChange && onClearAdvancedFilters && (
+        <div className="mt-4 pt-4 border-t border-gray-200">
+          <FiltersToolbar
+            filters={advancedFilters}
+            onFiltersChange={onAdvancedFiltersChange}
+            onClearFilters={onClearAdvancedFilters}
+          />
+        </div>
+      )}
     </div>
   );
 }

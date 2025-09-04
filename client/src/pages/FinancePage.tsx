@@ -278,6 +278,9 @@ export default function FinancePage() {
               onImport={() => setShowImportDialog(true)}
               onExport={() => setShowExportDialog(true)}
               onAdvancedFilters={() => setShowAdvancedFilters(!showAdvancedFilters)}
+              advancedFilters={filters}
+              onAdvancedFiltersChange={handleFiltersChange}
+              onClearAdvancedFilters={handleClearFilters}
             />
 
             {/* Transactions Table */}

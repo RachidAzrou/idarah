@@ -14,7 +14,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { CalendarIcon, User, Mail, Phone, Link, Crown, FileText, Search } from "lucide-react";
+import { CalendarIcon, User, Mail, Phone, Link, Crown, FileText, Search, UserCircle } from "lucide-react";
 import { MdOutlinePermIdentity } from "react-icons/md";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
@@ -283,46 +283,84 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
                               </div>
                               
                               {memberSearch && memberSearch.length > 1 && (
-                                <div className="max-h-40 overflow-y-auto border border-gray-200 rounded-md bg-white">
+                                <div className="max-h-60 overflow-y-auto border border-gray-200 rounded-lg bg-white shadow-sm">
                                   {filteredMembers && filteredMembers.length > 0 ? (
-                                    filteredMembers.map((member) => (
-                                      <div
-                                        key={member.id}
-                                        className="p-2 hover:bg-gray-50 cursor-pointer border-b last:border-b-0"
-                                        onClick={() => handleMemberSelect(member)}
-                                        data-testid={`member-option-${member.id}`}
-                                      >
-                                        <div className="font-medium">
-                                          {member.firstName} {member.lastName}
+                                    <div className="p-2 space-y-1">
+                                      {filteredMembers.map((member) => (
+                                        <div
+                                          key={member.id}
+                                          className="flex items-center gap-3 p-3 hover:bg-blue-50 cursor-pointer rounded-lg transition-colors duration-150 border border-transparent hover:border-blue-200"
+                                          onClick={() => handleMemberSelect(member)}
+                                          data-testid={`member-option-${member.id}`}
+                                        >
+                                          <div className="flex-shrink-0">
+                                            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-medium text-sm">
+                                              {member.firstName.charAt(0)}{member.lastName.charAt(0)}
+                                            </div>
+                                          </div>
+                                          <div className="flex-1 min-w-0">
+                                            <div className="font-medium text-gray-900 truncate">
+                                              {member.firstName} {member.lastName}
+                                            </div>
+                                            <div className="flex items-center gap-2 text-sm text-gray-500">
+                                              <span className="inline-flex items-center gap-1">
+                                                <User className="h-3 w-3" />
+                                                #{member.memberNumber}
+                                              </span>
+                                              {member.email && (
+                                                <span className="inline-flex items-center gap-1 truncate">
+                                                  <Mail className="h-3 w-3" />
+                                                  {member.email}
+                                                </span>
+                                              )}
+                                            </div>
+                                          </div>
+                                          <div className="flex-shrink-0 text-blue-500">
+                                            <User className="h-4 w-4" />
+                                          </div>
                                         </div>
-                                        <div className="text-sm text-gray-500">
-                                          #{member.memberNumber} • {member.email}
-                                        </div>
-                                      </div>
-                                    ))
+                                      ))}
+                                    </div>
                                   ) : (
-                                    <div className="p-3 text-gray-500 text-center">
-                                      Geen leden gevonden
+                                    <div className="p-6 text-center">
+                                      <UserCircle className="h-12 w-12 text-gray-300 mx-auto mb-2" />
+                                      <p className="text-gray-500 font-medium">Geen leden gevonden</p>
+                                      <p className="text-sm text-gray-400 mt-1">Probeer een andere zoekopdracht</p>
                                     </div>
                                   )}
                                 </div>
                               )}
                               
                               {selectedMember && (
-                                <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
-                                  <div className="flex items-center justify-between">
-                                    <div>
-                                      <div className="font-medium text-blue-900">
+                                <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg shadow-sm">
+                                  <div className="flex items-center gap-3">
+                                    <div className="flex-shrink-0">
+                                      <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-medium">
+                                        {selectedMember.firstName.charAt(0)}{selectedMember.lastName.charAt(0)}
+                                      </div>
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                      <div className="font-semibold text-blue-900 text-lg">
                                         {selectedMember.firstName} {selectedMember.lastName}
                                       </div>
-                                      <div className="text-sm text-blue-700">
-                                        #{selectedMember.memberNumber} • {selectedMember.email}
+                                      <div className="flex items-center gap-4 text-sm text-blue-700 mt-1">
+                                        <span className="inline-flex items-center gap-1">
+                                          <User className="h-4 w-4" />
+                                          Lidnummer #{selectedMember.memberNumber}
+                                        </span>
+                                        {selectedMember.email && (
+                                          <span className="inline-flex items-center gap-1">
+                                            <Mail className="h-4 w-4" />
+                                            {selectedMember.email}
+                                          </span>
+                                        )}
                                       </div>
                                     </div>
                                     <Button
                                       type="button"
                                       variant="ghost"
                                       size="sm"
+                                      className="text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded-full h-8 w-8 p-0"
                                       onClick={() => {
                                         setSelectedMember(null);
                                         setMemberSearch('');

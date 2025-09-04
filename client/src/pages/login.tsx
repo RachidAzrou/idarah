@@ -55,7 +55,7 @@ export default function Login() {
       <div className="absolute inset-0 bg-black/30"></div>
       
       {/* Left side - Branding and welcome text */}
-      <div className="flex-1 flex flex-col justify-center items-center px-8 sm:px-12 lg:px-16 relative z-10">
+      <div className="flex-1 flex flex-col justify-start items-center pt-20 px-8 sm:px-12 lg:px-16 relative z-10">
         <div className="max-w-md text-center">
           {/* Logo */}
           <div className="flex items-center justify-center mb-4">

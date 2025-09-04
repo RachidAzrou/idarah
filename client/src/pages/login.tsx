@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Building2, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import backgroundImage from "@assets/Luxury Navy Background_1757015851301.jpg";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Login() {
@@ -40,22 +41,32 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+    <div 
+      className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8"
+      style={{
+        backgroundImage: `url("${backgroundImage}")`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      {/* Background overlay */}
+      <div className="absolute inset-0 bg-black/20"></div>
+      <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10">
         <div className="flex justify-center">
           <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center">
             <Building2 className="w-6 h-6 text-primary-foreground" />
           </div>
         </div>
-        <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
+        <h2 className="mt-6 text-center text-3xl font-bold text-white">
           Inloggen bij Ledenbeheer
         </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
+        <p className="mt-2 text-center text-sm text-gray-200">
           Moskee management platform
         </p>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md relative z-10">
         <Card>
           <CardHeader>
             <CardTitle className="text-center">Welkom terug</CardTitle>

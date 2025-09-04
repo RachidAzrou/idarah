@@ -162,6 +162,8 @@ export default function Berichten() {
   const [previewTemplate, setPreviewTemplate] = useState<any>(null);
   const [previewSegment, setPreviewSegment] = useState<any>(null);
   const [showSegmentPreviewDialog, setShowSegmentPreviewDialog] = useState(false);
+  const [showDeleteSegmentDialog, setShowDeleteSegmentDialog] = useState(false);
+  const [segmentToDelete, setSegmentToDelete] = useState<any>(null);
   const [templateToDelete, setTemplateToDelete] = useState<any>(null);
   const [sendTemplateCode, setSendTemplateCode] = useState("");
   const [sendRecipient, setSendRecipient] = useState("");
@@ -437,13 +439,20 @@ export default function Berichten() {
   };
 
   const handleDeleteSegment = (segment: any) => {
-    if (confirm(`Weet je zeker dat je de verzendgroep "${segment.name}" wilt verwijderen?`)) {
+    setSegmentToDelete(segment);
+    setShowDeleteSegmentDialog(true);
+  };
+
+  const confirmDeleteSegment = () => {
+    if (segmentToDelete) {
       // TODO: Implement delete segment API call
       toast({
         title: "Verzendgroep verwijderd",
-        description: `"${segment.name}" is succesvol verwijderd.`,
+        description: `"${segmentToDelete.name}" is succesvol verwijderd.`,
         variant: "default"
       });
+      setShowDeleteSegmentDialog(false);
+      setSegmentToDelete(null);
     }
   };
 
@@ -478,9 +487,12 @@ export default function Berichten() {
   };
 
   const onSegmentSubmit = (data: z.infer<typeof segmentSchema>) => {
+    console.log('Submitting segment with data:', data);
     if (editingSegment) {
+      console.log('Updating existing segment:', editingSegment.id);
       updateSegmentMutation.mutate({ id: editingSegment.id, data });
     } else {
+      console.log('Creating new segment');
       createSegmentMutation.mutate(data);
     }
   };
@@ -2096,6 +2108,42 @@ Het organisatieteam van {{tenant.name}}`
             }}>
               Bewerken
             </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Segment Confirmation Dialog */}
+      <Dialog open={showDeleteSegmentDialog} onOpenChange={setShowDeleteSegmentDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-red-600" />
+              Verzendgroep verwijderen
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-gray-600">
+              Weet je zeker dat je de verzendgroep "<strong>{segmentToDelete?.name}</strong>" wilt verwijderen? 
+              Deze actie kan niet ongedaan worden gemaakt.
+            </p>
+            <div className="flex justify-end gap-3">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => setShowDeleteSegmentDialog(false)}
+                data-testid="button-cancel-delete-segment"
+              >
+                Annuleren
+              </Button>
+              <Button 
+                type="button"
+                variant="destructive"
+                onClick={confirmDeleteSegment}
+                data-testid="button-confirm-delete-segment"
+              >
+                Verwijderen
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>

@@ -29,9 +29,15 @@ const templateSchema = z.object({
   name: z.string().min(1, "Naam is verplicht"),
   code: z.string().min(1, "Code is verplicht"),
   subject: z.string().min(1, "Onderwerp is verplicht"),
-  bodyHtml: z.string().min(1, "HTML body is verplicht"),
-  bodyText: z.string().min(1, "Text body is verplicht")
-});
+  bodyHtml: z.string().optional(),
+  bodyText: z.string().optional()
+}).refine(
+  (data) => data.bodyHtml || data.bodyText,
+  {
+    message: "HTML body of Text body moet ingevuld zijn",
+    path: ["bodyHtml"]
+  }
+);
 
 const segmentSchema = z.object({
   name: z.string().min(1, "Naam is verplicht"),
@@ -122,8 +128,8 @@ export default function Berichten() {
         code: data.code,
         kind: "TRANSACTIONEEL", // Standaard waarde sinds type niet meer relevant is
         subject: data.subject,
-        body_html: data.bodyHtml,
-        body_text: data.bodyText
+        body_html: data.bodyHtml || "",
+        body_text: data.bodyText || ""
       });
     },
     onSuccess: () => {
@@ -149,8 +155,8 @@ export default function Berichten() {
         code: data.code,
         kind: "TRANSACTIONEEL", // Standaard waarde sinds type niet meer relevant is
         subject: data.subject,
-        body_html: data.bodyHtml,
-        body_text: data.bodyText
+        body_html: data.bodyHtml || "",
+        body_text: data.bodyText || ""
       };
       console.log('API payload:', payload);
       return apiRequest("PUT", `/api/messages/templates/${id}`, payload);

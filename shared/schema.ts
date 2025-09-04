@@ -1028,6 +1028,11 @@ export type MethodSlice = {
   count: number;
 };
 
+export type BoardTerm = typeof boardTerms.$inferSelect;
+export type InsertBoardTerm = z.infer<typeof insertBoardTermSchema>;
+
+export type CardVerifyResponse = z.infer<typeof cardVerifyResponseSchema>;
+
 export type EmailTemplate = typeof emailTemplates.$inferSelect;
 export type InsertEmailTemplate = z.infer<typeof insertEmailTemplateSchema>;
 

@@ -526,255 +526,95 @@ export default function Berichten() {
               </div>
             ) : (
               <>
-                {/* Database Templates */}
-                {Array.isArray(templates) && templates.map((template: any) => {
-                  // Function to get icon based on template name
-                  const getTemplateIcon = (name: string) => {
-                    const lowerName = name.toLowerCase();
-                    if (lowerName.includes('welkomstmail') || lowerName.includes('welkom') || lowerName.includes('verwelkomin')) {
-                      return <PiHandWaving className="w-5 h-5 text-gray-600" />;
-                    } else if (lowerName.includes('vervallen') || lowerName.includes('lidgeld') || lowerName.includes('herinnering')) {
-                      return <TbClockExclamation className="w-5 h-5 text-gray-600" />;
-                    } else if (lowerName.includes('algemene vergadering') || lowerName.includes('vergadering')) {
-                      return <GrGroup className="w-5 h-5 text-gray-600" />;
-                    } else if (lowerName.includes('festiviteit') || lowerName.includes('feest')) {
-                      return <PartyPopper className="w-5 h-5 text-gray-600" />;
-                    } else if (lowerName.includes('activiteit') || lowerName.includes('evenement')) {
-                      return <Megaphone className="w-5 h-5 text-gray-600" />;
-                    } else {
-                      return <Mail className="w-5 h-5 text-gray-600" />;
-                    }
-                  };
-
-                  return (
-                    <Card key={template.id} className="hover:shadow-lg transition-shadow border-gray-200 bg-gray-50" data-testid={`card-template-${template.id}`}>
+                {/* Template Voorbeelden Cards */}
+                {canEdit && (
+                  <>
+                    {/* Welkomstmail Nieuw Lid Template Card */}
+                    <Card className="hover:shadow-lg transition-shadow border-gray-200 bg-gray-50" data-testid="card-template-welcome">
                       <CardHeader>
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
                             <div className="flex items-center gap-2">
-                              {getTemplateIcon(template.name)}
-                              <CardTitle className="text-base text-gray-900" data-testid={`text-template-name-${template.id}`}>
-                                {template.name}
+                              <PiHandWaving className="w-5 h-5 text-gray-600" />
+                              <CardTitle className="text-base text-gray-900" data-testid="text-template-name-welcome">
+                                Welkomstmail Nieuw Lid
                               </CardTitle>
                             </div>
-                            <CardDescription className="text-gray-700" data-testid={`text-template-subject-${template.id}`}>
-                              {template.subject}
+                            <CardDescription className="text-gray-700" data-testid="text-template-subject-welcome">
+                              Verwelkomingsbericht voor nieuwe leden
                             </CardDescription>
                           </div>
                         </div>
                       </CardHeader>
                       <CardContent>
                         <div className="flex gap-2">
-                          <Button size="sm" variant="outline" onClick={() => handlePreviewTemplate(template)} data-testid={`button-preview-${template.id}`}>
-                            <Eye className="w-4 h-4 mr-1" />
-                            Preview
-                          </Button>
-                          {canEdit && (
-                            <Button size="sm" variant="outline" onClick={() => handleEditTemplate(template)} data-testid={`button-edit-template-${template.id}`}>
-                              <Edit className="w-4 h-4 mr-1" />
-                              Bewerk
-                            </Button>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </>
-            )}
-          </div>
-        </TabsContent>
-
-        {/* Segments Tab */}
-        <TabsContent value="segments" className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-medium">Segmenten</h2>
-            {canEdit && (
-              <Button onClick={handleNewSegment} className="flex items-center gap-2" data-testid="button-new-segment">
-                <Plus className="w-4 h-4" />
-                Nieuw Segment
-              </Button>
-            )}
-          </div>
-
-          {/* Segments grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-testid="segments-grid">
-            {segmentsLoading ? (
-              Array.from({ length: 3 }).map((_, i) => (
-                <Card key={i} className="animate-pulse">
-                  <CardHeader>
-                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                  </CardHeader>
-                </Card>
-              ))
-            ) : !segments || !Array.isArray(segments) || segments.length === 0 ? (
-              <div className="col-span-full text-center py-12" data-testid="segments-empty-state">
-                <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Nog geen segmenten</h3>
-                <p className="text-gray-500 mb-4">Maak je eerste segment</p>
-                {canEdit && (
-                  <Button onClick={handleNewSegment} data-testid="button-add-first-segment">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Segment Toevoegen
-                  </Button>
-                )}
-              </div>
-            ) : (
-              segments.map((segment: any) => (
-                <Card key={segment.id} className="hover:shadow-lg transition-shadow border-gray-200 bg-gray-50" data-testid={`card-segment-${segment.id}`}>
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <GrGroup className="w-5 h-5 text-gray-600" />
-                          <CardTitle className="text-base text-gray-900" data-testid={`text-segment-name-${segment.id}`}>
-                            {segment.name}
-                          </CardTitle>
-                        </div>
-                        <CardDescription className="text-gray-700 mt-1" data-testid={`text-segment-description-${segment.id}`}>
-                          {segment.description || 'Geen beschrijving'}
-                        </CardDescription>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex gap-2">
-                      {canEdit && (
-                        <Button size="sm" variant="outline" onClick={() => handleEditSegment(segment)} data-testid={`button-edit-segment-${segment.id}`}>
-                          <Edit className="w-4 h-4 mr-1" />
-                          Bewerk
-                        </Button>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
-            )}
-          </div>
-        </TabsContent>
-
-        {/* Campaigns Tab */}  
-        <TabsContent value="campaigns" className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-medium">Campagnes</h2>
-            {canEdit && (
-              <Button className="flex items-center gap-2" data-testid="button-new-campaign">
-                <Plus className="w-4 h-4" />
-                Nieuwe Campagne
-              </Button>
-            )}
-          </div>
-
-          <div className="col-span-full text-center py-12" data-testid="campaigns-empty-state">
-            <Send className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Campagnes binnenkort beschikbaar</h3>
-            <p className="text-gray-500 mb-4">E-mail campagnes worden later toegevoegd</p>
-          </div>
-        </TabsContent>
-
-      </Tabs>
-
-      {/* Template Dialog */}
-      <Dialog open={showTemplateDialog} onOpenChange={setShowTemplateDialog}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-auto">
-          <DialogHeader>
-            <DialogTitle>
-              {editingTemplate ? 'Template Bewerken' : 'Nieuwe Template'}
-            </DialogTitle>
-          </DialogHeader>
-          <Form {...templateForm}>
-            <form onSubmit={templateForm.handleSubmit(onTemplateSubmit)} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
-                  control={templateForm.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Naam *</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Bijv. Welkomstmail nieuwe leden" {...field} data-testid="input-template-name" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={templateForm.control}
-                  name="code" 
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Code *</FormLabel>
-                      <FormControl>
-                        <Input placeholder="bijv. welcome_new_member" {...field} data-testid="input-template-code" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              
-              <FormField
-                control={templateForm.control}
-                name="subject"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Onderwerp *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Welkom bij {{tenant.name}}" {...field} data-testid="input-template-subject" />
-                    </FormControl>
-                    <FormDescription>
-                      Gebruik variabelen zoals: {"{{member.firstName}}"}, {"{{tenant.name}}"}, {"{{member.email}}"}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={templateForm.control}
-                name="content"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Inhoud *</FormLabel>
-                    <FormControl>
-                      <Textarea 
-                        rows={16}
-                        placeholder="Beste {{member.firstName}} {{member.lastName}},
+                          <Button size="sm" variant="outline" onClick={() => {
+                            const welcomeTemplate = {
+                              name: "Welkomstmail Nieuw Lid",
+                              code: "WELCOME_NEW_MEMBER",
+                              subject: "Welkom bij {{tenant.name}}",
+                              content: `Beste {{member.firstName}} {{member.lastName}},
 
 Van harte welkom bij {{tenant.name}}!
 
-Met vriendelijke groet,
-Het bestuur"
-                        {...field} 
-                        data-testid="textarea-template-content"
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Ondersteunde variabelen: {"{{member.firstName}}"}, {"{{member.lastName}}"}, {"{{member.email}}"}, {"{{tenant.name}}"}, {"{{tenant.email}}"}, {"{{tenant.phone}}"}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+We zijn verheugd u als nieuw lid te verwelkomen in onze gemeenschap.
 
-              <div className="flex justify-end gap-3">
-                <Button type="button" variant="outline" onClick={() => setShowTemplateDialog(false)}>
-                  Annuleren
-                </Button>
-                <Button 
-                  type="submit" 
-                  disabled={createTemplateMutation.isPending || updateTemplateMutation.isPending || !hasTemplateChanges()}
-                  data-testid="button-save-template"
-                >
-                  {hasTemplateChanges() ? (editingTemplate ? 'Wijzigingen opslaan' : 'Template aanmaken') : 'Geen wijzigingen'}
-                </Button>
-              </div>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
+Uw lidgegevens:
+- Lidnummer: {{member.memberNumber}}
+- Categorie: {{member.category}}
+- E-mailadres: {{member.email}}
+
+Voor vragen kunt u altijd contact met ons opnemen via {{tenant.email}} of telefonisch via {{tenant.phone}}.
+
+Nogmaals welkom!
+
+Met vriendelijke groet,
+{{tenant.name}}`
+                            };
+                            handlePreviewTemplate(welcomeTemplate);
+                          }} data-testid="button-preview-welcome">
+                            <Eye className="w-4 h-4 mr-1" />
+                            Preview
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => {
+                              setEditingTemplate(null);
+                              templateForm.reset({
+                                name: "Welkomstmail Nieuw Lid",
+                                code: "WELCOME_NEW_MEMBER",
+                                subject: "Welkom bij {{tenant.name}}",
+                                content: `Beste {{member.firstName}} {{member.lastName}},
+
+Van harte welkom bij {{tenant.name}}!
+
+We zijn verheugd u als nieuw lid te verwelkomen in onze gemeenschap.
+
+Uw lidgegevens:
+- Lidnummer: {{member.memberNumber}}
+- Categorie: {{member.category}}
+- E-mailadres: {{member.email}}
+
+Voor vragen kunt u altijd contact met ons opnemen via {{tenant.email}} of telefonisch via {{tenant.phone}}.
+
+Nogmaals welkom!
+
+Met vriendelijke groet,
+{{tenant.name}}`
+                              });
+                              setShowTemplateDialog(true);
+                            }}
+                            data-testid="button-create-welcome-template"
+                          >
+                            <Edit className="w-4 h-4 mr-1" />
+                            Bewerk
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Vervallen Lidgeld Template Card */}
                     <Card className="hover:shadow-lg transition-shadow border-gray-200 bg-gray-50" data-testid="card-template-expired">
                       <CardHeader>
                         <div className="flex items-start justify-between">
@@ -782,11 +622,11 @@ Het bestuur"
                             <div className="flex items-center gap-2">
                               <TbClockExclamation className="w-5 h-5 text-gray-600" />
                               <CardTitle className="text-base text-gray-900" data-testid="text-template-name-expired">
-                                Herinnering Vervallen Lidgeld
+                                Vervallen Lidgeld
                               </CardTitle>
                             </div>
                             <CardDescription className="text-gray-700" data-testid="text-template-subject-expired">
-                              Voor leden met vervallen betalingen
+                              Herinnering voor vervallen lidgeld
                             </CardDescription>
                           </div>
                         </div>
@@ -1199,385 +1039,11 @@ Het organisatieteam van {{tenant.name}}`
                         </div>
                       </CardContent>
                     </Card>
+                  </>
                 )}
-              </>
-            )}
-          </div>
-        </TabsContent>
-
-        {/* Templates Tab (Send section) */}
-        <TabsContent value="send" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Single Email Section */}
-            {!sendToSegment ? (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Send className="w-5 h-5" />
-                    Enkele E-mail Verzenden
-                  </CardTitle>
-                  <CardDescription>
-                    Stuur een e-mail naar een specifiek lid
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-4">
-                    {/* Template Selection */}
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Template</label>
-                      <Select value={sendTemplateCode} onValueChange={setSendTemplateCode}>
-                        <SelectTrigger data-testid="select-template-single">
-                          <SelectValue placeholder="Selecteer template" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {Array.isArray(templates) && templates.map((template: any) => (
-                            <SelectItem key={template.id} value={template.code}>
-                              {template.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    {/* Recipient Selection */}
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Ontvanger</label>
-                      <Input
-                        placeholder="E-mailadres"
-                        value={sendRecipient}
-                        onChange={(e) => setSendRecipient(e.target.value)}
-                        data-testid="input-recipient"
-                      />
-                    </div>
-                  </div>
-                  {canEdit && (
-                    <Button 
-                      onClick={handleSendSingleEmail}
-                      disabled={sendSingleEmailMutation.isPending || !sendTemplateCode || !sendRecipient}
-                      data-testid="button-send-single"
-                    >
-                      {sendSingleEmailMutation.isPending ? (
-                        <>Verzenden...</>
-                      ) : (
-                        <>
-                          <Send className="w-4 h-4 mr-2" />
-                          Verstuur E-mail
-                        </>
-                      )}
-                    </Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          ) : (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="w-5 h-5" />
-                  Bulk E-mail Verzending
-                </CardTitle>
-                <CardDescription>
-                  Stuur een e-mail naar alle leden in een segment
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-4">
-                  {/* Template Selection */}
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Template</label>
-                    <Select value={sendTemplateCode} onValueChange={setSendTemplateCode}>
-                      <SelectTrigger data-testid="select-template-bulk">
-                        <SelectValue placeholder="Selecteer template" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Array.isArray(templates) && templates.map((template: any) => (
-                          <SelectItem key={template.id} value={template.code}>
-                            {template.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Segment Selection */}
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Segment</label>
-                    <Select value={selectedSegment} onValueChange={setSelectedSegment}>
-                      <SelectTrigger data-testid="select-segment-bulk">
-                        <SelectValue placeholder="Selecteer segment" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Array.isArray(segments) && segments.map((segment: any) => (
-                          <SelectItem key={segment.id} value={segment.id}>
-                            {segment.name} - {Object.keys(segment.rules || {}).length} regels
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {selectedSegment && (
-                    <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
-                      <p className="text-sm text-blue-800">
-                        Let op: De e-mail wordt verzonden naar alle leden die voldoen aan de segment criteria
-                      </p>
-                    </div>
-                  )}
-                  
-                  {canEdit && (
-                    <Button 
-                      onClick={() => {
-                        // TODO: Implement bulk send
-                        toast({
-                          title: "Bulk verzending",
-                          description: "Bulk verzending wordt binnenkort geïmplementeerd",
-                          variant: "default"
-                        });
-                      }}
-                      disabled={!sendTemplateCode || !selectedSegment}
-                      data-testid="button-send-bulk"
-                      className="w-full"
-                    >
-                      <Users className="w-4 h-4 mr-2" />
-                      Verstuur naar Segment
-                    </Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
-
-      </Tabs>
-
-      {/* Template Dialog */}
-      <Dialog open={showTemplateDialog} onOpenChange={setShowTemplateDialog}>
-        <DialogContent className="max-w-6xl">
-          <DialogHeader>
-            <DialogTitle>{editingTemplate ? 'Template Bewerken' : 'Nieuwe Template'}</DialogTitle>
-          </DialogHeader>
-          
-          <div className="flex gap-6">
-            <div className="flex-1">
-              <Form {...templateForm}>
-            <form onSubmit={templateForm.handleSubmit(onTemplateSubmit)} className="space-y-6">
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={templateForm.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Naam</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="Bijv. Welkomstmail" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={templateForm.control}
-                  name="code"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Code</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="bijv. welkomst_mail" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              
-              <FormField
-                control={templateForm.control}
-                name="subject"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Onderwerp</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Bijv. Welkom bij {{tenant.name}}" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={templateForm.control}
-                name="content"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Inhoud</FormLabel>
-                    <FormControl>
-                      <textarea
-                        {...field}
-                        rows={15}
-                        className="w-full p-3 border border-gray-300 rounded-md resize-vertical"
-                        placeholder="E-mail inhoud met placeholders zoals {{member.firstName}}, {{member.lastName}}, {{tenant.name}}, etc."
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="flex gap-2">
-                <Button type="submit" disabled={templateMutation.isPending}>
-                  {templateMutation.isPending ? 'Opslaan...' : 'Opslaan'}
-                </Button>
-                <Button type="button" variant="outline" onClick={() => setShowTemplateDialog(false)}>
-                  Annuleren
-                </Button>
-                {editingTemplate && canEdit && (
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    onClick={handleDeleteTemplate}
-                    disabled={deleteTemplateMutation.isPending}
-                  >
-                    {deleteTemplateMutation.isPending ? 'Verwijderen...' : 'Verwijderen'}
-                  </Button>
-                )}
-              </div>
-            </form>
-          </Form>
-            </div>
-
-            {/* Preview Section */}
-            <div className="flex-1 border-l pl-6">
-              <h3 className="text-lg font-medium mb-4">Preview</h3>
-              <div 
-                className="border border-gray-200 rounded p-4 bg-gray-50 max-h-96 overflow-y-auto"
-                dangerouslySetInnerHTML={{ 
-                  __html: renderPreview(templateForm.watch('content') || '') 
-                }}
-              />
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Segment Dialog */}
-      <Dialog open={showSegmentDialog} onOpenChange={setShowSegmentDialog}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>{editingSegment ? 'Segment Bewerken' : 'Nieuw Segment'}</DialogTitle>
-          </DialogHeader>
-          
-          <Form {...segmentForm}>
-            <form onSubmit={segmentForm.handleSubmit(onSegmentSubmit)} className="space-y-6">
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={segmentForm.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Naam</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="Bijv. Actieve Leden" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={segmentForm.control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Beschrijving</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="Korte beschrijving" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className="space-y-4">
-                <h4 className="font-medium">Segmentatie Regels</h4>
-                <p className="text-sm text-gray-600">
-                  Bepaal welke leden bij dit segment horen
-                </p>
                 
-                <FormField
-                  control={segmentForm.control}
-                  name="rules"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <textarea
-                          {...field}
-                          value={typeof field.value === 'string' ? field.value : JSON.stringify(field.value || {}, null, 2)}
-                          onChange={(e) => {
-                            try {
-                              const rules = JSON.parse(e.target.value);
-                              field.onChange(rules);
-                            } catch {
-                              field.onChange(e.target.value);
-                            }
-                          }}
-                          rows={8}
-                          className="w-full p-3 border border-gray-300 rounded-md font-mono text-sm"
-                          placeholder='{"membershipStatus": "ACTIEF", "ageMin": 18}'
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className="flex gap-2">
-                <Button type="submit" disabled={segmentMutation.isPending}>
-                  {segmentMutation.isPending ? 'Opslaan...' : 'Opslaan'}
-                </Button>
-                <Button type="button" variant="outline" onClick={() => setShowSegmentDialog(false)}>
-                  Annuleren
-                </Button>
-                {editingSegment && canEdit && (
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    onClick={handleDeleteSegment}
-                    disabled={deleteSegmentMutation.isPending}
-                  >
-                    {deleteSegmentMutation.isPending ? 'Verwijderen...' : 'Verwijderen'}
-                  </Button>
-                )}
-              </div>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
-
-      {/* Preview Dialog */}
-      <Dialog open={showPreviewDialog} onOpenChange={setShowPreviewDialog}>
-        <DialogContent className="max-w-4xl">
-          <DialogHeader>
-            <DialogTitle>Template Preview: {previewTemplate?.name}</DialogTitle>
-          </DialogHeader>
-          
-          <div className="border border-gray-200 rounded p-6 bg-gray-50 max-h-96 overflow-y-auto">
-            {previewTemplate && (
-              <div 
-                dangerouslySetInnerHTML={{ 
-                  __html: renderPreview(previewTemplate.content || '') 
-                }}
-              />
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
-    </div>
-  </main>
-);
-};
-
-export default BerichtenPage;
+                {/* Regular Templates */}
+                {Array.isArray(templates) && templates.map((template: any) => {
                   // Function to get icon based on template name
                   const getTemplateIcon = (name: string) => {
                     const lowerName = name.toLowerCase();
@@ -1630,6 +1096,7 @@ export default BerichtenPage;
                     </Card>
                   );
                 })}
+              </>
             )}
           </div>
         </TabsContent>
@@ -1662,7 +1129,7 @@ export default BerichtenPage;
                 <h3 className="text-lg font-medium text-gray-900 mb-2">Nog geen segmenten</h3>
                 <p className="text-gray-500 mb-4">Maak je eerste lid segment</p>
                 {canEdit && (
-                  <Button onClick={handleNewSegment} data-testid="button-add-first-segment">
+                  <Button data-testid="button-add-first-segment">
                     <Plus className="w-4 h-4 mr-2" />
                     Segment Toevoegen
                   </Button>

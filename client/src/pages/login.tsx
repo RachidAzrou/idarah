@@ -62,7 +62,7 @@ export default function Login() {
             <img 
               src={idarahLogo} 
               alt="IDARAH" 
-              className="h-32 w-auto"
+              className="h-64 w-auto"
             />
           </div>
           

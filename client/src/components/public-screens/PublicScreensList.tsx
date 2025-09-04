@@ -93,7 +93,8 @@ export function PublicScreensList({ onEdit, onDelete }: PublicScreensListProps) 
   return (
     <div className="space-y-6">
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4">
+      <div className="glass-card card-hover animate-fade-in group border-0 p-6 rounded-xl">
+        <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
@@ -125,6 +126,7 @@ export function PublicScreensList({ onEdit, onDelete }: PublicScreensListProps) 
             <SelectItem value="INACTIVE">Inactief</SelectItem>
           </SelectContent>
         </Select>
+        </div>
       </div>
 
       {/* Results */}

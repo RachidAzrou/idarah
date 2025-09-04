@@ -161,14 +161,25 @@ class MemberService {
         periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0); // Last day of next month
       }
       
-      // Get fee amount based on category and payment frequency
-      let amount = 25.00; // Default for STANDAARD
-      if (member.category === 'STUDENT') amount = 15.00;
-      if (member.category === 'SENIOR') amount = 20.00;
+      // Get tenant-specific fee settings
+      const tenant = await storage.getTenantById(member.tenantId);
+      if (!tenant) {
+        console.error(`No tenant found for member ${member.id}`);
+        return;
+      }
+
+      // Get fee amount based on category and payment frequency using tenant settings
+      let yearlyAmount = parseFloat(tenant.adultFee || '25.00'); // Default for STANDAARD
+      if (member.category === 'STUDENT') yearlyAmount = parseFloat(tenant.studentFee || '15.00');
+      if (member.category === 'SENIOR') yearlyAmount = parseFloat(tenant.seniorFee || '20.00');
       
-      // If yearly payment, multiply by 12 for full year amount
+      // Calculate amount based on payment term
+      let amount: number;
       if (financialSettings.paymentTerm === 'YEARLY') {
-        amount = amount * 12;
+        amount = yearlyAmount;
+      } else {
+        // For monthly payments, divide yearly amount by 12
+        amount = yearlyAmount / 12;
       }
 
       await storage.createMembershipFee({

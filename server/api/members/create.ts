@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
 import { z } from 'zod';
 import { db } from '../../db';
-import { members, memberFinancialSettings } from '../../../shared/schema';
+import { members, memberFinancialSettings, tenants } from '../../../shared/schema';
+import { eq } from 'drizzle-orm';
 import { createFirstFeeForMember } from '../../../lib/server/fees/first-fee';
 import { beNow } from '../../../lib/server/time';
 
@@ -61,11 +62,24 @@ export async function createMemberHandler(req: Request, res: Response) {
         active: true
       }).returning();
 
+      // Get tenant settings for calculating amounts
+      const tenant = await tx.select().from(tenants).where(eq(tenants.id, tenantId)).limit(1);
+      const tenantData = tenant[0];
+      
+      // Calculate amounts based on category and tenant settings
+      let yearlyAmount = parseFloat(tenantData?.adultFee || '25.00'); // Default for VOLWASSEN
+      if (body.category === 'STUDENT') yearlyAmount = parseFloat(tenantData?.studentFee || '15.00');
+      if (body.category === 'SENIOR') yearlyAmount = parseFloat(tenantData?.seniorFee || '20.00');
+      
+      const monthlyAmount = yearlyAmount / 12;
+
       // Create financial settings
       await tx.insert(memberFinancialSettings).values({
         memberId: member.id,
         paymentMethod: body.preferredMethod,
         paymentTerm: body.preferredTerm,
+        monthlyAmount: monthlyAmount.toString(),
+        yearlyAmount: yearlyAmount.toString(),
         iban: body.iban
       });
 

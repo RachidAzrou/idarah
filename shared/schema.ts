@@ -98,6 +98,9 @@ export const memberFinancialSettings = pgTable("member_financial_settings", {
   memberId: varchar("member_id").notNull().unique(),
   paymentMethod: paymentMethodEnum("payment_method").notNull(),
   paymentTerm: paymentTermEnum("payment_term").notNull(),
+  monthlyAmount: decimal("monthly_amount", { precision: 10, scale: 2 }).default('0.00'),
+  yearlyAmount: decimal("yearly_amount", { precision: 10, scale: 2 }).default('0.00'),
+  billingAnchorAt: timestamp("billing_anchor_at").defaultNow(),
   iban: text("iban"),
 });
 

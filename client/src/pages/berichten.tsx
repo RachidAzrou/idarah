@@ -17,12 +17,12 @@ import { apiRequest } from "@/lib/queryClient";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Mail, Plus, Send, Users, Eye, Settings, Ban, Edit, Play, TestTube, ChevronDown, ChevronRight, AlertTriangle, Calendar, PartyPopper, Megaphone, Trash2 } from "lucide-react";
+import { Mail, Plus, Send, Users, Eye, Settings, Ban, Edit, Play, TestTube, ChevronDown, ChevronRight, AlertTriangle, Calendar, Megaphone, Trash2 } from "lucide-react";
 
 import { PiPuzzlePiece, PiHandWaving } from "react-icons/pi";
 import { CgTemplate } from "react-icons/cg";
 import { MdEvent } from "react-icons/md";
-import { LuSend, LuLogs } from "react-icons/lu";
+import { LuSend, LuLogs, LuPartyPopper } from "react-icons/lu";
 import { TbHandStop, TbClockExclamation } from "react-icons/tb";
 import { GrGroup } from "react-icons/gr";
 import { FaArrowsDownToPeople } from "react-icons/fa6";
@@ -1211,7 +1211,7 @@ Met hartelijke groet,
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
                             <div className="flex items-center gap-2">
-                              <PartyPopper className="w-5 h-5 text-gray-600" />
+                              <LuPartyPopper className="w-5 h-5 text-gray-600" />
                               <CardTitle className="text-base text-gray-900" data-testid="text-template-name-celebration">
                                 Feestbegroeting
                               </CardTitle>

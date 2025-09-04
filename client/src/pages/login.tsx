@@ -56,11 +56,11 @@ export default function Login() {
       
       {/* Left side - Logo */}
       <div className="flex-1 flex flex-col justify-center items-end pr-8 relative z-10">
-        <div className="flex items-center justify-center">
+        <div className="flex items-center justify-center w-full h-full">
           <img 
             src={idarahLogo} 
             alt="IDARAH" 
-            className="w-full h-full object-contain"
+            className="w-full h-full object-contain scale-110"
           />
         </div>
       </div>

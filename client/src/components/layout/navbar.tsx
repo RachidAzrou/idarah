@@ -35,8 +35,8 @@ const navigation = [
   { name: "Lidkaarten", href: "/lidkaarten", icon: IdCard },
   { name: "Lidgelden", href: "/lidgelden", icon: PiHandCoinsFill },
   { name: "Financiën", href: "/financien", icon: RiMoneyEuroCircleLine },
-  { name: "Berichten", href: "/berichten", icon: Mail },
   { name: "Mijn Bestuur", href: "/bestuur", icon: RiUserStarLine },
+  { name: "Berichten", href: "/berichten", icon: Mail },
   { name: "Publieke Schermen", href: "/publieke-schermen", icon: Monitor },
   { name: "Instellingen", href: "/instellingen", icon: Settings },
 ];
@@ -60,7 +60,7 @@ export default function Navbar() {
         </div>
 
         {/* Navigation - naar links */}
-        <div className="flex-1 flex justify-start ml-4 overflow-x-auto">
+        <div className="flex-1 flex justify-start ml-2 overflow-x-auto">
           <nav className="hidden lg:flex items-center space-x-2 xl:space-x-3">
             {navigation.map((item) => {
               const isActive = location === item.href || (item.href !== "/dashboard" && location.startsWith(item.href));

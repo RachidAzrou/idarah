@@ -8,7 +8,7 @@ import { AnnouncementsView } from "@/components/public-view/AnnouncementsView";
 import { Controls } from "@/components/public-view/Controls";
 
 export default function PublicScreenViewPage() {
-  const [match, params] = useRoute("/public/screen/:publicToken");
+  const [match, params] = useRoute("/screen/:publicToken");
   const publicToken = params?.publicToken;
   const [screen, setScreen] = useState<PublicScreen | null>(null);
   const [loading, setLoading] = useState(true);

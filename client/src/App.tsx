@@ -66,7 +66,7 @@ function Router() {
       <Route path="/financien" component={() => <ProtectedRoute component={FinancePage} />} />
       <Route path="/publieke-schermen" component={() => <ProtectedRoute component={PublicScreensPage} />} />
       <Route path="/public/screen/:publicToken" component={PublicScreenViewPage} />
-      <Route path="/screen/:screenId" component={PublicViewPage} />
+      <Route path="/screen/:publicToken" component={PublicScreenViewPage} />
       <Route path="/card/:memberId" component={CardPage} />
       <Route path="/card/verify/:qrToken" component={CardVerifyPage} />
       <Route path="/bestuur" component={() => <ProtectedRoute component={Bestuur} />} />

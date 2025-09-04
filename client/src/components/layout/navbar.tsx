@@ -18,7 +18,7 @@ import {
   User,
   Crown
 } from "lucide-react";
-import { RiMoneyEuroCircleLine } from "react-icons/ri";
+import { RiMoneyEuroCircleLine, RiUserStarLine } from "react-icons/ri";
 import { PiHandCoinsFill } from "react-icons/pi";
 import darahLogo from "@assets/DARAH_1756909309495.png";
 import { Input } from "@/components/ui/input";
@@ -34,7 +34,7 @@ const navigation = [
   { name: "Lidkaarten", href: "/lidkaarten", icon: IdCard },
   { name: "Lidgelden", href: "/lidgelden", icon: PiHandCoinsFill },
   { name: "Financiën", href: "/financien", icon: RiMoneyEuroCircleLine },
-  { name: "Mijn Bestuur", href: "/bestuur", icon: Crown },
+  { name: "Mijn Bestuur", href: "/bestuur", icon: RiUserStarLine },
   { name: "Publieke Schermen", href: "/publieke-schermen", icon: Monitor },
   { name: "Instellingen", href: "/instellingen", icon: Settings },
 ];

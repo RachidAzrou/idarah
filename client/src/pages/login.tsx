@@ -57,7 +57,7 @@ export default function Login() {
       {/* Left side - Branding and welcome text */}
       <div className="flex-1 flex flex-col px-8 sm:px-12 lg:px-16 relative z-10">
         {/* Logo at top */}
-        <div className="pt-4 mb-auto">
+        <div className="pt-4 mb-auto -ml-8">
           <div className="flex items-start justify-start">
             <img 
               src={idarahLogo} 

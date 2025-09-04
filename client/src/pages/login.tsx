@@ -54,23 +54,19 @@ export default function Login() {
       {/* Background overlay */}
       <div className="absolute inset-0 bg-black/30"></div>
       
-      {/* Left side - Branding and welcome text */}
-      <div className="flex-1 flex flex-col px-8 sm:px-12 lg:px-16 relative z-10">
-        {/* Logo at top */}
-        <div className="pt-4 -ml-16">
-          <div className="flex items-start justify-start">
-            <img 
-              src={idarahLogo} 
-              alt="IDARAH" 
-              className="h-24 w-auto scale-[5] origin-top-left"
-            />
-          </div>
+      {/* Left side - Logo */}
+      <div className="flex-1 flex flex-col justify-center items-end pr-8 relative z-10">
+        <div className="">
+          <img 
+            src={idarahLogo} 
+            alt="IDARAH" 
+            className="h-40 w-auto scale-[7]"
+          />
         </div>
-        
       </div>
 
       {/* Right side - Login form */}
-      <div className="flex-1 flex flex-col justify-center pl-4 pr-8 sm:pl-6 sm:pr-12 lg:pl-8 lg:pr-16 relative z-10">
+      <div className="flex-1 flex flex-col justify-center pl-8 pr-8 sm:pl-12 sm:pr-12 lg:pl-16 lg:pr-16 relative z-10">
         <div className="max-w-md mx-auto w-full">
           {/* Title above login container */}
           <h1 className="text-4xl font-bold text-white mb-6 leading-tight text-center">

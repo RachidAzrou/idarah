@@ -67,7 +67,7 @@ export default function Login() {
           </div>
           
           {/* Welcome text */}
-          <h1 className="text-5xl font-bold text-white mb-6 leading-tight">
+          <h1 className="text-4xl font-bold text-white mb-6 leading-tight">
             Inloggen bij
             <br />
             uw account

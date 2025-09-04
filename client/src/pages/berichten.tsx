@@ -580,6 +580,7 @@ export default function Berichten() {
                     </Card>
                   );
                 })}
+              </>
             )}
           </div>
         </TabsContent>
@@ -1199,9 +1200,384 @@ Het organisatieteam van {{tenant.name}}`
                       </CardContent>
                     </Card>
                 )}
+              </>
+            )}
+          </div>
+        </TabsContent>
+
+        {/* Templates Tab (Send section) */}
+        <TabsContent value="send" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Single Email Section */}
+            {!sendToSegment ? (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Send className="w-5 h-5" />
+                    Enkele E-mail Verzenden
+                  </CardTitle>
+                  <CardDescription>
+                    Stuur een e-mail naar een specifiek lid
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-4">
+                    {/* Template Selection */}
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Template</label>
+                      <Select value={sendTemplateCode} onValueChange={setSendTemplateCode}>
+                        <SelectTrigger data-testid="select-template-single">
+                          <SelectValue placeholder="Selecteer template" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Array.isArray(templates) && templates.map((template: any) => (
+                            <SelectItem key={template.id} value={template.code}>
+                              {template.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Recipient Selection */}
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Ontvanger</label>
+                      <Input
+                        placeholder="E-mailadres"
+                        value={sendRecipient}
+                        onChange={(e) => setSendRecipient(e.target.value)}
+                        data-testid="input-recipient"
+                      />
+                    </div>
+                  </div>
+                  {canEdit && (
+                    <Button 
+                      onClick={handleSendSingleEmail}
+                      disabled={sendSingleEmailMutation.isPending || !sendTemplateCode || !sendRecipient}
+                      data-testid="button-send-single"
+                    >
+                      {sendSingleEmailMutation.isPending ? (
+                        <>Verzenden...</>
+                      ) : (
+                        <>
+                          <Send className="w-4 h-4 mr-2" />
+                          Verstuur E-mail
+                        </>
+                      )}
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="w-5 h-5" />
+                  Bulk E-mail Verzending
+                </CardTitle>
+                <CardDescription>
+                  Stuur een e-mail naar alle leden in een segment
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-4">
+                  {/* Template Selection */}
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Template</label>
+                    <Select value={sendTemplateCode} onValueChange={setSendTemplateCode}>
+                      <SelectTrigger data-testid="select-template-bulk">
+                        <SelectValue placeholder="Selecteer template" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Array.isArray(templates) && templates.map((template: any) => (
+                          <SelectItem key={template.id} value={template.code}>
+                            {template.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Segment Selection */}
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Segment</label>
+                    <Select value={selectedSegment} onValueChange={setSelectedSegment}>
+                      <SelectTrigger data-testid="select-segment-bulk">
+                        <SelectValue placeholder="Selecteer segment" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Array.isArray(segments) && segments.map((segment: any) => (
+                          <SelectItem key={segment.id} value={segment.id}>
+                            {segment.name} - {Object.keys(segment.rules || {}).length} regels
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {selectedSegment && (
+                    <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
+                      <p className="text-sm text-blue-800">
+                        Let op: De e-mail wordt verzonden naar alle leden die voldoen aan de segment criteria
+                      </p>
+                    </div>
+                  )}
+                  
+                  {canEdit && (
+                    <Button 
+                      onClick={() => {
+                        // TODO: Implement bulk send
+                        toast({
+                          title: "Bulk verzending",
+                          description: "Bulk verzending wordt binnenkort geïmplementeerd",
+                          variant: "default"
+                        });
+                      }}
+                      disabled={!sendTemplateCode || !selectedSegment}
+                      data-testid="button-send-bulk"
+                      className="w-full"
+                    >
+                      <Users className="w-4 h-4 mr-2" />
+                      Verstuur naar Segment
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+
+      </Tabs>
+
+      {/* Template Dialog */}
+      <Dialog open={showTemplateDialog} onOpenChange={setShowTemplateDialog}>
+        <DialogContent className="max-w-6xl">
+          <DialogHeader>
+            <DialogTitle>{editingTemplate ? 'Template Bewerken' : 'Nieuwe Template'}</DialogTitle>
+          </DialogHeader>
+          
+          <div className="flex gap-6">
+            <div className="flex-1">
+              <Form {...templateForm}>
+            <form onSubmit={templateForm.handleSubmit(onTemplateSubmit)} className="space-y-6">
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={templateForm.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Naam</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="Bijv. Welkomstmail" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={templateForm.control}
+                  name="code"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Code</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="bijv. welkomst_mail" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              
+              <FormField
+                control={templateForm.control}
+                name="subject"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Onderwerp</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Bijv. Welkom bij {{tenant.name}}" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={templateForm.control}
+                name="content"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Inhoud</FormLabel>
+                    <FormControl>
+                      <textarea
+                        {...field}
+                        rows={15}
+                        className="w-full p-3 border border-gray-300 rounded-md resize-vertical"
+                        placeholder="E-mail inhoud met placeholders zoals {{member.firstName}}, {{member.lastName}}, {{tenant.name}}, etc."
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="flex gap-2">
+                <Button type="submit" disabled={templateMutation.isPending}>
+                  {templateMutation.isPending ? 'Opslaan...' : 'Opslaan'}
+                </Button>
+                <Button type="button" variant="outline" onClick={() => setShowTemplateDialog(false)}>
+                  Annuleren
+                </Button>
+                {editingTemplate && canEdit && (
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    onClick={handleDeleteTemplate}
+                    disabled={deleteTemplateMutation.isPending}
+                  >
+                    {deleteTemplateMutation.isPending ? 'Verwijderen...' : 'Verwijderen'}
+                  </Button>
+                )}
+              </div>
+            </form>
+          </Form>
+            </div>
+
+            {/* Preview Section */}
+            <div className="flex-1 border-l pl-6">
+              <h3 className="text-lg font-medium mb-4">Preview</h3>
+              <div 
+                className="border border-gray-200 rounded p-4 bg-gray-50 max-h-96 overflow-y-auto"
+                dangerouslySetInnerHTML={{ 
+                  __html: renderPreview(templateForm.watch('content') || '') 
+                }}
+              />
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Segment Dialog */}
+      <Dialog open={showSegmentDialog} onOpenChange={setShowSegmentDialog}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>{editingSegment ? 'Segment Bewerken' : 'Nieuw Segment'}</DialogTitle>
+          </DialogHeader>
+          
+          <Form {...segmentForm}>
+            <form onSubmit={segmentForm.handleSubmit(onSegmentSubmit)} className="space-y-6">
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={segmentForm.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Naam</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="Bijv. Actieve Leden" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={segmentForm.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Beschrijving</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="Korte beschrijving" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="space-y-4">
+                <h4 className="font-medium">Segmentatie Regels</h4>
+                <p className="text-sm text-gray-600">
+                  Bepaal welke leden bij dit segment horen
+                </p>
                 
-                {/* Regular Templates */}
-                {Array.isArray(templates) && templates.map((template: any) => {
+                <FormField
+                  control={segmentForm.control}
+                  name="rules"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <textarea
+                          {...field}
+                          value={typeof field.value === 'string' ? field.value : JSON.stringify(field.value || {}, null, 2)}
+                          onChange={(e) => {
+                            try {
+                              const rules = JSON.parse(e.target.value);
+                              field.onChange(rules);
+                            } catch {
+                              field.onChange(e.target.value);
+                            }
+                          }}
+                          rows={8}
+                          className="w-full p-3 border border-gray-300 rounded-md font-mono text-sm"
+                          placeholder='{"membershipStatus": "ACTIEF", "ageMin": 18}'
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="flex gap-2">
+                <Button type="submit" disabled={segmentMutation.isPending}>
+                  {segmentMutation.isPending ? 'Opslaan...' : 'Opslaan'}
+                </Button>
+                <Button type="button" variant="outline" onClick={() => setShowSegmentDialog(false)}>
+                  Annuleren
+                </Button>
+                {editingSegment && canEdit && (
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    onClick={handleDeleteSegment}
+                    disabled={deleteSegmentMutation.isPending}
+                  >
+                    {deleteSegmentMutation.isPending ? 'Verwijderen...' : 'Verwijderen'}
+                  </Button>
+                )}
+              </div>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Preview Dialog */}
+      <Dialog open={showPreviewDialog} onOpenChange={setShowPreviewDialog}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>Template Preview: {previewTemplate?.name}</DialogTitle>
+          </DialogHeader>
+          
+          <div className="border border-gray-200 rounded p-6 bg-gray-50 max-h-96 overflow-y-auto">
+            {previewTemplate && (
+              <div 
+                dangerouslySetInnerHTML={{ 
+                  __html: renderPreview(previewTemplate.content || '') 
+                }}
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
+  </main>
+);
+};
+
+export default BerichtenPage;
                   // Function to get icon based on template name
                   const getTemplateIcon = (name: string) => {
                     const lowerName = name.toLowerCase();

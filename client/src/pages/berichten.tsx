@@ -1341,7 +1341,7 @@ Het organisatieteam van {{tenant.name}}`
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-testid="segments-grid">
             {segmentsLoading ? (
               Array.from({ length: 3 }).map((_, i) => (
-                <Card key={i} className="animate-pulse">
+                <Card key={i} className="glass-card animate-pulse">
                   <CardHeader>
                     <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
                     <div className="h-3 bg-gray-200 rounded w-1/2"></div>
@@ -1362,7 +1362,7 @@ Het organisatieteam van {{tenant.name}}`
               </div>
             ) : (
               Array.isArray(segments) && segments.map((segment: any) => (
-                <Card key={segment.id} className="hover:shadow-lg transition-shadow" data-testid={`card-segment-${segment.id}`}>
+                <Card key={segment.id} className="glass-card card-hover animate-fade-in group border-0" data-testid={`card-segment-${segment.id}`}>
                   <CardHeader>
                     <CardTitle className="text-base" data-testid={`text-segment-name-${segment.id}`}>
                       {segment.name}
@@ -1415,7 +1415,7 @@ Het organisatieteam van {{tenant.name}}`
           </div>
 
           {/* Email Composer */}
-          <Card className="border border-gray-200">
+          <Card className="glass-card card-hover animate-fade-in group border-0">
             <CardContent className="p-6">
               <div className="space-y-6">
                 {/* Template Selector */}

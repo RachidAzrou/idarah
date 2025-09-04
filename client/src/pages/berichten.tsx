@@ -174,13 +174,13 @@ export default function Berichten() {
   const [selectedSegment, setSelectedSegment] = useState("");
   const [originalTemplateData, setOriginalTemplateData] = useState<any>(null);
 
-  // Fetch data for each tab - use user tenantId for stable query key
+  // Fetch data for each tab
   const { data: templatesData, isLoading: templatesLoading } = useQuery({
-    queryKey: ["/api/messages/templates", user?.tenantId],
-    staleTime: 0,
-    gcTime: 0,
-    refetchOnMount: true,
-    refetchOnWindowFocus: true,
+    queryKey: ["/api/messages/templates"],
+    staleTime: 10000, // 10 seconds
+    gcTime: 300000, // 5 minutes
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
   });
 
   // Deduplicate templates to prevent double rendering and ensure uniqueness
@@ -236,9 +236,8 @@ export default function Berichten() {
       });
     },
     onSuccess: () => {
-      // Clear and refetch templates to prevent duplicates
-      queryClient.removeQueries({ queryKey: ["/api/messages/templates", user?.tenantId] });
-      queryClient.invalidateQueries({ queryKey: ["/api/messages/templates", user?.tenantId] });
+      // Invalidate and refetch templates
+      queryClient.invalidateQueries({ queryKey: ["/api/messages/templates"] });
       toast({ title: "Template aangemaakt", description: "De template is succesvol aangemaakt." });
       setShowTemplateDialog(false);
       setOriginalTemplateData(null);
@@ -267,9 +266,8 @@ export default function Berichten() {
       return apiRequest("PUT", `/api/messages/templates/${id}`, payload);
     },
     onSuccess: (result) => {
-      // Clear and refetch templates to prevent duplicates
-      queryClient.removeQueries({ queryKey: ["/api/messages/templates", user?.tenantId] });
-      queryClient.invalidateQueries({ queryKey: ["/api/messages/templates", user?.tenantId] });
+      // Invalidate and refetch templates
+      queryClient.invalidateQueries({ queryKey: ["/api/messages/templates"] });
       toast({ title: "Template bijgewerkt", description: "De template is succesvol bijgewerkt." });
       setShowTemplateDialog(false);
       setEditingTemplate(null);

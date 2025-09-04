@@ -531,7 +531,7 @@ export default function Bestuur() {
       {/* New Board Member Dialog */}
       {canEdit && (
         <Dialog open={showNewMemberDialog} onOpenChange={setShowNewMemberDialog}>
-          <DialogContent className="max-w-6xl max-h-[95vh] overflow-y-auto">
+          <DialogContent className="max-w-6xl max-h-[95vh] min-h-[600px] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <Plus className="h-5 w-5" />
@@ -553,7 +553,7 @@ export default function Bestuur() {
       {/* Edit Board Member Dialog */}
       {canEdit && (
         <Dialog open={!!selectedBoardMember} onOpenChange={() => setSelectedBoardMember(null)}>
-          <DialogContent className="max-w-6xl max-h-[95vh] overflow-y-auto">
+          <DialogContent className="max-w-6xl max-h-[95vh] min-h-[600px] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <Edit className="h-5 w-5" />

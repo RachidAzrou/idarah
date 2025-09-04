@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Building2, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import backgroundImage from "@assets/Luxury Navy Background_1757015851301.jpg";
+import idarahLogo from "@assets/idarah_1757016078310.png";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -58,10 +59,11 @@ export default function Login() {
         <div className="max-w-md">
           {/* Logo */}
           <div className="flex items-center mb-12">
-            <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center mr-3">
-              <Building2 className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-2xl font-bold text-white">Ledenbeheer</span>
+            <img 
+              src={idarahLogo} 
+              alt="IDARAH" 
+              className="h-16 w-auto"
+            />
           </div>
           
           {/* Welcome text */}

@@ -666,8 +666,8 @@ export default function Berichten() {
                   );
                 })}
                 
-                {/* Template Voorbeelden Cards - alleen tonen als er geen templates zijn */}
-                {canEdit && templates.length === 0 && (
+                {/* Template Voorbeelden Cards verwijderd - we tonen alleen echte templates */}
+                {false && canEdit && templates.length === 0 && (
                   <>
                     {/* Welkomstmail Nieuw Lid Template Card */}
                     <Card className="hover:shadow-lg transition-shadow border-gray-200 bg-gray-50" data-testid="card-template-welcome">

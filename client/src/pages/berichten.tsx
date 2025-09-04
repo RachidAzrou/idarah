@@ -580,7 +580,6 @@ export default function Berichten() {
                     </Card>
                   );
                 })}
-              </>
             )}
           </div>
         </TabsContent>
@@ -775,8 +774,6 @@ Het bestuur"
           </Form>
         </DialogContent>
       </Dialog>
-
-                    {/* Vervallen Lidgeld Template Card */}
                     <Card className="hover:shadow-lg transition-shadow border-gray-200 bg-gray-50" data-testid="card-template-expired">
                       <CardHeader>
                         <div className="flex items-start justify-between">
@@ -1201,7 +1198,6 @@ Het organisatieteam van {{tenant.name}}`
                         </div>
                       </CardContent>
                     </Card>
-                  </>
                 )}
                 
                 {/* Regular Templates */}
@@ -1258,7 +1254,6 @@ Het organisatieteam van {{tenant.name}}`
                     </Card>
                   );
                 })}
-              </>
             )}
           </div>
         </TabsContent>

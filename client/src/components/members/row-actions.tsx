@@ -125,7 +125,11 @@ export function RowActions({
             <AlertDialogTitle>Lid deactiveren</AlertDialogTitle>
             <AlertDialogDescription>
               Weet je zeker dat je <strong>{memberName}</strong> wilt deactiveren? 
-              Dit lid zal niet meer toegang hebben tot de diensten en wordt gemarkeerd als inactief.
+              <br /><br />
+              <strong>Dit gebeurt automatisch:</strong>
+              <br />• Lid wordt gemarkeerd als inactief
+              <br />• Lidkaart krijgt status "VERLOPEN"
+              <br />• Geen toegang meer tot diensten
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

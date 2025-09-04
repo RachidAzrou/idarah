@@ -10,7 +10,8 @@ import { feeService } from "./services/fee";
 import { financialService } from "./services/financial";
 import { cardService } from "./services/card";
 import { ruleService } from "./services/ruleService";
-import { insertUserSchema, insertMemberSchema, insertMembershipFeeSchema } from "@shared/schema";
+import { insertUserSchema, insertMemberSchema, insertMembershipFeeSchema, membershipCards, eq } from "@shared/schema";
+import { db } from "./db";
 import { generateFeesHandler } from "./api/jobs/fees/generate";
 import { createMemberHandler } from "./api/members/create";
 import publicScreensRouter from "./routes/public-screens";
@@ -314,6 +315,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const updatedMember = await storage.updateMember(req.params.id, memberData);
       console.log("PUT updated member successfully:", updatedMember.id);
+      
+      // Handle card status when member active status changes (PUT route)
+      if (memberData.active === false) {
+        // If member is being deactivated, automatically mark their card as expired
+        try {
+          await db
+            .update(membershipCards)
+            .set({ 
+              status: 'VERLOPEN',
+              updatedAt: new Date()
+            })
+            .where(eq(membershipCards.memberId, req.params.id));
+          console.log("PUT: Automatically set card status to VERLOPEN for deactivated member:", req.params.id);
+        } catch (cardError) {
+          console.error("PUT: Error updating card status for deactivated member:", cardError);
+          // Don't fail the main request if card update fails
+        }
+      } else if (memberData.active === true && member.active === false) {
+        // If member is being reactivated, recalculate their card status
+        try {
+          await cardService.recalculateCardStatus(req.params.id, req.tenantId);
+          console.log("PUT: Recalculated card status for reactivated member:", req.params.id);
+        } catch (cardError) {
+          console.error("PUT: Error recalculating card status for reactivated member:", cardError);
+          // Don't fail the main request if card update fails
+        }
+      }
+      
       res.json(updatedMember);
     } catch (error) {
       console.error("Error updating member - detailed:", error);
@@ -361,6 +390,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const updatedMember = await storage.updateMember(req.params.id, memberData);
       console.log("Updated member successfully:", updatedMember.id);
+      
+      // Handle card status when member active status changes (PATCH route)
+      if (memberData.active === false) {
+        // If member is being deactivated, automatically mark their card as expired
+        try {
+          await db
+            .update(membershipCards)
+            .set({ 
+              status: 'VERLOPEN',
+              updatedAt: new Date()
+            })
+            .where(eq(membershipCards.memberId, req.params.id));
+          console.log("PATCH: Automatically set card status to VERLOPEN for deactivated member:", req.params.id);
+        } catch (cardError) {
+          console.error("PATCH: Error updating card status for deactivated member:", cardError);
+          // Don't fail the main request if card update fails
+        }
+      } else if (memberData.active === true && member.active === false) {
+        // If member is being reactivated, recalculate their card status
+        try {
+          await cardService.recalculateCardStatus(req.params.id, req.tenantId);
+          console.log("PATCH: Recalculated card status for reactivated member:", req.params.id);
+        } catch (cardError) {
+          console.error("PATCH: Error recalculating card status for reactivated member:", cardError);
+          // Don't fail the main request if card update fails
+        }
+      }
+      
       res.json(updatedMember);
     } catch (error) {
       console.error("Error updating member - detailed:", error);

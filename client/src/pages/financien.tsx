@@ -7,9 +7,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart3, TrendingUp, Download, Search, Plus, Euro, ArrowUpRight, ArrowDownRight, CreditCard } from "lucide-react";
 import { formatCurrency, formatDate, formatDateTime } from "@/lib/format";
 import { useState } from "react";
+import { FiltersToolbar } from "@/components/finance/FiltersDrawer";
+import { FilterData } from "@/lib/zod/transaction";
 
 export default function Financien() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [filters, setFilters] = useState<FilterData>({
+    category: undefined,
+    method: "ALL",
+    memberId: undefined,
+    dateFrom: undefined,
+    dateTo: undefined,
+    amountMin: undefined,
+    amountMax: undefined
+  });
 
   const { data: transactions, isLoading: transactionsLoading } = useQuery({
     queryKey: ["/api/transactions"],
@@ -34,10 +45,46 @@ export default function Financien() {
 
   const stats = calculateFinancialStats();
 
-  const filteredTransactions = transactions?.filter((transaction: any) =>
-    transaction.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    transaction.category.toLowerCase().includes(searchTerm.toLowerCase())
-  ) || [];
+  const filteredTransactions = transactions?.filter((transaction: any) => {
+    // Search term filter
+    const matchesSearch = !searchTerm || 
+      transaction.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      transaction.category.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    // Category filter
+    const matchesCategory = !filters.category || transaction.category === filters.category;
+    
+    // Method filter
+    const matchesMethod = filters.method === "ALL" || transaction.method === filters.method;
+    
+    // Member filter
+    const matchesMember = !filters.memberId || transaction.memberId === filters.memberId;
+    
+    // Date range filter
+    const transactionDate = new Date(transaction.date);
+    const matchesDateFrom = !filters.dateFrom || transactionDate >= new Date(filters.dateFrom);
+    const matchesDateTo = !filters.dateTo || transactionDate <= new Date(filters.dateTo);
+    
+    // Amount range filter
+    const amount = Math.abs(parseFloat(transaction.amount));
+    const matchesAmountMin = filters.amountMin === undefined || amount >= filters.amountMin;
+    const matchesAmountMax = filters.amountMax === undefined || amount <= filters.amountMax;
+    
+    return matchesSearch && matchesCategory && matchesMethod && matchesMember &&
+           matchesDateFrom && matchesDateTo && matchesAmountMin && matchesAmountMax;
+  }) || [];
+
+  const handleClearFilters = () => {
+    setFilters({
+      category: undefined,
+      method: "ALL",
+      memberId: undefined,
+      dateFrom: undefined,
+      dateTo: undefined,
+      amountMin: undefined,
+      amountMax: undefined
+    });
+  };
 
   if (transactionsLoading) {
     return (
@@ -178,7 +225,10 @@ export default function Financien() {
               <TabsContent value="transactions" className="space-y-6">
                 {/* Search and Filters */}
                 <Card>
-                  <CardContent className="px-6 py-4">
+                  <CardHeader>
+                    <CardTitle className="text-lg">Filters & Zoeken</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
                     <div className="flex flex-col sm:flex-row gap-4">
                       <div className="relative flex-1">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -191,15 +241,18 @@ export default function Financien() {
                         />
                       </div>
                       <div className="flex gap-2">
-                        <Button variant="outline" size="sm" data-testid="filter-transactions">
-                          Filter
-                        </Button>
                         <Button variant="outline" size="sm" data-testid="export-transactions">
                           <Download className="h-4 w-4 mr-2" />
                           Export
                         </Button>
                       </div>
                     </div>
+                    
+                    <FiltersToolbar
+                      filters={filters}
+                      onFiltersChange={setFilters}
+                      onClearFilters={handleClearFilters}
+                    />
                   </CardContent>
                 </Card>
 

@@ -349,7 +349,7 @@ export const emailTemplates = pgTable("email_templates", {
   code: text("code").notNull(),
   kind: emailKindEnum("kind").notNull(),
   subject: text("subject").notNull(),
-  bodyHtml: text("body_html").notNull(),
+  bodyHtml: text("body_html"),
   bodyText: text("body_text"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),

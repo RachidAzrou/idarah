@@ -2,20 +2,34 @@
 
 import { useState, useEffect } from "react";
 import { LedenlijstConfig } from "@/lib/mock/public-screens";
-import { mockMembers, monthNames, getFilteredMembers, getMemberDisplayName, Member } from "@/lib/mock/members-data";
+import { monthNames, getFilteredMembers, getMemberDisplayName, Member } from "@/lib/mock/members-data";
 import { Check, X, Vote } from "lucide-react";
 import backgroundImage from "@assets/ramadan_15_03_2022_1_1756811846212.jpg";
 
 interface LedenlijstViewProps {
   config: LedenlijstConfig;
+  members?: any[]; // Real member data from API
 }
 
-export function LedenlijstView({ config }: LedenlijstViewProps) {
+export function LedenlijstView({ config, members = [] }: LedenlijstViewProps) {
   const [currentPage, setCurrentPage] = useState(0);
   const [filteredMembers, setFilteredMembers] = useState<Member[]>([]);
 
   useEffect(() => {
-    const filtered = getFilteredMembers(mockMembers, {
+    // Convert real member data to the format expected by getFilteredMembers
+    const convertedMembers: Member[] = members.map((member: any) => ({
+      id: member.id,
+      lidnummer: member.memberNumber,
+      voornaam: member.firstName,
+      achternaam: member.lastName,
+      initialen: member.firstName.charAt(0) + member.lastName.charAt(0),
+      categorie: member.category,
+      actief: member.active,
+      stemrecht: member.votingRights,
+      betaalstatus: [] // Will be filled with actual payment data if needed
+    }));
+    
+    const filtered = getFilteredMembers(convertedMembers, {
       categories: config.categories,
       useFullNames: config.display.useFullNames,
       useInitials: config.display.useInitials,
@@ -25,7 +39,7 @@ export function LedenlijstView({ config }: LedenlijstViewProps) {
     });
     setFilteredMembers(filtered);
     setCurrentPage(0);
-  }, [config]);
+  }, [config, members]);
 
   const totalPages = Math.ceil(filteredMembers.length / config.display.rowsPerPage);
   const startIndex = currentPage * config.display.rowsPerPage;

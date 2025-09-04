@@ -35,7 +35,27 @@ router.get('/token/:token', async (req, res) => {
       return res.status(404).json({ error: 'Screen not found' });
     }
     
-    res.json(screen);
+    // For LEDENLIJST screens, also fetch member data
+    let screenData: any = screen;
+    if (screen.type === 'LEDENLIJST') {
+      try {
+        console.log(`Fetching members for tenant: ${screen.tenantId}`);
+        const members = await storage.getMembersByTenant(screen.tenantId);
+        console.log(`Found ${members.length} total members`);
+        // Only send active members for public display
+        const activeMembers = members.filter(member => member.active);
+        console.log(`Found ${activeMembers.length} active members for public display`);
+        screenData = {
+          ...screen,
+          members: activeMembers
+        } as any;
+      } catch (error) {
+        console.error('Error fetching members for public screen:', error);
+        // Continue without member data rather than failing the whole request
+      }
+    }
+    
+    res.json(screenData);
   } catch (error) {
     console.error('Error fetching public screen:', error);
     res.status(500).json({ error: 'Failed to fetch public screen' });

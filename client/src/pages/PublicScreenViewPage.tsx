@@ -140,7 +140,10 @@ export default function PublicScreenViewPage() {
     <div className="min-h-screen relative">
       {/* Main Content */}
       {screen.type === 'LEDENLIJST' && (
-        <LedenlijstView config={screen.config as LedenlijstConfig} />
+        <LedenlijstView 
+          config={screen.config as LedenlijstConfig} 
+          members={(screen as any).members || []}
+        />
       )}
       
       {screen.type === 'MEDEDELINGEN' && (

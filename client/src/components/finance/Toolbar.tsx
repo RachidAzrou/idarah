@@ -40,12 +40,6 @@ export function Toolbar({
   onAdvancedFiltersChange,
   onClearAdvancedFilters
 }: ToolbarProps) {
-  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
-
-  const handleAdvancedFiltersToggle = () => {
-    setShowAdvancedFilters(!showAdvancedFilters);
-    onAdvancedFilters();
-  };
   return (
     <div className="glass-card card-hover animate-fade-in group flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between p-4 rounded-lg border-0">
       {/* Search and Quick Filters */}
@@ -88,16 +82,6 @@ export function Toolbar({
           </SelectContent>
         </Select>
         
-        {/* Advanced Filters Button */}
-        <Button
-          variant={showAdvancedFilters ? "default" : "outline"}
-          onClick={handleAdvancedFiltersToggle}
-          className="gap-2"
-          data-testid="button-advanced-filters"
-        >
-          <Filter className="h-4 w-4" />
-          Filters
-        </Button>
       </div>
       
       {/* Action Buttons */}
@@ -131,7 +115,7 @@ export function Toolbar({
       </div>
       
       {/* Advanced Filters Toolbar */}
-      {showAdvancedFilters && advancedFilters && onAdvancedFiltersChange && onClearAdvancedFilters && (
+      {advancedFilters && onAdvancedFiltersChange && onClearAdvancedFilters && (
         <div className="mt-4 pt-4 border-t border-gray-200">
           <FiltersToolbar
             filters={advancedFilters}

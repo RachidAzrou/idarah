@@ -77,6 +77,7 @@ const ruleSchema = z.object({
   name: z.string().min(1, "Regelnaam is verplicht"),
   description: z.string().optional(),
   scope: z.enum(['STEMRECHT', 'VERKIESBAAR']),
+  minAge: z.string().optional(),
   minYears: z.string().optional(),
   minPayments: z.string().optional(),
   consecutive: z.boolean().default(false),
@@ -431,13 +432,24 @@ export default function Instellingen() {
   };
 
   const onRuleSubmit = (data: RuleFormData) => {
-    createRuleMutation.mutate(data);
+    const ruleData = {
+      ...data,
+      parameters: {
+        minAge: data.minAge ? parseInt(data.minAge) : undefined,
+        minYears: data.minYears ? parseInt(data.minYears) : undefined,
+        minPayments: data.minPayments ? parseInt(data.minPayments) : undefined,
+        consecutive: data.consecutive,
+        categories: data.categories,
+      },
+    };
+    createRuleMutation.mutate(ruleData);
   };
 
   const onEditRuleSubmit = (data: RuleFormData) => {
     const ruleData = {
       ...data,
       parameters: {
+        minAge: data.minAge ? parseInt(data.minAge) : undefined,
         minYears: data.minYears ? parseInt(data.minYears) : undefined,
         minPayments: data.minPayments ? parseInt(data.minPayments) : undefined,
         consecutive: data.consecutive,
@@ -487,6 +499,7 @@ export default function Instellingen() {
       name: rule.name,
       description: rule.description || "",
       scope: rule.scope,
+      minAge: rule.parameters?.minAge?.toString() || "",
       minYears: rule.parameters?.minYears?.toString() || "",
       minPayments: rule.parameters?.minPayments?.toString() || "",
       consecutive: rule.parameters?.consecutive || false,
@@ -514,6 +527,9 @@ export default function Instellingen() {
     const params = rule.parameters || {};
     let description = `Voor ${getRuleScopeLabel(rule.scope).toLowerCase()}`;
     
+    if (params.minAge) {
+      description += `, minimaal ${params.minAge} jaar oud`;
+    }
     if (params.minYears) {
       description += `, minimaal ${params.minYears} jaar lid`;
     }
@@ -1255,7 +1271,22 @@ export default function Instellingen() {
                               )}
                             />
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                              <FormField
+                                control={ruleForm.control}
+                                name="minAge"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Minimumleeftijd</FormLabel>
+                                    <FormControl>
+                                      <Input type="number" placeholder="18" {...field} data-testid="input-rule-min-age" />
+                                    </FormControl>
+                                    <FormDescription>Optioneel</FormDescription>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+
                               <FormField
                                 control={ruleForm.control}
                                 name="minYears"
@@ -1439,7 +1470,22 @@ export default function Instellingen() {
                           )}
                         />
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <FormField
+                            control={editRuleForm.control}
+                            name="minAge"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Minimumleeftijd</FormLabel>
+                                <FormControl>
+                                  <Input type="number" placeholder="18" {...field} data-testid="input-edit-rule-min-age" />
+                                </FormControl>
+                                <FormDescription>Optioneel</FormDescription>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
                           <FormField
                             control={editRuleForm.control}
                             name="minYears"

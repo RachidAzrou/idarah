@@ -1,0 +1,120 @@
+You are a senior full-stack engineer.
+Goal: Build the “Mijn Bestuur” page for the organisation. Keep it simple: manage bestuursleden + mandaten (actueel + historiek). Geen vergaderingen, geen documenten, geen publiceerbaar toggle.
+
+0) Scope
+
+Overzicht van bestuursleden (actief/inactief).
+
+Koppeling met Member (indien intern lid) of externe persoon (naam/e-mail/telefoon).
+
+Functie (rol), contactinfo, mandaat start/eind, status (actief/inactief).
+
+Historiek van vorige mandaten (bv. zelfde persoon meerdere termijnen).
+
+Beheerders kunnen leden toevoegen, bewerken, mandaat beëindigen.
+
+MEDEWERKER → read-only. BEHEERDER & SUPERADMIN → CRUD.
+
+1) Prisma schema
+enum BoardRole { VOORZITTER ONDERVERZITTER SECRETARIS PENNINGMEESTER BESTUURSLID ADVISEUR }
+enum BoardStatus { ACTIEF INACTIEF }
+
+model BoardMember {
+  id           String      @id @default(cuid())
+  tenantId     String
+  memberId     String?     // link naar Member indien intern
+  member       Member?     @relation(fields: [memberId], references: [id])
+  externalName String?     // naam indien extern
+  email        String?
+  phone        String?
+  role         BoardRole
+  status       BoardStatus @default(ACTIEF)
+  termStart    DateTime
+  termEnd      DateTime?
+  responsibilities String?
+  orderIndex   Int         @default(100) // voor sortering
+  avatarUrl    String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  terms        BoardTerm[]
+}
+
+model BoardTerm {
+  id           String    @id @default(cuid())
+  tenantId     String
+  boardMemberId String
+  boardMember  BoardMember @relation(fields: [boardMemberId], references: [id])
+  role         BoardRole
+  start        DateTime
+  end          DateTime?
+  note         String?
+  createdAt    DateTime    @default(now())
+}
+
+2) Zod schemas
+
+BoardMemberUpsert: { memberId?: string, externalName?: string, email?: string, phone?: string, role: BoardRole, status?: BoardStatus, termStart: string, termEnd?: string, responsibilities?: string, orderIndex?: number, avatarUrl?: string }
+
+BoardTermCreate: { boardMemberId: string, role: BoardRole, start: string, end?: string, note?: string }
+
+3) Services
+
+createOrUpdateBoardMember(data)
+
+Als memberId aanwezig → koppelen met bestaand lid.
+
+Mandaatinfo opslaan, historiek aanvullen (BoardTerm).
+
+endActiveTerm(boardMemberId, endDate)
+
+Sluit lopend mandaat af; update status naar INACTIEF indien geen nieuwe termijn.
+
+reorderBoard(order)
+
+Update orderIndex voor visuele volgorde.
+
+listBoardMembers(tenantId, filters)
+
+Alle bestuursleden ophalen, met historiek (terms).
+
+4) API/tRPC endpoints
+
+GET /api/board/members (filters: status, role, q).
+
+POST /api/board/members (create).
+
+PUT /api/board/members/:id (update).
+
+POST /api/board/members/:id/end-term.
+
+POST /api/board/reorder.
+
+RBAC:
+
+MEDEWERKER: read-only.
+
+BEHEERDER en SUPERADMIN: volledige CRUD.
+
+5) Pagina /mijn-bestuur
+
+Tabs of sections:
+
+Overzicht
+
+Lijst/grid met alle actieve bestuursleden.
+
+Kolommen: naam, rol, status, start/einde mandaat, contact, acties.
+
+Acties: bewerken, mandaat beëindigen, volgorde aanpassen.
+
+Nieuw bestuurslid wizard
+
+Kies: bestaand lid of externe invoer.
+
+Vul: rol, startdatum, (optioneel einddatum), contactgegevens, verantwoordelijkheden.
+
+Opslaan → automatisch BoardMember + BoardTerm.
+
+Historiek (detail van 1 persoon)
+
+Overzicht van alle eerdere mandaten (BoardTerm[]).

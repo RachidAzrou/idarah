@@ -34,7 +34,8 @@ export function LedenlijstView({ config, members = [] }: LedenlijstViewProps) {
         categorie: displayCategory,
         actief: member.active,
         stemrecht: member.votingRights,
-        betaalstatus: [] // Will be filled with actual payment data if needed
+        betaalstatus: [], // Will be filled with actual payment data if needed
+        betalingen: {} // Payment data by year
       };
     });
     
@@ -56,6 +57,7 @@ export function LedenlijstView({ config, members = [] }: LedenlijstViewProps) {
   const startIndex = currentPage * config.display.rowsPerPage;
   const endIndex = startIndex + config.display.rowsPerPage;
   const currentMembers = filteredMembers.slice(startIndex, endIndex);
+  
 
   // Auto-advance pages
   useEffect(() => {
@@ -199,7 +201,7 @@ export function LedenlijstView({ config, members = [] }: LedenlijstViewProps) {
                   )}
                   {monthNames.map((month, monthIndex) => {
                     const monthNumber = monthIndex + 1;
-                    const status = member.betalingen[config.year]?.[monthNumber] || 'open';
+                    const status = member.betalingen?.[config.year]?.[monthNumber] || 'open';
                     
                     return (
                       <td

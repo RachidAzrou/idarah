@@ -164,6 +164,7 @@ export function getFilteredMembers(
     actieveLedenOnly?: boolean;
   }
 ): Member[] {
+  
   let filtered = [...members];
 
   if (config.actieveLedenOnly) {

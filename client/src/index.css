@@ -316,12 +316,12 @@
   
   /* Modern button hover effects */
   .btn-hover {
-    @apply transition-all duration-300 ease-out hover:shadow-lg hover:-translate-y-0.5 hover:scale-105;
+    @apply transition-all duration-300 ease-out hover:shadow-lg;
   }
   
   /* Card hover effects with glassmorphism */
   .card-hover {
-    @apply transition-all duration-300 ease-out hover:shadow-xl hover:-translate-y-1;
+    @apply transition-all duration-300 ease-out;
   }
   
   /* Glassmorphism card effect */
@@ -341,7 +341,7 @@
   }
   
   .btn-premium:hover {
-    @apply shadow-xl scale-105 -translate-y-0.5;
+    @apply shadow-xl;
     background-position: 100% 0;
   }
   

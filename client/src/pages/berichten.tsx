@@ -156,6 +156,7 @@ export default function Berichten() {
   const [showSegmentDialog, setShowSegmentDialog] = useState(false);
   const [showPreviewDialog, setShowPreviewDialog] = useState(false);
   const [showMappingTool, setShowMappingTool] = useState(false);
+  const [showVariablesHelper, setShowVariablesHelper] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<any>(null);
   const [editingSegment, setEditingSegment] = useState<any>(null);
@@ -1558,18 +1559,194 @@ Het organisatieteam van {{tenant.name}}`
 
                 {/* Email Content */}
                 <div>
-                  <Label htmlFor="email-content" className="text-sm font-medium text-gray-700 mb-2 block">E-mail Inhoud</Label>
-                  <Textarea
-                    id="email-content"
-                    value={emailContent}
-                    onChange={(e) => setEmailContent(e.target.value)}
-                    placeholder="Typ hier de inhoud van je e-mail...&#10;&#10;Je kunt Handlebars variabelen gebruiken zoals:&#10;- {{member.firstName}} voor voornaam&#10;- {{member.lastName}} voor achternaam&#10;- {{tenant.name}} voor organisatie naam"
-                    className="min-h-[300px] font-mono text-sm"
-                    data-testid="textarea-content"
-                  />
-                  <p className="text-xs text-gray-500 mt-2">
-                    Tip: Gebruik handlebars variabelen zoals {"{{"} member.firstName {"}"} voor personalisatie
-                  </p>
+                  <div className="flex items-center justify-between mb-2">
+                    <Label htmlFor="email-content" className="text-sm font-medium text-gray-700">E-mail Inhoud</Label>
+                    <Collapsible open={showVariablesHelper} onOpenChange={setShowVariablesHelper}>
+                      <CollapsibleTrigger asChild>
+                        <Button variant="outline" size="sm" className="text-xs">
+                          {showVariablesHelper ? <ChevronDown className="w-3 h-3 mr-1" /> : <ChevronRight className="w-3 h-3 mr-1" />}
+                          Handlebars Variabelen
+                        </Button>
+                      </CollapsibleTrigger>
+                    </Collapsible>
+                  </div>
+                  
+                  <div className="flex gap-4">
+                    <div className="flex-1">
+                      <Textarea
+                        id="email-content"
+                        value={emailContent}
+                        onChange={(e) => setEmailContent(e.target.value)}
+                        placeholder="Typ hier de inhoud van je e-mail...&#10;&#10;Je kunt Handlebars variabelen gebruiken zoals:&#10;- {{member.firstName}} voor voornaam&#10;- {{member.lastName}} voor achternaam&#10;- {{tenant.name}} voor organisatie naam"
+                        className="min-h-[300px] font-mono text-sm"
+                        data-testid="textarea-content"
+                      />
+                      <p className="text-xs text-gray-500 mt-2">
+                        Tip: Gebruik handlebars variabelen zoals {"{{"} member.firstName {"}"} voor personalisatie
+                      </p>
+                    </div>
+                    
+                    <Collapsible open={showVariablesHelper} onOpenChange={setShowVariablesHelper}>
+                      <CollapsibleContent className="w-80">
+                        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 ml-2">
+                          <h3 className="text-sm font-semibold mb-3 text-gray-900">Beschikbare Variabelen</h3>
+                          <div className="space-y-4 max-h-80 overflow-y-auto">
+                            
+                            <div className="space-y-2">
+                              <h4 className="font-medium text-xs text-gray-900 uppercase tracking-wide">Lid Informatie</h4>
+                              <div className="space-y-1 text-xs">
+                                <div className="flex justify-between items-center">
+                                  <code 
+                                    className="bg-white px-2 py-1 rounded border cursor-pointer hover:bg-blue-50 transition-colors"
+                                    onClick={() => {
+                                      const cursorPos = document.getElementById('email-content')?.selectionStart || 0;
+                                      const newContent = emailContent.slice(0, cursorPos) + '{{member.firstName}}' + emailContent.slice(cursorPos);
+                                      setEmailContent(newContent);
+                                    }}
+                                  >
+                                    {"{{member.firstName}}"}
+                                  </code>
+                                  <span className="text-gray-500">Voornaam</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                  <code 
+                                    className="bg-white px-2 py-1 rounded border cursor-pointer hover:bg-blue-50 transition-colors"
+                                    onClick={() => {
+                                      const cursorPos = document.getElementById('email-content')?.selectionStart || 0;
+                                      const newContent = emailContent.slice(0, cursorPos) + '{{member.lastName}}' + emailContent.slice(cursorPos);
+                                      setEmailContent(newContent);
+                                    }}
+                                  >
+                                    {"{{member.lastName}}"}
+                                  </code>
+                                  <span className="text-gray-500">Achternaam</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                  <code 
+                                    className="bg-white px-2 py-1 rounded border cursor-pointer hover:bg-blue-50 transition-colors"
+                                    onClick={() => {
+                                      const cursorPos = document.getElementById('email-content')?.selectionStart || 0;
+                                      const newContent = emailContent.slice(0, cursorPos) + '{{member.email}}' + emailContent.slice(cursorPos);
+                                      setEmailContent(newContent);
+                                    }}
+                                  >
+                                    {"{{member.email}}"}
+                                  </code>
+                                  <span className="text-gray-500">E-mailadres</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                  <code 
+                                    className="bg-white px-2 py-1 rounded border cursor-pointer hover:bg-blue-50 transition-colors"
+                                    onClick={() => {
+                                      const cursorPos = document.getElementById('email-content')?.selectionStart || 0;
+                                      const newContent = emailContent.slice(0, cursorPos) + '{{member.memberNumber}}' + emailContent.slice(cursorPos);
+                                      setEmailContent(newContent);
+                                    }}
+                                  >
+                                    {"{{member.memberNumber}}"}
+                                  </code>
+                                  <span className="text-gray-500">Lidnummer</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                  <code 
+                                    className="bg-white px-2 py-1 rounded border cursor-pointer hover:bg-blue-50 transition-colors"
+                                    onClick={() => {
+                                      const cursorPos = document.getElementById('email-content')?.selectionStart || 0;
+                                      const newContent = emailContent.slice(0, cursorPos) + '{{member.category}}' + emailContent.slice(cursorPos);
+                                      setEmailContent(newContent);
+                                    }}
+                                  >
+                                    {"{{member.category}}"}
+                                  </code>
+                                  <span className="text-gray-500">Categorie</span>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="space-y-2">
+                              <h4 className="font-medium text-xs text-gray-900 uppercase tracking-wide">Organisatie</h4>
+                              <div className="space-y-1 text-xs">
+                                <div className="flex justify-between items-center">
+                                  <code 
+                                    className="bg-white px-2 py-1 rounded border cursor-pointer hover:bg-blue-50 transition-colors"
+                                    onClick={() => {
+                                      const cursorPos = document.getElementById('email-content')?.selectionStart || 0;
+                                      const newContent = emailContent.slice(0, cursorPos) + '{{tenant.name}}' + emailContent.slice(cursorPos);
+                                      setEmailContent(newContent);
+                                    }}
+                                  >
+                                    {"{{tenant.name}}"}
+                                  </code>
+                                  <span className="text-gray-500">Naam</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                  <code 
+                                    className="bg-white px-2 py-1 rounded border cursor-pointer hover:bg-blue-50 transition-colors"
+                                    onClick={() => {
+                                      const cursorPos = document.getElementById('email-content')?.selectionStart || 0;
+                                      const newContent = emailContent.slice(0, cursorPos) + '{{tenant.email}}' + emailContent.slice(cursorPos);
+                                      setEmailContent(newContent);
+                                    }}
+                                  >
+                                    {"{{tenant.email}}"}
+                                  </code>
+                                  <span className="text-gray-500">E-mail</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                  <code 
+                                    className="bg-white px-2 py-1 rounded border cursor-pointer hover:bg-blue-50 transition-colors"
+                                    onClick={() => {
+                                      const cursorPos = document.getElementById('email-content')?.selectionStart || 0;
+                                      const newContent = emailContent.slice(0, cursorPos) + '{{tenant.phone}}' + emailContent.slice(cursorPos);
+                                      setEmailContent(newContent);
+                                    }}
+                                  >
+                                    {"{{tenant.phone}}"}
+                                  </code>
+                                  <span className="text-gray-500">Telefoon</span>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="space-y-2">
+                              <h4 className="font-medium text-xs text-gray-900 uppercase tracking-wide">Lidgelden</h4>
+                              <div className="space-y-1 text-xs">
+                                <div className="text-gray-600 mb-1">Alle lidgelden:</div>
+                                <div className="flex justify-between items-center">
+                                  <code 
+                                    className="bg-white px-2 py-1 rounded border cursor-pointer hover:bg-blue-50 transition-colors"
+                                    onClick={() => {
+                                      const cursorPos = document.getElementById('email-content')?.selectionStart || 0;
+                                      const newContent = emailContent.slice(0, cursorPos) + '{{#each fees}}{{currency amount}} - {{status}}{{/each}}' + emailContent.slice(cursorPos);
+                                      setEmailContent(newContent);
+                                    }}
+                                  >
+                                    {"{{#each fees}}...{{/each}}"}
+                                  </code>
+                                  <span className="text-gray-500">Loop</span>
+                                </div>
+                                <div className="text-gray-600 mb-1 mt-2">Alleen openstaande:</div>
+                                <div className="flex justify-between items-center">
+                                  <code 
+                                    className="bg-blue-50 px-2 py-1 rounded border cursor-pointer hover:bg-blue-100 transition-colors"
+                                    onClick={() => {
+                                      const cursorPos = document.getElementById('email-content')?.selectionStart || 0;
+                                      const newContent = emailContent.slice(0, cursorPos) + '{{#each openstaandeFees}}{{currency amount}}{{/each}}' + emailContent.slice(cursorPos);
+                                      setEmailContent(newContent);
+                                    }}
+                                  >
+                                    {"{{#each openstaandeFees}}"}
+                                  </code>
+                                  <span className="text-gray-500">Openstaand</span>
+                                </div>
+                              </div>
+                            </div>
+
+                          </div>
+                        </div>
+                      </CollapsibleContent>
+                    </Collapsible>
+                  </div>
                 </div>
 
                 {/* Send Button */}

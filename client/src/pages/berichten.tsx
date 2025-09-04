@@ -442,49 +442,10 @@ export default function Berichten() {
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-medium">E-mail Templates</h2>
             {canEdit && (
-              <div className="flex gap-2">
-                <Button onClick={handleNewTemplate} className="flex items-center gap-2" data-testid="button-new-template">
-                  <Plus className="w-4 h-4" />
-                  Nieuwe Template
-                </Button>
-                <Button 
-                  onClick={() => {
-                    setEditingTemplate(null);
-                    templateForm.reset({
-                      name: "Vervallen Lidgeld Herinnering",
-                      code: "EXPIRED_FEES",
-                      subject: "Herinnering: Vervallen lidgelden voor {{member.firstName}} {{member.lastName}}",
-                      content: `Beste {{member.firstName}} {{member.lastName}},
-
-We willen je eraan herinneren dat er nog openstaande lidgelden zijn die inmiddels vervallen zijn.
-
-Je openstaande vervallen lidgelden:
-{{#each member.fees.expired}}
-- €{{amount}} voor {{period}} (vervaldatum: {{dueDate}})
-{{/each}}
-
-Totaal vervallen bedrag: €{{member.fees.totalExpiredAmount}}
-
-Graag zouden we je willen vragen om deze bedragen zo spoedig mogelijk te voldoen. Je kunt betalen via:
-
-- Bankoverschrijving naar rekeningnummer: [REKENINGNUMMER]
-- Bancontact ter plaatse tijdens openingsuren
-- Contant tijdens openingsuren
-
-Heb je vragen over je lidgelden of wil je een betalingsregeling bespreken? Neem dan contact met ons op.
-
-Met vriendelijke groet,
-Het bestuur`
-                    });
-                    setShowTemplateDialog(true);
-                  }}
-                  className="bg-orange-600 hover:bg-orange-700 text-white flex items-center gap-2" 
-                  data-testid="button-create-expired-template"
-                >
-                  <AlertTriangle className="w-4 h-4" />
-                  Vervallen Lidgeld
-                </Button>
-              </div>
+              <Button onClick={handleNewTemplate} className="flex items-center gap-2" data-testid="button-new-template">
+                <Plus className="w-4 h-4" />
+                Nieuwe Template
+              </Button>
             )}
           </div>
 
@@ -511,36 +472,102 @@ Het bestuur`
                 )}
               </div>
             ) : (
-              Array.isArray(templates) && templates.map((template: any) => (
-                <Card key={template.id} className="hover:shadow-lg transition-shadow" data-testid={`card-template-${template.id}`}>
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <CardTitle className="text-base" data-testid={`text-template-name-${template.id}`}>
-                          {template.name}
-                        </CardTitle>
-                        <CardDescription data-testid={`text-template-subject-${template.id}`}>
-                          {template.subject}
-                        </CardDescription>
+              <>
+                {/* Vervallen Lidgeld Template Card */}
+                {canEdit && (
+                  <Card className="hover:shadow-lg transition-shadow border-orange-200 bg-orange-50" data-testid="card-template-expired">
+                    <CardHeader>
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <AlertTriangle className="w-5 h-5 text-orange-600" />
+                            <CardTitle className="text-base text-orange-900" data-testid="text-template-name-expired">
+                              Vervallen Lidgeld Herinnering
+                            </CardTitle>
+                          </div>
+                          <CardDescription className="text-orange-700" data-testid="text-template-subject-expired">
+                            Template voor vervallen lidgelden
+                          </CardDescription>
+                        </div>
                       </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex gap-2">
-                      <Button size="sm" variant="outline" onClick={() => handlePreviewTemplate(template)} data-testid={`button-preview-${template.id}`}>
-                        <Eye className="w-4 h-4 mr-1" />
-                        Preview
-                      </Button>
-                      {canEdit && (
-                        <Button size="sm" variant="outline" onClick={() => handleEditTemplate(template)} data-testid={`button-edit-template-${template.id}`}>
-                          <Edit className="w-4 h-4 mr-1" />
-                          Bewerk
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex gap-2">
+                        <Button 
+                          size="sm" 
+                          className="bg-orange-600 hover:bg-orange-700 text-white"
+                          onClick={() => {
+                            setEditingTemplate(null);
+                            templateForm.reset({
+                              name: "Vervallen Lidgeld Herinnering",
+                              code: "EXPIRED_FEES",
+                              subject: "Herinnering: Vervallen lidgelden voor {{member.firstName}} {{member.lastName}}",
+                              content: `Beste {{member.firstName}} {{member.lastName}},
+
+We willen je eraan herinneren dat er nog openstaande lidgelden zijn die inmiddels vervallen zijn.
+
+Je openstaande vervallen lidgelden:
+{{#each member.fees.expired}}
+- €{{amount}} voor {{period}} (vervaldatum: {{dueDate}})
+{{/each}}
+
+Totaal vervallen bedrag: €{{member.fees.totalExpiredAmount}}
+
+Graag zouden we je willen vragen om deze bedragen zo spoedig mogelijk te voldoen. Je kunt betalen via:
+
+- Bankoverschrijving naar rekeningnummer: [REKENINGNUMMER]
+- Bancontact ter plaatse tijdens openingsuren
+- Contant tijdens openingsuren
+
+Heb je vragen over je lidgelden of wil je een betalingsregeling bespreken? Neem dan contact met ons op.
+
+Met vriendelijke groet,
+Het bestuur`
+                            });
+                            setShowTemplateDialog(true);
+                          }}
+                          data-testid="button-create-expired-template"
+                        >
+                          <Plus className="w-4 h-4 mr-1" />
+                          Aanmaken
                         </Button>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+                
+                {/* Regular Templates */}
+                {Array.isArray(templates) && templates.map((template: any) => (
+                  <Card key={template.id} className="hover:shadow-lg transition-shadow" data-testid={`card-template-${template.id}`}>
+                    <CardHeader>
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <CardTitle className="text-base" data-testid={`text-template-name-${template.id}`}>
+                            {template.name}
+                          </CardTitle>
+                          <CardDescription data-testid={`text-template-subject-${template.id}`}>
+                            {template.subject}
+                          </CardDescription>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex gap-2">
+                        <Button size="sm" variant="outline" onClick={() => handlePreviewTemplate(template)} data-testid={`button-preview-${template.id}`}>
+                          <Eye className="w-4 h-4 mr-1" />
+                          Preview
+                        </Button>
+                        {canEdit && (
+                          <Button size="sm" variant="outline" onClick={() => handleEditTemplate(template)} data-testid={`button-edit-template-${template.id}`}>
+                            <Edit className="w-4 h-4 mr-1" />
+                            Bewerk
+                          </Button>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </>
             )}
           </div>
         </TabsContent>

@@ -554,7 +554,7 @@ export default function Berichten() {
         if (segment.name.toLowerCase().includes(input)) {
           suggestions.push({
             type: 'segment' as const,
-            label: `📊 ${segment.name} (Verzendgroep)`,
+            label: `${segment.name} (Verzendgroep)`,
             value: segment.id,
             segment: segment
           });

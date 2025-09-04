@@ -170,6 +170,18 @@ export const ruleOutcomes = pgTable("rule_outcomes", {
   evaluatedAt: timestamp("evaluated_at").defaultNow().notNull(),
 });
 
+export const ruleOverrides = pgTable("rule_overrides", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tenantId: varchar("tenant_id").notNull(),
+  memberId: varchar("member_id").notNull(),
+  ruleScope: ruleScopeEnum("rule_scope").notNull(),
+  overrideValue: boolean("override_value").notNull(),
+  reason: text("reason").notNull(),
+  overriddenBy: varchar("overridden_by").notNull(), // User ID who made the override
+  overriddenAt: timestamp("overridden_at").defaultNow().notNull(),
+  active: boolean("active").default(true).notNull(),
+});
+
 export const publicScreens = pgTable("public_screens", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   tenantId: varchar("tenant_id").notNull(),
@@ -573,6 +585,11 @@ export const insertRuleOutcomeSchema = createInsertSchema(ruleOutcomes).omit({
   evaluatedAt: true,
 });
 
+export const insertRuleOverrideSchema = createInsertSchema(ruleOverrides).omit({
+  id: true,
+  overriddenAt: true,
+});
+
 export const insertPublicScreenSchema = createInsertSchema(publicScreens).omit({
   id: true,
   createdAt: true,
@@ -668,6 +685,9 @@ export type InsertRule = z.infer<typeof insertRuleSchema>;
 
 export type RuleOutcome = typeof ruleOutcomes.$inferSelect;
 export type InsertRuleOutcome = z.infer<typeof insertRuleOutcomeSchema>;
+
+export type RuleOverride = typeof ruleOverrides.$inferSelect;
+export type InsertRuleOverride = z.infer<typeof insertRuleOverrideSchema>;
 
 export type PublicScreen = typeof publicScreens.$inferSelect;
 export type InsertPublicScreen = z.infer<typeof insertPublicScreenSchema>;

@@ -9,6 +9,7 @@ import { memberService } from "./services/member";
 import { feeService } from "./services/fee";
 import { financialService } from "./services/financial";
 import { cardService } from "./services/card";
+import { ruleService } from "./services/ruleService";
 import { insertUserSchema, insertMemberSchema, insertMembershipFeeSchema } from "@shared/schema";
 import { generateFeesHandler } from "./api/jobs/fees/generate";
 import { createMemberHandler } from "./api/members/create";
@@ -1694,6 +1695,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(mockData);
     } catch (error) {
       res.status(500).json({ error: "Fout bij ophalen betaalmethode data" });
+    }
+  });
+
+  // Rule validation endpoints
+  app.get('/api/members/:id/voting-rights', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      const memberId = req.params.id;
+      const tenantId = req.user!.tenantId;
+
+      // Verify member belongs to user's tenant
+      const member = await storage.getMember(memberId);
+      if (!member || member.tenantId !== tenantId) {
+        return res.status(404).json({ error: "Lid niet gevonden" });
+      }
+
+      const status = await ruleService.getVotingRightsStatus(memberId, tenantId);
+      res.json(status);
+    } catch (error) {
+      console.error('Error getting voting rights:', error);
+      res.status(500).json({ error: "Fout bij ophalen stemrecht status" });
+    }
+  });
+
+  app.post('/api/members/:id/voting-rights/override', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      const memberId = req.params.id;
+      const tenantId = req.user!.tenantId;
+      const { overrideValue, reason } = req.body;
+
+      // Verify member belongs to user's tenant
+      const member = await storage.getMember(memberId);
+      if (!member || member.tenantId !== tenantId) {
+        return res.status(404).json({ error: "Lid niet gevonden" });
+      }
+
+      // Validate input
+      if (typeof overrideValue !== 'boolean' || !reason || typeof reason !== 'string') {
+        return res.status(400).json({ error: "Ongeldige parameters" });
+      }
+
+      const override = await ruleService.createRuleOverride(
+        memberId,
+        tenantId,
+        'STEMRECHT',
+        overrideValue,
+        reason,
+        req.user!.id
+      );
+
+      // Get updated status
+      const updatedStatus = await ruleService.getVotingRightsStatus(memberId, tenantId);
+
+      res.json({
+        override,
+        status: updatedStatus
+      });
+    } catch (error) {
+      console.error('Error creating voting rights override:', error);
+      res.status(500).json({ error: "Fout bij aanmaken stemrecht override" });
     }
   });
 

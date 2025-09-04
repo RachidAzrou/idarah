@@ -11,6 +11,8 @@ import { ChevronUp, ChevronDown, Users, UserX } from "lucide-react";
 import { CiExport } from "react-icons/ci";
 import { formatDate, getMemberCategoryLabel } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { VotingStatus } from "@/components/members/voting-status";
+import { Member as MemberSchema } from "@shared/schema";
 
 interface Member {
   id: string;
@@ -23,6 +25,7 @@ interface Member {
   createdAt: string;
   gender?: string;
   birthDate?: string;
+  votingRights: boolean;
 }
 
 interface SortConfig {
@@ -212,6 +215,9 @@ export function MembersTable({
               <TableHead className="hidden md:table-cell">
                 Categorie
               </TableHead>
+              <TableHead className="hidden xl:table-cell">
+                Stemrecht
+              </TableHead>
               <TableHead 
                 className="hidden lg:table-cell cursor-pointer hover:bg-[#f9fafb]"
                 onClick={() => handleSort('createdAt')}
@@ -264,6 +270,12 @@ export function MembersTable({
                   <Badge variant="secondary" className="text-xs">
                     {getMemberCategoryLabel(member.category)}
                   </Badge>
+                </TableCell>
+                <TableCell className="hidden xl:table-cell">
+                  <VotingStatus 
+                    member={member as any} 
+                    compact={false}
+                  />
                 </TableCell>
                 <TableCell className="hidden lg:table-cell text-gray-500">
                   {formatDate(member.createdAt)}

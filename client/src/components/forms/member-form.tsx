@@ -26,6 +26,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Member, MemberFinancialSettings, MemberPermissions } from "@shared/schema";
+import { useRuleValidation } from "@/hooks/useRuleValidation";
+import { RuleWarning } from "@/components/ui/rule-warning";
+import { RuleOverrideDialog } from "@/components/forms/rule-override-dialog";
 
 // Extended member type that includes related data
 interface MemberWithDetails extends Member {
@@ -98,8 +101,10 @@ export function MemberForm({ member, onSuccess, onCancel }: MemberFormProps) {
   const [showDuplicateWarning, setShowDuplicateWarning] = useState(false);
   const [duplicateInfo, setDuplicateInfo] = useState<any>(null);
   const [pendingData, setPendingData] = useState<MemberFormData | null>(null);
+  const [showVotingOverrideDialog, setShowVotingOverrideDialog] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { validateVotingRights } = useRuleValidation();
 
   // Build default values based on whether we're editing or creating
   const getDefaultValues = (): Partial<MemberFormData> => {
@@ -855,29 +860,58 @@ export function MemberForm({ member, onSuccess, onCancel }: MemberFormProps) {
                   <FormField
                     control={form.control}
                     name="organization.votingEligible"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Stemgerechtigd?</FormLabel>
-                        <FormControl>
-                          <RadioGroup
-                            onValueChange={(value) => field.onChange(value === "true")}
-                            value={field.value ? "true" : "false"}
-                            className="flex gap-6"
-                            data-testid="radio-voting-eligible"
-                          >
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem value="true" id="voting-yes" />
-                              <Label htmlFor="voting-yes">Ja</Label>
+                    render={({ field }) => {
+                      // Validate voting rights based on current form data
+                      const currentFormData = form.getValues();
+                      const memberData = {
+                        birthDate: currentFormData.dateOfBirth,
+                        category: currentFormData.category,
+                        active: true // Assume new members are active
+                      };
+                      
+                      const validation = validateVotingRights(memberData);
+                      const shouldShowWarning = field.value && !validation.isValid;
+
+                      return (
+                        <FormItem>
+                          <FormLabel>Stemgerechtigd?</FormLabel>
+                          <FormControl>
+                            <RadioGroup
+                              onValueChange={(value) => field.onChange(value === "true")}
+                              value={field.value ? "true" : "false"}
+                              className="flex gap-6"
+                              data-testid="radio-voting-eligible"
+                            >
+                              <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="true" id="voting-yes" />
+                                <Label htmlFor="voting-yes">Ja</Label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="false" id="voting-no" />
+                                <Label htmlFor="voting-no">Nee</Label>
+                              </div>
+                            </RadioGroup>
+                          </FormControl>
+                          
+                          {/* Show rule warnings if voting rights are enabled but member doesn't qualify */}
+                          {shouldShowWarning && (
+                            <div className="mt-4">
+                              <RuleWarning
+                                type="warning"
+                                title="Regel overtredingen gedetecteerd"
+                                warnings={validation.warnings}
+                                reasons={validation.reasons}
+                                showOverride={true}
+                                onOverride={() => setShowVotingOverrideDialog(true)}
+                                overrideLabel="Handmatig toekennen"
+                              />
                             </div>
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem value="false" id="voting-no" />
-                              <Label htmlFor="voting-no">Nee</Label>
-                            </div>
-                          </RadioGroup>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+                          )}
+                          
+                          <FormMessage />
+                        </FormItem>
+                      );
+                    }}
                   />
 
                   <FormField
@@ -1135,6 +1169,29 @@ export function MemberForm({ member, onSuccess, onCancel }: MemberFormProps) {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* Voting Rights Override Dialog */}
+        <RuleOverrideDialog
+          open={showVotingOverrideDialog}
+          onOpenChange={setShowVotingOverrideDialog}
+          memberId={member?.id || "new-member"}
+          memberName={`${form.getValues().firstName || ''} ${form.getValues().lastName || ''}`.trim() || 'Nieuw lid'}
+          currentStatus={form.getValues().organization?.votingEligible || false}
+          warnings={validateVotingRights({
+            birthDate: form.getValues().dateOfBirth,
+            category: form.getValues().category,
+            active: true
+          }).warnings}
+          ruleScope="STEMRECHT"
+          onSuccess={() => {
+            // For new members, we can't create an override until after they're created
+            // So we just show a success message and allow the form to continue
+            toast({
+              title: "Override opgepland",
+              description: "Het stemrecht wordt handmatig toegekend na het aanmaken van het lid.",
+            });
+          }}
+        />
     </div>
   );
 }

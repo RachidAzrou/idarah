@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { BoardMemberForm } from "@/components/forms/board-member-form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/use-auth";
+import { cn } from "@/lib/utils";
 import { Crown, Plus, Edit, CalendarX, Phone, Mail, User } from "lucide-react";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
@@ -529,9 +530,15 @@ export default function Bestuur() {
       {/* New Board Member Dialog */}
       {canEdit && (
         <Dialog open={showNewMemberDialog} onOpenChange={setShowNewMemberDialog}>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-6xl max-h-[95vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Nieuw Bestuurslid</DialogTitle>
+              <DialogTitle className="flex items-center gap-2">
+                <Plus className="h-5 w-5" />
+                Nieuw Bestuurslid
+              </DialogTitle>
+              <DialogDescription>
+                Voeg een nieuw bestuurslid toe aan de bestuursadministratie
+              </DialogDescription>
             </DialogHeader>
             <BoardMemberForm
               onSubmit={handleCreateBoardMember}
@@ -545,9 +552,15 @@ export default function Bestuur() {
       {/* Edit Board Member Dialog */}
       {canEdit && (
         <Dialog open={!!selectedBoardMember} onOpenChange={() => setSelectedBoardMember(null)}>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-6xl max-h-[95vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Bestuurslid Bewerken</DialogTitle>
+              <DialogTitle className="flex items-center gap-2">
+                <Edit className="h-5 w-5" />
+                Bestuurslid Bewerken
+              </DialogTitle>
+              <DialogDescription>
+                Bewerk de gegevens van het bestuurslid
+              </DialogDescription>
             </DialogHeader>
             {selectedBoardMember && (
               <BoardMemberForm

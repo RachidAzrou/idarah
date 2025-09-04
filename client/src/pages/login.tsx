@@ -135,10 +135,9 @@ export default function Login() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">Geen account?</span>
+              <div className="flex justify-end text-sm">
                 <a href="#" className="text-blue-600 hover:text-blue-700 font-medium">
-                  Account aanvragen
+                  Wachtwoord vergeten?
                 </a>
               </div>
 

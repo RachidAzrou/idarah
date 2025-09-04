@@ -13,7 +13,8 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
-import { Crown, Plus, Edit, CalendarX, Phone, Mail, User } from "lucide-react";
+import { Crown, Plus, Edit, Phone, Mail, User } from "lucide-react";
+import { FiUserX } from "react-icons/fi";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 
@@ -376,7 +377,7 @@ export default function Bestuur() {
                                 disabled={deactivateBoardMemberMutation.isPending}
                                 data-testid={`button-end-term-${item.boardMember.id}`}
                               >
-                                <CalendarX className="w-4 h-4" />
+                                <FiUserX className="w-4 h-4" />
                               </Button>
                             )}
                           </div>

@@ -216,9 +216,6 @@ export function MembersTable({
               <TableHead className="hidden md:table-cell">
                 Categorie
               </TableHead>
-              <TableHead className="hidden xl:table-cell">
-                Stemrecht
-              </TableHead>
               <TableHead 
                 className="hidden lg:table-cell cursor-pointer hover:bg-[#f9fafb]"
                 onClick={() => handleSort('createdAt')}
@@ -272,12 +269,6 @@ export function MembersTable({
                   <Badge variant="secondary" className="text-xs">
                     {getMemberCategoryLabel(member.category)}
                   </Badge>
-                </TableCell>
-                <TableCell className="hidden xl:table-cell">
-                  <VotingStatus 
-                    member={member as any} 
-                    compact={false}
-                  />
                 </TableCell>
                 <TableCell className="hidden lg:table-cell text-gray-500">
                   {formatDate(member.createdAt)}

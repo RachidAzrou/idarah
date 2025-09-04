@@ -606,7 +606,7 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
                                       value={field.value ? field.value.getMonth().toString() : ""}
                                       onValueChange={(month) => {
                                         const currentDate = field.value || new Date();
-                                        const newDate = new Date(currentDate.getFullYear(), parseInt(month), currentDate.getDate());
+                                        const newDate = new Date(currentDate.getFullYear(), parseInt(month), Math.min(currentDate.getDate(), new Date(currentDate.getFullYear(), parseInt(month) + 1, 0).getDate()));
                                         field.onChange(newDate);
                                       }}
                                     >
@@ -625,7 +625,7 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
                                       value={field.value ? field.value.getFullYear().toString() : ""}
                                       onValueChange={(year) => {
                                         const currentDate = field.value || new Date();
-                                        const newDate = new Date(parseInt(year), currentDate.getMonth(), currentDate.getDate());
+                                        const newDate = new Date(parseInt(year), currentDate.getMonth(), Math.min(currentDate.getDate(), new Date(parseInt(year), currentDate.getMonth() + 1, 0).getDate()));
                                         field.onChange(newDate);
                                       }}
                                     >
@@ -649,7 +649,9 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
                                   mode="single"
                                   selected={field.value}
                                   onSelect={field.onChange}
+                                  month={field.value || new Date()}
                                   initialFocus
+                                  locale={nl}
                                   classNames={{
                                     months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
                                     month: "space-y-4",
@@ -746,7 +748,7 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
                                       value={field.value ? field.value.getMonth().toString() : ""}
                                       onValueChange={(month) => {
                                         const currentDate = field.value || new Date();
-                                        const newDate = new Date(currentDate.getFullYear(), parseInt(month), currentDate.getDate());
+                                        const newDate = new Date(currentDate.getFullYear(), parseInt(month), Math.min(currentDate.getDate(), new Date(currentDate.getFullYear(), parseInt(month) + 1, 0).getDate()));
                                         field.onChange(newDate);
                                       }}
                                     >
@@ -765,7 +767,7 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
                                       value={field.value ? field.value.getFullYear().toString() : ""}
                                       onValueChange={(year) => {
                                         const currentDate = field.value || new Date();
-                                        const newDate = new Date(parseInt(year), currentDate.getMonth(), currentDate.getDate());
+                                        const newDate = new Date(parseInt(year), currentDate.getMonth(), Math.min(currentDate.getDate(), new Date(parseInt(year), currentDate.getMonth() + 1, 0).getDate()));
                                         field.onChange(newDate);
                                       }}
                                     >
@@ -789,7 +791,9 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
                                   mode="single"
                                   selected={field.value}
                                   onSelect={field.onChange}
+                                  month={field.value || new Date()}
                                   initialFocus
+                                  locale={nl}
                                   classNames={{
                                     months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
                                     month: "space-y-4",

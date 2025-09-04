@@ -1,6 +1,6 @@
 import { Fee } from "@shared/fees-schema";
 import { formatCurrencyBE, formatPercentage } from "@/lib/format";
-import { Check, TrendingUp, TrendingDown, AlertTriangle, FileText } from "lucide-react";
+import { Check, AlertTriangle, FileText } from "lucide-react";
 import { TbClockHour3 } from "react-icons/tb";
 
 interface KpiCardProps {
@@ -58,11 +58,6 @@ function KpiCard({ title, value, delta, icon, iconBgColor }: KpiCardProps) {
           <p className="text-xs font-medium text-muted-foreground mb-1">{title}</p>
           <p className="text-lg font-bold text-foreground mb-2 group-hover:text-primary transition-colors duration-300 tabular-nums">{value}</p>
           <div className="flex items-center space-x-1">
-            {delta.positive ? (
-              <TrendingUp className={`h-3 w-3 ${colors.iconClass} group-hover:scale-110 transition-transform duration-300`} />
-            ) : (
-              <TrendingDown className={`h-3 w-3 ${colors.iconClass} group-hover:scale-110 transition-transform duration-300`} />
-            )}
             <span className={`text-xs font-medium ${colors.textClass} group-hover:text-opacity-80 transition-all duration-300`}>
               {delta.value}
             </span>

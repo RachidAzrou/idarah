@@ -1,7 +1,7 @@
 "use client";
 
 import { formatCurrencyBE } from "@/lib/format";
-import { TrendingUp, TrendingDown, Euro } from "lucide-react";
+import { Euro } from "lucide-react";
 import { HiInboxIn } from "react-icons/hi";
 import { MdOutlineOutbox } from "react-icons/md";
 import { TbClockExclamation } from "react-icons/tb";
@@ -27,11 +27,6 @@ function KpiCard({ title, value, delta, icon, iconBgColor = "bg-blue-50" }: KpiC
           <p className="text-xs font-medium text-muted-foreground mb-1">{title}</p>
           <p className="text-lg font-bold text-foreground mb-2 group-hover:text-primary transition-colors duration-300">{value}</p>
           <div className="flex items-center space-x-1">
-            {delta.positive ? (
-              <TrendingUp className="h-3 w-3 text-green-600" />
-            ) : (
-              <TrendingDown className="h-3 w-3 text-red-500" />
-            )}
             <span className={`text-xs font-medium ${delta.positive ? 'text-green-600' : 'text-red-500'}`}>
               {delta.value}
             </span>

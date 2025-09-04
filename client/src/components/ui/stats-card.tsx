@@ -1,6 +1,5 @@
 import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
-import { TrendingUp, TrendingDown } from "lucide-react";
 
 interface StatsCardProps {
   title: string;
@@ -32,14 +31,9 @@ export function StatsCard({
             {trend && (
               <div className="flex items-center space-x-1">
                 <div className={cn(
-                  "flex items-center text-xs font-medium",
+                  "text-xs font-medium",
                   trend.positive ? "text-green-600" : "text-red-600"
                 )} data-testid="stats-trend">
-                  {trend.positive ? (
-                    <TrendingUp className="h-3 w-3 mr-1" />
-                  ) : (
-                    <TrendingDown className="h-3 w-3 mr-1" />
-                  )}
                   {trend.value}
                 </div>
               </div>

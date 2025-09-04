@@ -1,0 +1,64 @@
+Ik heb een probleem met dubbele e-mailtemplates in mijn app: in de database staan er maar 5 templates, maar in de UI zie ik er dubbel zoveel. Verwijderen werkt ook niet goed, omdat de UI-bron dubbel rendert. 
+
+⚡️ Wat je moet doen:
+1. Controleer de UI-component waar de templates worden gemapt:
+   - Verwijder alle demo/mock arrays of stubdata (zoek naar DEMO_TEMPLATES of mockTemplates).
+   - Vervang state volledig met de fetch-resultaten i.p.v. `prev => [...prev, ...fetched]`.
+   - Zorg dat de React keys **uniek** zijn, gebruik altijd `key={template.id}` i.p.v. de array index.
+   - Voeg een dedupe helper toe zodat dezelfde `tenantId:code` nooit dubbel wordt getoond:
+     ```ts
+     export function uniqueBy<T>(arr: T[], key: (x: T) => string) {
+       const seen = new Set<string>();
+       return arr.filter((x) => {
+         const k = key(x);
+         if (seen.has(k)) return false;
+         seen.add(k);
+         return true;
+       });
+     }
+     ```
+     En gebruik:
+     ```tsx
+     const templates = uniqueBy(data ?? [], (t) => `${t.tenantId}:${t.code}`);
+     ```
+
+2. Controleer de API/Prisma query:
+   - Haal templates tenant-specifiek op:
+     ```ts
+     await prisma.emailTemplate.findMany({
+       where: { tenantId },
+       orderBy: { name: 'asc' },
+     });
+     ```
+   - Voeg een unieke index toe in Prisma schema:
+     ```prisma
+     @@unique([tenantId, code], name: "code_tenant_unique")
+     ```
+
+3. Fix de seed-logica:
+   - Gebruik **upsert** i.p.v. create, zodat seeden nooit dubbele records aanmaakt:
+     ```ts
+     await prisma.emailTemplate.upsert({
+       where: { code_tenant_unique: { code, tenantId } },
+       update: { subject, bodyHtml, bodyText, kind },
+       create: { tenantId, code, name, subject, bodyHtml, bodyText, kind },
+     });
+     ```
+
+4. Check React Query/tRPC:
+   - Zorg dat je queryKey stabiel is:
+     ```ts
+     useQuery({ queryKey: ['emailTemplates', tenantId], queryFn: ... })
+     ```
+   - Vermijd manueel mergen van resultaten in `onSuccess`.
+
+5. Service Worker cache:
+   - Forceer update of disable SW in dev. 
+   - Voor `/api/messages/templates` altijd NetworkFirst strategie gebruiken.
+
+✅ Verwachte resultaat:
+- UI toont exact dezelfde 5 templates als in DB.
+- Geen dubbele kaarten meer.
+- Delete werkt correct (verdwijnt direct uit UI én DB).
+
+Pas bovenstaande fix toe zodat de UI volledig synchroon loopt met de database.

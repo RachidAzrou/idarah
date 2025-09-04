@@ -18,6 +18,17 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Mail, Plus, Send, Users, Eye, Settings, Ban, Edit, Play, TestTube, ChevronDown, ChevronRight, AlertTriangle, Calendar, PartyPopper, Megaphone } from "lucide-react";
+
+// Utility function to deduplicate templates by tenantId:code
+function uniqueBy<T>(arr: T[], key: (x: T) => string) {
+  const seen = new Set<string>();
+  return arr.filter((x) => {
+    const k = key(x);
+    if (seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  });
+}
 import { PiPuzzlePiece, PiHandWaving } from "react-icons/pi";
 import { CgTemplate } from "react-icons/cg";
 import { MdEvent } from "react-icons/md";
@@ -163,14 +174,17 @@ export default function Berichten() {
   const [selectedSegment, setSelectedSegment] = useState("");
   const [originalTemplateData, setOriginalTemplateData] = useState<any>(null);
 
-  // Fetch data for each tab
-  const { data: templates, isLoading: templatesLoading } = useQuery({
-    queryKey: ["/api/messages/templates"],
+  // Fetch data for each tab - use user tenantId for stable query key
+  const { data: templatesData, isLoading: templatesLoading } = useQuery({
+    queryKey: ["/api/messages/templates", user?.tenantId],
     staleTime: 0,
     gcTime: 0,
     refetchOnMount: true,
     refetchOnWindowFocus: true,
   });
+
+  // Deduplicate templates to prevent double rendering and ensure uniqueness
+  const templates = uniqueBy(templatesData ?? [], (t) => `${t.tenantId || user?.tenantId}:${t.code}`);
 
 
   const { data: segments, isLoading: segmentsLoading } = useQuery({
@@ -222,9 +236,9 @@ export default function Berichten() {
       });
     },
     onSuccess: () => {
-      // Force refresh templates to get the latest data
-      queryClient.invalidateQueries({ queryKey: ["/api/messages/templates"] });
-      queryClient.refetchQueries({ queryKey: ["/api/messages/templates"] });
+      // Clear and refetch templates to prevent duplicates
+      queryClient.removeQueries({ queryKey: ["/api/messages/templates", user?.tenantId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/messages/templates", user?.tenantId] });
       toast({ title: "Template aangemaakt", description: "De template is succesvol aangemaakt." });
       setShowTemplateDialog(false);
       setOriginalTemplateData(null);
@@ -253,9 +267,9 @@ export default function Berichten() {
       return apiRequest("PUT", `/api/messages/templates/${id}`, payload);
     },
     onSuccess: (result) => {
-      // Force refresh templates to get the latest data
-      queryClient.invalidateQueries({ queryKey: ["/api/messages/templates"] });
-      queryClient.refetchQueries({ queryKey: ["/api/messages/templates"] });
+      // Clear and refetch templates to prevent duplicates
+      queryClient.removeQueries({ queryKey: ["/api/messages/templates", user?.tenantId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/messages/templates", user?.tenantId] });
       toast({ title: "Template bijgewerkt", description: "De template is succesvol bijgewerkt." });
       setShowTemplateDialog(false);
       setEditingTemplate(null);

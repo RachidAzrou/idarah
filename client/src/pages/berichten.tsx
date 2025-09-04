@@ -204,7 +204,9 @@ export default function Berichten() {
       });
     },
     onSuccess: () => {
+      // Force refresh templates to get the latest data
       queryClient.invalidateQueries({ queryKey: ["/api/messages/templates"] });
+      queryClient.refetchQueries({ queryKey: ["/api/messages/templates"] });
       toast({ title: "Template aangemaakt", description: "De template is succesvol aangemaakt." });
       setShowTemplateDialog(false);
       templateForm.reset();
@@ -232,7 +234,9 @@ export default function Berichten() {
       return apiRequest("PUT", `/api/messages/templates/${id}`, payload);
     },
     onSuccess: (result) => {
+      // Force refresh templates to get the latest data
       queryClient.invalidateQueries({ queryKey: ["/api/messages/templates"] });
+      queryClient.refetchQueries({ queryKey: ["/api/messages/templates"] });
       toast({ title: "Template bijgewerkt", description: "De template is succesvol bijgewerkt." });
       setShowTemplateDialog(false);
       setEditingTemplate(null);
@@ -325,12 +329,12 @@ export default function Berichten() {
     // Generate preview content from the stored content or use existing HTML/text
     let previewData = { ...template };
     
-    // If template has content field (new format), generate HTML and text versions for preview
-    if (template.content && (!template.bodyHtml && !template.body_html)) {
+    // Always prioritize content field and generate fresh HTML for preview
+    if (template.content) {
       previewData.bodyHtml = convertToHTML(template.content);
       previewData.bodyText = convertToPlainText(template.content);
     } else {
-      // Use existing HTML/text content
+      // Fallback to existing HTML/text content for old templates
       previewData.bodyHtml = template.bodyHtml || template.body_html;
       previewData.bodyText = template.bodyText || template.body_text;
     }

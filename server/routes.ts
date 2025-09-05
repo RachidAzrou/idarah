@@ -1316,6 +1316,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }) : null
         }));
 
+      // Get board member status
+      let boardInfo = null;
+      try {
+        const boardMember = await boardService.getBoardMemberByMemberId(null, member.id);
+        if (boardMember && boardMember.boardMember?.status === 'ACTIEF') {
+          boardInfo = {
+            isActiveBoardMember: true,
+            role: boardMember.boardMember.role,
+            customRole: boardMember.boardMember.customRole
+          };
+        }
+      } catch (error) {
+        console.error('Error fetching board member status:', error);
+        // Continue without board info
+      }
+
       // Calculate payment status summary
       const outstandingFees = recentFees.filter(fee => fee.status === 'PENDING' || fee.status === 'OVERDUE' || fee.status === 'OPEN');
       const paidFees = recentFees.filter(fee => fee.status === 'PAID');
@@ -1379,6 +1395,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           totalPaid: paidFees.length,
           hasOutstanding: outstandingFees.length > 0
         },
+        boardInfo,
         refreshedAt: new Date().toISOString(),
         etag: cardMeta.etag
       };

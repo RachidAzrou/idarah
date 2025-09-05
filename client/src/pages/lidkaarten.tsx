@@ -36,6 +36,7 @@ import { MdOutlineBrowserUpdated } from "react-icons/md";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 import type { Member, CardMeta, Tenant } from "@shared/schema";
+import previewBackgroundImage from "@assets/de-lege-achtergrond-van-de-fotograafstudio-samenvatting-achtergrondtextuur-van-schoonheid-donker-en-licht-duidelijk-blauw-koud-grijs-sneeuwwit-gradient-vlakke-muur-en-vloer_1757089301495.jpg";
 
 interface CardWithMember {
   member: Member;
@@ -659,16 +660,26 @@ export default function LidkaartenPage() {
           
           {previewCard && tenant && (
             <div className="space-y-4">
-              <div className="relative aspect-[16/10] rounded-lg overflow-hidden border border-gray-200">
-                <CardCanvas className="rounded-lg">
-                  <LiveCard
-                    member={previewCard.member}
-                    cardMeta={previewCard.cardMeta!}
-                    tenant={tenant}
-                    standalone={true}
-                    className="h-full w-full"
-                  />
-                </CardCanvas>
+              <div 
+                className="relative min-h-[400px] rounded-lg overflow-hidden flex items-center justify-center p-8"
+                style={{
+                  backgroundImage: `url(${previewBackgroundImage})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  backgroundRepeat: 'no-repeat'
+                }}
+              >
+                <div className="w-full max-w-[600px] aspect-[16/10]">
+                  <CardCanvas className="rounded-lg shadow-2xl">
+                    <LiveCard
+                      member={previewCard.member}
+                      cardMeta={previewCard.cardMeta!}
+                      tenant={tenant}
+                      standalone={true}
+                      className="h-full w-full"
+                    />
+                  </CardCanvas>
+                </div>
               </div>
               
               <div className="flex items-center justify-end gap-2 pt-4 border-t">

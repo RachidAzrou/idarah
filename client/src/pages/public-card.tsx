@@ -138,27 +138,29 @@ export default function PublicCard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-white flex items-center justify-center p-6">
       <div className="w-full max-w-5xl">
-        <div className="relative aspect-[16/10] rounded-lg overflow-hidden border border-gray-200">
-          <CardCanvas className="rounded-lg">
-            <LiveCard
-              member={member}
-              cardMeta={cardMeta}
-              tenant={tenant}
-              onRefresh={handleRefresh}
-              isRefreshing={isRefetching}
-              standalone={true}
-              className="h-full w-full"
-            />
-          </CardCanvas>
-        </div>
-        
-        {/* Footer info */}
-        <div className="text-center mt-6 text-gray-400">
-          <p className="text-sm">
-            Publieke lidkaart weergave • {tenant.name}
-          </p>
+        <div className="space-y-4">
+          <div className="relative aspect-[16/10] rounded-lg overflow-hidden border border-gray-200">
+            <CardCanvas className="rounded-lg">
+              <LiveCard
+                member={member}
+                cardMeta={cardMeta}
+                tenant={tenant}
+                onRefresh={handleRefresh}
+                isRefreshing={isRefetching}
+                standalone={true}
+                className="h-full w-full"
+              />
+            </CardCanvas>
+          </div>
+          
+          {/* Footer info */}
+          <div className="text-center text-gray-500">
+            <p className="text-sm">
+              Publieke lidkaart weergave • {tenant.name}
+            </p>
+          </div>
         </div>
       </div>
     </div>

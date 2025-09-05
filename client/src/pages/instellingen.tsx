@@ -49,9 +49,39 @@ const organizationSchema = z.object({
   postalCode: z.string().optional(),
   city: z.string().optional(),
   country: z.string().optional(),
-  email: z.string().email("Ongeldig e-mailadres").optional().or(z.literal("")),
-  phone: z.string().optional(),
-  website: z.string().url("Ongeldige website URL").optional().or(z.literal("")),
+  email: z.string()
+    .optional()
+    .or(z.literal(""))
+    .refine((email) => {
+      if (!email || email === "") return true;
+      // Strikte email validatie
+      const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+      return emailRegex.test(email);
+    }, "Ongeldig e-mailadres format"),
+  phone: z.string()
+    .optional()
+    .refine((phone) => {
+      if (!phone || phone === "") return true;
+      // Belgisch/Nederlands telefoonnummer validatie
+      const phoneRegex = /^(\+32|0032|0)[1-9]\d{7,8}$|^(\+31|0031|0)[1-9]\d{7,8}$/;
+      // Ook accept internationale formaten
+      const internationalRegex = /^\+[1-9]\d{1,14}$/;
+      const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
+      return phoneRegex.test(cleanPhone) || internationalRegex.test(cleanPhone);
+    }, "Ongeldig telefoonnummer format (Belgisch/Nederlands of internationaal format verwacht)"),
+  website: z.string()
+    .optional()
+    .or(z.literal(""))
+    .refine((website) => {
+      if (!website || website === "") return true;
+      // Website URL validatie
+      try {
+        new URL(website);
+        return true;
+      } catch {
+        return false;
+      }
+    }, "Ongeldige website URL"),
   companyNumber: z.string().optional(),
   companyType: z.enum(['VZW', 'BVBA', 'NV', 'VOF', 'EENMANSZAAK', 'CVBA', 'SE', 'ANDERE']).optional(),
   logoUrl: z.string().optional(),
@@ -68,9 +98,24 @@ const membershipFeeSchema = z.object({
 
 const userSchema = z.object({
   name: z.string().min(1, "Naam is verplicht"),
-  email: z.string().email("Ongeldig e-mailadres"),
+  email: z.string().refine((email) => {
+    // Strikte email validatie
+    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+    return emailRegex.test(email);
+  }, "Ongeldig e-mailadres format"),
   role: z.enum(['BEHEERDER', 'MEDEWERKER']),
-  password: z.string().min(6, "Wachtwoord moet minstens 6 karakters zijn").optional(),
+  password: z.string()
+    .optional()
+    .refine((password) => {
+      if (!password || password === "") return true; // Optional field
+      return password.length >= 8; // Stronger password requirement
+    }, "Wachtwoord moet minstens 8 karakters zijn")
+    .refine((password) => {
+      if (!password || password === "") return true;
+      // At least one uppercase, one lowercase, and one number
+      const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/;
+      return strongPasswordRegex.test(password);
+    }, "Wachtwoord moet minstens één hoofdletter, één kleine letter en één cijfer bevatten"),
 });
 
 const ruleSchema = z.object({

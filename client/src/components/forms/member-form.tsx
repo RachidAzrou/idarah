@@ -50,10 +50,33 @@ const memberSchema = z.object({
   firstName: z.string().min(1, "Voornaam is verplicht"),
   lastName: z.string().min(1, "Achternaam is verplicht"),
   gender: z.enum(['M', 'V'], { required_error: "Geslacht is verplicht" }),
-  dateOfBirth: z.date({ required_error: "Geboortedatum is verplicht" }),
+  dateOfBirth: z.date({ required_error: "Geboortedatum is verplicht" })
+    .refine((date) => date <= new Date(), "Geboortedatum kan niet in de toekomst liggen")
+    .refine((date) => {
+      const age = new Date().getFullYear() - date.getFullYear();
+      return age <= 150;
+    }, "Geboortedatum is niet realistisch"),
   category: z.enum(['STUDENT', 'STANDAARD', 'SENIOR'], { required_error: "Categorie is verplicht" }),
-  email: z.string().email("Ongeldig e-mailadres").optional().or(z.literal("")),
-  phone: z.string().optional(),
+  email: z.string()
+    .optional()
+    .or(z.literal(""))
+    .refine((email) => {
+      if (!email || email === "") return true;
+      // Strikte email validatie
+      const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+      return emailRegex.test(email);
+    }, "Ongeldig e-mailadres format"),
+  phone: z.string()
+    .optional()
+    .refine((phone) => {
+      if (!phone || phone === "") return true;
+      // Belgisch/Nederlands telefoonnummer validatie
+      const phoneRegex = /^(\+32|0032|0)[1-9]\d{7,8}$|^(\+31|0031|0)[1-9]\d{7,8}$/;
+      // Ook accept internationale formaten
+      const internationalRegex = /^\+[1-9]\d{1,14}$/;
+      const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
+      return phoneRegex.test(cleanPhone) || internationalRegex.test(cleanPhone);
+    }, "Ongeldig telefoonnummer format (Belgisch/Nederlands of internationaal format verwacht)"),
   street: z.string().min(1, "Straat is verplicht"),
   number: z.string().min(1, "Nummer is verplicht"),
   bus: z.string().optional(),
@@ -640,6 +663,10 @@ export function MemberForm({ member, onSuccess, onCancel }: MemberFormProps) {
                                   showOutsideDays={false}
                                   className="p-3"
                                   defaultMonth={new Date()}
+                                  disabled={(date) => {
+                                    // Geboortedatum kan niet in de toekomst liggen
+                                    return date > new Date();
+                                  }}
                                 />
                               </PopoverContent>
                             </Popover>

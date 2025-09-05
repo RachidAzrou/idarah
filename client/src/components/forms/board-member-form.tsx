@@ -28,8 +28,26 @@ const boardMemberSchema = z.object({
   
   // For external person
   externalName: z.string().optional(),
-  email: z.string().email("Ongeldig e-mailadres").optional().or(z.literal("")),
-  phone: z.string().optional(),
+  email: z.string()
+    .optional()
+    .or(z.literal(""))
+    .refine((email) => {
+      if (!email || email === "") return true;
+      // Strikte email validatie
+      const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+      return emailRegex.test(email);
+    }, "Ongeldig e-mailadres format"),
+  phone: z.string()
+    .optional()
+    .refine((phone) => {
+      if (!phone || phone === "") return true;
+      // Belgisch/Nederlands telefoonnummer validatie
+      const phoneRegex = /^(\+32|0032|0)[1-9]\d{7,8}$|^(\+31|0031|0)[1-9]\d{7,8}$/;
+      // Ook accept internationale formaten
+      const internationalRegex = /^\+[1-9]\d{1,14}$/;
+      const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
+      return phoneRegex.test(cleanPhone) || internationalRegex.test(cleanPhone);
+    }, "Ongeldig telefoonnummer format (Belgisch/Nederlands of internationaal format verwacht)"),
   
   // Board role info
   role: z.enum(['VOORZITTER', 'VICE_VOORZITTER', 'SECRETARIS', 'PENNINGMEESTER', 'BESTUURSLID', 'ANDERS']).default('BESTUURSLID'),
@@ -71,6 +89,17 @@ const boardMemberSchema = z.object({
 }, {
   message: "Aangepaste rol is verplicht wanneer 'Anders' is geselecteerd",
   path: ["customRole"]
+}).refine((data) => {
+  // Einddatum moet na startdatum liggen
+  if (data.termStart && data.termEnd) {
+    const startDate = data.termStart instanceof Date ? data.termStart : new Date(data.termStart);
+    const endDate = data.termEnd instanceof Date ? data.termEnd : new Date(data.termEnd);
+    return endDate > startDate;
+  }
+  return true;
+}, {
+  message: "Einddatum moet na startdatum liggen",
+  path: ["termEnd"]
 });
 
 type BoardMemberFormData = z.infer<typeof boardMemberSchema>;
@@ -1029,6 +1058,14 @@ export function BoardMemberForm({ onSubmit, onCancel, isLoading = false, isEditM
                                   month={field.value || new Date()}
                                   initialFocus
                                   locale={nl}
+                                  disabled={(date) => {
+                                    const startDate = form.getValues('termStart');
+                                    if (startDate) {
+                                      // Einddatum moet na startdatum liggen
+                                      return date <= startDate;
+                                    }
+                                    return false;
+                                  }}
                                   classNames={{
                                     months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
                                     month: "space-y-4",

@@ -8,7 +8,7 @@ import { PiUserCircleCheckLight } from "react-icons/pi";
 import { cn } from "@/lib/utils";
 import { BoardMemberBadge } from "@/components/ui/board-member-badge";
 import { useBoardMemberStatus } from "@/hooks/useBoardMemberStatus";
-import { Crown } from "lucide-react";
+// Crown import removed as icon is no longer used
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 import fadingBlueBackground from "@assets/fading-blue-background_1756897101831.jpg";
@@ -180,7 +180,7 @@ export function MembershipCard({
                   className="h-6 w-auto mb-2 opacity-90"
                 />
               )}
-              <h1 className={`embossed-text font-bold uppercase tracking-wider ${isConstrained ? 'text-xl' : cardData.tenant.name.length > 15 ? 'text-xl' : cardData.tenant.name.length > 10 ? 'text-2xl' : 'text-3xl'}`}>
+              <h1 className={`embossed-text font-bold uppercase tracking-wider ${isConstrained ? 'text-2xl' : cardData.tenant.name.length > 15 ? 'text-3xl' : cardData.tenant.name.length > 10 ? 'text-4xl' : 'text-5xl'}`}>
                 Lidkaart {cardData.tenant.name.toUpperCase()}
               </h1>
             </div>
@@ -215,26 +215,8 @@ export function MembershipCard({
             {(isActiveBoardMember || cardData.votingRights) && (
               <div className="flex flex-col items-center mr-8">
                 {isActiveBoardMember ? (
-                  <Crown 
-                    className={`${isConstrained ? 'w-16 h-16' : 'w-24 h-24'}`}
-                    data-testid="board-member-icon"
-                    style={{
-                      color: '#FFD700',
-                      textShadow: `
-                        3px 3px 0 rgba(255,255,255,0.3),
-                        -3px -3px 0 rgba(0,0,0,0.9),
-                        -4px -4px 0 rgba(0,0,0,0.8),
-                        -5px -5px 0 rgba(0,0,0,0.6),
-                        -6px -6px 0 rgba(0,0,0,0.4),
-                        -7px -7px 0 rgba(0,0,0,0.2),
-                        inset 4px 4px 8px rgba(0,0,0,0.8),
-                        inset -2px -2px 4px rgba(255,215,0,0.2),
-                        0 0 12px rgba(255,215,0,0.4),
-                        0 0 20px rgba(255,215,0,0.2)
-                      `,
-                      filter: 'drop-shadow(3px 3px 8px rgba(0,0,0,0.6)) brightness(1.2)'
-                    }}
-                  />
+                  // Crown icon removed as requested
+                  <div className="w-0 h-0" />
                 ) : (
                   cardData.votingRights && (
                     <PiUserCircleCheckLight 

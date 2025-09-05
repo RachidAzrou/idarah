@@ -251,9 +251,6 @@ export function LedenlijstView({ config, members = [] }: LedenlijstViewProps) {
                           {status === 'vervallen' && (
                             <X className="w-5 h-5 text-white font-bold" strokeWidth={3} />
                           )}
-                          {status === 'open' && (
-                            <div className="w-2 h-2 bg-white rounded-full opacity-60"></div>
-                          )}
                         </div>
                       </td>
                     );

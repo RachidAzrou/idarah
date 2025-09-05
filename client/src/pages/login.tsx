@@ -54,16 +54,6 @@ export default function Login() {
       {/* Background overlay */}
       <div className="absolute inset-0 bg-black/30"></div>
       
-      {/* Logo section - Top on mobile, Left on desktop */}
-      <div className="flex-1 flex flex-col justify-center items-center relative z-10 py-8 lg:py-0">
-        <div className="">
-          <img 
-            src={idarahLogo} 
-            alt="IDARAH" 
-            className="h-20 w-auto scale-[3] sm:h-32 sm:scale-[5] lg:h-40 lg:scale-[7]"
-          />
-        </div>
-      </div>
 
       {/* Login form section - Bottom on mobile, Right on desktop */}
       <div className="flex-1 flex flex-col justify-center px-6 sm:px-8 lg:pl-8 lg:pr-16 relative z-10">

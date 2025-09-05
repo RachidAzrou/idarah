@@ -108,7 +108,7 @@ export default function Sidebar() {
         <div className="mt-auto border-t border-sidebar-border p-6">
           <Button 
             variant="ghost" 
-            className="w-full justify-start gap-x-3 px-4 py-3 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50"
+            className="w-full justify-start gap-x-3 px-4 py-3 text-sm font-medium text-white hover:text-white hover:bg-red-50"
             onClick={logout}
             data-testid="logout-button"
           >

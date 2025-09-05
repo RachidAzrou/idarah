@@ -109,14 +109,8 @@ export function MembershipCard({
   // Check board member status
   const { isActiveBoardMember } = useBoardMemberStatus(cardData.memberId || '');
   
-  // Debug logging
-  console.log('PWA Card Debug:', {
-    memberId: cardData.memberId,
-    isActiveBoardMember,
-    votingRights: cardData.votingRights,
-    firstName: cardData.firstName,
-    lastName: cardData.lastName
-  });
+  // Debug logging - temporary 
+  console.log('PWA Final Status:', { isActiveBoardMember, votingRights: cardData.votingRights });
 
   // Generate QR code URL for verification
   const qrCodeUrl = `${window.location.origin}/card/verify/${cardData.qrToken}`;
@@ -223,40 +217,30 @@ export function MembershipCard({
             {/* Status Badge - Right side (Board Member takes priority over Voting Rights) */}
             {(isActiveBoardMember || cardData.votingRights) && (
               <div className="flex flex-col items-center mr-8">
-                {console.log('PWA Rendering:', { isActiveBoardMember, votingRights: cardData.votingRights, shouldShowSection: (isActiveBoardMember || cardData.votingRights) })}
-                {isActiveBoardMember ? (
-                  // Show icon placeholder for board members to maintain space
-                  <div className={`${isConstrained ? 'w-16 h-16' : 'w-24 h-24'} flex items-center justify-center`}>
-                    {/* Icon removed but space maintained for text alignment */}
-                  </div>
-                ) : (
-                  cardData.votingRights && (
-                    <PiUserCircleCheckLight 
-                      className={`${isConstrained ? 'w-16 h-16' : 'w-24 h-24'}`}
-                      data-testid="voting-icon"
-                      style={{
-                        color: '#C0C0C0',
-                        textShadow: `
-                          3px 3px 0 rgba(255,255,255,0.3),
-                          -3px -3px 0 rgba(0,0,0,0.9),
-                          -4px -4px 0 rgba(0,0,0,0.8),
-                          -5px -5px 0 rgba(0,0,0,0.6),
-                          -6px -6px 0 rgba(0,0,0,0.4),
-                          -7px -7px 0 rgba(0,0,0,0.2),
-                          inset 4px 4px 8px rgba(0,0,0,0.8),
-                          inset -2px -2px 4px rgba(192,192,192,0.2),
-                          0 0 12px rgba(192,192,192,0.4),
-                          0 0 20px rgba(192,192,192,0.2)
-                        `,
-                        filter: 'drop-shadow(3px 3px 8px rgba(0,0,0,0.6)) brightness(1.2)'
-                      }}
-                    />
-                  )
-                )}
+                {/* Force show icons - testing */}
+                <PiUserCircleCheckLight 
+                  className={`${isConstrained ? 'w-16 h-16' : 'w-24 h-24'}`}
+                  data-testid="voting-icon"
+                  style={{
+                    color: isActiveBoardMember ? '#FFD700' : '#C0C0C0',
+                    textShadow: `
+                      3px 3px 0 rgba(255,255,255,0.3),
+                      -3px -3px 0 rgba(0,0,0,0.9),
+                      -4px -4px 0 rgba(0,0,0,0.8),
+                      -5px -5px 0 rgba(0,0,0,0.6),
+                      -6px -6px 0 rgba(0,0,0,0.4),
+                      -7px -7px 0 rgba(0,0,0,0.2),
+                      inset 4px 4px 8px rgba(0,0,0,0.8),
+                      inset -2px -2px 4px rgba(192,192,192,0.2),
+                      0 0 12px rgba(192,192,192,0.4),
+                      0 0 20px rgba(192,192,192,0.2)
+                    `,
+                    filter: 'drop-shadow(3px 3px 8px rgba(0,0,0,0.6)) brightness(1.2)'
+                  }}
+                />
                 
-                {/* Primary text - Board Member takes priority */}
-                {console.log('PWA Text Rendering:', { isActiveBoardMember, showingBestuurslid: isActiveBoardMember, showingStemgerechtigd: !isActiveBoardMember && cardData.votingRights })}
-                {isActiveBoardMember ? (
+                {/* Primary text - Always show based on final status */}
+                {isActiveBoardMember && (
                   <span 
                     className={`${isConstrained ? 'text-xs' : 'text-base'} uppercase tracking-[0.1em] font-bold mt-3`}
                     style={{
@@ -273,25 +257,25 @@ export function MembershipCard({
                   >
                     BESTUURSLID
                   </span>
-                ) : (
-                  cardData.votingRights && (
-                    <span 
-                      className={`${isConstrained ? 'text-xs' : 'text-base'} uppercase tracking-[0.1em] font-bold mt-3`}
-                      style={{
-                        color: '#C0C0C0',
-                        textShadow: `
-                          1px 1px 0 rgba(255,255,255,0.2),
-                          -1px -1px 0 rgba(0,0,0,0.7),
-                          -2px -2px 0 rgba(0,0,0,0.5),
-                          inset 2px 2px 4px rgba(0,0,0,0.6),
-                          0 0 6px rgba(192,192,192,0.3)
-                        `,
-                        filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.4))'
-                      }}
-                    >
-                      STEMGERECHTIGD
-                    </span>
-                  )
+                )}
+                
+                {cardData.votingRights && !isActiveBoardMember && (
+                  <span 
+                    className={`${isConstrained ? 'text-xs' : 'text-base'} uppercase tracking-[0.1em] font-bold mt-3`}
+                    style={{
+                      color: '#C0C0C0',
+                      textShadow: `
+                        1px 1px 0 rgba(255,255,255,0.2),
+                        -1px -1px 0 rgba(0,0,0,0.7),
+                        -2px -2px 0 rgba(0,0,0,0.5),
+                        inset 2px 2px 4px rgba(0,0,0,0.6),
+                        0 0 6px rgba(192,192,192,0.3)
+                      `,
+                      filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.4))'
+                    }}
+                  >
+                    STEMGERECHTIGD
+                  </span>
                 )}
                 
                 {/* Secondary text - show voting rights if board member */}

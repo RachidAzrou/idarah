@@ -2056,15 +2056,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const tenantId = req.user!.tenantId;
       
-      // Add tenantId to the request body before validation
+      // Validate data without tenantId first, then add it
+      const boardMemberDataSchema = insertBoardMemberSchema.omit({ tenantId: true });
+      const validatedData = boardMemberDataSchema.parse(req.body);
+      
+      // Add tenantId after validation
       const dataWithTenant = {
-        ...req.body,
+        ...validatedData,
         tenantId: tenantId
       };
-      
-      const validatedData = insertBoardMemberSchema.parse(dataWithTenant);
 
-      const boardMember = await boardService.createBoardMember(tenantId, validatedData);
+      const boardMember = await boardService.createBoardMember(tenantId, dataWithTenant);
       res.json(boardMember);
     } catch (error) {
       console.error('Error creating board member:', error);

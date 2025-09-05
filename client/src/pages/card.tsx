@@ -7,12 +7,14 @@ import { InstallCoach, useInstallCoach } from "@/components/pwa/InstallCoach";
 import { useQuery } from "@tanstack/react-query";
 
 interface CardData {
+  memberId: string;
   firstName: string;
   lastName: string;
   memberNumber: string;
   category: 'STUDENT' | 'STANDAARD' | 'SENIOR';
   status: 'ACTUEEL' | 'NIET_ACTUEEL' | 'VERLOPEN';
   validUntil: Date | null;
+  votingRights: boolean;
   badges: string[];
   qrToken: string;
   tenant: {

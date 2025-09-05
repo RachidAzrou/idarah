@@ -451,10 +451,35 @@ export class DatabaseStorage implements IStorage {
 
   // Transactions
   async getTransactionsByTenant(tenantId: string): Promise<Transaction[]> {
-    return await db.select().from(transactions)
-      .where(eq(transactions.tenantId, tenantId))
-      .orderBy(desc(transactions.date))
-      .limit(1000); // Limit to prevent large data loads
+    const result = await db.execute(sql`
+      SELECT 
+        t.id,
+        t.tenant_id as "tenantId",
+        t.member_id as "memberId", 
+        t.type,
+        t.category,
+        t.amount,
+        t.date,
+        t.method,
+        t.description,
+        t.related_fee_id as "relatedFeeId",
+        CASE 
+          WHEN m.first_name IS NOT NULL AND m.last_name IS NOT NULL 
+          THEN CONCAT(m.first_name, ' ', m.last_name)
+          WHEN m.first_name IS NOT NULL 
+          THEN m.first_name
+          WHEN m.last_name IS NOT NULL 
+          THEN m.last_name
+          ELSE NULL 
+        END as "memberName"
+      FROM ${transactions} t
+      LEFT JOIN ${members} m ON t.member_id = m.id  
+      WHERE t.tenant_id = ${tenantId}
+      ORDER BY t.date DESC
+      LIMIT 1000
+    `);
+    
+    return result.rows as Transaction[];
   }
 
   async createTransaction(transaction: InsertTransaction): Promise<Transaction> {

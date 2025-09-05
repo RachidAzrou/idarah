@@ -284,7 +284,7 @@ export function MembershipCard({
           </div>
 
           {/* Member Information */}
-          <div className={`mb-3 space-y-3 ml-8 ${isConstrained ? 'scale-75 origin-top-left' : ''}`}>
+          <div className={`mb-3 space-y-3 ml-8 -mt-4 ${isConstrained ? 'scale-75 origin-top-left' : ''}`}>
             {/* Member Name */}
             <div>
               <p className="embossed-text text-[clamp(14px,1.8vmin,16px)] uppercase tracking-wide opacity-80 mb-1 font-medium">
@@ -302,7 +302,7 @@ export function MembershipCard({
                 <p className="embossed-text text-[clamp(16px,2.0vmin,18px)] uppercase tracking-wide opacity-80 mb-1 font-medium">
                   LIDNUMMER
                 </p>
-                <p className="embossed-text text-[clamp(20px,2.4vmin,22px)] font-mono font-bold tracking-[0.2em] leading-tight" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.9), -1px -1px 2px rgba(255,255,255,0.3), 0 0 8px rgba(255,255,255,0.1)', filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))'}}>
+                <p className="embossed-text text-[clamp(16px,2.0vmin,18px)] font-mono font-bold tracking-[0.2em] leading-tight" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.9), -1px -1px 2px rgba(255,255,255,0.3), 0 0 8px rgba(255,255,255,0.1)', filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))'}}>
                   {cardData.memberNumber}
                 </p>
               </div>
@@ -311,7 +311,7 @@ export function MembershipCard({
                 <p className="embossed-text text-[clamp(16px,2.0vmin,18px)] uppercase tracking-wide opacity-80 mb-1 font-medium">
                   CATEGORIE
                 </p>
-                <span className="embossed-text text-[clamp(20px,2.4vmin,22px)] font-medium uppercase" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.9), -1px -1px 2px rgba(255,255,255,0.3), 0 0 8px rgba(255,255,255,0.1)', filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))'}}>
+                <span className="embossed-text text-[clamp(16px,2.0vmin,18px)] font-medium uppercase" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.9), -1px -1px 2px rgba(255,255,255,0.3), 0 0 8px rgba(255,255,255,0.1)', filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))'}}>
                   {getMemberCategoryLabel(cardData.category)}
                 </span>
               </div>

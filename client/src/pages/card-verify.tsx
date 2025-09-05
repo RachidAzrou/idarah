@@ -60,6 +60,11 @@ const STATUS_CONFIG = {
     color: "bg-green-100 text-green-800 border-green-200",
     icon: CheckCircle
   },
+  NIET_ACTUEEL: {
+    label: "Niet actueel",
+    color: "bg-orange-100 text-orange-800 border-orange-200",
+    icon: AlertTriangle
+  },
   VERLOPEN: {
     label: "Verlopen", 
     color: "bg-red-100 text-red-800 border-red-200",

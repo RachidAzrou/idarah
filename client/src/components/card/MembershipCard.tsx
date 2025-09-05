@@ -109,8 +109,7 @@ export function MembershipCard({
   // Check board member status
   const { isActiveBoardMember } = useBoardMemberStatus(cardData.memberId || '');
   
-  // Debug logging - temporary 
-  console.log('PWA Final Status:', { isActiveBoardMember, votingRights: cardData.votingRights });
+  // Board member status and voting rights are now properly displayed
 
   // Generate QR code URL for verification
   const qrCodeUrl = `${window.location.origin}/card/verify/${cardData.qrToken}`;

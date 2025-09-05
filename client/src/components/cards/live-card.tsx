@@ -166,9 +166,7 @@ export function LiveCard({
   const validUntil = cardMeta.validUntil || new Date();
 
   return (
-    <div className={cn("w-full h-full relative overflow-hidden flex items-center justify-center", standalone ? "" : "min-h-screen p-4 sm:p-6", className)} style={!standalone ? {
-      background: `linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%), radial-gradient(ellipse at top, rgba(59, 130, 246, 0.03) 0%, transparent 50%), radial-gradient(ellipse at bottom, rgba(99, 102, 241, 0.02) 0%, transparent 50%)`
-    } : {}}>
+    <>
       {/* PWA Install Banner */}
       {isInstallable && !standalone && (
         <div className="fixed top-4 left-4 right-4 bg-blue-600 text-white p-3 rounded-lg shadow-lg z-10">
@@ -441,7 +439,7 @@ export function LiveCard({
             </div>
           </div>
           </div>
-      </div>
+        </div>
       </div>
 
       {/* QR Code Modal */}
@@ -466,6 +464,6 @@ export function LiveCard({
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

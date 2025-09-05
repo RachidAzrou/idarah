@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useRoute } from "wouter";
 import { PublicScreen, LedenlijstConfig, MededelingenConfig, MultimediaConfig } from "@/lib/mock/public-screens";
 import { LedenlijstView } from "@/components/public-view/LedenlijstView";
-import { AnnouncementsView } from "@/components/public-view/AnnouncementsView";
+import { MededelingenView } from "@/components/public-view/MededelingenView";
 import { Controls } from "@/components/public-view/Controls";
 
 export default function PublicScreenViewPage() {
@@ -217,7 +217,7 @@ export default function PublicScreenViewPage() {
       )}
       
       {screen.type === 'MEDEDELINGEN' && (
-        <AnnouncementsView config={screen.config as MededelingenConfig} />
+        <MededelingenView config={screen.config as MededelingenConfig} />
       )}
       
       {screen.type === 'MULTIMEDIA' && (

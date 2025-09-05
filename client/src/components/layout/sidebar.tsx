@@ -47,7 +47,7 @@ export default function Sidebar() {
           <img 
             src={darahLogo} 
             alt="DARAH Logo" 
-            className="w-32 h-8 sm:w-36 sm:h-9 lg:w-40 lg:h-10 object-contain"
+            className="w-48 h-12 sm:w-52 sm:h-14 lg:w-56 lg:h-16 object-cover object-left"
           />
         </Link>
       </div>

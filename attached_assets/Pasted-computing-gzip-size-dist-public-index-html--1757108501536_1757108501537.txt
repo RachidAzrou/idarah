@@ -1,0 +1,19 @@
+computing gzip size...
+../dist/public/index.html                                                                                                                                                                                                           2.35 kB │ gzip:   0.92 kB
+../dist/public/assets/idarah (2)_1757094401589-PLsO-NRd.png                                                                                                                                                                        11.14 kB
+../dist/public/assets/Luxury Navy Background_1757015851301-yPLSE5C0.jpg                                                                                                                                                           731.06 kB
+../dist/public/assets/de-lege-achtergrond-van-de-fotograafstudio-samenvatting-achtergrondtextuur-van-schoonheid-donker-en-licht-duidelijk-blauw-koud-grijs-sneeuwwit-gradient-vlakke-muur-en-vloer_1757088942721-ByLl7YqK.jpg   2,713.04 kB
+../dist/public/assets/ramadan_15_03_2022_1_1756811846212-fLrjvKMo.jpg                                                                                                                                                           2,816.63 kB
+../dist/public/assets/fading-blue-background_1756897101831-CpWqOwv4.jpg                                                                                                                                                        11,727.30 kB
+../dist/public/assets/index-PCejIDhG.css                                                                                                                                                                                          129.72 kB │ gzip:  22.89 kB
+../dist/public/assets/qr-scanner-worker.min-D85Z9gVD.js                                                                                                                                                                            43.95 kB │ gzip:  10.46 kB
+../dist/public/assets/index-BffK_Jkk.js                                                                                                                                                                                         2,061.17 kB │ gzip: 584.87 kB
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 23.74s
+  dist/index.js  248.5kb
+⚡ Done in 31ms
+Error: Found invalid Node.js Version: "22.x". Please set Node.js Version to 18.x in your Project Settings to use Node.js 18.
+Learn More: http://vercel.link/node-version

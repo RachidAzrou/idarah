@@ -305,8 +305,8 @@ export default function LidkaartenPage() {
 
 
   const handleViewCard = (member: Member) => {
-    // Always use relative URL to open development version with latest changes
-    const cardUrl = `/card/${member.id}`;
+    // Force development URL to see latest changes
+    const cardUrl = `http://localhost:5000/card/${member.id}`;
     // Open in new tab/window for PWA installation
     window.open(cardUrl, '_blank');
   };

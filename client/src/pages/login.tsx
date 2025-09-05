@@ -10,6 +10,7 @@ import { Building2, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import backgroundImage from "@assets/Luxury Navy Background_1757015851301.jpg";
 import idarahLogo from "@assets/idarah (2)_1757094634426.png";
+import idarahVideo from "@assets/idarah_1757094870172.mp4";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -58,11 +59,14 @@ export default function Login() {
       {/* Login form section - Bottom on mobile, Right on desktop */}
       <div className="flex-1 flex flex-col justify-center px-6 sm:px-8 lg:pl-8 lg:pr-16 relative z-10">
         <div className="max-w-md mx-auto w-full">
-          {/* Logo above title */}
+          {/* Logo animation above title */}
           <div className="flex justify-center mb-6">
-            <img 
-              src={idarahLogo} 
-              alt="IDARAH Logo" 
+            <video 
+              src={idarahVideo}
+              autoPlay
+              muted
+              loop
+              playsInline
               className="h-20 sm:h-24 lg:h-28 w-auto object-contain scale-[4]"
             />
           </div>

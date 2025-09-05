@@ -9,7 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Building2, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import backgroundImage from "@assets/Luxury Navy Background_1757015851301.jpg";
-import idarahLogo from "@assets/idarah_1757016078310.png";
+import idarahLogo from "@assets/idarah (2)_1757094634426.png";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -58,6 +58,15 @@ export default function Login() {
       {/* Login form section - Bottom on mobile, Right on desktop */}
       <div className="flex-1 flex flex-col justify-center px-6 sm:px-8 lg:pl-8 lg:pr-16 relative z-10">
         <div className="max-w-md mx-auto w-full">
+          {/* Logo above title */}
+          <div className="flex justify-center mb-4">
+            <img 
+              src={idarahLogo} 
+              alt="IDARAH Logo" 
+              className="h-12 w-auto object-contain"
+            />
+          </div>
+          
           {/* Title above login container */}
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-6 leading-tight text-center">
             Inloggen bij uw account

@@ -237,13 +237,15 @@ export function LedenlijstView({ config, members = [] }: LedenlijstViewProps) {
                         className="px-3 py-4 text-center"
                       >
                         <div
-                          className={`w-10 h-10 rounded-full mx-auto border-2 transition-transform duration-200 hover:scale-110 ${
-                            status === 'betaald' ? 'bg-gradient-to-br from-emerald-400 to-emerald-600 border-emerald-300' :
-                            status === 'vervallen' ? 'bg-gradient-to-br from-red-400 to-red-600 border-red-300' :
-                            'bg-gradient-to-br from-gray-300 to-gray-500 border-gray-200'
+                          className={`w-10 h-10 rounded-full mx-auto border transition-all duration-300 ${
+                            status === 'betaald' ? 'bg-emerald-500 border-emerald-400 shadow-emerald-200' :
+                            status === 'vervallen' ? 'bg-red-500 border-red-400 shadow-red-200' :
+                            'bg-gray-400 border-gray-300 shadow-gray-200'
                           }`}
                           style={{
-                            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+                            boxShadow: status === 'betaald' ? '0 4px 12px rgba(16, 185, 129, 0.25)' :
+                                     status === 'vervallen' ? '0 4px 12px rgba(239, 68, 68, 0.25)' :
+                                     '0 2px 8px rgba(156, 163, 175, 0.2)'
                           }}
                           title={`${month}: ${status === 'betaald' ? 'Betaald' : status === 'vervallen' ? 'Vervallen' : 'Open'}`}
                         >

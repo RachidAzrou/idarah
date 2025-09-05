@@ -245,12 +245,6 @@ export function LedenlijstView({ config, members = [] }: LedenlijstViewProps) {
                           } hover:scale-105 hover:shadow-lg cursor-pointer`}
                           title={`${month}: ${status === 'betaald' ? 'Betaald' : status === 'vervallen' ? 'Vervallen' : 'Open'}`}
                         >
-                          {status === 'betaald' && (
-                            <Check className="w-5 h-5 text-white font-bold" strokeWidth={3} />
-                          )}
-                          {status === 'vervallen' && (
-                            <X className="w-5 h-5 text-white font-bold" strokeWidth={3} />
-                          )}
                         </div>
                       </td>
                     );

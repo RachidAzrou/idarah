@@ -126,15 +126,6 @@ export function MembershipCard({
   const displayStatus = cardData.status === 'VERLOPEN' 
     ? 'VERLOPEN' 
     : (isOffline ? 'NIET_ACTUEEL' : 'ACTUEEL');
-  
-  // Scale text sizes based on constrained mode
-  const textScale = isConstrained ? 0.7 : 1;
-  const getScaledClamp = (minPx: number, vmin: number, maxPx: number) => {
-    const scaledMin = Math.round(minPx * textScale);
-    const scaledVmin = vmin * textScale;
-    const scaledMax = Math.round(maxPx * textScale);
-    return `clamp(${scaledMin}px,${scaledVmin}vmin,${scaledMax}px)`;
-  };
 
   return (
     <>
@@ -218,9 +209,8 @@ export function MembershipCard({
             {/* Voting Rights Badge - Right side */}
             {cardData.votingRights && (
               <div className="flex flex-col items-center mr-8">
-                {/* Embossed Gold Icon Lines */}
                 <PiUserCircleCheckLight 
-                  className={`${isConstrained ? 'w-16 h-16' : 'w-20 h-20'}`}
+                  className={`${isConstrained ? 'w-16 h-16' : 'w-24 h-24'}`}
                   data-testid="voting-icon"
                   style={{
                     color: '#C0C0C0',
@@ -239,10 +229,8 @@ export function MembershipCard({
                     filter: 'drop-shadow(3px 3px 8px rgba(0,0,0,0.6)) brightness(1.2)'
                   }}
                 />
-                
-                {/* Minimal Gold Text */}
                 <span 
-                  className={`${isConstrained ? 'text-xs' : 'text-sm'} uppercase tracking-[0.1em] font-bold mt-3`}
+                  className={`${isConstrained ? 'text-xs' : 'text-base'} uppercase tracking-[0.1em] font-bold mt-3`}
                   style={{
                     color: '#C0C0C0',
                     textShadow: `
@@ -265,10 +253,10 @@ export function MembershipCard({
           <div className={`mb-4 space-y-4 ml-8 ${isConstrained ? 'scale-75 origin-top-left' : ''}`}>
             {/* Member Name */}
             <div>
-              <p className="embossed-text text-[clamp(16px,2.0vmin,18px)] uppercase tracking-wide opacity-80 mb-1 font-medium">
+              <p className="embossed-text text-[clamp(18px,2.4vmin,22px)] uppercase tracking-wide opacity-80 mb-1 font-medium">
                 NAAM
               </p>
-              <h2 className="embossed-text text-[clamp(20px,2.4vmin,22px)] font-semibold uppercase tracking-wide leading-tight" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.9), -1px -1px 2px rgba(255,255,255,0.3), 0 0 8px rgba(255,255,255,0.1)', filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))'}}>
+              <h2 className="embossed-text text-[clamp(24px,2.8vmin,28px)] font-semibold uppercase tracking-wide leading-tight" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.9), -1px -1px 2px rgba(255,255,255,0.3), 0 0 8px rgba(255,255,255,0.1)', filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))'}}>
                 {cardData.firstName} {cardData.lastName}
               </h2>
               <div className="flex items-center gap-2 mt-2">
@@ -279,7 +267,7 @@ export function MembershipCard({
                   className="text-yellow-400"
                 />
                 <span 
-                  className="embossed-text text-[clamp(12px,1.6vmin,14px)] uppercase tracking-wide font-medium"
+                  className="embossed-text text-[clamp(14px,1.8vmin,16px)] uppercase tracking-wide font-medium"
                   style={{
                     color: '#FFD700',
                     textShadow: `
@@ -300,19 +288,19 @@ export function MembershipCard({
             {/* Lidnummer and Category - side by side */}
             <div className="grid grid-cols-2 gap-4 mt-3">
               <div>
-                <p className="embossed-text text-[clamp(16px,2.0vmin,18px)] uppercase tracking-wide opacity-80 mb-1 font-medium">
+                <p className="embossed-text text-[clamp(18px,2.4vmin,22px)] uppercase tracking-wide opacity-80 mb-1 font-medium">
                   LIDNUMMER
                 </p>
-                <p className="embossed-text text-[clamp(20px,2.4vmin,22px)] font-mono font-bold tracking-[0.2em] leading-tight" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.9), -1px -1px 2px rgba(255,255,255,0.3), 0 0 8px rgba(255,255,255,0.1)', filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))'}}>
+                <p className="embossed-text text-[clamp(24px,2.8vmin,28px)] font-mono font-bold tracking-[0.2em] leading-tight" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.9), -1px -1px 2px rgba(255,255,255,0.3), 0 0 8px rgba(255,255,255,0.1)', filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))'}}>
                   {cardData.memberNumber}
                 </p>
               </div>
               
               <div>
-                <p className="embossed-text text-[clamp(16px,2.0vmin,18px)] uppercase tracking-wide opacity-80 mb-1 font-medium">
+                <p className="embossed-text text-[clamp(18px,2.4vmin,22px)] uppercase tracking-wide opacity-80 mb-1 font-medium">
                   CATEGORIE
                 </p>
-                <span className="embossed-text text-[clamp(20px,2.4vmin,22px)] font-medium uppercase" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.9), -1px -1px 2px rgba(255,255,255,0.3), 0 0 8px rgba(255,255,255,0.1)', filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))'}}>
+                <span className="embossed-text text-[clamp(24px,2.8vmin,28px)] font-medium uppercase" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.9), -1px -1px 2px rgba(255,255,255,0.3), 0 0 8px rgba(255,255,255,0.1)', filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))'}}>
                   {getMemberCategoryLabel(cardData.category)}
                 </span>
               </div>
@@ -322,10 +310,10 @@ export function MembershipCard({
           {/* Bottom right: Valid until */}
           <div className="absolute bottom-4 right-4">
             <div className="flex items-center gap-2">
-              <span className="embossed-text text-[clamp(7px,1.0vmin,9px)] uppercase tracking-wide opacity-70 font-medium">
+              <span className="embossed-text text-[clamp(9px,1.2vmin,12px)] uppercase tracking-wide opacity-70 font-medium">
                 GELDIG TOT
               </span>
-              <span className="embossed-text text-[clamp(8px,1.1vmin,10px)] font-medium font-mono tabular-nums">
+              <span className="embossed-text text-[clamp(10px,1.3vmin,14px)] font-medium font-mono tabular-nums">
                 {cardData.validUntil ? format(cardData.validUntil, 'dd-MM-yyyy', { locale: nl }) : '31-12-2025'}
               </span>
             </div>

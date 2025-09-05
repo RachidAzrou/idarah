@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { UserPlus, CreditCard } from 'lucide-react';
 import { LuUserCog } from 'react-icons/lu';
 import { RiSettings4Line } from 'react-icons/ri';
+import { GiPayMoney } from 'react-icons/gi';
 import { useQuery } from '@tanstack/react-query';
 import { formatDistanceToNow } from 'date-fns';
 import { nl } from 'date-fns/locale';
@@ -32,7 +33,7 @@ const RecentActivities = React.memo(function RecentActivities() {
       user: t.memberName || 'Onbekend lid',
       action: t.type === 'INCOME' ? 'Betaling ontvangen' : 'Uitgave geregistreerd',
       time: formatDistanceToNow(new Date(t.date), { addSuffix: true, locale: nl }),
-      icon: t.type === 'INCOME' ? CreditCard : UserPlus,
+      icon: t.type === 'INCOME' ? GiPayMoney : UserPlus,
       iconBg: t.type === 'INCOME' ? 'bg-green-50' : 'bg-red-50',
       iconColor: t.type === 'INCOME' ? 'text-green-600' : 'text-red-600'
     }));

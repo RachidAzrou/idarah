@@ -45,6 +45,7 @@ interface CardVerificationData {
   }>;
   paymentStatus: {
     summary: string;
+    details: string[];
     totalOutstanding: number;
     totalPaid: number;
     hasOutstanding: boolean;
@@ -391,10 +392,14 @@ function VerificationView({ qrToken }: { qrToken: string }) {
                   <p className="font-medium text-sm">
                     {data.paymentStatus.summary}
                   </p>
-                  {data.paymentStatus.hasOutstanding && (
-                    <p className="text-xs mt-1 opacity-80">
-                      {data.paymentStatus.totalOutstanding} te betalen
-                    </p>
+                  {data.paymentStatus.hasOutstanding && data.paymentStatus.details && data.paymentStatus.details.length > 0 && (
+                    <div className="mt-2 space-y-1">
+                      {data.paymentStatus.details.map((detail, index) => (
+                        <p key={index} className="text-xs opacity-90 leading-relaxed">
+                          {detail}
+                        </p>
+                      ))}
+                    </div>
                   )}
                 </div>
               </div>

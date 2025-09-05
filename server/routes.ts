@@ -1333,9 +1333,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const paidFees = recentFees.filter(fee => fee.status === 'PAID');
       
       let paymentStatusSummary = 'Alles is betaald';
+      let paymentDetails = [];
+      
       if (outstandingFees.length > 0) {
-        const overdueCount = outstandingFees.filter(fee => fee.status === 'OVERDUE').length;
-        const pendingCount = outstandingFees.filter(fee => fee.status === 'PENDING' || fee.status === 'OPEN').length;
+        const overdueFees = outstandingFees.filter(fee => fee.status === 'OVERDUE');
+        const pendingFees = outstandingFees.filter(fee => fee.status === 'PENDING' || fee.status === 'OPEN');
+        
+        // Create detailed lists
+        if (overdueFees.length > 0) {
+          const overdueList = overdueFees.map(fee => `${fee.period} (€${fee.amount})`).join(', ');
+          paymentDetails.push(`Vervallen: ${overdueList}`);
+        }
+        
+        if (pendingFees.length > 0) {
+          const pendingList = pendingFees.map(fee => `${fee.period} (€${fee.amount})`).join(', ');
+          paymentDetails.push(`Openstaand: ${pendingList}`);
+        }
+        
+        // Create summary
+        const overdueCount = overdueFees.length;
+        const pendingCount = pendingFees.length;
         
         if (overdueCount > 0 && pendingCount > 0) {
           paymentStatusSummary = `${overdueCount} vervallen en ${pendingCount} openstaande betalingen`;
@@ -1363,6 +1380,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         fees: recentFees,
         paymentStatus: {
           summary: paymentStatusSummary,
+          details: paymentDetails,
           totalOutstanding: outstandingFees.length,
           totalPaid: paidFees.length,
           hasOutstanding: outstandingFees.length > 0

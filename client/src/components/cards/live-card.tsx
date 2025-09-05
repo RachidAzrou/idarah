@@ -328,7 +328,7 @@ export function LiveCard({
             </div>
 
             {/* Member Information */}
-            <div className="mb-8 space-y-6 ml-8">
+            <div className="mb-4 space-y-4 ml-8">
               {/* Member Name */}
               <div>
                 <p className="embossed-text text-[clamp(16px,2.0vmin,18px)] uppercase tracking-wide opacity-80 mb-1 font-medium">

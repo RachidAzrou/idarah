@@ -52,6 +52,39 @@ export default function Sidebar() {
         </Link>
       </div>
 
+      {/* Dashboard Widget */}
+      <div className="px-4 pb-4">
+        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-blue-900">Dashboard</h3>
+            <Link href="/dashboard" className="text-xs text-blue-600 hover:text-blue-800">
+              Bekijk alles
+            </Link>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-white rounded-lg p-2 border border-blue-100">
+              <div className="text-lg font-bold text-blue-900">15</div>
+              <div className="text-xs text-blue-600">Leden</div>
+            </div>
+            <div className="bg-white rounded-lg p-2 border border-blue-100">
+              <div className="text-lg font-bold text-green-700">€2.815</div>
+              <div className="text-xs text-green-600">Inkomsten</div>
+            </div>
+          </div>
+          
+          <div className="bg-white rounded-lg p-3 border border-blue-100">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-medium text-blue-900">Lidgelden Status</span>
+              <span className="text-xs text-green-600">93%</span>
+            </div>
+            <div className="w-full bg-blue-100 rounded-full h-2">
+              <div className="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full" style={{ width: '93%' }}></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Navigation */}
       <nav className="flex flex-1 flex-col px-6">
         <ul role="list" className="flex flex-1 flex-col gap-y-2">

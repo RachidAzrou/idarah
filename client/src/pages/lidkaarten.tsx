@@ -305,12 +305,9 @@ export default function LidkaartenPage() {
 
 
   const handleViewCard = (member: Member) => {
-    // Check if we're currently on production URL, if so force development server
-    const isOnProductionUrl = window.location.hostname.includes('replit.dev');
-    const cardUrl = isOnProductionUrl 
-      ? `http://localhost:5000/card/${member.id}`  // Force development server
-      : `/card/${member.id}`;  // Use relative URL in development
-    // Open in new tab/window for PWA installation  
+    // Use public card page - standalone like public screens
+    const cardUrl = `/public/card/${member.id}`;
+    // Open in new tab/window for standalone viewing
     window.open(cardUrl, '_blank');
   };
 

@@ -11,6 +11,9 @@ import { financialService } from "./services/financial";
 import { cardService } from "./services/card";
 import { ruleService } from "./services/ruleService";
 import { boardService } from "./services/board";
+import { makeCardETag } from "./lib/card/etag";
+import { randomBytes } from "crypto";
+import { computeCardStatus } from "./lib/card/status";
 import { insertUserSchema, insertMemberSchema, insertMembershipFeeSchema, cardMeta, insertBoardMemberSchema, emailSegments, emailSuppresses } from "@shared/schema";
 
 // Define AuthenticatedRequest type
@@ -1346,6 +1349,85 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ 
         error: "Er ging iets mis. Probeer opnieuw." 
       });
+    }
+  });
+
+  // Public card API endpoint (no authentication required) - for standalone public viewing
+  app.get("/api/public/card/:memberId", async (req, res) => {
+    try {
+      const { memberId } = req.params;
+
+      // Get member data
+      const member = await storage.getMember(memberId);
+      if (!member || !member.active) {
+        return res.status(404).json({ message: "Card not found" });
+      }
+
+      // Get tenant data
+      const tenant = await storage.getTenant(member.tenantId);
+      if (!tenant) {
+        return res.status(404).json({ message: "Organization not found" });
+      }
+
+      // Get or create card metadata
+      let cardMeta = await storage.getCardMetaByMember(memberId);
+      if (!cardMeta) {
+        cardMeta = await storage.createCardMeta({
+          memberId,
+          tenantId: member.tenantId,
+          qrToken: randomBytes(32).toString('hex'),
+          validUntil: new Date(new Date().getFullYear(), 11, 31), // End of current year
+          etag: makeCardETag(
+            {
+              id: member.id,
+              firstName: member.firstName,
+              lastName: member.lastName,
+              memberNumber: member.memberNumber,
+              category: member.category,
+              votingRights: member.votingRights || false,
+            },
+            {
+              name: tenant.name,
+              logoUrl: tenant.logoUrl,
+              primaryColor: tenant.primaryColor || '#bb2e2e',
+            },
+            'ACTUEEL',
+            new Date(new Date().getFullYear(), 11, 31),
+            []
+          )
+        });
+      }
+
+      // Get member fees for status calculation
+      const memberFees = await storage.getMembershipFeesByMember(memberId);
+      
+      // Derive current status
+      const status = await computeCardStatus(memberId);
+
+      // Build response
+      const response = {
+        memberId: member.id,
+        firstName: member.firstName,
+        lastName: member.lastName,
+        memberNumber: member.memberNumber,
+        category: member.category,
+        votingRights: member.votingRights || false,
+        status,
+        validUntil: cardMeta.validUntil,
+        qrToken: cardMeta.qrToken,
+        tenant: {
+          id: tenant.id,
+          name: tenant.name,
+          logoUrl: tenant.logoUrl
+        }
+      };
+
+      // Set cache headers for 10 seconds
+      res.set('Cache-Control', 'public, max-age=10');
+      res.json(response);
+    } catch (error) {
+      console.error('Error fetching public card data:', error);
+      res.status(500).json({ message: "Failed to fetch card data" });
     }
   });
 

@@ -19,6 +19,7 @@ import Instellingen from "@/pages/instellingen";
 import Profiel from "@/pages/profiel";
 import { CardPage } from "@/pages/card";
 import CardVerifyPage from "@/pages/card-verify";
+import PublicCard from "@/pages/public-card";
 import Lidkaarten from "@/pages/lidkaarten";
 import Bestuur from "@/pages/bestuur";
 import Berichten from "@/pages/berichten";
@@ -69,6 +70,7 @@ function Router() {
       <Route path="/screen/:publicToken" component={PublicScreenViewPage} />
       <Route path="/card/:memberId" component={CardPage} />
       <Route path="/card/verify/:qrToken" component={CardVerifyPage} />
+      <Route path="/public/card/:memberId" component={PublicCard} />
       <Route path="/bestuur" component={() => <ProtectedRoute component={Bestuur} />} />
       <Route path="/berichten" component={() => <ProtectedRoute component={Berichten} />} />
       <Route path="/instellingen" component={() => <ProtectedRoute component={Instellingen} />} />

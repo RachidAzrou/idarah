@@ -305,9 +305,12 @@ export default function LidkaartenPage() {
 
 
   const handleViewCard = (member: Member) => {
-    // Use relative URL - deploy to production to see latest changes there
-    const cardUrl = `/card/${member.id}`;
-    // Open in new tab/window for PWA installation
+    // Check if we're currently on production URL, if so force development server
+    const isOnProductionUrl = window.location.hostname.includes('replit.dev');
+    const cardUrl = isOnProductionUrl 
+      ? `http://localhost:5000/card/${member.id}`  // Force development server
+      : `/card/${member.id}`;  // Use relative URL in development
+    // Open in new tab/window for PWA installation  
     window.open(cardUrl, '_blank');
   };
 

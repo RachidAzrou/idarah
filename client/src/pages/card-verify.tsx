@@ -168,11 +168,12 @@ function VerificationView({ qrToken }: { qrToken: string }) {
         videoRef.current,
         (result) => {
           const qrCodeText = result.data;
-          const urlMatch = qrCodeText.match(/\/card\/([a-f0-9]+)/);
+          // Support both old and new URL patterns
+          const urlMatch = qrCodeText.match(/\/card\/(?:verify\/)?([a-f0-9]+)/);
           if (urlMatch && urlMatch[1]) {
             const newToken = urlMatch[1];
             stopScanning();
-            window.location.href = `/card/${newToken}`;
+            window.location.href = `/card/verify/${newToken}`;
           }
         },
         {
@@ -484,8 +485,8 @@ function VerificationView({ qrToken }: { qrToken: string }) {
 }
 
 export default function CardVerifyPage() {
-  const [, params] = useRoute("/card/:token");
-  const qrToken = params?.token;
+  const [, params] = useRoute("/card/verify/:qrToken");
+  const qrToken = params?.qrToken;
 
   if (!qrToken) {
     return (

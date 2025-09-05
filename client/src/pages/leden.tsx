@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { FiUserPlus } from "react-icons/fi";
 import { Edit2 } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface FilterValues {
   categories: string[];
@@ -323,165 +324,122 @@ export default function Leden() {
     importMembersMutation.mutate(membersData);
   };
 
-  const handleResetFilters = () => {
-    setSearchTerm("");
-    setStatusFilter("all");
-    setCategoryFilter("all");
-    setVotingRightsFilter("");
-    setJoinDateFrom(undefined);
-    setJoinDateTo(undefined);
-    setPaymentStatusFilter("all");
-    setAdvancedFilters(initialFilters);
-    setPage(1);
-    toast({ title: "Filters gereset", description: "Alle filters zijn gewist" });
+  const handleAdvancedFilters = (filters: FilterValues) => {
+    setAdvancedFilters(filters);
+    setShowFiltersDrawer(false);
   };
-
-  const handlePageChange = (newPage: number) => {
-    setPage(newPage);
-  };
-
-  const handlePerPageChange = (newPerPage: number) => {
-    setPerPage(newPerPage);
-    setPage(1); // Reset to first page
-  };
-
 
   return (
-    <main className="flex-1 py-4">
-      <div className="px-4 sm:px-6 lg:px-8 w-full">
-        {/* Page Header */}
-        <div className="border-b border-gray-200 pb-5 mb-6">
-          <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent tracking-tight" data-testid="page-title">Ledenbeheer</h1>
-            <p className="mt-1 text-sm text-gray-700">Beheer je verenigingsleden en hun gegevens</p>
-          </div>
-        </div>
+    <div className="space-y-6">
+      <Toolbar 
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        statusFilter={statusFilter}
+        onStatusFilterChange={setStatusFilter}
+        categoryFilter={categoryFilter}
+        onCategoryFilterChange={setCategoryFilter}
+        votingRightsFilter={votingRightsFilter}
+        onVotingRightsFilterChange={setVotingRightsFilter}
+        joinDateFrom={joinDateFrom}
+        onJoinDateFromChange={setJoinDateFrom}
+        joinDateTo={joinDateTo}
+        onJoinDateToChange={setJoinDateTo}
+        paymentStatusFilter={paymentStatusFilter}
+        onPaymentStatusFilterChange={setPaymentStatusFilter}
+        onFiltersClick={() => setShowFiltersDrawer(true)}
+        onExportClick={handleExport}
+        onImportClick={handleImport}
+        onNewMemberClick={() => setShowNewMemberDialog(true)}
+        totalMembers={totalMembers}
+        isLoading={isLoading}
+      />
 
-        {/* Toolbar */}
-        <Toolbar
-          searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
-          statusFilter={statusFilter}
-          onStatusFilterChange={setStatusFilter}
-          categoryFilter={categoryFilter}
-          onCategoryFilterChange={setCategoryFilter}
-          votingRightsFilter={votingRightsFilter}
-          onVotingRightsFilterChange={setVotingRightsFilter}
-          joinDateFrom={joinDateFrom}
-          onJoinDateFromChange={setJoinDateFrom}
-          joinDateTo={joinDateTo}
-          onJoinDateToChange={setJoinDateTo}
-          paymentStatusFilter={paymentStatusFilter}
-          onPaymentStatusFilterChange={setPaymentStatusFilter}
-          onExport={handleExport}
-          onImport={handleImport}
-          onNewMember={() => setShowNewMemberDialog(true)}
-          onMoreFilters={handleResetFilters}
-        />
+      <MembersTable
+        members={paginatedMembers}
+        total={totalMembers}
+        page={page}
+        perPage={perPage}
+        onPageChange={setPage}
+        onPerPageChange={setPerPage}
+        onRowAction={handleRowAction}
+        onBulkAction={handleBulkAction}
+        onView={handleMemberView}
+        onEdit={handleMemberEdit}
+        onToggleStatus={handleMemberToggleStatus}
+        onDelete={handleMemberDelete}
+        loading={isLoading}
+      />
 
-        {/* Members Table */}
-        <MembersTable
-          members={paginatedMembers}
-          total={totalMembers}
-          page={page}
-          perPage={perPage}
-          onPageChange={handlePageChange}
-          onPerPageChange={handlePerPageChange}
-          onRowAction={handleRowAction}
-          onBulkAction={handleBulkAction}
-          onView={handleMemberView}
-          onEdit={handleMemberEdit}
-          onToggleStatus={handleMemberToggleStatus}
-          onDelete={handleMemberDelete}
-          loading={isLoading}
-        />
+      {/* Dialogs */}
+      <Dialog open={showNewMemberDialog} onOpenChange={setShowNewMemberDialog}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FiUserPlus className="h-5 w-5" />
+              Nieuw Lid Toevoegen
+            </DialogTitle>
+            <DialogDescription>
+              Voeg een nieuw lid toe aan de ledenlijst.
+            </DialogDescription>
+          </DialogHeader>
+          <MemberForm 
+            onSubmit={(data) => {
+              // Add mutation logic here
+              setShowNewMemberDialog(false);
+            }}
+            onCancel={() => setShowNewMemberDialog(false)}
+          />
+        </DialogContent>
+      </Dialog>
 
-        {/* New Member Dialog */}
-        <Dialog open={showNewMemberDialog} onOpenChange={setShowNewMemberDialog}>
-          <DialogContent className="max-w-6xl max-h-[95vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <FiUserPlus className="h-5 w-5" />
-                Nieuw Lid Toevoegen
-              </DialogTitle>
-              <DialogDescription>
-                Voeg een nieuw lid toe aan de ledenadministratie
-              </DialogDescription>
-            </DialogHeader>
-            <MemberForm
-              onSuccess={() => setShowNewMemberDialog(false)}
-              onCancel={() => setShowNewMemberDialog(false)}
+      <Dialog open={showEditMember} onOpenChange={setShowEditMember}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Edit2 className="h-5 w-5" />
+              Lid Bewerken
+            </DialogTitle>
+            <DialogDescription>
+              Bewerk de gegevens van {selectedMember?.firstName} {selectedMember?.lastName}.
+            </DialogDescription>
+          </DialogHeader>
+          {selectedMember && (
+            <MemberForm 
+              initialData={selectedMember}
+              onSubmit={(data) => {
+                updateMemberMutation.mutate({ id: selectedMember.id, data });
+                setShowEditMember(false);
+              }}
+              onCancel={() => setShowEditMember(false)}
             />
-          </DialogContent>
-        </Dialog>
+          )}
+        </DialogContent>
+      </Dialog>
 
-        {/* Import Dialog */}
-        <MemberImportDialog
-          open={showImportDialog}
-          onClose={() => setShowImportDialog(false)}
-          onImport={handleImportMembers}
-        />
+      <MemberImportDialog
+        open={showImportDialog}
+        onOpenChange={setShowImportDialog}
+        onImport={handleImportMembers}
+      />
 
-        {/* Export Dialog */}
-        <ExportDialog
-          open={showExportDialog}
-          onOpenChange={setShowExportDialog}
-          filteredMembers={filteredMembers}
-        />
+      <MemberDetailDialog
+        open={showMemberDetail}
+        onOpenChange={setShowMemberDetail}
+        member={selectedMember}
+      />
 
-        {/* Member Detail Dialog */}
-        <MemberDetailDialog
-          member={selectedMember}
-          open={showMemberDetail}
-          onClose={() => {
-            setShowMemberDetail(false);
-            setSelectedMember(null);
-          }}
-          onEdit={(member) => {
-            setSelectedMember(member);
-            setShowEditMember(true);
-          }}
-        />
+      <ExportDialog
+        open={showExportDialog}
+        onOpenChange={setShowExportDialog}
+        members={filteredMembers}
+      />
 
-        {/* Edit Member Dialog */}
-        <Dialog open={showEditMember} onOpenChange={(open) => {
-          setShowEditMember(open);
-          if (!open) setSelectedMember(null);
-        }}>
-          <DialogContent className="max-w-6xl max-h-[95vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <Edit2 className="h-5 w-5" />
-                Lid Bewerken
-              </DialogTitle>
-              <DialogDescription>
-                Bewerk de gegevens van {selectedMember?.firstName} {selectedMember?.lastName}
-              </DialogDescription>
-            </DialogHeader>
-            {selectedMember && (
-              <MemberForm
-                member={selectedMember}
-                onSuccess={() => {
-                  setShowEditMember(false);
-                  setSelectedMember(null);
-                }}
-                onCancel={() => {
-                  setShowEditMember(false);
-                  setSelectedMember(null);
-                }}
-              />
-            )}
-          </DialogContent>
-        </Dialog>
-
-        {/* Filters Drawer */}
-        <FiltersDrawer
-          open={showFiltersDrawer}
-          onOpenChange={setShowFiltersDrawer}
-          filters={advancedFilters}
-          onFiltersChange={setAdvancedFilters}
-        />
-      </div>
-    </main>
+      <FiltersDrawer
+        open={showFiltersDrawer}
+        onOpenChange={setShowFiltersDrawer}
+        filters={advancedFilters}
+        onFiltersChange={handleAdvancedFilters}
+      />
+    </div>
   );
 }

@@ -74,7 +74,7 @@ function StatusLED({ status, className }: StatusLEDProps) {
         style={config.glowStyle}
         aria-hidden="true"
       />
-      <span className="text-sm font-medium card-font embossed-text" style={{textShadow: '1px 1px 2px rgba(0,0,0,0.8), -0.5px -0.5px 1px rgba(255,255,255,0.2)', filter: 'drop-shadow(0.5px 0.5px 1px rgba(0,0,0,0.4))'}}>
+      <span className="text-sm font-medium card-font debossed-text">
         {config.label}
       </span>
     </div>

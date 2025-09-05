@@ -146,8 +146,6 @@ export function LedenlijstView({ config, members = [] }: LedenlijstViewProps) {
         backgroundRepeat: 'no-repeat'
       }}
     >
-      {/* Modern glassmorphism background overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/90 via-white/85 to-blue-100/90 backdrop-blur-sm"></div>
       {/* Header */}
       <div className="text-center mb-12 relative z-10">
         <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-lg">

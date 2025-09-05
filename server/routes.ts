@@ -1153,13 +1153,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     
     // Check if current year fees are paid (optional business logic)
-    if (fees && fees.length > 0) {
-      const currentYear = new Date().getFullYear();
-      const currentYearFees = fees.filter(fee => {
-        const feeYear = new Date(fee.periodStart).getFullYear();
-        return feeYear === currentYear;
-      });
-      
+    const currentYear = new Date().getFullYear();
+    const currentYearFees = fees ? fees.filter(fee => {
+      const feeYear = new Date(fee.periodStart).getFullYear();
+      return feeYear === currentYear;
+    }) : [];
+    
+    // If there are current year fees, check if any are paid
+    if (currentYearFees.length > 0) {
       const hasPaidCurrentYear = currentYearFees.some(fee => fee.status === 'PAID');
       if (!hasPaidCurrentYear) {
         return 'NIET_ACTUEEL';
@@ -1339,14 +1340,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const overdueFees = outstandingFees.filter(fee => fee.status === 'OVERDUE');
         const pendingFees = outstandingFees.filter(fee => fee.status === 'PENDING' || fee.status === 'OPEN');
         
-        // Create detailed lists
+        // Create detailed lists with periods
         if (overdueFees.length > 0) {
-          const overdueList = overdueFees.map(fee => `${fee.period} (€${fee.amount})`).join(', ');
+          const overdueList = overdueFees.map(fee => {
+            const periodStart = new Date(fee.periodEnd).toLocaleDateString('nl-BE', { month: 'short', year: 'numeric' });
+            return `${periodStart} (€${fee.amount})`;
+          }).join(', ');
           paymentDetails.push(`Vervallen: ${overdueList}`);
         }
         
         if (pendingFees.length > 0) {
-          const pendingList = pendingFees.map(fee => `${fee.period} (€${fee.amount})`).join(', ');
+          const pendingList = pendingFees.map(fee => {
+            const periodStart = new Date(fee.periodEnd).toLocaleDateString('nl-BE', { month: 'short', year: 'numeric' });
+            return `${periodStart} (€${fee.amount})`;
+          }).join(', ');
           paymentDetails.push(`Openstaand: ${pendingList}`);
         }
         

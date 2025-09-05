@@ -22,6 +22,7 @@ export interface LedenlijstConfig {
     filterByCategories: boolean;
     showVotingRights: boolean;
     rowsPerPage: number;
+    secondsPerPage?: number;
   };
   year: number;
   categories: string[];

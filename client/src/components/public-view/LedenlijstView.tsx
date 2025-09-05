@@ -92,12 +92,13 @@ export function LedenlijstView({ config, members = [] }: LedenlijstViewProps) {
   useEffect(() => {
     if (totalPages <= 1) return;
 
+    const secondsPerPage = config.display.secondsPerPage || 15;
     const interval = setInterval(() => {
       setCurrentPage(prev => (prev + 1) % totalPages);
-    }, 15000); // 15 seconden per pagina
+    }, secondsPerPage * 1000); // Gebruik ingestelde seconden per pagina
 
     return () => clearInterval(interval);
-  }, [totalPages]);
+  }, [totalPages, config.display.secondsPerPage]);
 
   const getPaymentStatusIcon = (status: 'betaald' | 'open' | 'vervallen') => {
     switch (status) {
@@ -255,31 +256,12 @@ export function LedenlijstView({ config, members = [] }: LedenlijstViewProps) {
           </table>
         </div>
 
-        {/* Paginering info */}
+        {/* Paginering info - subtiel rechtsbeneden */}
         {totalPages > 1 && (
-          <div className="mt-8 flex justify-center relative z-10">
-            <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-200">
-              <div className="flex justify-center items-center gap-3 mb-4">
-                {Array.from({ length: totalPages }, (_, i) => (
-                  <div
-                    key={i}
-                    className={`w-4 h-4 rounded-full transition-all duration-300 shadow-md ${
-                      i === currentPage 
-                        ? 'bg-gradient-to-br from-blue-500 to-blue-600 scale-125 shadow-lg' 
-                        : 'bg-gradient-to-br from-blue-200 to-blue-300 hover:scale-110'
-                    }`}
-                  />
-                ))}
-              </div>
-              <div className="text-center">
-                <p className="text-slate-800 font-bold text-xl">
-                  Pagina {currentPage + 1} van {totalPages}
-                </p>
-                <p className="text-slate-600 text-base mt-2 font-medium">
-                  {filteredMembers.length} leden weergegeven
-                </p>
-              </div>
-            </div>
+          <div className="mt-4 flex justify-end relative z-10">
+            <p className="text-gray-500 text-sm">
+              {filteredMembers.length} leden weergegeven
+            </p>
           </div>
         )}
       </div>

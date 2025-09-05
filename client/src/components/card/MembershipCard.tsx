@@ -70,11 +70,11 @@ function StatusLED({ status, className }: StatusLEDProps) {
   return (
     <div className={cn("flex items-center gap-2", className)}>
       <div 
-        className={cn("w-3 h-3 rounded-full", config.color)}
+        className={cn("w-4 h-4 rounded-full", config.color)}
         style={config.glowStyle}
         aria-hidden="true"
       />
-      <span className="text-xs font-medium card-font debossed-text">
+      <span className="text-sm font-medium card-font debossed-text">
         {config.label}
       </span>
     </div>
@@ -108,6 +108,15 @@ export function MembershipCard({
   
   // Check board member status
   const { isActiveBoardMember } = useBoardMemberStatus(cardData.memberId || '');
+  
+  // Debug logging
+  console.log('PWA Card Debug:', {
+    memberId: cardData.memberId,
+    isActiveBoardMember,
+    votingRights: cardData.votingRights,
+    firstName: cardData.firstName,
+    lastName: cardData.lastName
+  });
 
   // Generate QR code URL for verification
   const qrCodeUrl = `${window.location.origin}/card/verify/${cardData.qrToken}`;
@@ -198,12 +207,12 @@ export function MembershipCard({
               className="debossed-qr-container transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/50 hover:scale-105"
               data-testid="qr-plate"
               aria-label="Toon scanbare QR code"
-              style={{ minWidth: isConstrained ? '75px' : '100px', minHeight: isConstrained ? '75px' : '100px' }}
+              style={{ minWidth: isConstrained ? '100px' : '140px', minHeight: isConstrained ? '100px' : '140px' }}
             >
               <div className="debossed-qr-frame">
                 <QRCodeSVG
                   value={qrCodeUrl}
-                  size={isConstrained ? 50 : 70}
+                  size={isConstrained ? 70 : 100}
                   className="debossed-qr"
                   fgColor="#D1D5DB"
                   bgColor="transparent"
@@ -215,8 +224,10 @@ export function MembershipCard({
             {(isActiveBoardMember || cardData.votingRights) && (
               <div className="flex flex-col items-center mr-8">
                 {isActiveBoardMember ? (
-                  // Crown icon removed as requested
-                  <div className="w-0 h-0" />
+                  // Show icon placeholder for board members to maintain space
+                  <div className={`${isConstrained ? 'w-16 h-16' : 'w-24 h-24'} flex items-center justify-center`}>
+                    {/* Icon removed but space maintained for text alignment */}
+                  </div>
                 ) : (
                   cardData.votingRights && (
                     <PiUserCircleCheckLight 

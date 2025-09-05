@@ -5,7 +5,15 @@ import { authService } from "../services/auth";
 declare global {
   namespace Express {
     interface Request {
-      user?: any;
+      user?: {
+        id: string;
+        tenantId: string;
+        name: string;
+        email: string;
+        role: 'SUPERADMIN' | 'BEHEERDER' | 'MEDEWERKER';
+        active: boolean;
+        createdAt: Date;
+      };
       tenantId?: string;
     }
   }

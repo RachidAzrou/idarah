@@ -1,6 +1,7 @@
 import { storage } from "../storage";
 import { createHash, randomBytes } from "crypto";
 import type { Member, CardMeta, Tenant, CardVerifyResponse } from "@shared/schema";
+import { computeCardStatus } from "../lib/card/status";
 
 export class CardService {
   /**
@@ -148,6 +149,33 @@ export class CardService {
    */
   async getCardData(memberId: string): Promise<{ member: Member; cardMeta: CardMeta; tenant: Tenant } | null> {
     return await this.getOrCreateCardMeta(memberId);
+  }
+
+  /**
+   * Recalculate card status based on member data and payments
+   */
+  async recalculateCardStatus(memberId: string, tenantId: string): Promise<void> {
+    try {
+      // Get existing card metadata
+      const cardMeta = await storage.getCardMetaByMember(memberId);
+      if (!cardMeta || cardMeta.tenantId !== tenantId) {
+        console.warn(`Card not found for member ${memberId} in tenant ${tenantId}`);
+        return;
+      }
+
+      // Compute new status
+      const newStatus = await computeCardStatus(memberId);
+      
+      // Update card with new status
+      await storage.updateCardMeta(cardMeta.id, {
+        status: newStatus,
+      });
+
+      console.log(`Updated card status for member ${memberId} to ${newStatus}`);
+    } catch (error) {
+      console.error(`Error recalculating card status for member ${memberId}:`, error);
+      throw error;
+    }
   }
 }
 

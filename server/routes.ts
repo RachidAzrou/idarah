@@ -145,11 +145,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Check if email is already taken by another user
       const existingUser = await storage.getUserByEmail(email);
-      if (existingUser && existingUser.id !== req.user!.id) {
+      if (existingUser && req.user && existingUser.id !== req.user.id) {
         return res.status(409).json({ message: "Dit email adres is al in gebruik" });
       }
 
-      const updatedUser = await storage.updateUser(req.user!.id, { name, email });
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const updatedUser = await storage.updateUser(req.user.id, { name, email });
       res.json(updatedUser);
     } catch (error) {
       console.error("Error updating profile:", error);
@@ -170,7 +171,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Verify current password using auth service
-      const loginResult = await authService.login(req.user!.email, currentPassword);
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const loginResult = await authService.login(req.user.email, currentPassword);
       if (!loginResult.success) {
         return res.status(400).json({ message: "Huidig wachtwoord is incorrect" });
       }
@@ -1432,13 +1434,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Card lifecycle management endpoints
-  app.post('/api/members/:id/card/refresh-validuntil', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.post('/api/members/:id/card/refresh-validuntil', authMiddleware, async (req, res) => {
     try {
       const memberId = req.params.id;
       
       // Verify member belongs to user's tenant
       const member = await storage.getMember(memberId);
-      if (!member || member.tenantId !== req.user!.tenantId) {
+      if (!member || !req.user || member.tenantId !== req.user.tenantId) {
         return res.status(404).json({ error: "Lid niet gevonden" });
       }
       
@@ -1465,13 +1467,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/members/:id/card/status-details', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.get('/api/members/:id/card/status-details', authMiddleware, async (req, res) => {
     try {
       const memberId = req.params.id;
       
       // Verify member belongs to user's tenant  
       const member = await storage.getMember(memberId);
-      if (!member || member.tenantId !== req.user!.tenantId) {
+      if (!member || !req.user || member.tenantId !== req.user.tenantId) {
         return res.status(404).json({ error: "Lid niet gevonden" });
       }
       
@@ -1487,7 +1489,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/admin/rollover', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.post('/api/admin/rollover', authMiddleware, async (req, res) => {
     try {
       // Check for SUPERADMIN role
       if (req.user!.role !== 'SUPERADMIN') {
@@ -1514,7 +1516,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Reconciliatie endpoints
   
   // Import bankafschrift
-  app.post('/api/finance/import', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.post('/api/finance/import', authMiddleware, async (req, res) => {
     try {
       if (req.user!.role === 'MEDEWERKER') {
         return res.status(403).json({ error: "Onvoldoende rechten" });
@@ -1557,7 +1559,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Preview import zonder opslaan
-  app.post('/api/finance/import/preview', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.post('/api/finance/import/preview', authMiddleware, async (req, res) => {
     try {
       if (req.user!.role === 'MEDEWERKER') {
         return res.status(403).json({ error: "Onvoldoende rechten" });
@@ -1581,7 +1583,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Bank statements lijst
-  app.get('/api/finance/statements', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.get('/api/finance/statements', authMiddleware, async (req, res) => {
     try {
       // TODO: Implementeer database query voor bank statements
       res.json([]);
@@ -1591,7 +1593,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Bank transacties met filters
-  app.get('/api/finance/bank-transactions', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.get('/api/finance/bank-transactions', authMiddleware, async (req, res) => {
     try {
       // TODO: Implementeer database query met filters
       const { status, from, to, side, category, vendor, q } = req.query;
@@ -1602,7 +1604,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Bevestig match
-  app.post('/api/finance/bank-transactions/:id/confirm', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.post('/api/finance/bank-transactions/:id/confirm', authMiddleware, async (req, res) => {
     try {
       if (req.user!.role === 'MEDEWERKER') {
         return res.status(403).json({ error: "Onvoldoende rechten" });
@@ -1621,7 +1623,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Split transactie
-  app.post('/api/finance/bank-transactions/:id/split', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.post('/api/finance/bank-transactions/:id/split', authMiddleware, async (req, res) => {
     try {
       if (req.user!.role === 'MEDEWERKER') {
         return res.status(403).json({ error: "Onvoldoende rechten" });
@@ -1640,7 +1642,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Afkeuren transactie
-  app.post('/api/finance/bank-transactions/:id/reject', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.post('/api/finance/bank-transactions/:id/reject', authMiddleware, async (req, res) => {
     try {
       if (req.user!.role === 'MEDEWERKER') {
         return res.status(403).json({ error: "Onvoldoende rechten" });
@@ -1659,7 +1661,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Boek transacties naar journaal
-  app.post('/api/finance/book', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.post('/api/finance/book', authMiddleware, async (req, res) => {
     try {
       if (req.user!.role === 'MEDEWERKER') {
         return res.status(403).json({ error: "Onvoldoende rechten" });
@@ -1677,7 +1679,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Expense categories CRUD
-  app.get('/api/finance/categories', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.get('/api/finance/categories', authMiddleware, async (req, res) => {
     try {
       // TODO: Implementeer database query
       res.json([]);
@@ -1686,7 +1688,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/finance/categories', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.post('/api/finance/categories', authMiddleware, async (req, res) => {
     try {
       if (req.user!.role === 'MEDEWERKER') {
         return res.status(403).json({ error: "Onvoldoende rechten" });
@@ -1701,7 +1703,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Vendors CRUD
-  app.get('/api/finance/vendors', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.get('/api/finance/vendors', authMiddleware, async (req, res) => {
     try {
       // TODO: Implementeer database query
       res.json([]);
@@ -1710,7 +1712,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/finance/vendors', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.post('/api/finance/vendors', authMiddleware, async (req, res) => {
     try {
       if (req.user!.role === 'MEDEWERKER') {
         return res.status(403).json({ error: "Onvoldoende rechten" });
@@ -1725,7 +1727,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Match rules CRUD
-  app.get('/api/finance/rules', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.get('/api/finance/rules', authMiddleware, async (req, res) => {
     try {
       // TODO: Implementeer database query
       res.json([]);
@@ -1734,7 +1736,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/finance/rules', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.post('/api/finance/rules', authMiddleware, async (req, res) => {
     try {
       if (req.user!.role === 'MEDEWERKER') {
         return res.status(403).json({ error: "Onvoldoende rechten" });
@@ -1751,7 +1753,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Rapportage endpoints
   
   // Cashflow rapportage
-  app.get('/api/reports/cashflow', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.get('/api/reports/cashflow', authMiddleware, async (req, res) => {
     try {
       const { from, to, types, categories, methods, statuses } = req.query;
       
@@ -1769,7 +1771,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Categorie breakdown
-  app.get('/api/reports/categories', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.get('/api/reports/categories', authMiddleware, async (req, res) => {
     try {
       const { kind = 'expense', from, to } = req.query;
       
@@ -1788,7 +1790,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Gestapelde categorie data per maand
-  app.get('/api/reports/stacked-by-category', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.get('/api/reports/stacked-by-category', authMiddleware, async (req, res) => {
     try {
       // Mock data - TODO: Implementeer echte aggregatie
       const mockData = [
@@ -1804,7 +1806,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Fee status trend
-  app.get('/api/reports/fee-status-trend', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.get('/api/reports/fee-status-trend', authMiddleware, async (req, res) => {
     try {
       // Mock data - TODO: Implementeer echte aggregatie
       const mockData = [
@@ -1820,7 +1822,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Top leden per bedrag
-  app.get('/api/reports/top-members', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.get('/api/reports/top-members', authMiddleware, async (req, res) => {
     try {
       // Mock data - TODO: Implementeer echte aggregatie
       const mockData = [
@@ -1836,7 +1838,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Betaalmethode breakdown
-  app.get('/api/reports/methods', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.get('/api/reports/methods', authMiddleware, async (req, res) => {
     try {
       // Mock data - TODO: Implementeer echte aggregatie
       const mockData = [
@@ -1854,7 +1856,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Rule validation endpoints
-  app.get('/api/members/:id/voting-rights', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.get('/api/members/:id/voting-rights', authMiddleware, async (req, res) => {
     try {
       const memberId = req.params.id;
       const tenantId = req.user!.tenantId;
@@ -1873,7 +1875,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/members/:id/voting-rights/override', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.post('/api/members/:id/voting-rights/override', authMiddleware, async (req, res) => {
     try {
       const memberId = req.params.id;
       const tenantId = req.user!.tenantId;
@@ -1939,7 +1941,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Board member endpoints
-  app.get('/api/board/members', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.get('/api/board/members', authMiddleware, async (req, res) => {
     try {
       const tenantId = req.user!.tenantId;
       
@@ -1963,7 +1965,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/board/members/:id', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.get('/api/board/members/:id', authMiddleware, async (req, res) => {
     try {
       const tenantId = req.user!.tenantId;
       const boardMember = await boardService.getBoardMember(tenantId, req.params.id);
@@ -1979,7 +1981,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/board/members', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.post('/api/board/members', authMiddleware, async (req, res) => {
     try {
       // Check permissions - only BEHEERDER and SUPERADMIN can create
       if (req.user!.role === 'MEDEWERKER') {
@@ -2000,7 +2002,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put('/api/board/members/:id', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.put('/api/board/members/:id', authMiddleware, async (req, res) => {
     try {
       // Check permissions - only BEHEERDER and SUPERADMIN can update
       if (req.user!.role === 'MEDEWERKER') {
@@ -2026,7 +2028,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/board/members/:id/end-term', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.post('/api/board/members/:id/end-term', authMiddleware, async (req, res) => {
     try {
       // Check permissions - only BEHEERDER and SUPERADMIN can end terms
       if (req.user!.role === 'MEDEWERKER') {
@@ -2050,7 +2052,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/board/reorder', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.post('/api/board/reorder', authMiddleware, async (req, res) => {
     try {
       // Check permissions - only BEHEERDER and SUPERADMIN can reorder
       if (req.user!.role === 'MEDEWERKER') {
@@ -2068,7 +2070,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/board/members/by-member/:memberId', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.get('/api/board/members/by-member/:memberId', authMiddleware, async (req, res) => {
     try {
       const tenantId = req.user!.tenantId;
       const memberId = req.params.memberId;
@@ -2086,7 +2088,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const emailService = new EmailService();
 
   // Templates
-  app.get('/api/messages/templates', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.get('/api/messages/templates', authMiddleware, async (req, res) => {
     try {
       const templates = await emailService.listTemplates(req.user!.tenantId);
       // Add no-cache headers to prevent duplicates
@@ -2102,7 +2104,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/messages/templates', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.post('/api/messages/templates', authMiddleware, async (req, res) => {
     try {
       // Check permissions - only BEHEERDER and SUPERADMIN can create
       if (req.user!.role === 'MEDEWERKER') {
@@ -2117,7 +2119,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put('/api/messages/templates/:id', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.put('/api/messages/templates/:id', authMiddleware, async (req, res) => {
     try {
       // Check permissions - only BEHEERDER and SUPERADMIN can update
       if (req.user!.role === 'MEDEWERKER') {
@@ -2132,7 +2134,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/messages/templates/:id', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.delete('/api/messages/templates/:id', authMiddleware, async (req, res) => {
     try {
       // Check permissions - only BEHEERDER and SUPERADMIN can delete
       if (req.user!.role === 'MEDEWERKER') {
@@ -2147,7 +2149,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/messages/templates/:id/test', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.post('/api/messages/templates/:id/test', authMiddleware, async (req, res) => {
     try {
       // Check permissions - only BEHEERDER and SUPERADMIN can send test
       if (req.user!.role === 'MEDEWERKER') {
@@ -2164,7 +2166,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Segments
-  app.get('/api/messages/segments', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.get('/api/messages/segments', authMiddleware, async (req, res) => {
     try {
       const segments = await emailService.listSegments(req.user!.tenantId);
       res.json(segments);
@@ -2174,7 +2176,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/messages/segments', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.post('/api/messages/segments', authMiddleware, async (req, res) => {
     try {
       // Check permissions - only BEHEERDER and SUPERADMIN can create
       if (req.user!.role === 'MEDEWERKER') {
@@ -2189,7 +2191,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/messages/segments/:id', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.delete('/api/messages/segments/:id', authMiddleware, async (req, res) => {
     try {
       // Check permissions - only BEHEERDER and SUPERADMIN can delete
       if (req.user!.role === 'MEDEWERKER') {
@@ -2204,7 +2206,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/messages/segments/:id/preview', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.post('/api/messages/segments/:id/preview', authMiddleware, async (req, res) => {
     try {
       const segment = await db.select()
         .from(emailSegments)
@@ -2227,7 +2229,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Campaigns
-  app.get('/api/messages/campaigns', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.get('/api/messages/campaigns', authMiddleware, async (req, res) => {
     try {
       const campaigns = await emailService.listCampaigns(req.user!.tenantId);
       res.json(campaigns);
@@ -2238,7 +2240,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
 
-  app.post('/api/messages/campaigns', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.post('/api/messages/campaigns', authMiddleware, async (req, res) => {
     try {
       // Check permissions - only BEHEERDER and SUPERADMIN can create
       if (req.user!.role === 'MEDEWERKER') {
@@ -2256,7 +2258,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/messages/campaigns/:id/queue', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.post('/api/messages/campaigns/:id/queue', authMiddleware, async (req, res) => {
     try {
       // Check permissions - only BEHEERDER and SUPERADMIN can queue
       if (req.user!.role === 'MEDEWERKER') {
@@ -2319,7 +2321,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Single transactional send
-  app.post('/api/messages/send', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.post('/api/messages/send', authMiddleware, async (req, res) => {
     try {
       // Check permissions - only BEHEERDER and SUPERADMIN can send
       if (req.user!.role === 'MEDEWERKER') {
@@ -2342,7 +2344,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Composer send - sends to multiple recipients of different types
-  app.post('/api/messages/composer/send', authMiddleware, async (req: AuthenticatedRequest, res) => {
+  app.post('/api/messages/composer/send', authMiddleware, async (req, res) => {
     try {
       // Check permissions - only BEHEERDER and SUPERADMIN can send
       if (req.user!.role === 'MEDEWERKER') {

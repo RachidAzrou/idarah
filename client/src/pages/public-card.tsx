@@ -9,11 +9,12 @@ interface CardData {
   firstName: string;
   lastName: string;
   memberNumber: string;
-  category: string;
+  category: 'STUDENT' | 'STANDAARD' | 'SENIOR';
   votingRights: boolean;
-  status: string;
+  status: 'ACTUEEL' | 'NIET_ACTUEEL' | 'VERLOPEN';
   validUntil: Date | null;
   qrToken: string;
+  etag: string;
   tenant: {
     id: string;
     name: string;

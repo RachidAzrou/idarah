@@ -1,47 +1,50 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { useRoute } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { CheckCircle2, XCircle, AlertTriangle, Wifi, WifiOff, Clock, RefreshCw, Check, Euro, LogOut, User, QrCode, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { 
+  CheckCircle, 
+  XCircle, 
+  AlertTriangle, 
+  RefreshCw, 
+  Calendar,
+  User,
+  Users,
+  Crown,
+  QrCode,
+  Scan
+} from "lucide-react";
 import { cn } from "@/lib/utils";
+import { MembershipCard } from "@/components/card/MembershipCard";
 import { QuickAuthModal } from "@/components/auth/quick-auth-modal";
 import QrScanner from "qr-scanner";
 
 interface CardVerificationData {
-  status: 'ACTUEEL' | 'NIET_ACTUEEL' | 'VERLOPEN';
-  validUntil: string | null;
-  eligibleToVote: boolean;
+  isValid: boolean;
   member: {
-    name: string;
+    id: string;
+    firstName: string;
+    lastName: string;
     memberNumber: string;
-    category: string;
+  };
+  card: {
+    status: string;
+    expiryDate: string;
+    issuedDate: string;
   };
   tenant: {
-    name: string;
-    logoUrl: string | null;
-  };
-  fees?: Array<{
     id: string;
-    period: string;
-    amount: string;
-    status: 'PAID' | 'OPEN' | 'OVERDUE';
-    periodEnd: string;
-    paidAt: string | null;
-  }>;
-  refreshedAt: string;
-  etag: string;
-}
-
-interface CardVerifyPageProps {
-  params: { qrToken: string };
+    name: string;
+    logoUrl?: string;
+  };
 }
 
 function StatusBadge({ status }: { status: string }) {
   const statusConfig = {
     ACTUEEL: {
       color: 'bg-green-500 text-white',
-      icon: CheckCircle2,
+      icon: CheckCircle,
       label: 'Actueel',
     },
     NIET_ACTUEEL: {
@@ -70,7 +73,7 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 function VerificationView({ qrToken }: { qrToken: string }) {
-  // All state hooks first - always called in same order
+  // ALL HOOKS DECLARED AT THE TOP - NEVER CONDITIONAL
   const [data, setData] = useState<CardVerificationData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -80,11 +83,12 @@ function VerificationView({ qrToken }: { qrToken: string }) {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
   const [scanning, setScanning] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
   
-  // All ref hooks second - always called in same order
   const videoRef = useRef<HTMLVideoElement>(null);
   const qrScannerRef = useRef<QrScanner | null>(null);
 
+  // Stable fetch function
   const fetchData = useCallback(async (isRefresh = false) => {
     try {
       if (isRefresh) setRefreshing(true);
@@ -98,7 +102,6 @@ function VerificationView({ qrToken }: { qrToken: string }) {
       });
       
       if (response.status === 401) {
-        // Niet geautoriseerd - toon login modal
         setIsAuthenticated(false);
         setShowAuthModal(true);
         setLoading(false);
@@ -123,7 +126,71 @@ function VerificationView({ qrToken }: { qrToken: string }) {
     }
   }, [qrToken]);
 
-  // Combined effect for authentication check and event listeners
+  const handleAuthenticated = useCallback((token: string) => {
+    setIsAuthenticated(true);
+    setShowAuthModal(false);
+    
+    const userJson = sessionStorage.getItem('qr_verify_user');
+    if (userJson) {
+      setAuthUser(JSON.parse(userJson));
+    }
+    
+    fetchData();
+  }, [fetchData]);
+
+  const handleLogout = useCallback(() => {
+    sessionStorage.removeItem('qr_verify_token');
+    sessionStorage.removeItem('qr_verify_user');
+    setIsAuthenticated(false);
+    setAuthUser(null);
+    setData(null);
+    setShowAuthModal(true);
+  }, []);
+
+  const stopScanning = useCallback(() => {
+    if (qrScannerRef.current) {
+      qrScannerRef.current.stop();
+      qrScannerRef.current.destroy();
+      qrScannerRef.current = null;
+    }
+    setScanning(false);
+    setShowScanner(false);
+  }, []);
+
+  const startScanning = useCallback(async () => {
+    if (!videoRef.current) return;
+    
+    try {
+      setScanning(true);
+      setShowScanner(true);
+      
+      qrScannerRef.current = new QrScanner(
+        videoRef.current,
+        (result) => {
+          const qrCodeText = result.data;
+          const urlMatch = qrCodeText.match(/\/card\/([a-f0-9]+)/);
+          if (urlMatch && urlMatch[1]) {
+            const newToken = urlMatch[1];
+            stopScanning();
+            window.location.href = `/card/${newToken}`;
+          }
+        },
+        {
+          returnDetailedScanResult: true,
+          highlightScanRegion: true,
+          highlightCodeOutline: true,
+        }
+      );
+      
+      await qrScannerRef.current.start();
+    } catch (error) {
+      console.error('Failed to start QR scanner:', error);
+      setScanning(false);
+      setShowScanner(false);
+    }
+  }, [stopScanning]);
+
+  // Auth check effect - runs once on mount
   useEffect(() => {
     const verifyToken = sessionStorage.getItem('qr_verify_token');
     const userJson = sessionStorage.getItem('qr_verify_user');
@@ -135,40 +202,40 @@ function VerificationView({ qrToken }: { qrToken: string }) {
         const now = new Date();
         const hoursPassed = (now.getTime() - authenticatedAt.getTime()) / (1000 * 60 * 60);
         
-        // Token is valid for 2 hours
         if (hoursPassed < 2) {
           setIsAuthenticated(true);
           setAuthUser(user);
+          setAuthChecked(true);
           fetchData();
         } else {
-          // Token expired
           sessionStorage.removeItem('qr_verify_token');
           sessionStorage.removeItem('qr_verify_user');
           setShowAuthModal(true);
+          setAuthChecked(true);
           setLoading(false);
         }
       } catch {
         setShowAuthModal(true);
+        setAuthChecked(true);
         setLoading(false);
       }
     } else {
       setShowAuthModal(true);
+      setAuthChecked(true);
       setLoading(false);
     }
-  }, [qrToken, fetchData]);
+  }, [fetchData]);
 
-  // Window focus and visibility handlers - separate effect
+  // Window focus handlers - always runs, but only acts when authenticated
   useEffect(() => {
-    if (!isAuthenticated) return;
-
     const handleFocus = () => {
-      if (!loading && !refreshing) {
+      if (isAuthenticated && !loading && !refreshing) {
         fetchData(true);
       }
     };
     
     const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible' && !loading && !refreshing) {
+      if (isAuthenticated && document.visibilityState === 'visible' && !loading && !refreshing) {
         fetchData(true);
       }
     };
@@ -182,27 +249,24 @@ function VerificationView({ qrToken }: { qrToken: string }) {
     };
   }, [isAuthenticated, loading, refreshing, fetchData]);
 
-  const handleAuthenticated = useCallback((token: string) => {
-    setIsAuthenticated(true);
-    setShowAuthModal(false);
-    
-    const userJson = sessionStorage.getItem('qr_verify_user');
-    if (userJson) {
-      setAuthUser(JSON.parse(userJson));
-    }
-    
-    // Fetch data after authentication
-    fetchData();
-  }, [fetchData]);
+  // Cleanup scanner on unmount
+  useEffect(() => {
+    return () => {
+      stopScanning();
+    };
+  }, [stopScanning]);
 
-  const handleLogout = () => {
-    sessionStorage.removeItem('qr_verify_token');
-    sessionStorage.removeItem('qr_verify_user');
-    setIsAuthenticated(false);
-    setAuthUser(null);
-    setData(null);
-    setShowAuthModal(true);
-  };
+  // CONDITIONAL RENDERING ONLY AFTER ALL HOOKS
+  if (!authChecked) {
+    return (
+      <div className="flex items-center justify-center min-h-64">
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <RefreshCw className="h-5 w-5 animate-spin" />
+          Verificatie initialiseren...
+        </div>
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return (
@@ -248,348 +312,196 @@ function VerificationView({ qrToken }: { qrToken: string }) {
     );
   }
 
-  if (!data) return null;
-
-  const refreshedTime = new Date(data.refreshedAt).toLocaleTimeString('nl-BE', {
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZone: 'Europe/Brussels'
-  });
-
-  // QR Scanner functions with useCallback
-  const stopScanning = useCallback(() => {
-    if (qrScannerRef.current) {
-      qrScannerRef.current.stop();
-      qrScannerRef.current.destroy();
-      qrScannerRef.current = null;
-    }
-    setScanning(false);
-    setShowScanner(false);
-  }, []);
-
-  const startScanning = useCallback(async () => {
-    if (!videoRef.current) return;
-    
-    try {
-      setScanning(true);
-      setShowScanner(true);
-      
-      qrScannerRef.current = new QrScanner(
-        videoRef.current,
-        (result) => {
-          const qrCodeText = result.data;
-          // Extract token from QR code URL
-          const urlMatch = qrCodeText.match(/\/card\/([a-f0-9]+)/);
-          if (urlMatch && urlMatch[1]) {
-            const newToken = urlMatch[1];
-            stopScanning();
-            // Navigate to new verification page
-            window.location.href = `/card/${newToken}`;
-          }
-        },
-        {
-          returnDetailedScanResult: true,
-          highlightScanRegion: true,
-          highlightCodeOutline: true,
-        }
-      );
-      
-      await qrScannerRef.current.start();
-    } catch (error) {
-      console.error('Failed to start QR scanner:', error);
-      setScanning(false);
-      setShowScanner(false);
-    }
-  }, [stopScanning]);
-
-  // Calculate payment status summary
-  const getPaymentSummary = () => {
-    if (!data.fees || data.fees.length === 0) {
-      return { status: 'ok', message: 'Geen betaalinformatie beschikbaar' };
-    }
-
-    const openFees = data.fees.filter(fee => fee.status === 'OPEN');
-    const overdueFees = data.fees.filter(fee => fee.status === 'OVERDUE');
-    
-    if (overdueFees.length > 0) {
-      const totalOverdue = overdueFees.reduce((sum, fee) => sum + parseFloat(fee.amount), 0);
-      return { 
-        status: 'overdue', 
-        message: `€${totalOverdue.toFixed(2)} vervallen`,
-        count: overdueFees.length
-      };
-    }
-    
-    if (openFees.length > 0) {
-      const totalOpen = openFees.reduce((sum, fee) => sum + parseFloat(fee.amount), 0);
-      return { 
-        status: 'open', 
-        message: `€${totalOpen.toFixed(2)} openstaand`,
-        count: openFees.length
-      };
-    }
-    
-    return { status: 'ok', message: 'Alle betalingen up-to-date' };
-  };
-
-  const paymentSummary = getPaymentSummary();
-
-  // Cleanup scanner on unmount
-  useEffect(() => {
-    return () => {
-      stopScanning();
-    };
-  }, [stopScanning]);
+  if (!data) {
+    return (
+      <Card className="max-w-md mx-auto">
+        <CardContent className="pt-6">
+          <div className="text-center space-y-4">
+            <AlertTriangle className="h-12 w-12 text-yellow-500 mx-auto" />
+            <div>
+              <h3 className="font-semibold text-lg">Geen gegevens gevonden</h3>
+              <p className="text-muted-foreground mt-1">Er konden geen verificatiegegevens worden geladen.</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
-    <>
-      <Card className="max-w-lg mx-auto">
-        <CardHeader className="pb-4">
-          <div className="flex flex-col sm:flex-row items-start sm:justify-between gap-4">
-            <div className="space-y-2 flex-1">
-              <div className="flex items-start justify-between">
-                <CardTitle className="text-xl sm:text-2xl">Lidkaart verificatie</CardTitle>
-                {authUser && (
+    <div className="container mx-auto px-4 py-8 max-w-4xl">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Lidkaart Verificatie</h1>
+          <p className="text-muted-foreground">Controle van digitale lidkaart</p>
+        </div>
+        
+        <div className="flex items-center gap-2">
+          {authUser && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <User className="h-4 w-4" />
+              {authUser.name}
+            </div>
+          )}
+          <Button
+            onClick={handleLogout}
+            variant="outline"
+            size="sm"
+          >
+            Uitloggen
+          </Button>
+        </div>
+      </div>
+
+      {/* Verification Result */}
+      <div className="space-y-6">
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                {data.isValid ? (
+                  <CheckCircle className="h-5 w-5 text-green-500" />
+                ) : (
+                  <XCircle className="h-5 w-5 text-red-500" />
+                )}
+                Verificatie {data.isValid ? 'Gelukt' : 'Mislukt'}
+              </CardTitle>
+              <StatusBadge status={data.card.status} />
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <User className="h-4 w-4" />
+                  Lid
+                </div>
+                <p className="font-medium">
+                  {data.member.firstName} {data.member.lastName}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Lidnummer: {data.member.memberNumber}
+                </p>
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Calendar className="h-4 w-4" />
+                  Geldigheid
+                </div>
+                <p className="text-sm">
+                  <span className="text-muted-foreground">Uitgegeven:</span> {new Date(data.card.issuedDate).toLocaleDateString('nl-NL')}
+                </p>
+                <p className="text-sm">
+                  <span className="text-muted-foreground">Vervalt:</span> {new Date(data.card.expiryDate).toLocaleDateString('nl-NL')}
+                </p>
+              </div>
+            </div>
+
+            <div className="pt-4 border-t">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                <Users className="h-4 w-4" />
+                Organisatie
+              </div>
+              <div className="flex items-center gap-3">
+                {data.tenant.logoUrl && (
+                  <img 
+                    src={data.tenant.logoUrl} 
+                    alt={data.tenant.name}
+                    className="h-8 w-auto"
+                  />
+                )}
+                <span className="font-medium">{data.tenant.name}</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Actions */}
+        <div className="flex flex-wrap gap-3">
+          <Button
+            onClick={() => fetchData(true)}
+            disabled={refreshing}
+            variant="outline"
+            className="gap-2"
+          >
+            <RefreshCw className={cn("h-4 w-4", refreshing && "animate-spin")} />
+            {refreshing ? 'Vernieuwen...' : 'Vernieuwen'}
+          </Button>
+          
+          <Button
+            onClick={startScanning}
+            variant="outline"
+            className="gap-2"
+          >
+            <Scan className="h-4 w-4" />
+            Andere QR Scannen
+          </Button>
+        </div>
+
+        {/* QR Scanner Modal */}
+        {showScanner && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-background rounded-lg p-6 max-w-sm w-full mx-4">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold">QR Code Scannen</h3>
                   <Button
+                    onClick={stopScanning}
                     variant="ghost"
                     size="sm"
-                    onClick={handleLogout}
-                    className="text-xs gap-1 h-8"
-                    data-testid="button-logout"
                   >
-                    <LogOut className="h-3 w-3" />
-                    Uitloggen
+                    <XCircle className="h-4 w-4" />
                   </Button>
-                )}
-              </div>
-              <div className="flex items-center gap-2">
-                <StatusBadge status={data.status} />
-                {data.tenant.name && (
-                  <span className="text-sm text-gray-600">{data.tenant.name}</span>
-                )}
-              </div>
-              {authUser && (
-                <div className="flex items-center gap-2 text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">
-                  <User className="h-3 w-3" />
-                  <span>{authUser.name} ({authUser.role})</span>
                 </div>
-              )}
-            </div>
-            {data.tenant.logoUrl && (
-              <img 
-                src={data.tenant.logoUrl} 
-                alt={data.tenant.name}
-                className="h-12 sm:h-16 w-auto opacity-90"
-              />
-            )}
-          </div>
-        </CardHeader>
-      
-      <CardContent className="space-y-6">
-        {/* Payment Status Summary */}
-        <div className="p-3 rounded-lg border-l-4 bg-gray-50" style={{
-          borderLeftColor: paymentSummary.status === 'overdue' ? '#dc2626' : 
-                          paymentSummary.status === 'open' ? '#ea580c' : '#16a34a',
-          backgroundColor: paymentSummary.status === 'overdue' ? '#fef2f2' : 
-                          paymentSummary.status === 'open' ? '#fff7ed' : '#f0fdf4'
-        }}>
-          <div className="flex items-center gap-2">
-            {paymentSummary.status === 'overdue' && <AlertTriangle className="h-4 w-4 text-red-600" />}
-            {paymentSummary.status === 'open' && <Clock className="h-4 w-4 text-orange-600" />}
-            {paymentSummary.status === 'ok' && <Check className="h-4 w-4 text-green-600" />}
-            <span className={`font-medium text-sm ${
-              paymentSummary.status === 'overdue' ? 'text-red-700' : 
-              paymentSummary.status === 'open' ? 'text-orange-700' : 'text-green-700'
-            }`}>
-              Betaalstatus: {paymentSummary.message}
-            </span>
-          </div>
-        </div>
-
-        {/* Member Details */}
-        <div className="grid grid-cols-1 gap-4">
-          <div>
-            <label className="text-sm font-medium text-muted-foreground">Naam</label>
-            <p className="text-lg font-semibold">{data.member.name}</p>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="text-sm font-medium text-muted-foreground">Lidnummer</label>
-              <p className="font-mono text-sm">{data.member.memberNumber}</p>
-            </div>
-            
-            <div>
-              <label className="text-sm font-medium text-muted-foreground">Categorie</label>
-              <p className="text-sm">{data.member.category}</p>
-            </div>
-          </div>
-          
-          {data.validUntil && (
-            <div>
-              <label className="text-sm font-medium text-muted-foreground">Geldig tot</label>
-              <p className="text-sm font-mono">{data.validUntil}</p>
-            </div>
-          )}
-          
-          {data.eligibleToVote && (
-            <div>
-              <Badge variant="secondary" className="w-fit">
-                Stemgerechtigd
-              </Badge>
-            </div>
-          )}
-        </div>
-
-        {/* Payment Information */}
-        {data.fees && data.fees.length > 0 && (
-          <div className="space-y-3">
-            <h3 className="font-semibold text-lg mb-3">Betaalinformatie</h3>
-            <div className="space-y-2">
-              {data.fees.map((fee) => (
-                <div key={fee.id} className="flex items-center justify-between p-3 rounded-lg bg-gray-50 border">
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-2">
-                      {fee.status === 'PAID' && (
-                        <>
-                          <Check className="h-4 w-4 text-green-600" />
-                          <span className="text-green-600 font-medium text-sm">Betaald</span>
-                        </>
-                      )}
-                      {fee.status === 'OPEN' && (
-                        <>
-                          <Clock className="h-4 w-4 text-orange-500" />
-                          <span className="text-orange-500 font-medium text-sm">Openstaand</span>
-                        </>
-                      )}
-                      {fee.status === 'OVERDUE' && (
-                        <>
-                          <AlertTriangle className="h-4 w-4 text-red-600" />
-                          <span className="text-red-600 font-medium text-sm">Vervallen</span>
-                        </>
-                      )}
+                
+                <div className="relative">
+                  <video
+                    ref={videoRef}
+                    className="w-full rounded-lg bg-black"
+                    style={{ aspectRatio: '1' }}
+                  />
+                  {scanning && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="text-white text-sm bg-black/50 px-2 py-1 rounded">
+                        Zoeken naar QR code...
+                      </div>
                     </div>
-                    <div className="text-sm">
-                      <span className="font-medium">Lidgeld {fee.period}</span>
-                      {fee.status === 'PAID' && fee.paidAt && (
-                        <div className="text-xs text-gray-600">Betaald op {fee.paidAt}</div>
-                      )}
-                      {fee.status !== 'PAID' && (
-                        <div className="text-xs text-gray-600">Vervalt op {fee.periodEnd}</div>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1 text-sm font-mono">
-                    <Euro className="h-3 w-3" />
-                    {fee.amount}
-                  </div>
+                  )}
                 </div>
-              ))}
+                
+                <p className="text-sm text-muted-foreground text-center">
+                  Richt de camera op een QR code om een andere lidkaart te verifiëren
+                </p>
+              </div>
             </div>
           </div>
         )}
-
-        {/* Metadata */}
-        <div className="border-t pt-4">
-          <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <span>Laatst geverifieerd: {refreshedTime}</span>
-            <span>v{data.etag}</span>
-          </div>
-          {refreshing && (
-            <div className="flex items-center gap-1 text-xs text-muted-foreground mt-2">
-              <RefreshCw className="h-3 w-3 animate-spin" />
-              Verversing...
-            </div>
-          )}
-        </div>
-
-        {/* Action Buttons */}
-        <div className="grid grid-cols-2 gap-3">
-          <Button 
-            onClick={() => fetchData(true)} 
-            variant="outline"
-            size="sm"
-            className="gap-2"
-            disabled={refreshing}
-          >
-            <RefreshCw className={cn("h-4 w-4", refreshing && "animate-spin")} />
-            Ververs status
-          </Button>
-          
-          {authUser && (
-            <Button 
-              onClick={startScanning} 
-              variant="outline"
-              size="sm"
-              className="gap-2"
-              disabled={scanning}
-            >
-              <QrCode className="h-4 w-4" />
-              Scan nieuwe QR
-            </Button>
-          )}
-        </div>
-      </CardContent>
-    </Card>
-
-    {/* QR Scanner Modal */}
-    <Dialog open={showScanner} onOpenChange={setShowScanner}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <QrCode className="h-5 w-5" />
-            QR Code Scanner
-          </DialogTitle>
-        </DialogHeader>
-        <div className="space-y-4">
-          <div className="relative bg-black rounded-lg overflow-hidden">
-            <video
-              ref={videoRef}
-              className="w-full h-64 object-cover"
-              style={{ background: '#000' }}
-            />
-            {scanning && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                <div className="text-white text-sm bg-black/50 px-3 py-1 rounded">
-                  Scannen...
-                </div>
-              </div>
-            )}
-          </div>
-          <div className="text-center space-y-2">
-            <p className="text-sm text-gray-600">
-              Houd een QR code voor de camera om een nieuwe lidkaart te scannen
-            </p>
-            <Button
-              onClick={stopScanning}
-              variant="outline"
-              size="sm"
-              className="gap-2"
-            >
-              <X className="h-4 w-4" />
-              Annuleren
-            </Button>
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
-    </>
-  );
-}
-
-export default function CardVerifyPage({ params }: CardVerifyPageProps) {
-  const { qrToken } = params;
-
-  return (
-    <div 
-      className="min-h-screen w-full relative overflow-hidden flex items-start sm:items-center justify-center p-3 sm:p-6"
-      style={{
-        background: `radial-gradient(circle at 50% 40%, #0B2440 0%, #0E3A6E 45%, #0B2440 100%), radial-gradient(circle at 50% 50%, transparent 40%, rgba(0,0,0,0.3) 100%), linear-gradient(135deg, rgba(255,255,255,0.02) 0%, transparent 50%, rgba(0,0,0,0.05) 100%)`
-      }}
-    >
-      <div className="w-full max-w-lg pt-4 sm:pt-0">
-        <VerificationView qrToken={qrToken} />
       </div>
     </div>
   );
+}
+
+export default function CardVerifyPage() {
+  const [, params] = useRoute("/card/:token");
+  const qrToken = params?.token;
+
+  if (!qrToken) {
+    return (
+      <Card className="max-w-md mx-auto mt-8">
+        <CardContent className="pt-6">
+          <div className="text-center space-y-4">
+            <QrCode className="h-12 w-12 text-muted-foreground mx-auto" />
+            <div>
+              <h3 className="font-semibold text-lg">Ongeldige QR Code</h3>
+              <p className="text-muted-foreground mt-1">De QR code kon niet worden gelezen.</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return <VerificationView qrToken={qrToken} />;
 }

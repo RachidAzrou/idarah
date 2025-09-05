@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
-import darahLogo from "@assets/idarah (1)_1757094079436.png";
+import darahLogo from "@assets/idarah (2)_1757094401589.png";
 import { getUserInitials } from "@/lib/auth";
 import { useAuth } from "@/hooks/use-auth";
 

@@ -236,51 +236,68 @@ export function MembershipCard({
                     }}
                   />
                 ) : (
-                  <PiUserCircleCheckLight 
-                    className={`${isConstrained ? 'w-16 h-16' : 'w-24 h-24'}`}
-                    data-testid="voting-icon"
-                    style={{
-                      color: '#C0C0C0',
-                      textShadow: `
-                        3px 3px 0 rgba(255,255,255,0.3),
-                        -3px -3px 0 rgba(0,0,0,0.9),
-                        -4px -4px 0 rgba(0,0,0,0.8),
-                        -5px -5px 0 rgba(0,0,0,0.6),
-                        -6px -6px 0 rgba(0,0,0,0.4),
-                        -7px -7px 0 rgba(0,0,0,0.2),
-                        inset 4px 4px 8px rgba(0,0,0,0.8),
-                        inset -2px -2px 4px rgba(192,192,192,0.2),
-                        0 0 12px rgba(192,192,192,0.4),
-                        0 0 20px rgba(192,192,192,0.2)
-                      `,
-                      filter: 'drop-shadow(3px 3px 8px rgba(0,0,0,0.6)) brightness(1.2)'
-                    }}
-                  />
+                  cardData.votingRights && (
+                    <PiUserCircleCheckLight 
+                      className={`${isConstrained ? 'w-16 h-16' : 'w-24 h-24'}`}
+                      data-testid="voting-icon"
+                      style={{
+                        color: '#C0C0C0',
+                        textShadow: `
+                          3px 3px 0 rgba(255,255,255,0.3),
+                          -3px -3px 0 rgba(0,0,0,0.9),
+                          -4px -4px 0 rgba(0,0,0,0.8),
+                          -5px -5px 0 rgba(0,0,0,0.6),
+                          -6px -6px 0 rgba(0,0,0,0.4),
+                          -7px -7px 0 rgba(0,0,0,0.2),
+                          inset 4px 4px 8px rgba(0,0,0,0.8),
+                          inset -2px -2px 4px rgba(192,192,192,0.2),
+                          0 0 12px rgba(192,192,192,0.4),
+                          0 0 20px rgba(192,192,192,0.2)
+                        `,
+                        filter: 'drop-shadow(3px 3px 8px rgba(0,0,0,0.6)) brightness(1.2)'
+                      }}
+                    />
+                  )
                 )}
                 
                 {/* Primary text */}
-                <span 
-                  className={`${isConstrained ? 'text-xs' : 'text-base'} uppercase tracking-[0.1em] font-bold mt-3`}
-                  style={{
-                    color: isActiveBoardMember ? '#FFD700' : '#C0C0C0',
-                    textShadow: isActiveBoardMember ? `
-                      2px 2px 0 rgba(255,255,255,0.3),
-                      -2px -2px 0 rgba(0,0,0,0.8),
-                      -3px -3px 0 rgba(0,0,0,0.6),
-                      inset 2px 2px 4px rgba(0,0,0,0.6),
-                      0 0 8px rgba(255,215,0,0.4)
-                    ` : `
-                      1px 1px 0 rgba(255,255,255,0.2),
-                      -1px -1px 0 rgba(0,0,0,0.7),
-                      -2px -2px 0 rgba(0,0,0,0.5),
-                      inset 2px 2px 4px rgba(0,0,0,0.6),
-                      0 0 6px rgba(192,192,192,0.3)
-                    `,
-                    filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.4))'
-                  }}
-                >
-                  {isActiveBoardMember ? 'BESTUURSLID' : 'STEMGERECHTIGD'}
-                </span>
+                {isActiveBoardMember ? (
+                  <span 
+                    className={`${isConstrained ? 'text-xs' : 'text-base'} uppercase tracking-[0.1em] font-bold mt-3`}
+                    style={{
+                      color: '#FFD700',
+                      textShadow: `
+                        2px 2px 0 rgba(255,255,255,0.3),
+                        -2px -2px 0 rgba(0,0,0,0.8),
+                        -3px -3px 0 rgba(0,0,0,0.6),
+                        inset 2px 2px 4px rgba(0,0,0,0.6),
+                        0 0 8px rgba(255,215,0,0.4)
+                      `,
+                      filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.4))'
+                    }}
+                  >
+                    BESTUURSLID
+                  </span>
+                ) : (
+                  cardData.votingRights && (
+                    <span 
+                      className={`${isConstrained ? 'text-xs' : 'text-base'} uppercase tracking-[0.1em] font-bold mt-3`}
+                      style={{
+                        color: '#C0C0C0',
+                        textShadow: `
+                          1px 1px 0 rgba(255,255,255,0.2),
+                          -1px -1px 0 rgba(0,0,0,0.7),
+                          -2px -2px 0 rgba(0,0,0,0.5),
+                          inset 2px 2px 4px rgba(0,0,0,0.6),
+                          0 0 6px rgba(192,192,192,0.3)
+                        `,
+                        filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.4))'
+                      }}
+                    >
+                      STEMGERECHTIGD
+                    </span>
+                  )
+                )}
                 
                 {/* Secondary text - show voting rights if board member */}
                 {isActiveBoardMember && cardData.votingRights && (

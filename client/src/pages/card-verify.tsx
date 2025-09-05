@@ -179,40 +179,49 @@ function VerificationView({ qrToken }: { qrToken: string }) {
     setShowScanner(false);
   }, []);
 
-  const startScanning = useCallback(async () => {
-    if (!videoRef.current) return;
-    
-    try {
-      setScanning(true);
-      setShowScanner(true);
-      
-      qrScannerRef.current = new QrScanner(
-        videoRef.current,
-        (result) => {
-          const qrCodeText = result.data;
-          // Support both old and new URL patterns
-          const urlMatch = qrCodeText.match(/\/card\/(?:verify\/)?([a-f0-9]+)/);
-          if (urlMatch && urlMatch[1]) {
-            const newToken = urlMatch[1];
-            stopScanning();
-            window.location.href = `/card/verify/${newToken}`;
-          }
-        },
-        {
-          returnDetailedScanResult: true,
-          highlightScanRegion: true,
-          highlightCodeOutline: true,
+  const startScanning = useCallback(() => {
+    console.log('Starting QR scanner...');
+    setShowScanner(true);
+  }, []);
+
+  // Initialize scanner when modal opens
+  useEffect(() => {
+    if (showScanner && videoRef.current && !qrScannerRef.current) {
+      console.log('Initializing QR scanner with video element:', videoRef.current);
+      const initScanner = async () => {
+        try {
+          setScanning(true);
+          
+          qrScannerRef.current = new QrScanner(
+            videoRef.current!,
+            (result) => {
+              const qrCodeText = result.data;
+              // Support both old and new URL patterns
+              const urlMatch = qrCodeText.match(/\/card\/(?:verify\/)?([a-f0-9]+)/);
+              if (urlMatch && urlMatch[1]) {
+                const newToken = urlMatch[1];
+                stopScanning();
+                window.location.href = `/card/verify/${newToken}`;
+              }
+            },
+            {
+              returnDetailedScanResult: true,
+              highlightScanRegion: true,
+              highlightCodeOutline: true,
+            }
+          );
+          
+          await qrScannerRef.current.start();
+        } catch (err) {
+          console.error('Failed to start QR scanner:', err);
+          setScanning(false);
+          setShowScanner(false);
         }
-      );
-      
-      await qrScannerRef.current.start();
-      setScanning(true);
-    } catch (err) {
-      console.error('Failed to start QR scanner:', err);
-      setScanning(false);
-      setShowScanner(false);
+      };
+
+      initScanner();
     }
-  }, [stopScanning]);
+  }, [showScanner, stopScanning]);
 
   // Check for existing auth on load
   useEffect(() => {

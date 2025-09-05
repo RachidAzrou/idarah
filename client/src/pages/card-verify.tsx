@@ -330,10 +330,12 @@ function VerificationView({ qrToken }: { qrToken: string }) {
               <CardTitle className="flex items-center gap-2">
                 {data.status === 'ACTUEEL' ? (
                   <CheckCircle className="h-5 w-5 text-green-500" />
+                ) : data.status === 'NIET_ACTUEEL' ? (
+                  <AlertTriangle className="h-5 w-5 text-orange-500" />
                 ) : (
                   <XCircle className="h-5 w-5 text-red-500" />
                 )}
-                Verificatie {data.status === 'ACTUEEL' ? 'Gelukt' : 'Mislukt'}
+                Verificatie {data.status === 'ACTUEEL' ? 'Gelukt' : data.status === 'NIET_ACTUEEL' ? 'Gelukt (Niet actueel)' : 'Mislukt'}
               </CardTitle>
               <StatusBadge status={data.status || 'UNKNOWN'} />
             </div>

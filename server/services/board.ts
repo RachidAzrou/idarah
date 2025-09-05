@@ -133,17 +133,21 @@ export class BoardService {
     return result[0] || null;
   }
 
-  async getBoardMemberByMemberId(tenantId: string, memberId: string) {
+  async getBoardMemberByMemberId(tenantId: string | null, memberId: string) {
+    const whereConditions = [eq(boardMembers.memberId, memberId)];
+    
+    // Only add tenant filter if tenantId is provided (for authenticated requests)
+    if (tenantId) {
+      whereConditions.push(eq(boardMembers.tenantId, tenantId));
+    }
+
     const result = await db.select({
       boardMember: boardMembers,
       member: members,
     })
     .from(boardMembers)
     .leftJoin(members, eq(boardMembers.memberId, members.id))
-    .where(and(
-      eq(boardMembers.tenantId, tenantId),
-      eq(boardMembers.memberId, memberId)
-    ))
+    .where(and(...whereConditions))
     .limit(1);
 
     return result[0] || null;

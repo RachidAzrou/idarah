@@ -1830,6 +1830,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Public board member status endpoint (no auth required)
+  app.get('/api/public/board-status/:memberId', async (req, res) => {
+    try {
+      const memberId = req.params.memberId;
+      
+      if (!memberId) {
+        return res.status(400).json({ error: "Member ID vereist" });
+      }
+
+      // Get board member status for the given member
+      const boardMember = await boardService.getBoardMemberByMemberId(null, memberId);
+      
+      if (!boardMember) {
+        return res.json({ isActiveBoardMember: false });
+      }
+
+      res.json({
+        isActiveBoardMember: boardMember.boardMember?.status === 'ACTIEF',
+        role: boardMember.boardMember?.role
+      });
+    } catch (error) {
+      console.error('Error fetching public board member status:', error);
+      res.status(500).json({ error: "Fout bij ophalen bestuursstatus" });
+    }
+  });
+
   // Board member endpoints
   app.get('/api/board/members', authMiddleware, async (req: AuthenticatedRequest, res) => {
     try {

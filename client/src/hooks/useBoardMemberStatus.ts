@@ -1,26 +1,25 @@
 import { useQuery } from "@tanstack/react-query";
 
 export function useBoardMemberStatus(memberId?: string) {
-  const { data: boardMember } = useQuery({
-    queryKey: ["/api/board/members", "by-member", memberId],
+  const { data: boardStatus } = useQuery({
+    queryKey: ["/api/public/board-status", memberId],
     enabled: !!memberId,
     staleTime: 30000, // Cache for 30 seconds
-    // Custom query function since we need a different API call structure
+    // Use public endpoint that doesn't require authentication
     queryFn: async () => {
-      const response = await fetch(`/api/board/members?memberId=${memberId}`);
+      const response = await fetch(`/api/public/board-status/${memberId}`);
       if (!response.ok) {
-        if (response.status === 404) return null;
+        if (response.status === 404) return { isActiveBoardMember: false };
         throw new Error('Failed to fetch board member status');
       }
-      const data = await response.json();
-      return data.length > 0 ? data[0] : null;
+      return response.json();
     }
   });
 
   return {
-    isActiveBoardMember: boardMember?.boardMember?.status === 'ACTIEF',
-    boardMemberRole: boardMember?.boardMember?.role,
-    boardMember: boardMember?.boardMember,
+    isActiveBoardMember: boardStatus?.isActiveBoardMember || false,
+    boardMemberRole: boardStatus?.role,
+    boardMember: boardStatus,
   };
 }
 

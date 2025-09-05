@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils";
 import { MembershipCard } from "@/components/card/MembershipCard";
 import { QuickAuthModal } from "@/components/auth/quick-auth-modal";
 import QrScanner from "qr-scanner";
+import backgroundImage from "@assets/Luxury Navy Background_1757015851301.jpg";
 
 interface CardVerificationData {
   isValid: boolean;
@@ -40,28 +41,31 @@ interface CardVerificationData {
   };
 }
 
+const STATUS_CONFIG = {
+  ACTUEEL: {
+    label: "Actueel",
+    color: "bg-green-100 text-green-800 border-green-200",
+    icon: CheckCircle
+  },
+  VERLOPEN: {
+    label: "Verlopen", 
+    color: "bg-red-100 text-red-800 border-red-200",
+    icon: XCircle
+  },
+  INGETROKKEN: {
+    label: "Ingetrokken",
+    color: "bg-gray-100 text-gray-800 border-gray-200", 
+    icon: XCircle
+  },
+  UNKNOWN: {
+    label: "Onbekend",
+    color: "bg-yellow-100 text-yellow-800 border-yellow-200",
+    icon: AlertTriangle
+  }
+} as const;
+
 function StatusBadge({ status }: { status: string }) {
-  const statusConfig = {
-    ACTUEEL: {
-      color: 'bg-green-500 text-white',
-      icon: CheckCircle,
-      label: 'Actueel',
-    },
-    NIET_ACTUEEL: {
-      color: 'bg-orange-500 text-white',
-      icon: AlertTriangle,
-      label: 'Niet actueel',
-    },
-    VERLOPEN: {
-      color: 'bg-red-500 text-white',
-      icon: XCircle,
-      label: 'Verlopen',
-    },
-  };
-
-  const config = statusConfig[status as keyof typeof statusConfig];
-  if (!config) return null;
-
+  const config = STATUS_CONFIG[status as keyof typeof STATUS_CONFIG] || STATUS_CONFIG.UNKNOWN;
   const Icon = config.icon;
 
   return (
@@ -184,71 +188,30 @@ function VerificationView({ qrToken }: { qrToken: string }) {
       );
       
       await qrScannerRef.current.start();
-    } catch (error) {
-      console.error('Failed to start QR scanner:', error);
+      setScanning(true);
+    } catch (err) {
+      console.error('Failed to start QR scanner:', err);
       setScanning(false);
       setShowScanner(false);
     }
   }, [stopScanning]);
 
-  // Auth check effect - runs once on mount
+  // Check for existing auth on load
   useEffect(() => {
-    const verifyToken = sessionStorage.getItem('qr_verify_token');
+    const token = sessionStorage.getItem('qr_verify_token');
     const userJson = sessionStorage.getItem('qr_verify_user');
     
-    if (verifyToken && userJson) {
-      try {
-        const user = JSON.parse(userJson);
-        const authenticatedAt = new Date(user.authenticatedAt);
-        const now = new Date();
-        const hoursPassed = (now.getTime() - authenticatedAt.getTime()) / (1000 * 60 * 60);
-        
-        if (hoursPassed < 2) {
-          setIsAuthenticated(true);
-          setAuthUser(user);
-          setAuthChecked(true);
-          fetchData();
-        } else {
-          sessionStorage.removeItem('qr_verify_token');
-          sessionStorage.removeItem('qr_verify_user');
-          setShowAuthModal(true);
-          setAuthChecked(true);
-          setLoading(false);
-        }
-      } catch {
-        setShowAuthModal(true);
-        setAuthChecked(true);
-        setLoading(false);
-      }
+    if (token && userJson) {
+      setIsAuthenticated(true);
+      setAuthUser(JSON.parse(userJson));
+      fetchData();
     } else {
+      setIsAuthenticated(false);
       setShowAuthModal(true);
-      setAuthChecked(true);
       setLoading(false);
     }
+    setAuthChecked(true);
   }, [fetchData]);
-
-  // Window focus handlers - always runs, but only acts when authenticated
-  useEffect(() => {
-    const handleFocus = () => {
-      if (isAuthenticated && !loading && !refreshing) {
-        fetchData(true);
-      }
-    };
-    
-    const handleVisibilityChange = () => {
-      if (isAuthenticated && document.visibilityState === 'visible' && !loading && !refreshing) {
-        fetchData(true);
-      }
-    };
-
-    window.addEventListener('focus', handleFocus);
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    
-    return () => {
-      window.removeEventListener('focus', handleFocus);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [isAuthenticated, loading, refreshing, fetchData]);
 
   // Cleanup scanner on unmount
   useEffect(() => {
@@ -257,41 +220,34 @@ function VerificationView({ qrToken }: { qrToken: string }) {
     };
   }, [stopScanning]);
 
-  // CONDITIONAL RENDERING ONLY AFTER ALL HOOKS
-  if (!authChecked) {
-    return (
-      <div className="flex items-center justify-center min-h-64">
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <RefreshCw className="h-5 w-5 animate-spin" />
-          Verificatie initialiseren...
-        </div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
+  // Show auth modal if not authenticated
+  if (!authChecked || (!isAuthenticated && showAuthModal)) {
     return (
       <QuickAuthModal
         isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
         onAuthenticated={handleAuthenticated}
+        purpose="QR Code Verificatie"
+        description="Log in om QR codes van lidkaarten te verifiëren"
       />
     );
   }
 
-  if (loading && !data) {
+  if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-64">
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <RefreshCw className="h-5 w-5 animate-spin" />
-          Verificatie laden...
-        </div>
-      </div>
+      <Card className="w-full max-w-4xl mx-auto">
+        <CardContent className="pt-6">
+          <div className="flex items-center justify-center py-12">
+            <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
   if (error) {
     return (
-      <Card className="max-w-md mx-auto">
+      <Card className="w-full max-w-4xl mx-auto">
         <CardContent className="pt-6">
           <div className="text-center space-y-4">
             <XCircle className="h-12 w-12 text-red-500 mx-auto" />
@@ -315,7 +271,7 @@ function VerificationView({ qrToken }: { qrToken: string }) {
 
   if (!data) {
     return (
-      <Card className="max-w-md mx-auto">
+      <Card className="w-full max-w-4xl mx-auto">
         <CardContent className="pt-6">
           <div className="text-center space-y-4">
             <AlertTriangle className="h-12 w-12 text-yellow-500 mx-auto" />
@@ -330,33 +286,34 @@ function VerificationView({ qrToken }: { qrToken: string }) {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Lidkaart Verificatie</h1>
-          <p className="text-muted-foreground">Controle van digitale lidkaart</p>
+    <Card className="w-full max-w-4xl mx-auto">
+      <CardHeader>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <CardTitle className="text-2xl font-bold">Lidkaart Verificatie</CardTitle>
+            <p className="text-muted-foreground">Controle van digitale lidkaart</p>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            {authUser && (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <User className="h-4 w-4" />
+                {authUser.name}
+              </div>
+            )}
+            <Button
+              onClick={handleLogout}
+              variant="outline"
+              size="sm"
+            >
+              Uitloggen
+            </Button>
+          </div>
         </div>
-        
-        <div className="flex items-center gap-2">
-          {authUser && (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <User className="h-4 w-4" />
-              {authUser.name}
-            </div>
-          )}
-          <Button
-            onClick={handleLogout}
-            variant="outline"
-            size="sm"
-          >
-            Uitloggen
-          </Button>
-        </div>
-      </div>
-
-      {/* Verification Result */}
-      <div className="space-y-6">
+      </CardHeader>
+      
+      <CardContent className="space-y-6">
+        {/* Verification Result */}
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
@@ -444,8 +401,8 @@ function VerificationView({ qrToken }: { qrToken: string }) {
         {/* QR Scanner Modal */}
         {showScanner && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-background rounded-lg p-6 max-w-sm w-full mx-4">
-              <div className="space-y-4">
+            <Card className="max-w-sm w-full mx-4">
+              <CardContent className="p-6 space-y-4">
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg font-semibold">QR Code Scannen</h3>
                   <Button
@@ -475,12 +432,12 @@ function VerificationView({ qrToken }: { qrToken: string }) {
                 <p className="text-sm text-muted-foreground text-center">
                   Richt de camera op een QR code om een andere lidkaart te verifiëren
                 </p>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           </div>
         )}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -488,21 +445,36 @@ export default function CardVerifyPage() {
   const [, params] = useRoute("/card/verify/:qrToken");
   const qrToken = params?.qrToken;
 
-  if (!qrToken) {
-    return (
-      <Card className="max-w-md mx-auto mt-8">
-        <CardContent className="pt-6">
-          <div className="text-center space-y-4">
-            <QrCode className="h-12 w-12 text-muted-foreground mx-auto" />
-            <div>
-              <h3 className="font-semibold text-lg">Ongeldige QR Code</h3>
-              <p className="text-muted-foreground mt-1">De QR code kon niet worden gelezen.</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  return <VerificationView qrToken={qrToken} />;
+  return (
+    <div 
+      className="min-h-screen flex items-center justify-center p-4"
+      style={{
+        backgroundImage: `url("${backgroundImage}")`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      {/* Background overlay */}
+      <div className="absolute inset-0 bg-black/30"></div>
+      
+      <div className="relative z-10 w-full max-w-4xl">
+        {!qrToken ? (
+          <Card className="max-w-md mx-auto">
+            <CardContent className="pt-6">
+              <div className="text-center space-y-4">
+                <QrCode className="h-12 w-12 text-muted-foreground mx-auto" />
+                <div>
+                  <h3 className="font-semibold text-lg">Ongeldige QR Code</h3>
+                  <p className="text-muted-foreground mt-1">De QR code kon niet worden gelezen.</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <VerificationView qrToken={qrToken} />
+        )}
+      </div>
+    </div>
+  );
 }

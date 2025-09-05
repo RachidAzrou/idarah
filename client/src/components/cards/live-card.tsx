@@ -7,6 +7,8 @@ import { RefreshCw, Wifi, WifiOff, Clock } from "lucide-react";
 import { PiUserCircleCheckLight } from "react-icons/pi";
 import { cn } from "@/lib/utils";
 import { BoardMemberBadge } from "@/components/ui/board-member-badge";
+import { useBoardMemberStatus } from "@/hooks/useBoardMemberStatus";
+import { Crown } from "lucide-react";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 import type { Member, CardMeta, Tenant } from "@shared/schema";
@@ -93,6 +95,9 @@ export function LiveCard({
   const [isInstallable, setIsInstallable] = useState(false);
   const [isFlipping, setIsFlipping] = useState(false);
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
+  
+  // Check board member status
+  const { isActiveBoardMember } = useBoardMemberStatus(member.id);
 
   // Check for PWA installability and reduced motion
   useEffect(() => {
@@ -287,32 +292,63 @@ export function LiveCard({
                 </div>
               </button>
               
-              {/* Voting Rights Badge - Right side */}
-              {member.votingRights && (
+              {/* Status Badge - Right side (Board Member takes priority over Voting Rights) */}
+              {(isActiveBoardMember || member.votingRights) && (
                 <div className="flex flex-col items-center mr-8">
-                  <PiUserCircleCheckLight 
-                    className="w-[clamp(36px, 5vmin, 48px)] h-[clamp(36px, 5vmin, 48px)]"
-                    data-testid="voting-icon"
-                    style={{
-                      color: '#C0C0C0',
-                      textShadow: `
-                        3px 3px 0 rgba(255,255,255,0.3),
-                        -3px -3px 0 rgba(0,0,0,0.9),
-                        -4px -4px 0 rgba(0,0,0,0.8),
-                        -5px -5px 0 rgba(0,0,0,0.6),
-                        -6px -6px 0 rgba(0,0,0,0.4),
-                        -7px -7px 0 rgba(0,0,0,0.2),
-                        inset 4px 4px 8px rgba(0,0,0,0.8),
-                        inset -2px -2px 4px rgba(192,192,192,0.2),
-                        0 0 12px rgba(192,192,192,0.4),
-                        0 0 20px rgba(192,192,192,0.2)
-                      `,
-                      filter: 'drop-shadow(3px 3px 8px rgba(0,0,0,0.6)) brightness(1.2)'
-                    }}
-                  />
+                  {isActiveBoardMember ? (
+                    <Crown 
+                      className="w-[clamp(36px, 5vmin, 48px)] h-[clamp(36px, 5vmin, 48px)]"
+                      data-testid="board-member-icon"
+                      style={{
+                        color: '#FFD700',
+                        textShadow: `
+                          3px 3px 0 rgba(255,255,255,0.3),
+                          -3px -3px 0 rgba(0,0,0,0.9),
+                          -4px -4px 0 rgba(0,0,0,0.8),
+                          -5px -5px 0 rgba(0,0,0,0.6),
+                          -6px -6px 0 rgba(0,0,0,0.4),
+                          -7px -7px 0 rgba(0,0,0,0.2),
+                          inset 4px 4px 8px rgba(0,0,0,0.8),
+                          inset -2px -2px 4px rgba(255,215,0,0.2),
+                          0 0 12px rgba(255,215,0,0.4),
+                          0 0 20px rgba(255,215,0,0.2)
+                        `,
+                        filter: 'drop-shadow(3px 3px 8px rgba(0,0,0,0.6)) brightness(1.2)'
+                      }}
+                    />
+                  ) : (
+                    <PiUserCircleCheckLight 
+                      className="w-[clamp(36px, 5vmin, 48px)] h-[clamp(36px, 5vmin, 48px)]"
+                      data-testid="voting-icon"
+                      style={{
+                        color: '#C0C0C0',
+                        textShadow: `
+                          3px 3px 0 rgba(255,255,255,0.3),
+                          -3px -3px 0 rgba(0,0,0,0.9),
+                          -4px -4px 0 rgba(0,0,0,0.8),
+                          -5px -5px 0 rgba(0,0,0,0.6),
+                          -6px -6px 0 rgba(0,0,0,0.4),
+                          -7px -7px 0 rgba(0,0,0,0.2),
+                          inset 4px 4px 8px rgba(0,0,0,0.8),
+                          inset -2px -2px 4px rgba(192,192,192,0.2),
+                          0 0 12px rgba(192,192,192,0.4),
+                          0 0 20px rgba(192,192,192,0.2)
+                        `,
+                        filter: 'drop-shadow(3px 3px 8px rgba(0,0,0,0.6)) brightness(1.2)'
+                      }}
+                    />
+                  )}
+                  
+                  {/* Primary text */}
                   <span className="embossed-text text-[clamp(10px, 1.2vmin, 14px)] uppercase tracking-[0.1em] font-bold mt-3" style={{
-                    color: '#C0C0C0',
-                    textShadow: `
+                    color: isActiveBoardMember ? '#FFD700' : '#C0C0C0',
+                    textShadow: isActiveBoardMember ? `
+                      2px 2px 0 rgba(255,255,255,0.3),
+                      -2px -2px 0 rgba(0,0,0,0.8),
+                      -3px -3px 0 rgba(0,0,0,0.6),
+                      inset 2px 2px 4px rgba(0,0,0,0.6),
+                      0 0 8px rgba(255,215,0,0.4)
+                    ` : `
                       1px 1px 0 rgba(255,255,255,0.2),
                       -1px -1px 0 rgba(0,0,0,0.7),
                       -2px -2px 0 rgba(0,0,0,0.5),
@@ -321,8 +357,25 @@ export function LiveCard({
                     `,
                     filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.4))'
                   }}>
-                    STEMGERECHTIGD
+                    {isActiveBoardMember ? 'BESTUURSLID' : 'STEMGERECHTIGD'}
                   </span>
+                  
+                  {/* Secondary text - show voting rights if board member */}
+                  {isActiveBoardMember && member.votingRights && (
+                    <span className="embossed-text text-[clamp(8px, 1.0vmin, 12px)] uppercase tracking-[0.1em] font-bold mt-1" style={{
+                      color: '#C0C0C0',
+                      textShadow: `
+                        1px 1px 0 rgba(255,255,255,0.2),
+                        -1px -1px 0 rgba(0,0,0,0.7),
+                        -2px -2px 0 rgba(0,0,0,0.5),
+                        inset 2px 2px 4px rgba(0,0,0,0.6),
+                        0 0 6px rgba(192,192,192,0.3)
+                      `,
+                      filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.4))'
+                    }}>
+                      STEMGERECHTIGD
+                    </span>
+                  )}
                 </div>
               )}
             </div>

@@ -42,12 +42,12 @@ export default function Sidebar() {
   const sidebarContent = (
     <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-sidebar border-r border-sidebar-border">
       {/* Logo */}
-      <div className="flex h-16 shrink-0 items-center px-4" data-testid="logo">
-        <Link href="/dashboard" className="flex items-center -ml-2">
+      <div className="flex h-16 shrink-0 items-center px-2" data-testid="logo">
+        <Link href="/dashboard" className="flex items-center -ml-4">
           <img 
             src={darahLogo} 
             alt="DARAH Logo" 
-            className="w-44 h-10 sm:w-48 sm:h-12 lg:w-52 lg:h-14 object-cover object-left"
+            className="w-40 h-9 sm:w-44 sm:h-10 lg:w-48 lg:h-11 object-cover object-left"
           />
         </Link>
       </div>

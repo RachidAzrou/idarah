@@ -305,7 +305,11 @@ export default function LidkaartenPage() {
 
 
   const handleViewCard = (member: Member) => {
-    const cardUrl = `/card/${member.id}`;
+    // Use development URL when in development mode, production URL otherwise
+    const isDevelopment = window.location.hostname === 'localhost' || window.location.port === '5000';
+    const cardUrl = isDevelopment 
+      ? `/card/${member.id}`
+      : `${window.location.origin}/card/${member.id}`;
     // Open in new tab/window for PWA installation
     window.open(cardUrl, '_blank');
   };

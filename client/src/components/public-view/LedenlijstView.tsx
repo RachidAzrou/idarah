@@ -137,7 +137,7 @@ export function LedenlijstView({ config, members = [] }: LedenlijstViewProps) {
 
   return (
     <div 
-      className="min-h-screen p-8 relative"
+      className="min-h-screen p-8 relative font-sans"
       style={{
         backgroundImage: `url("${backgroundImage}")`,
         backgroundSize: 'cover',
@@ -145,11 +145,11 @@ export function LedenlijstView({ config, members = [] }: LedenlijstViewProps) {
         backgroundRepeat: 'no-repeat'
       }}
     >
-      {/* Background overlay - softer and not too bright */}
-      <div className="absolute inset-0 bg-gray-100/80"></div>
+      {/* Modern glassmorphism background overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/90 via-white/85 to-blue-100/90 backdrop-blur-sm"></div>
       {/* Header */}
       <div className="text-center mb-12 relative z-10">
-        <div className="bg-white rounded-2xl p-8 border border-gray-200" style={{ boxShadow: '0 6px 16px rgba(2,6,23,0.08)' }}>
+        <div className="glassmorphism-card p-8 border border-white/30">
           <h1
             style={{
               fontSize: `${config.title.fontSize}px`,
@@ -184,25 +184,25 @@ export function LedenlijstView({ config, members = [] }: LedenlijstViewProps) {
 
       {/* Tabel */}
       <div className="w-full relative z-10">
-        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden" style={{ boxShadow: '0 6px 16px rgba(2,6,23,0.08)' }}>
+        <div className="glassmorphism-card border border-white/30 overflow-hidden">
           <table className="w-full">
             <thead>
-              <tr className="bg-gray-50 border-b border-gray-200">
-                <th className="px-6 py-3 text-left font-semibold text-blue-900 text-xs uppercase tracking-wider">
+              <tr className="bg-gradient-to-r from-blue-50/80 to-blue-100/60 border-b border-blue-200/50 backdrop-blur-sm">
+                <th className="px-6 py-4 text-left font-semibold text-blue-900 text-sm uppercase tracking-wider">
                   Lidnr.
                 </th>
-                <th className="px-6 py-3 text-left font-semibold text-blue-900 text-xs uppercase tracking-wider">
+                <th className="px-6 py-4 text-left font-semibold text-blue-900 text-sm uppercase tracking-wider">
                   Naam
                 </th>
                 {config.display.showVotingRights && (
-                  <th className="px-4 py-3 text-center font-semibold text-blue-900 text-xs uppercase tracking-wider">
+                  <th className="px-4 py-4 text-center font-semibold text-blue-900 text-sm uppercase tracking-wider">
                     Stemrecht
                   </th>
                 )}
                 {monthNames.map((month, index) => (
                   <th
                     key={month}
-                    className="px-3 py-3 text-center font-semibold text-blue-900 text-xs uppercase tracking-wider min-w-[50px]"
+                    className="px-3 py-4 text-center font-semibold text-blue-900 text-sm uppercase tracking-wider min-w-[60px]"
                   >
                     {month}
                   </th>
@@ -211,18 +211,18 @@ export function LedenlijstView({ config, members = [] }: LedenlijstViewProps) {
             </thead>
             <tbody>
               {currentMembers.map((member, memberIndex) => (
-                <tr key={member.id} className="hover:bg-blue-50/50 border-b border-blue-100 last:border-0 transition-all duration-200">
-                  <td className="px-6 py-3 font-mono text-xs text-slate-500">
+                <tr key={member.id} className="hover:bg-gradient-to-r hover:from-blue-50/80 hover:to-blue-100/60 border-b border-blue-100/50 last:border-0 transition-all duration-300 backdrop-blur-sm">
+                  <td className="px-6 py-4 font-mono text-sm text-slate-600 font-medium">
                     {member.lidnummer}
                   </td>
-                  <td className="px-6 py-3 text-blue-900 font-medium text-sm">
+                  <td className="px-6 py-4 text-blue-900 font-semibold text-base">
                     {getMemberDisplayName(member, {
                       useFullNames: config.display.useFullNames,
                       useInitials: config.display.useInitials
                     })}
                   </td>
                   {config.display.showVotingRights && (
-                    <td className="px-4 py-3 text-center">
+                    <td className="px-4 py-4 text-center">
                       {member.stemrecht && (
                         <Vote className="w-5 h-5 text-primary mx-auto" />
                       )}
@@ -235,16 +235,18 @@ export function LedenlijstView({ config, members = [] }: LedenlijstViewProps) {
                     return (
                       <td
                         key={month}
-                        className="px-3 py-3 text-center"
+                        className="px-3 py-4 text-center"
                       >
                         <div
-                          className={`w-6 h-6 rounded-md mx-auto transition-all duration-200 shadow-sm ${
-                            status === 'betaald' ? 'bg-emerald-400 border-2 border-emerald-500' :
-                            status === 'vervallen' ? 'bg-red-400 border-2 border-red-500' :
-                            'bg-slate-300 border-2 border-slate-400'
-                          }`}
+                          className={`w-8 h-8 rounded-xl mx-auto transition-all duration-300 shadow-lg flex items-center justify-center ${
+                            status === 'betaald' ? 'bg-gradient-to-br from-emerald-400 to-emerald-500 border-2 border-emerald-300' :
+                            status === 'vervallen' ? 'bg-gradient-to-br from-red-400 to-red-500 border-2 border-red-300' :
+                            'bg-gradient-to-br from-slate-300 to-slate-400 border-2 border-slate-200'
+                          } hover:scale-110 hover:shadow-xl`}
                           title={`${month}: ${status}`}
-                        ></div>
+                        >
+                          {getPaymentStatusIcon(status)}
+                        </div>
                       </td>
                     );
                   })}
@@ -257,24 +259,24 @@ export function LedenlijstView({ config, members = [] }: LedenlijstViewProps) {
         {/* Paginering info */}
         {totalPages > 1 && (
           <div className="mt-8 flex justify-center relative z-10">
-            <div className="bg-white/95 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-slate-200/50">
+            <div className="glassmorphism-card p-6 border border-white/30">
               <div className="flex justify-center items-center gap-3 mb-4">
                 {Array.from({ length: totalPages }, (_, i) => (
                   <div
                     key={i}
-                    className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                    className={`w-4 h-4 rounded-full transition-all duration-300 shadow-md ${
                       i === currentPage 
-                        ? 'bg-blue-600 scale-125' 
-                        : 'bg-blue-200'
+                        ? 'bg-gradient-to-br from-blue-500 to-blue-600 scale-125 shadow-lg' 
+                        : 'bg-gradient-to-br from-blue-200 to-blue-300 hover:scale-110'
                     }`}
                   />
                 ))}
               </div>
               <div className="text-center">
-                <p className="text-slate-700 font-semibold text-lg">
+                <p className="text-slate-800 font-bold text-xl">
                   Pagina {currentPage + 1} van {totalPages}
                 </p>
-                <p className="text-slate-500 text-sm mt-1">
+                <p className="text-slate-600 text-base mt-2 font-medium">
                   {filteredMembers.length} leden weergegeven
                 </p>
               </div>

@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { useParams } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { MembershipCard } from "@/components/card/MembershipCard";
+import { LiveCard } from "@/components/cards/live-card";
+import { CardCanvas } from "@/components/card/CardCanvas";
 import { Loader2 } from "lucide-react";
-// Define CardData interface locally for this component
-interface CardData {
+import type { Member, CardMeta, Tenant } from "@shared/schema";
+// Interface for the public card API response
+interface PublicCardData {
   memberId: string;
   firstName: string;
   lastName: string;
@@ -14,7 +16,6 @@ interface CardData {
   status: 'ACTUEEL' | 'NIET_ACTUEEL' | 'VERLOPEN';
   validUntil: Date | null;
   qrToken: string;
-  etag: string;
   tenant: {
     id: string;
     name: string;
@@ -41,7 +42,7 @@ export default function PublicCard() {
   }, []);
 
   // Fetch card data - public endpoint (no auth required)
-  const { data: cardData, isLoading, error, refetch, isRefetching } = useQuery<CardData>({
+  const { data: cardData, isLoading, error, refetch, isRefetching } = useQuery<PublicCardData>({
     queryKey: [`/api/public/card/${memberId}`],
     enabled: !!memberId,
     staleTime: 10 * 1000, // 10 seconds
@@ -88,26 +89,75 @@ export default function PublicCard() {
     );
   }
 
+  // Transform API response to match LiveCard expectations
+  const member: Member = {
+    id: cardData.memberId,
+    firstName: cardData.firstName,
+    lastName: cardData.lastName,
+    memberNumber: cardData.memberNumber,
+    category: cardData.category,
+    votingRights: cardData.votingRights,
+    active: true,
+    tenantId: cardData.tenant.id,
+    email: '',
+    phoneNumber: null,
+    address: null,
+    birthDate: null,
+    joinDate: new Date(),
+    notes: null,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  };
+
+  const cardMeta: CardMeta = {
+    id: '',
+    memberId: cardData.memberId,
+    tenantId: cardData.tenant.id,
+    qrToken: cardData.qrToken,
+    status: cardData.status,
+    validUntil: cardData.validUntil,
+    etag: '',
+    createdAt: new Date(),
+    updatedAt: new Date()
+  };
+
+  const tenant: Tenant = {
+    id: cardData.tenant.id,
+    name: cardData.tenant.name,
+    slug: '',
+    logoUrl: cardData.tenant.logoUrl,
+    primaryColor: '#bb2e2e',
+    description: null,
+    contactEmail: '',
+    contactPhone: null,
+    address: null,
+    website: null,
+    active: true,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div 
-          className="w-full aspect-[1.586/1] max-w-md mx-auto"
-          style={{ minHeight: '300px' }}
-        >
-          <MembershipCard
-            cardData={cardData}
-            onRefresh={handleRefresh}
-            isRefreshing={isRefetching}
-            isOffline={isOffline}
-            className="w-full h-full"
-          />
+      <div className="w-full max-w-5xl">
+        <div className="relative aspect-[16/10] rounded-lg overflow-hidden border border-gray-200">
+          <CardCanvas className="rounded-lg">
+            <LiveCard
+              member={member}
+              cardMeta={cardMeta}
+              tenant={tenant}
+              onRefresh={handleRefresh}
+              isRefreshing={isRefetching}
+              standalone={true}
+              className="h-full w-full"
+            />
+          </CardCanvas>
         </div>
         
         {/* Footer info */}
         <div className="text-center mt-6 text-gray-400">
           <p className="text-sm">
-            Publieke lidkaart weergave • {cardData.tenant.name}
+            Publieke lidkaart weergave • {tenant.name}
           </p>
         </div>
       </div>

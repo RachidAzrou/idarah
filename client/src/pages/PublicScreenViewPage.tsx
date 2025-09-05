@@ -12,6 +12,7 @@ export default function PublicScreenViewPage() {
   const publicToken = params?.publicToken;
   const [screen, setScreen] = useState<PublicScreen | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<{type: string, message: string} | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showControls, setShowControls] = useState(true);
 
@@ -43,11 +44,29 @@ export default function PublicScreenViewPage() {
         if (response.ok) {
           const data = await response.json();
           setScreen(data);
+          setError(null);
         } else {
+          // Handle different error responses
+          if (response.status === 403) {
+            const errorData = await response.json();
+            setError({
+              type: errorData.type || 'UNKNOWN',
+              message: errorData.message || 'Dit scherm is momenteel niet actief'
+            });
+          } else {
+            setError({
+              type: 'NOT_FOUND',
+              message: 'Het opgevraagde scherm bestaat niet of is verwijderd'
+            });
+          }
           setScreen(null);
         }
       } catch (error) {
         console.error('Error loading screen:', error);
+        setError({
+          type: 'CONNECTION_ERROR',
+          message: 'Kan geen verbinding maken met de server'
+        });
         setScreen(null);
       } finally {
         setLoading(false);
@@ -131,6 +150,47 @@ export default function PublicScreenViewPage() {
     );
   }
 
+  if (!screen && error) {
+    // Type-specific error messages
+    const getErrorContent = () => {
+      switch (error.type) {
+        case 'MEDEDELINGEN':
+          return {
+            title: 'Geen actieve mededelingen',
+            message: 'Er zijn momenteel geen mededelingen beschikbaar.'
+          };
+        case 'LEDENLIJST':
+          return {
+            title: 'Geen actieve ledenlijst',
+            message: 'De ledenlijst is momenteel niet beschikbaar.'
+          };
+        case 'NOT_FOUND':
+          return {
+            title: 'Scherm niet gevonden',
+            message: error.message
+          };
+        default:
+          return {
+            title: 'Scherm niet beschikbaar',
+            message: error.message
+          };
+      }
+    };
+
+    const errorContent = getErrorContent();
+    
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
+        <div className="text-center space-y-4">
+          <h1 className="text-2xl font-bold">{errorContent.title}</h1>
+          <p className="text-gray-400">
+            {errorContent.message}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   if (!screen) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
@@ -138,19 +198,6 @@ export default function PublicScreenViewPage() {
           <h1 className="text-2xl font-bold">Scherm niet gevonden</h1>
           <p className="text-gray-400">
             Het opgevraagde scherm bestaat niet of is verwijderd.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!screen.active) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
-        <div className="text-center space-y-4">
-          <h1 className="text-2xl font-bold">Scherm is niet actief</h1>
-          <p className="text-gray-400">
-            Dit scherm is momenteel gedeactiveerd.
           </p>
         </div>
       </div>

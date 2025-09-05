@@ -32,7 +32,11 @@ router.get('/token/:token', async (req, res) => {
     
     // Check if the screen is active
     if (!screen.active) {
-      return res.status(404).json({ error: 'Screen not found' });
+      return res.status(403).json({ 
+        error: 'Screen inactive', 
+        message: 'Dit scherm is momenteel niet actief',
+        type: screen.type 
+      });
     }
     
     // For LEDENLIJST screens, also fetch member and fee data

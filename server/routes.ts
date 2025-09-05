@@ -1143,7 +1143,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return 'VERLOPEN';
     }
     
-    // Check card meta status
+    // Check card meta status - this determines connectivity/sync status
     if (cardMeta.status === 'VERLOPEN') {
       return 'VERLOPEN';
     }
@@ -1152,22 +1152,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return 'NIET_ACTUEEL';
     }
     
-    // Check if current year fees are paid (optional business logic)
-    const currentYear = new Date().getFullYear();
-    const currentYearFees = fees ? fees.filter(fee => {
-      const feeYear = new Date(fee.periodStart).getFullYear();
-      return feeYear === currentYear;
-    }) : [];
-    
-    // If there are current year fees, check if any are paid
-    if (currentYearFees.length > 0) {
-      const hasPaidCurrentYear = currentYearFees.some(fee => fee.status === 'PAID');
-      if (!hasPaidCurrentYear) {
-        return 'NIET_ACTUEEL';
-      }
-    }
-    
-    return 'ACTUEEL';
+    // ACTUEEL/NIET_ACTUEEL is about internet connectivity and database sync only
+    // Not about payment status - return the card's stored status
+    return cardMeta.status || 'ACTUEEL';
   }
 
   // Public card data API (JSON)

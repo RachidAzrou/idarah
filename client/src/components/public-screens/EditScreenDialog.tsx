@@ -267,7 +267,7 @@ export function EditScreenDialog({ screen, open, onOpenChange }: EditScreenDialo
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-6xl h-[95vh] flex flex-col" data-testid="edit-screen-dialog">
+      <DialogContent className="max-w-6xl h-[95vh] flex flex-col !bg-white" data-testid="edit-screen-dialog">
         <DialogHeader className="flex-shrink-0 pb-6 border-b border-border">
           <DialogTitle className="flex items-center gap-3 text-xl">
             <Edit className="h-6 w-6" />

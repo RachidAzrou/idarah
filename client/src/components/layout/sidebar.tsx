@@ -63,7 +63,7 @@ export default function Sidebar() {
                 </div>
                 <div className="min-w-0 flex-1 text-left">
                   <p className="text-sm font-medium text-sidebar-foreground" data-testid="user-name">{user.name}</p>
-                  <p className="text-xs text-sidebar-foreground/70 font-medium" data-testid="user-role">{user.role}</p>
+                  <p className="text-xs text-blue-600 font-medium" data-testid="user-role">{user.role}</p>
                 </div>
               </Button>
             </DropdownMenuTrigger>

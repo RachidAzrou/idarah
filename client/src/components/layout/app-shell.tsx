@@ -10,7 +10,7 @@ export default function AppShell({ children }: AppShellProps) {
     <div className="min-h-screen bg-background">
       <Sidebar />
       <main className="lg:pl-64">
-        <div className="px-4 py-6 sm:px-6 lg:px-8">
+        <div className="px-4 py-3 sm:px-6 lg:px-8">
           {children}
         </div>
       </main>

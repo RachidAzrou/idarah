@@ -12,15 +12,16 @@ import { Link } from "wouter";
 
 export default function Dashboard() {
   return (
-        <main className="flex-1 py-4">
-          <div className="px-4 sm:px-6 lg:px-8 w-full">
-            {/* Page Header */}
-            <div className="border-b border-gray-200 pb-5 mb-6">
-              <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent tracking-tight" data-testid="page-title">Dashboard</h1>
-                <p className="mt-2 text-sm text-gray-600 font-medium">Overzicht van jouw moskee ledenbeheer</p>
-              </div>
+        <main className="flex-1">
+          {/* Fixed Page Header */}
+          <div className="sticky top-0 z-30 bg-background border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-3">
+            <div>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent tracking-tight" data-testid="page-title">Dashboard</h1>
+              <p className="mt-1 text-sm text-gray-600 font-medium">Overzicht van jouw moskee ledenbeheer</p>
             </div>
+          </div>
+          
+          <div className="px-4 sm:px-6 lg:px-8 w-full pt-4">
 
             {/* KPI Cards - 6 kaarten in een grid */}
             <ModernKpiCards />

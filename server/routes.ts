@@ -101,6 +101,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ user: req.user });
   });
 
+  // Password reset route
+  app.post("/api/auth/reset-password", async (req, res) => {
+    try {
+      const { email } = z.object({
+        email: z.string().email()
+      }).parse(req.body);
+
+      const result = await authService.resetPassword(email);
+      
+      if (!result.success) {
+        return res.status(404).json({ message: result.message });
+      }
+
+      res.json({ message: "Een nieuw wachtwoord is verzonden naar uw e-mailadres." });
+    } catch (error) {
+      console.error("Password reset error:", error);
+      res.status(400).json({ message: "Ongeldig e-mailadres" });
+    }
+  });
+
   // Quick authentication for QR verification
   app.post("/api/auth/quick-verify", async (req, res) => {
     try {

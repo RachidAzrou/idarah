@@ -1,3 +1,84 @@
+import { MailService } from '@sendgrid/mail';
+
+const mailService = new MailService();
+
+// Initialize with API key if available
+if (process.env.SENDGRID_API_KEY) {
+  mailService.setApiKey(process.env.SENDGRID_API_KEY);
+}
+
+interface EmailParams {
+  to: string;
+  from: string;
+  subject: string;
+  text?: string;
+  html?: string;
+}
+
+export async function sendEmail(params: EmailParams): Promise<boolean> {
+  try {
+    if (!process.env.SENDGRID_API_KEY) {
+      console.log("SendGrid API key not configured - email would be sent to:", params.to);
+      console.log("Subject:", params.subject);
+      console.log("Content:", params.text || params.html);
+      return true; // Return success for development
+    }
+
+    await mailService.send({
+      to: params.to,
+      from: params.from,
+      subject: params.subject,
+      text: params.text,
+      html: params.html,
+    });
+    
+    console.log("Email sent successfully to:", params.to);
+    return true;
+  } catch (error) {
+    console.error('SendGrid email error:', error);
+    return false;
+  }
+}
+
+export function generatePasswordResetEmail(newPassword: string, userEmail: string) {
+  const subject = "Uw nieuwe wachtwoord - IDARAH Ledenbeheer";
+  
+  const text = `
+Hallo,
+
+U heeft een nieuw wachtwoord aangevraagd voor uw IDARAH Ledenbeheer account.
+
+Uw nieuwe wachtwoord is: ${newPassword}
+
+Log in op het systeem met dit nieuwe wachtwoord. We raden u aan om uw wachtwoord te wijzigen na het inloggen.
+
+Met vriendelijke groet,
+Het IDARAH team
+  `;
+
+  const html = `
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+  <h2 style="color: #333;">Uw nieuwe wachtwoord</h2>
+  
+  <p>Hallo,</p>
+  
+  <p>U heeft een nieuw wachtwoord aangevraagd voor uw IDARAH Ledenbeheer account.</p>
+  
+  <div style="background-color: #f8f9fa; padding: 20px; border-radius: 5px; margin: 20px 0;">
+    <strong>Uw nieuwe wachtwoord is: </strong>
+    <code style="background-color: #e9ecef; padding: 4px 8px; border-radius: 3px; font-size: 16px;">${newPassword}</code>
+  </div>
+  
+  <p>Log in op het systeem met dit nieuwe wachtwoord. We raden u aan om uw wachtwoord te wijzigen na het inloggen.</p>
+  
+  <p>Met vriendelijke groet,<br>Het IDARAH team</p>
+</div>
+  `;
+
+  return { subject, text, html };
+}
+
+// Original email service implementation continues below...
 import { db } from "../db";
 import { 
   emailTemplates, 

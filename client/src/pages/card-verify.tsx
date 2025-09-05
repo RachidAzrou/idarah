@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -85,7 +85,7 @@ function VerificationView({ qrToken }: { qrToken: string }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const qrScannerRef = useRef<QrScanner | null>(null);
 
-  const fetchData = async (isRefresh = false) => {
+  const fetchData = useCallback(async (isRefresh = false) => {
     try {
       if (isRefresh) setRefreshing(true);
       else setLoading(true);
@@ -121,9 +121,9 @@ function VerificationView({ qrToken }: { qrToken: string }) {
       setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, [qrToken]);
 
-  // Check authentication and fetch data on load
+  // Combined effect for authentication check and event listeners
   useEffect(() => {
     const verifyToken = sessionStorage.getItem('qr_verify_token');
     const userJson = sessionStorage.getItem('qr_verify_user');
@@ -139,8 +139,7 @@ function VerificationView({ qrToken }: { qrToken: string }) {
         if (hoursPassed < 2) {
           setIsAuthenticated(true);
           setAuthUser(user);
-          // Fetch data immediately after setting auth
-          setTimeout(() => fetchData(), 0);
+          fetchData();
         } else {
           // Token expired
           sessionStorage.removeItem('qr_verify_token');
@@ -156,9 +155,9 @@ function VerificationView({ qrToken }: { qrToken: string }) {
       setShowAuthModal(true);
       setLoading(false);
     }
-  }, [qrToken]);
+  }, [qrToken, fetchData]);
 
-  // Window focus and visibility handlers
+  // Window focus and visibility handlers - separate effect
   useEffect(() => {
     if (!isAuthenticated) return;
 
@@ -181,9 +180,9 @@ function VerificationView({ qrToken }: { qrToken: string }) {
       window.removeEventListener('focus', handleFocus);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [isAuthenticated, loading, refreshing]);
+  }, [isAuthenticated, loading, refreshing, fetchData]);
 
-  const handleAuthenticated = (token: string) => {
+  const handleAuthenticated = useCallback((token: string) => {
     setIsAuthenticated(true);
     setShowAuthModal(false);
     
@@ -193,8 +192,8 @@ function VerificationView({ qrToken }: { qrToken: string }) {
     }
     
     // Fetch data after authentication
-    setTimeout(() => fetchData(), 0);
-  };
+    fetchData();
+  }, [fetchData]);
 
   const handleLogout = () => {
     sessionStorage.removeItem('qr_verify_token');
@@ -257,8 +256,18 @@ function VerificationView({ qrToken }: { qrToken: string }) {
     timeZone: 'Europe/Brussels'
   });
 
-  // QR Scanner functions
-  const startScanning = async () => {
+  // QR Scanner functions with useCallback
+  const stopScanning = useCallback(() => {
+    if (qrScannerRef.current) {
+      qrScannerRef.current.stop();
+      qrScannerRef.current.destroy();
+      qrScannerRef.current = null;
+    }
+    setScanning(false);
+    setShowScanner(false);
+  }, []);
+
+  const startScanning = useCallback(async () => {
     if (!videoRef.current) return;
     
     try {
@@ -291,17 +300,7 @@ function VerificationView({ qrToken }: { qrToken: string }) {
       setScanning(false);
       setShowScanner(false);
     }
-  };
-
-  const stopScanning = () => {
-    if (qrScannerRef.current) {
-      qrScannerRef.current.stop();
-      qrScannerRef.current.destroy();
-      qrScannerRef.current = null;
-    }
-    setScanning(false);
-    setShowScanner(false);
-  };
+  }, [stopScanning]);
 
   // Calculate payment status summary
   const getPaymentSummary = () => {
@@ -340,7 +339,7 @@ function VerificationView({ qrToken }: { qrToken: string }) {
     return () => {
       stopScanning();
     };
-  }, []);
+  }, [stopScanning]);
 
   return (
     <>

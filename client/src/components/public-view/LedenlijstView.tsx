@@ -149,7 +149,7 @@ export function LedenlijstView({ config, members = [] }: LedenlijstViewProps) {
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50/90 via-white/85 to-blue-100/90 backdrop-blur-sm"></div>
       {/* Header */}
       <div className="text-center mb-12 relative z-10">
-        <div className="glassmorphism-card p-8 border border-white/30">
+        <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-lg">
           <h1
             style={{
               fontSize: `${config.title.fontSize}px`,
@@ -184,10 +184,10 @@ export function LedenlijstView({ config, members = [] }: LedenlijstViewProps) {
 
       {/* Tabel */}
       <div className="w-full relative z-10">
-        <div className="glassmorphism-card border border-white/30 overflow-hidden">
+        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-lg">
           <table className="w-full">
             <thead>
-              <tr className="bg-gradient-to-r from-blue-50/80 to-blue-100/60 border-b border-blue-200/50 backdrop-blur-sm">
+              <tr className="bg-[#e6effd] border-b border-gray-200">
                 <th className="px-6 py-4 text-left font-semibold text-blue-900 text-sm uppercase tracking-wider">
                   Lidnr.
                 </th>
@@ -211,7 +211,7 @@ export function LedenlijstView({ config, members = [] }: LedenlijstViewProps) {
             </thead>
             <tbody>
               {currentMembers.map((member, memberIndex) => (
-                <tr key={member.id} className="hover:bg-gradient-to-r hover:from-blue-50/80 hover:to-blue-100/60 border-b border-blue-100/50 last:border-0 transition-all duration-300 backdrop-blur-sm">
+                <tr key={member.id} className="hover:bg-gray-50 border-b border-gray-100 last:border-0 transition-all duration-200">
                   <td className="px-6 py-4 font-mono text-sm text-slate-600 font-medium">
                     {member.lidnummer}
                   </td>
@@ -259,7 +259,7 @@ export function LedenlijstView({ config, members = [] }: LedenlijstViewProps) {
         {/* Paginering info */}
         {totalPages > 1 && (
           <div className="mt-8 flex justify-center relative z-10">
-            <div className="glassmorphism-card p-6 border border-white/30">
+            <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-200">
               <div className="flex justify-center items-center gap-3 mb-4">
                 {Array.from({ length: totalPages }, (_, i) => (
                   <div

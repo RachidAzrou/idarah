@@ -294,6 +294,38 @@ function VerificationView({ qrToken }: { qrToken: string }) {
     setShowScanner(false);
   };
 
+  // Calculate payment status summary
+  const getPaymentSummary = () => {
+    if (!data.fees || data.fees.length === 0) {
+      return { status: 'ok', message: 'Geen betaalinformatie beschikbaar' };
+    }
+
+    const openFees = data.fees.filter(fee => fee.status === 'OPEN');
+    const overdueFees = data.fees.filter(fee => fee.status === 'OVERDUE');
+    
+    if (overdueFees.length > 0) {
+      const totalOverdue = overdueFees.reduce((sum, fee) => sum + parseFloat(fee.amount), 0);
+      return { 
+        status: 'overdue', 
+        message: `€${totalOverdue.toFixed(2)} vervallen`,
+        count: overdueFees.length
+      };
+    }
+    
+    if (openFees.length > 0) {
+      const totalOpen = openFees.reduce((sum, fee) => sum + parseFloat(fee.amount), 0);
+      return { 
+        status: 'open', 
+        message: `€${totalOpen.toFixed(2)} openstaand`,
+        count: openFees.length
+      };
+    }
+    
+    return { status: 'ok', message: 'Alle betalingen up-to-date' };
+  };
+
+  const paymentSummary = getPaymentSummary();
+
   // Cleanup scanner on unmount
   useEffect(() => {
     return () => {
@@ -346,6 +378,26 @@ function VerificationView({ qrToken }: { qrToken: string }) {
         </CardHeader>
       
       <CardContent className="space-y-6">
+        {/* Payment Status Summary */}
+        <div className="p-3 rounded-lg border-l-4 bg-gray-50" style={{
+          borderLeftColor: paymentSummary.status === 'overdue' ? '#dc2626' : 
+                          paymentSummary.status === 'open' ? '#ea580c' : '#16a34a',
+          backgroundColor: paymentSummary.status === 'overdue' ? '#fef2f2' : 
+                          paymentSummary.status === 'open' ? '#fff7ed' : '#f0fdf4'
+        }}>
+          <div className="flex items-center gap-2">
+            {paymentSummary.status === 'overdue' && <AlertTriangle className="h-4 w-4 text-red-600" />}
+            {paymentSummary.status === 'open' && <Clock className="h-4 w-4 text-orange-600" />}
+            {paymentSummary.status === 'ok' && <Check className="h-4 w-4 text-green-600" />}
+            <span className={`font-medium text-sm ${
+              paymentSummary.status === 'overdue' ? 'text-red-700' : 
+              paymentSummary.status === 'open' ? 'text-orange-700' : 'text-green-700'
+            }`}>
+              Betaalstatus: {paymentSummary.message}
+            </span>
+          </div>
+        </div>
+
         {/* Member Details */}
         <div className="grid grid-cols-1 gap-4">
           <div>

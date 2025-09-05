@@ -34,6 +34,7 @@ const initialFilters: FilterValues = {
 };
 
 export default function Leden() {
+  const isMobile = useIsMobile();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");

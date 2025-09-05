@@ -238,10 +238,7 @@ function VerificationView({ qrToken }: { qrToken: string }) {
     return (
       <QuickAuthModal
         isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
         onAuthenticated={handleAuthenticated}
-        purpose="QR Code Verificatie"
-        description="Log in om QR codes van lidkaarten te verifiëren"
       />
     );
   }

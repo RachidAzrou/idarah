@@ -1,10 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle2, XCircle, AlertTriangle, Wifi, WifiOff, Clock, RefreshCw, Check, Euro, LogOut, User } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { CheckCircle2, XCircle, AlertTriangle, Wifi, WifiOff, Clock, RefreshCw, Check, Euro, LogOut, User, QrCode, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { QuickAuthModal } from "@/components/auth/quick-auth-modal";
+import QrScanner from "qr-scanner";
 
 interface CardVerificationData {
   status: 'ACTUEEL' | 'NIET_ACTUEEL' | 'VERLOPEN';
@@ -75,6 +77,10 @@ function VerificationView({ qrToken }: { qrToken: string }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authUser, setAuthUser] = useState<any>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showScanner, setShowScanner] = useState(false);
+  const [scanning, setScanning] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const qrScannerRef = useRef<QrScanner | null>(null);
 
   const fetchData = async (isRefresh = false) => {
     try {
@@ -242,6 +248,59 @@ function VerificationView({ qrToken }: { qrToken: string }) {
     timeZone: 'Europe/Brussels'
   });
 
+  // QR Scanner functions
+  const startScanning = async () => {
+    if (!videoRef.current) return;
+    
+    try {
+      setScanning(true);
+      setShowScanner(true);
+      
+      qrScannerRef.current = new QrScanner(
+        videoRef.current,
+        (result) => {
+          const qrCodeText = result.data;
+          // Extract token from QR code URL
+          const urlMatch = qrCodeText.match(/\/card\/([a-f0-9]+)/);
+          if (urlMatch && urlMatch[1]) {
+            const newToken = urlMatch[1];
+            stopScanning();
+            // Navigate to new verification page
+            window.location.href = `/card/${newToken}`;
+          }
+        },
+        {
+          returnDetailedScanResult: true,
+          highlightScanRegion: true,
+          highlightCodeOutline: true,
+        }
+      );
+      
+      await qrScannerRef.current.start();
+    } catch (error) {
+      console.error('Failed to start QR scanner:', error);
+      setScanning(false);
+      setShowScanner(false);
+    }
+  };
+
+  const stopScanning = () => {
+    if (qrScannerRef.current) {
+      qrScannerRef.current.stop();
+      qrScannerRef.current.destroy();
+      qrScannerRef.current = null;
+    }
+    setScanning(false);
+    setShowScanner(false);
+  };
+
+  // Cleanup scanner on unmount
+  useEffect(() => {
+    return () => {
+      stopScanning();
+    };
+  }, []);
+
   return (
     <>
       <Card className="max-w-lg mx-auto">
@@ -384,19 +443,76 @@ function VerificationView({ qrToken }: { qrToken: string }) {
           )}
         </div>
 
-        {/* Refresh Button */}
-        <Button 
-          onClick={() => fetchData(true)} 
-          variant="outline"
-          size="sm"
-          className="w-full gap-2"
-          disabled={refreshing}
-        >
-          <RefreshCw className={cn("h-4 w-4", refreshing && "animate-spin")} />
-          Ververs status
-        </Button>
+        {/* Action Buttons */}
+        <div className="grid grid-cols-2 gap-3">
+          <Button 
+            onClick={() => fetchData(true)} 
+            variant="outline"
+            size="sm"
+            className="gap-2"
+            disabled={refreshing}
+          >
+            <RefreshCw className={cn("h-4 w-4", refreshing && "animate-spin")} />
+            Ververs status
+          </Button>
+          
+          {authUser && (
+            <Button 
+              onClick={startScanning} 
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              disabled={scanning}
+            >
+              <QrCode className="h-4 w-4" />
+              Scan nieuwe QR
+            </Button>
+          )}
+        </div>
       </CardContent>
     </Card>
+
+    {/* QR Scanner Modal */}
+    <Dialog open={showScanner} onOpenChange={setShowScanner}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <QrCode className="h-5 w-5" />
+            QR Code Scanner
+          </DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          <div className="relative bg-black rounded-lg overflow-hidden">
+            <video
+              ref={videoRef}
+              className="w-full h-64 object-cover"
+              style={{ background: '#000' }}
+            />
+            {scanning && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                <div className="text-white text-sm bg-black/50 px-3 py-1 rounded">
+                  Scannen...
+                </div>
+              </div>
+            )}
+          </div>
+          <div className="text-center space-y-2">
+            <p className="text-sm text-gray-600">
+              Houd een QR code voor de camera om een nieuwe lidkaart te scannen
+            </p>
+            <Button
+              onClick={stopScanning}
+              variant="outline"
+              size="sm"
+              className="gap-2"
+            >
+              <X className="h-4 w-4" />
+              Annuleren
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
     </>
   );
 }

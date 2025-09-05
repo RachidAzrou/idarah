@@ -74,7 +74,7 @@ function StatusLED({ status, className }: StatusLEDProps) {
         style={config.glowStyle}
         aria-hidden="true"
       />
-      <span className="text-sm font-medium card-font debossed-text">
+      <span className="text-sm font-medium card-font embossed-text" style={{textShadow: '1px 1px 2px rgba(0,0,0,0.8), -0.5px -0.5px 1px rgba(255,255,255,0.2)', filter: 'drop-shadow(0.5px 0.5px 1px rgba(0,0,0,0.4))'}}>
         {config.label}
       </span>
     </div>
@@ -182,7 +182,7 @@ export function MembershipCard({
                   className="h-6 w-auto mb-2 opacity-90"
                 />
               )}
-              <h1 className={`embossed-text font-bold uppercase tracking-wider ${isConstrained ? 'text-2xl' : cardData.tenant.name.length > 15 ? 'text-3xl' : cardData.tenant.name.length > 10 ? 'text-4xl' : 'text-5xl'}`}>
+              <h1 className={`embossed-text font-bold uppercase tracking-wider ${isConstrained ? 'text-xl' : cardData.tenant.name.length > 15 ? 'text-2xl' : cardData.tenant.name.length > 10 ? 'text-3xl' : 'text-4xl'}`}>
                 Lidkaart {cardData.tenant.name.toUpperCase()}
               </h1>
             </div>
@@ -216,27 +216,10 @@ export function MembershipCard({
             {/* Status Badge - Right side (Board Member takes priority over Voting Rights) */}
             {(isActiveBoardMember || cardData.votingRights) && (
               <div className="flex flex-col items-center mr-8">
-                {/* Force show icons - testing */}
-                <PiUserCircleCheckLight 
-                  className={`${isConstrained ? 'w-16 h-16' : 'w-24 h-24'}`}
-                  data-testid="voting-icon"
-                  style={{
-                    color: isActiveBoardMember ? '#FFD700' : '#C0C0C0',
-                    textShadow: `
-                      3px 3px 0 rgba(255,255,255,0.3),
-                      -3px -3px 0 rgba(0,0,0,0.9),
-                      -4px -4px 0 rgba(0,0,0,0.8),
-                      -5px -5px 0 rgba(0,0,0,0.6),
-                      -6px -6px 0 rgba(0,0,0,0.4),
-                      -7px -7px 0 rgba(0,0,0,0.2),
-                      inset 4px 4px 8px rgba(0,0,0,0.8),
-                      inset -2px -2px 4px rgba(192,192,192,0.2),
-                      0 0 12px rgba(192,192,192,0.4),
-                      0 0 20px rgba(192,192,192,0.2)
-                    `,
-                    filter: 'drop-shadow(3px 3px 8px rgba(0,0,0,0.6)) brightness(1.2)'
-                  }}
-                />
+                {/* Icon removed as requested */}
+                <div className={`${isConstrained ? 'w-16 h-16' : 'w-24 h-24'} flex items-center justify-center`}>
+                  {/* Icon space maintained for text alignment */}
+                </div>
                 
                 {/* Primary text - Always show based on final status */}
                 {isActiveBoardMember && (
@@ -307,7 +290,7 @@ export function MembershipCard({
               <p className="embossed-text text-[clamp(18px,2.4vmin,22px)] uppercase tracking-wide opacity-80 mb-1 font-medium">
                 NAAM
               </p>
-              <h2 className="embossed-text text-[clamp(24px,2.8vmin,28px)] font-semibold uppercase tracking-wide leading-tight" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.9), -1px -1px 2px rgba(255,255,255,0.3), 0 0 8px rgba(255,255,255,0.1)', filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))'}}>
+              <h2 className="embossed-text text-[clamp(20px,2.4vmin,24px)] font-semibold uppercase tracking-wide leading-tight" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.9), -1px -1px 2px rgba(255,255,255,0.3), 0 0 8px rgba(255,255,255,0.1)', filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))'}}>
                 {cardData.firstName} {cardData.lastName}
               </h2>
               {/* No status badges under name anymore - moved to QR section */}
@@ -316,19 +299,19 @@ export function MembershipCard({
             {/* Lidnummer and Category - side by side */}
             <div className="grid grid-cols-2 gap-4 mt-3">
               <div>
-                <p className="embossed-text text-[clamp(18px,2.4vmin,22px)] uppercase tracking-wide opacity-80 mb-1 font-medium">
+                <p className="embossed-text text-[clamp(16px,2.0vmin,18px)] uppercase tracking-wide opacity-80 mb-1 font-medium">
                   LIDNUMMER
                 </p>
-                <p className="embossed-text text-[clamp(24px,2.8vmin,28px)] font-mono font-bold tracking-[0.2em] leading-tight" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.9), -1px -1px 2px rgba(255,255,255,0.3), 0 0 8px rgba(255,255,255,0.1)', filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))'}}>
+                <p className="embossed-text text-[clamp(20px,2.4vmin,22px)] font-mono font-bold tracking-[0.2em] leading-tight" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.9), -1px -1px 2px rgba(255,255,255,0.3), 0 0 8px rgba(255,255,255,0.1)', filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))'}}>
                   {cardData.memberNumber}
                 </p>
               </div>
               
               <div>
-                <p className="embossed-text text-[clamp(18px,2.4vmin,22px)] uppercase tracking-wide opacity-80 mb-1 font-medium">
+                <p className="embossed-text text-[clamp(16px,2.0vmin,18px)] uppercase tracking-wide opacity-80 mb-1 font-medium">
                   CATEGORIE
                 </p>
-                <span className="embossed-text text-[clamp(24px,2.8vmin,28px)] font-medium uppercase" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.9), -1px -1px 2px rgba(255,255,255,0.3), 0 0 8px rgba(255,255,255,0.1)', filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))'}}>
+                <span className="embossed-text text-[clamp(20px,2.4vmin,22px)] font-medium uppercase" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.9), -1px -1px 2px rgba(255,255,255,0.3), 0 0 8px rgba(255,255,255,0.1)', filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))'}}>
                   {getMemberCategoryLabel(cardData.category)}
                 </span>
               </div>

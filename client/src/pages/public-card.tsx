@@ -27,6 +27,22 @@ export default function PublicCard() {
   const { memberId } = useParams<{ memberId: string }>();
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
 
+  // Set body background when component mounts
+  useEffect(() => {
+    document.body.style.backgroundColor = 'white';
+    document.body.style.margin = '0';
+    document.body.style.padding = '0';
+    document.body.style.minHeight = '100vh';
+    
+    return () => {
+      // Reset body styles when component unmounts
+      document.body.style.backgroundColor = '';
+      document.body.style.margin = '';
+      document.body.style.padding = '';
+      document.body.style.minHeight = '';
+    };
+  }, []);
+
   // Monitor online/offline status
   useEffect(() => {
     const handleOnline = () => setIsOffline(false);
@@ -138,7 +154,7 @@ export default function PublicCard() {
   };
 
   return (
-    <div className="fixed inset-0 w-full h-full bg-white flex items-center justify-center p-6 overflow-auto">
+    <div className="flex items-center justify-center p-6 min-h-screen">
       <div className="w-full max-w-5xl">
         <div className="space-y-4">
           <div className="relative aspect-[16/10] rounded-lg overflow-hidden border border-gray-200">

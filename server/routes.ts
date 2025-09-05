@@ -1193,12 +1193,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const response = {
+        memberId: cardData.member.id,
         firstName: cardData.member.firstName,
         lastName: cardData.member.lastName,
         memberNumber: cardData.member.memberNumber,
         category: cardData.member.category,
         status: cardData.cardMeta.status,
         validUntil: cardData.cardMeta.validUntil,
+        votingRights: cardData.member.votingRights || false,
         badges,
         qrToken: cardData.cardMeta.qrToken,
         tenant: {

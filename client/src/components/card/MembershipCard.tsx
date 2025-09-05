@@ -19,7 +19,7 @@ interface CardData {
   category: 'STUDENT' | 'STANDAARD' | 'SENIOR';
   status: 'ACTUEEL' | 'NIET_ACTUEEL' | 'VERLOPEN';
   validUntil: Date | null;
-  badges: string[];
+  votingRights: boolean;
   qrToken: string;
   tenant: {
     name: string;
@@ -216,7 +216,7 @@ export function MembershipCard({
             </button>
 
             {/* Voting Rights Badge - Right side */}
-            {(cardData.badges.includes("Stemgerechtigd") || true) && (
+            {cardData.votingRights && (
               <div className="flex flex-col items-center mr-8">
                 {/* Embossed Gold Icon Lines */}
                 <PiUserCircleCheckLight 
@@ -262,7 +262,7 @@ export function MembershipCard({
           </div>
 
           {/* Member Information */}
-          <div className={`mb-8 space-y-6 ml-8 ${isConstrained ? 'scale-75 origin-top-left' : ''}`}>
+          <div className={`mb-4 space-y-4 ml-8 ${isConstrained ? 'scale-75 origin-top-left' : ''}`}>
             {/* Member Name */}
             <div>
               <p className="embossed-text text-[clamp(16px,2.0vmin,18px)] uppercase tracking-wide opacity-80 mb-1 font-medium">
@@ -271,32 +271,30 @@ export function MembershipCard({
               <h2 className="embossed-text text-[clamp(20px,2.4vmin,22px)] font-semibold uppercase tracking-wide leading-tight" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.9), -1px -1px 2px rgba(255,255,255,0.3), 0 0 8px rgba(255,255,255,0.1)', filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))'}}>
                 {cardData.firstName} {cardData.lastName}
               </h2>
-              {cardData.memberId && (
-                <div className="flex items-center gap-2 mt-2">
-                  <BoardMemberBadge 
-                    memberId={cardData.memberId} 
-                    variant="embossed"
-                    size="md"
-                    className="text-yellow-400"
-                  />
-                  <span 
-                    className="embossed-text text-[clamp(12px,1.6vmin,14px)] uppercase tracking-wide font-medium"
-                    style={{
-                      color: '#FFD700',
-                      textShadow: `
-                        2px 2px 0 rgba(255,255,255,0.3),
-                        -2px -2px 0 rgba(0,0,0,0.8),
-                        -3px -3px 0 rgba(0,0,0,0.6),
-                        inset 2px 2px 4px rgba(0,0,0,0.6),
-                        0 0 8px rgba(255,215,0,0.4)
-                      `,
-                      filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.5))'
-                    }}
-                  >
-                    BESTUURSLID
-                  </span>
-                </div>
-              )}
+              <div className="flex items-center gap-2 mt-2">
+                <BoardMemberBadge 
+                  memberId={cardData.memberId || ''} 
+                  variant="embossed"
+                  size="md"
+                  className="text-yellow-400"
+                />
+                <span 
+                  className="embossed-text text-[clamp(12px,1.6vmin,14px)] uppercase tracking-wide font-medium"
+                  style={{
+                    color: '#FFD700',
+                    textShadow: `
+                      2px 2px 0 rgba(255,255,255,0.3),
+                      -2px -2px 0 rgba(0,0,0,0.8),
+                      -3px -3px 0 rgba(0,0,0,0.6),
+                      inset 2px 2px 4px rgba(0,0,0,0.6),
+                      0 0 8px rgba(255,215,0,0.4)
+                    `,
+                    filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.5))'
+                  }}
+                >
+                  BESTUURSLID
+                </span>
+              </div>
             </div>
 
             {/* Lidnummer and Category - side by side */}

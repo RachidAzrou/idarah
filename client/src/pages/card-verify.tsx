@@ -436,11 +436,11 @@ function VerificationView({ qrToken }: { qrToken: string }) {
           
           <Button
             onClick={startScanning}
-            variant="outline"
-            className="gap-2"
+            variant="default"
+            className="gap-2 bg-blue-600 hover:bg-blue-700"
           >
             <Scan className="h-4 w-4" />
-            Andere QR Scannen
+            Scan Volgende QR Code
           </Button>
         </div>
 
@@ -476,7 +476,7 @@ function VerificationView({ qrToken }: { qrToken: string }) {
                 </div>
                 
                 <p className="text-sm text-muted-foreground text-center">
-                  Richt de camera op een QR code om een andere lidkaart te verifiëren
+                  Richt de camera op de QR code van een lidkaart om deze te verifiëren
                 </p>
               </CardContent>
             </Card>

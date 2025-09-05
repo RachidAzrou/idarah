@@ -361,14 +361,14 @@ function VerificationView({ qrToken }: { qrToken: string }) {
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2">
-                {data.isValid ? (
+                {data.status === 'ACTUEEL' ? (
                   <CheckCircle className="h-5 w-5 text-green-500" />
                 ) : (
                   <XCircle className="h-5 w-5 text-red-500" />
                 )}
-                Verificatie {data.isValid ? 'Gelukt' : 'Mislukt'}
+                Verificatie {data.status === 'ACTUEEL' ? 'Gelukt' : 'Mislukt'}
               </CardTitle>
-              <StatusBadge status={data.card.status} />
+              <StatusBadge status={data.status || 'UNKNOWN'} />
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -379,7 +379,7 @@ function VerificationView({ qrToken }: { qrToken: string }) {
                   Lid
                 </div>
                 <p className="font-medium">
-                  {data.member.firstName} {data.member.lastName}
+                  {data.member.name}
                 </p>
                 <p className="text-sm text-muted-foreground">
                   Lidnummer: {data.member.memberNumber}
@@ -392,10 +392,10 @@ function VerificationView({ qrToken }: { qrToken: string }) {
                   Geldigheid
                 </div>
                 <p className="text-sm">
-                  <span className="text-muted-foreground">Uitgegeven:</span> {new Date(data.card.issuedDate).toLocaleDateString('nl-NL')}
+                  <span className="text-muted-foreground">Geldig tot:</span> {data.validUntil || 'Onbekend'}
                 </p>
                 <p className="text-sm">
-                  <span className="text-muted-foreground">Vervalt:</span> {new Date(data.card.expiryDate).toLocaleDateString('nl-NL')}
+                  <span className="text-muted-foreground">Stemgerechtigd:</span> {data.eligibleToVote ? 'Ja' : 'Nee'}
                 </p>
               </div>
             </div>

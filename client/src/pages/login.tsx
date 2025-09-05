@@ -59,11 +59,11 @@ export default function Login() {
       <div className="flex-1 flex flex-col justify-center px-6 sm:px-8 lg:pl-8 lg:pr-16 relative z-10">
         <div className="max-w-md mx-auto w-full">
           {/* Logo above title */}
-          <div className="flex justify-center mb-4">
+          <div className="flex justify-center mb-6">
             <img 
               src={idarahLogo} 
               alt="IDARAH Logo" 
-              className="h-12 w-auto object-contain"
+              className="h-20 sm:h-24 lg:h-28 w-auto object-contain"
             />
           </div>
           

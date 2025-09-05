@@ -50,6 +50,11 @@ interface CardVerificationData {
     totalPaid: number;
     hasOutstanding: boolean;
   };
+  boardInfo?: {
+    isActiveBoardMember: boolean;
+    role: string;
+    customRole?: string;
+  } | null;
   refreshedAt: string;
   etag: string;
 }
@@ -180,14 +185,12 @@ function VerificationView({ qrToken }: { qrToken: string }) {
   }, []);
 
   const startScanning = useCallback(() => {
-    console.log('Starting QR scanner...');
     setShowScanner(true);
   }, []);
 
   // Initialize scanner when modal opens
   useEffect(() => {
     if (showScanner && videoRef.current && !qrScannerRef.current) {
-      console.log('Initializing QR scanner with video element:', videoRef.current);
       const initScanner = async () => {
         try {
           setScanning(true);
@@ -385,6 +388,24 @@ function VerificationView({ qrToken }: { qrToken: string }) {
                   <span className="text-muted-foreground">Stemgerechtigd:</span> {data.eligibleToVote ? 'Ja' : 'Nee'}
                 </p>
               </div>
+
+              {/* Board Member Information */}
+              {data.boardInfo?.isActiveBoardMember && (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Crown className="h-4 w-4" />
+                    Bestuursinformatie
+                  </div>
+                  <div className="p-3 rounded-lg border bg-purple-50 border-purple-200 text-purple-800">
+                    <p className="font-medium text-sm">
+                      Actief Bestuurslid
+                    </p>
+                    <p className="text-xs mt-1">
+                      Functie: {data.boardInfo.customRole || data.boardInfo.role}
+                    </p>
+                  </div>
+                </div>
+              )}
 
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">

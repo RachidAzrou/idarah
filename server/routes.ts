@@ -1329,13 +1329,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }));
 
       // Calculate payment status summary
-      const outstandingFees = recentFees.filter(fee => fee.status === 'PENDING' || fee.status === 'OVERDUE');
+      const outstandingFees = recentFees.filter(fee => fee.status === 'PENDING' || fee.status === 'OVERDUE' || fee.status === 'OPEN');
       const paidFees = recentFees.filter(fee => fee.status === 'PAID');
       
       let paymentStatusSummary = 'Alles is betaald';
       if (outstandingFees.length > 0) {
         const overdueCount = outstandingFees.filter(fee => fee.status === 'OVERDUE').length;
-        const pendingCount = outstandingFees.filter(fee => fee.status === 'PENDING').length;
+        const pendingCount = outstandingFees.filter(fee => fee.status === 'PENDING' || fee.status === 'OPEN').length;
         
         if (overdueCount > 0 && pendingCount > 0) {
           paymentStatusSummary = `${overdueCount} vervallen en ${pendingCount} openstaande betalingen`;

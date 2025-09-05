@@ -1289,6 +1289,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
       const category = categoryLabels[member.category] || member.category;
 
+      // Calculate age from birth date
+      let age = null;
+      if (member.birthDate) {
+        const birthDate = new Date(member.birthDate);
+        const today = new Date();
+        age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+          age--;
+        }
+      }
+
       // Process fees for payment information (recent fees only, last 2 years)
       const cutoffDate = new Date();
       cutoffDate.setFullYear(cutoffDate.getFullYear() - 2);
@@ -1316,6 +1328,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }) : null
         }));
 
+      // Calculate payment status summary
+      const outstandingFees = recentFees.filter(fee => fee.status === 'PENDING' || fee.status === 'OVERDUE');
+      const paidFees = recentFees.filter(fee => fee.status === 'PAID');
+      
+      let paymentStatusSummary = 'Alles is betaald';
+      if (outstandingFees.length > 0) {
+        const overdueCount = outstandingFees.filter(fee => fee.status === 'OVERDUE').length;
+        const pendingCount = outstandingFees.filter(fee => fee.status === 'PENDING').length;
+        
+        if (overdueCount > 0 && pendingCount > 0) {
+          paymentStatusSummary = `${overdueCount} vervallen en ${pendingCount} openstaande betalingen`;
+        } else if (overdueCount > 0) {
+          paymentStatusSummary = `${overdueCount} vervallen ${overdueCount === 1 ? 'betaling' : 'betalingen'}`;
+        } else {
+          paymentStatusSummary = `${pendingCount} openstaande ${pendingCount === 1 ? 'betaling' : 'betalingen'}`;
+        }
+      }
+
       const response = {
         status,
         validUntil,
@@ -1323,13 +1353,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         member: {
           name: `${member.firstName} ${member.lastName}`,
           memberNumber: member.memberNumber,
-          category
+          category,
+          age
         },
         tenant: {
           name: tenant.name,
           logoUrl: tenant.logoUrl
         },
         fees: recentFees,
+        paymentStatus: {
+          summary: paymentStatusSummary,
+          totalOutstanding: outstandingFees.length,
+          totalPaid: paidFees.length,
+          hasOutstanding: outstandingFees.length > 0
+        },
         refreshedAt: new Date().toISOString(),
         etag: cardMeta.etag
       };

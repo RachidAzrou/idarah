@@ -22,23 +22,35 @@ import QrScanner from "qr-scanner";
 import backgroundImage from "@assets/Luxury Navy Background_1757015851301.jpg";
 
 interface CardVerificationData {
-  isValid: boolean;
+  status: string;
+  validUntil: string | null;
+  eligibleToVote: boolean;
   member: {
-    id: string;
-    firstName: string;
-    lastName: string;
+    name: string;
     memberNumber: string;
-  };
-  card: {
-    status: string;
-    expiryDate: string;
-    issuedDate: string;
+    category: string;
+    age: number | null;
   };
   tenant: {
-    id: string;
     name: string;
     logoUrl?: string;
   };
+  fees: Array<{
+    id: string;
+    period: string;
+    amount: number;
+    status: string;
+    periodEnd: string;
+    paidAt: string | null;
+  }>;
+  paymentStatus: {
+    summary: string;
+    totalOutstanding: number;
+    totalPaid: number;
+    hasOutstanding: boolean;
+  };
+  refreshedAt: string;
+  etag: string;
 }
 
 const STATUS_CONFIG = {
@@ -328,8 +340,8 @@ function VerificationView({ qrToken }: { qrToken: string }) {
               <StatusBadge status={data.status || 'UNKNOWN'} />
             </div>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CardContent className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <User className="h-4 w-4" />
@@ -341,6 +353,16 @@ function VerificationView({ qrToken }: { qrToken: string }) {
                 <p className="text-sm text-muted-foreground">
                   Lidnummer: {data.member.memberNumber}
                 </p>
+                <div className="flex gap-4 text-sm">
+                  <span className="text-muted-foreground">Categorie:</span>
+                  <span className="font-medium">{data.member.category}</span>
+                </div>
+                {data.member.age && (
+                  <div className="flex gap-4 text-sm">
+                    <span className="text-muted-foreground">Leeftijd:</span>
+                    <span className="font-medium">{data.member.age} jaar</span>
+                  </div>
+                )}
               </div>
               
               <div className="space-y-2">
@@ -354,6 +376,27 @@ function VerificationView({ qrToken }: { qrToken: string }) {
                 <p className="text-sm">
                   <span className="text-muted-foreground">Stemgerechtigd:</span> {data.eligibleToVote ? 'Ja' : 'Nee'}
                 </p>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Crown className="h-4 w-4" />
+                  Betaalstatus
+                </div>
+                <div className={`p-3 rounded-lg border ${
+                  data.paymentStatus.hasOutstanding 
+                    ? 'bg-orange-50 border-orange-200 text-orange-800' 
+                    : 'bg-green-50 border-green-200 text-green-800'
+                }`}>
+                  <p className="font-medium text-sm">
+                    {data.paymentStatus.summary}
+                  </p>
+                  {data.paymentStatus.hasOutstanding && (
+                    <p className="text-xs mt-1 opacity-80">
+                      {data.paymentStatus.totalOutstanding} te betalen
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
 

@@ -70,6 +70,7 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 function VerificationView({ qrToken }: { qrToken: string }) {
+  // All state hooks first - always called in same order
   const [data, setData] = useState<CardVerificationData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -79,6 +80,8 @@ function VerificationView({ qrToken }: { qrToken: string }) {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
   const [scanning, setScanning] = useState(false);
+  
+  // All ref hooks second - always called in same order
   const videoRef = useRef<HTMLVideoElement>(null);
   const qrScannerRef = useRef<QrScanner | null>(null);
 
@@ -120,7 +123,7 @@ function VerificationView({ qrToken }: { qrToken: string }) {
     }
   };
 
-  // Check authentication on load
+  // Check authentication and fetch data on load
   useEffect(() => {
     const verifyToken = sessionStorage.getItem('qr_verify_token');
     const userJson = sessionStorage.getItem('qr_verify_user');
@@ -136,46 +139,49 @@ function VerificationView({ qrToken }: { qrToken: string }) {
         if (hoursPassed < 2) {
           setIsAuthenticated(true);
           setAuthUser(user);
+          // Fetch data immediately after setting auth
+          setTimeout(() => fetchData(), 0);
         } else {
           // Token expired
           sessionStorage.removeItem('qr_verify_token');
           sessionStorage.removeItem('qr_verify_user');
           setShowAuthModal(true);
+          setLoading(false);
         }
       } catch {
         setShowAuthModal(true);
+        setLoading(false);
       }
     } else {
       setShowAuthModal(true);
+      setLoading(false);
     }
-  }, []);
+  }, [qrToken]);
 
+  // Window focus and visibility handlers
   useEffect(() => {
-    if (isAuthenticated) {
-      fetchData();
-      
-      // Refetch on window focus
-      const handleFocus = () => {
-        if (!loading && !refreshing) {
-          fetchData(true);
-        }
-      };
-      
-      const handleVisibilityChange = () => {
-        if (document.visibilityState === 'visible' && !loading && !refreshing) {
-          fetchData(true);
-        }
-      };
+    if (!isAuthenticated) return;
 
-      window.addEventListener('focus', handleFocus);
-      document.addEventListener('visibilitychange', handleVisibilityChange);
-      
-      return () => {
-        window.removeEventListener('focus', handleFocus);
-        document.removeEventListener('visibilitychange', handleVisibilityChange);
-      };
-    }
-  }, [qrToken, isAuthenticated]);
+    const handleFocus = () => {
+      if (!loading && !refreshing) {
+        fetchData(true);
+      }
+    };
+    
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && !loading && !refreshing) {
+        fetchData(true);
+      }
+    };
+
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [isAuthenticated, loading, refreshing]);
 
   const handleAuthenticated = (token: string) => {
     setIsAuthenticated(true);
@@ -185,6 +191,9 @@ function VerificationView({ qrToken }: { qrToken: string }) {
     if (userJson) {
       setAuthUser(JSON.parse(userJson));
     }
+    
+    // Fetch data after authentication
+    setTimeout(() => fetchData(), 0);
   };
 
   const handleLogout = () => {

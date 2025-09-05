@@ -1,4 +1,5 @@
 import { Link, useLocation } from "wouter";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { 
   LayoutDashboard, 
@@ -44,6 +45,7 @@ const navigation = [
 export default function Navbar() {
   const [location] = useLocation();
   const { user, logout } = useAuth();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-sidebar-border bg-sidebar backdrop-blur supports-[backdrop-filter]:bg-sidebar/95">
@@ -86,19 +88,39 @@ export default function Navbar() {
           </nav>
 
           {/* Mobile Menu - alleen op mobiel */}
-          <DropdownMenu>
+          <DropdownMenu open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="lg:hidden h-9 w-9 text-sidebar-foreground hover:bg-sidebar-accent focus-ring" data-testid="mobile-menu-button">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="lg:hidden h-9 w-9 text-sidebar-foreground hover:bg-sidebar-accent focus-ring relative z-50 touch-manipulation" 
+                data-testid="mobile-menu-button"
+                aria-label="Open navigation menu"
+                style={{ touchAction: 'manipulation' }}
+              >
                 <Menu className="h-5 w-5" />
                 <span className="sr-only">Open navigation menu</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuContent 
+              align="end" 
+              className="w-56 z-[60] bg-popover border border-border shadow-lg" 
+              sideOffset={8}
+            >
               {navigation.map((item) => {
+                const isActive = location === item.href || (item.href !== "/dashboard" && location.startsWith(item.href));
                 const Icon = item.icon;
                 return (
                   <DropdownMenuItem key={item.name} asChild>
-                    <Link href={item.href} className="flex items-center gap-x-2">
+                    <Link 
+                      href={item.href} 
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={cn(
+                        "flex items-center gap-x-2 cursor-pointer",
+                        isActive && "bg-accent text-accent-foreground"
+                      )}
+                      data-testid={`mobile-nav-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
+                    >
                       <Icon className="h-4 w-4" />
                       {item.name}
                     </Link>

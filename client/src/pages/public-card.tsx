@@ -29,17 +29,17 @@ export default function PublicCard() {
 
   // Set body background when component mounts
   useEffect(() => {
-    document.body.style.backgroundColor = 'white';
     document.body.style.margin = '0';
     document.body.style.padding = '0';
     document.body.style.minHeight = '100vh';
+    document.body.style.overflow = 'hidden';
     
     return () => {
       // Reset body styles when component unmounts
-      document.body.style.backgroundColor = '';
       document.body.style.margin = '';
       document.body.style.padding = '';
       document.body.style.minHeight = '';
+      document.body.style.overflow = '';
     };
   }, []);
 
@@ -154,31 +154,16 @@ export default function PublicCard() {
   };
 
   return (
-    <div className="flex items-center justify-center p-6 min-h-screen">
-      <div className="w-full max-w-5xl">
-        <div className="space-y-4">
-          <div className="relative aspect-[16/10] rounded-lg overflow-hidden border border-gray-200">
-            <CardCanvas className="rounded-lg">
-              <LiveCard
-                member={member}
-                cardMeta={cardMeta}
-                tenant={tenant}
-                onRefresh={handleRefresh}
-                isRefreshing={isRefetching}
-                standalone={true}
-                className="h-full w-full"
-              />
-            </CardCanvas>
-          </div>
-          
-          {/* Footer info */}
-          <div className="text-center text-gray-500">
-            <p className="text-sm">
-              Publieke lidkaart weergave • {tenant.name}
-            </p>
-          </div>
-        </div>
-      </div>
+    <div className="w-full h-screen">
+      <LiveCard
+        member={member}
+        cardMeta={cardMeta}
+        tenant={tenant}
+        onRefresh={handleRefresh}
+        isRefreshing={isRefetching}
+        standalone={false}
+        className="w-full h-full"
+      />
     </div>
   );
 }

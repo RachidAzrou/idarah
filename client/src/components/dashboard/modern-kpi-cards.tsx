@@ -85,7 +85,8 @@ export default function ModernKpiCards() {
       value: isLoading ? "..." : `€${(((stats as any)?.monthlyIncome || 0)).toFixed(2)}`,
       delta: { value: "Deze maand", positive: true },
       icon: <HiInboxArrowDown className="h-4 w-4 text-blue-600" />,
-      iconBgColor: "bg-blue-50"
+      iconBgColor: "bg-blue-50",
+      deltaColor: "text-blue-600"
     }
   ];
 

@@ -68,6 +68,7 @@ export function MembersTable({
 }: MembersTableProps) {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: null, direction: 'asc' });
+  const isMobile = useIsMobile();
 
   const handleSort = (key: keyof Member) => {
     const direction = sortConfig.key === key && sortConfig.direction === 'asc' ? 'desc' : 'asc';
@@ -114,8 +115,6 @@ export function MembersTable({
   if (loading) {
     return <SkeletonTable />;
   }
-
-  const isMobile = useIsMobile();
 
   if (isMobile) {
     return (

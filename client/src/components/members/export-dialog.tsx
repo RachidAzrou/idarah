@@ -128,7 +128,7 @@ export function ExportDialog({ open, onOpenChange, filteredMembers }: ExportDial
       setExportProgress(25);
       
       // Get member IDs from filtered members
-      const memberIds = filteredMembers.map(member => member.id);
+      const memberIds = filteredMembers?.map(member => member.id) || [];
       
       setExportProgress(50);
       
@@ -162,7 +162,7 @@ export function ExportDialog({ open, onOpenChange, filteredMembers }: ExportDial
 
       toast({
         title: "Export succesvol",
-        description: `${filteredMembers.length} leden geëxporteerd naar Excel bestand.`
+        description: `${filteredMembers?.length || 0} leden geëxporteerd naar Excel bestand.`
       });
     } catch (error) {
       console.error('Export error:', error);
@@ -205,7 +205,7 @@ export function ExportDialog({ open, onOpenChange, filteredMembers }: ExportDial
             Leden Export Wizard
           </DialogTitle>
           <p className="text-sm text-gray-600">
-            {filteredMembers.length} leden klaar voor export
+            {filteredMembers?.length || 0} leden klaar voor export
           </p>
         </DialogHeader>
 
@@ -308,7 +308,7 @@ export function ExportDialog({ open, onOpenChange, filteredMembers }: ExportDial
                 <div>
                   <h3 className="text-lg font-semibold">Export wordt uitgevoerd...</h3>
                   <p className="text-sm text-gray-600">
-                    {filteredMembers.length} leden met {selectedFields.length} velden worden geëxporteerd
+                    {filteredMembers?.length || 0} leden met {selectedFields.length} velden worden geëxporteerd
                   </p>
                 </div>
                 
@@ -332,7 +332,7 @@ export function ExportDialog({ open, onOpenChange, filteredMembers }: ExportDial
                 <div>
                   <h3 className="text-lg font-semibold text-green-800">Export Voltooid!</h3>
                   <p className="text-sm text-gray-600">
-                    {filteredMembers.length} leden succesvol geëxporteerd
+                    {filteredMembers?.length || 0} leden succesvol geëxporteerd
                   </p>
                   {exportedFile && (
                     <p className="text-sm text-gray-500 mt-2">

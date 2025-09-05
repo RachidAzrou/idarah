@@ -140,7 +140,7 @@ export function LedenlijstView({ config, members = [] }: LedenlijstViewProps) {
     <div 
       className="min-h-screen p-8 relative font-sans"
       style={{
-        backgroundImage: `url("${backgroundImage}")`,
+        backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.85)), url("${backgroundImage}")`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'

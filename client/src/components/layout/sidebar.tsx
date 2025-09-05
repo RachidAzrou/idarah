@@ -16,6 +16,8 @@ import {
   LogOut,
   User
 } from "lucide-react";
+import { RiMoneyEuroCircleLine } from "react-icons/ri";
+import { FaPeopleLine } from "react-icons/fa6";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import darahLogo from "@assets/idarah (2)_1757094401589.png";
@@ -27,8 +29,8 @@ const navigation = [
   { name: "Leden", href: "/leden", icon: Users },
   { name: "Lidkaarten", href: "/lidkaarten", icon: IdCard },
   { name: "Lidgelden", href: "/lidgelden", icon: CreditCard },
-  { name: "Financiën", href: "/financien", icon: BarChart3 },
-  { name: "Mijn Bestuur", href: "/bestuur", icon: Building2 },
+  { name: "Financiën", href: "/financien", icon: RiMoneyEuroCircleLine },
+  { name: "Mijn Bestuur", href: "/bestuur", icon: FaPeopleLine },
   { name: "Berichten", href: "/berichten", icon: Mail },
   { name: "Publieke Schermen", href: "/publieke-schermen", icon: Monitor },
   { name: "Instellingen", href: "/instellingen", icon: Settings },

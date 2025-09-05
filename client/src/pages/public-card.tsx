@@ -138,7 +138,7 @@ export default function PublicCard() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-6">
+    <div className="fixed inset-0 w-full h-full bg-white flex items-center justify-center p-6 overflow-auto">
       <div className="w-full max-w-5xl">
         <div className="space-y-4">
           <div className="relative aspect-[16/10] rounded-lg overflow-hidden border border-gray-200">

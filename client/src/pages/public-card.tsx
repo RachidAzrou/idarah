@@ -5,6 +5,7 @@ import { LiveCard } from "@/components/cards/live-card";
 import { CardCanvas } from "@/components/card/CardCanvas";
 import { Loader2 } from "lucide-react";
 import type { Member, CardMeta, Tenant } from "@shared/schema";
+import backgroundImage from "@assets/de-lege-achtergrond-van-de-fotograafstudio-samenvatting-achtergrondtextuur-van-schoonheid-donker-en-licht-duidelijk-blauw-koud-grijs-sneeuwwit-gradient-vlakke-muur-en-vloer_1757088942721.jpg";
 // Interface for the public card API response
 interface PublicCardData {
   memberId: string;
@@ -33,6 +34,10 @@ export default function PublicCard() {
     document.body.style.padding = '0';
     document.body.style.minHeight = '100vh';
     document.body.style.overflow = 'hidden';
+    document.body.style.backgroundImage = `url(${backgroundImage})`;
+    document.body.style.backgroundSize = 'cover';
+    document.body.style.backgroundPosition = 'center';
+    document.body.style.backgroundRepeat = 'no-repeat';
     
     return () => {
       // Reset body styles when component unmounts
@@ -40,6 +45,10 @@ export default function PublicCard() {
       document.body.style.padding = '';
       document.body.style.minHeight = '';
       document.body.style.overflow = '';
+      document.body.style.backgroundImage = '';
+      document.body.style.backgroundSize = '';
+      document.body.style.backgroundPosition = '';
+      document.body.style.backgroundRepeat = '';
     };
   }, []);
 
@@ -154,16 +163,29 @@ export default function PublicCard() {
   };
 
   return (
-    <div className="w-full h-screen">
-      <LiveCard
-        member={member}
-        cardMeta={cardMeta}
-        tenant={tenant}
-        onRefresh={handleRefresh}
-        isRefreshing={isRefetching}
-        standalone={false}
-        className="w-full h-full"
-      />
+    <div className="w-full h-screen flex items-center justify-center p-6">
+      <div className="w-full max-w-5xl">
+        <div className="space-y-4">
+          <CardCanvas className="rounded-lg">
+            <LiveCard
+              member={member}
+              cardMeta={cardMeta}
+              tenant={tenant}
+              onRefresh={handleRefresh}
+              isRefreshing={isRefetching}
+              standalone={true}
+              className="h-full w-full"
+            />
+          </CardCanvas>
+          
+          {/* Footer info */}
+          <div className="text-center text-white/80">
+            <p className="text-sm">
+              Publieke lidkaart weergave • {tenant.name}
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

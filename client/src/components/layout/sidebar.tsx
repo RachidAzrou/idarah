@@ -55,30 +55,15 @@ export default function Sidebar() {
       {/* User Section */}
       {user && (
         <div className="border-b border-sidebar-border px-6 pb-4">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="w-full justify-start gap-x-3 px-2 py-2 h-auto">
-                <div className="h-8 w-8 bg-sidebar-primary text-sidebar-primary-foreground rounded-full flex items-center justify-center text-sm font-medium" data-testid="user-avatar">
-                  {getUserInitials(user.name)}
-                </div>
-                <div className="min-w-0 flex-1 text-left">
-                  <p className="text-sm font-medium text-sidebar-foreground" data-testid="user-name">{user.name}</p>
-                  <p className="text-xs text-blue-600 font-medium" data-testid="user-role">{user.role}</p>
-                </div>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuItem>
-                <User className="mr-2 h-4 w-4" />
-                <span>Profiel</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={logout}>
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Uitloggen</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Link href="/profiel" className="flex items-center gap-x-3 px-2 py-2 rounded-xl hover:bg-sidebar-accent transition-all duration-300 ease-out">
+            <div className="h-8 w-8 bg-sidebar-primary text-sidebar-primary-foreground rounded-full flex items-center justify-center text-sm font-medium" data-testid="user-avatar">
+              {getUserInitials(user.name)}
+            </div>
+            <div className="min-w-0 flex-1 text-left">
+              <p className="text-sm font-medium text-sidebar-foreground" data-testid="user-name">{user.name}</p>
+              <p className="text-xs text-blue-600 font-medium" data-testid="user-role">{user.role}</p>
+            </div>
+          </Link>
         </div>
       )}
 
@@ -117,6 +102,21 @@ export default function Sidebar() {
           </li>
         </ul>
       </nav>
+
+      {/* Logout Button */}
+      {user && (
+        <div className="mt-auto border-t border-sidebar-border p-6">
+          <Button 
+            variant="ghost" 
+            className="w-full justify-start gap-x-3 px-4 py-3 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50"
+            onClick={logout}
+            data-testid="logout-button"
+          >
+            <LogOut className="h-5 w-5" />
+            Uitloggen
+          </Button>
+        </div>
+      )}
 
     </div>
   );

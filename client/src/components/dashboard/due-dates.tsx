@@ -80,12 +80,7 @@ export default function DueDates() {
               item.status === 'success' ? 'bg-green-50' :
               'bg-blue-50'
             }`}>
-              <BiCalendarExclamation className={`h-4 w-4 ${
-                item.status === 'today' ? 'text-red-600' :
-                item.status === 'urgent' ? 'text-orange-600' :
-                item.status === 'success' ? 'text-green-600' :
-                'text-blue-600'
-              }`} />
+              <BiCalendarExclamation className="h-4 w-4 text-red-600" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-gray-900">

@@ -284,13 +284,13 @@ export function MembershipCard({
           </div>
 
           {/* Member Information */}
-          <div className={`mb-4 space-y-4 ml-8 ${isConstrained ? 'scale-75 origin-top-left' : ''}`}>
+          <div className={`mb-3 space-y-3 ml-8 ${isConstrained ? 'scale-75 origin-top-left' : ''}`}>
             {/* Member Name */}
             <div>
-              <p className="embossed-text text-[clamp(18px,2.4vmin,22px)] uppercase tracking-wide opacity-80 mb-1 font-medium">
+              <p className="embossed-text text-[clamp(14px,1.8vmin,16px)] uppercase tracking-wide opacity-80 mb-1 font-medium">
                 NAAM
               </p>
-              <h2 className="embossed-text text-[clamp(20px,2.4vmin,24px)] font-semibold uppercase tracking-wide leading-tight" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.9), -1px -1px 2px rgba(255,255,255,0.3), 0 0 8px rgba(255,255,255,0.1)', filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))'}}>
+              <h2 className="embossed-text text-[clamp(16px,2.0vmin,18px)] font-semibold uppercase tracking-wide leading-tight" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.9), -1px -1px 2px rgba(255,255,255,0.3), 0 0 8px rgba(255,255,255,0.1)', filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))'}}>
                 {cardData.firstName} {cardData.lastName}
               </h2>
               {/* No status badges under name anymore - moved to QR section */}

@@ -1,10 +1,5 @@
 {
   "buildCommand": "npm run build && cp -r dist/public/* .",
-  "functions": {
-    "api/server.js": {
-      "runtime": "nodejs20.x"
-    }
-  },
   "rewrites": [
     {
       "source": "/api/(.*)",

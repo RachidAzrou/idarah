@@ -2055,7 +2055,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const tenantId = req.user!.tenantId;
-      const validatedData = insertBoardMemberSchema.parse(req.body);
+      
+      // Add tenantId to the request body before validation
+      const dataWithTenant = {
+        ...req.body,
+        tenantId: tenantId
+      };
+      
+      const validatedData = insertBoardMemberSchema.parse(dataWithTenant);
 
       const boardMember = await boardService.createBoardMember(tenantId, validatedData);
       res.json(boardMember);

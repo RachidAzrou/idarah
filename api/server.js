@@ -1,11 +1,11 @@
 // Vercel serverless function for API endpoints
-const express = require('express');
-const path = require('path');
+import express from 'express';
 
 // Import the built Express server
 let app;
 try {
-  app = require('../dist/index.js').default;
+  const serverModule = await import('../dist/index.js');
+  app = serverModule.default;
 } catch (error) {
   console.error('Error loading server:', error);
   
@@ -17,4 +17,4 @@ try {
   });
 }
 
-module.exports = app;
+export default app;

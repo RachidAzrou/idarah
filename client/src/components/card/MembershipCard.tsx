@@ -223,6 +223,7 @@ export function MembershipCard({
             {/* Status Badge - Right side (Board Member takes priority over Voting Rights) */}
             {(isActiveBoardMember || cardData.votingRights) && (
               <div className="flex flex-col items-center mr-8">
+                {console.log('PWA Rendering:', { isActiveBoardMember, votingRights: cardData.votingRights, shouldShowSection: (isActiveBoardMember || cardData.votingRights) })}
                 {isActiveBoardMember ? (
                   // Show icon placeholder for board members to maintain space
                   <div className={`${isConstrained ? 'w-16 h-16' : 'w-24 h-24'} flex items-center justify-center`}>
@@ -254,6 +255,7 @@ export function MembershipCard({
                 )}
                 
                 {/* Primary text - Board Member takes priority */}
+                {console.log('PWA Text Rendering:', { isActiveBoardMember, showingBestuurslid: isActiveBoardMember, showingStemgerechtigd: !isActiveBoardMember && cardData.votingRights })}
                 {isActiveBoardMember ? (
                   <span 
                     className={`${isConstrained ? 'text-xs' : 'text-base'} uppercase tracking-[0.1em] font-bold mt-3`}

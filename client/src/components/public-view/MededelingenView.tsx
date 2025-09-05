@@ -13,7 +13,7 @@ export function MededelingenView({ config }: MededelingenViewProps) {
 
   // Get slides/messages with safe fallback
   const slides = config?.slides || config?.messages || [];
-  const activeSlides = slides.filter((slide: any) => slide.active !== false);
+  const activeSlides = slides.filter((slide: any) => slide.active === true);
   const currentSlide = activeSlides[currentSlideIndex];
 
   // Safe config defaults

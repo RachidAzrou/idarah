@@ -305,11 +305,8 @@ export default function LidkaartenPage() {
 
 
   const handleViewCard = (member: Member) => {
-    // Check if we're in development (port 5000) or production (replit domain)
-    const isProduction = window.location.hostname.includes('replit.dev');
-    const cardUrl = isProduction 
-      ? `https://3d4c5ce5-e595-4447-afbd-e830450332bf-00-26rzswrf5l18h.spock.replit.dev:5000/card/${member.id}`
-      : `/card/${member.id}`;
+    // Use relative URL - deploy to production to see latest changes there
+    const cardUrl = `/card/${member.id}`;
     // Open in new tab/window for PWA installation
     window.open(cardUrl, '_blank');
   };

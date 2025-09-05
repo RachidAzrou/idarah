@@ -13,6 +13,7 @@ interface LedenlijstConfigStepProps {
       filterByCategories: boolean;
       showVotingRights: boolean;
       rowsPerPage: number;
+      secondsPerPage: number;
       year: number;
       categories: string[];
     };
@@ -29,6 +30,7 @@ export function LedenlijstConfigStep({ data, onUpdate }: LedenlijstConfigStepPro
     filterByCategories: true,
     showVotingRights: false,
     rowsPerPage: 20,
+    secondsPerPage: 15,
     year: new Date().getFullYear(),
     categories: ["Student", "Standaard"]
   };
@@ -206,27 +208,49 @@ export function LedenlijstConfigStep({ data, onUpdate }: LedenlijstConfigStepPro
       </div>
 
 
-      {/* Rijen per pagina */}
+      {/* Paginering */}
       <div className="space-y-4 p-4 border rounded-lg">
         <h4 className="font-medium">Paginering</h4>
         
-        <div>
-          <Label htmlFor="rows-per-page">Rijen per pagina</Label>
-          <Select
-            value={settings.rowsPerPage.toString()}
-            onValueChange={(value) => updateSettings('rowsPerPage', parseInt(value))}
-          >
-            <SelectTrigger data-testid="select-rows-per-page">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="10">10</SelectItem>
-              <SelectItem value="20">20</SelectItem>
-              <SelectItem value="30">30</SelectItem>
-              <SelectItem value="50">50</SelectItem>
-              <SelectItem value="100">100</SelectItem>
-            </SelectContent>
-          </Select>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="rows-per-page">Rijen per pagina</Label>
+            <Select
+              value={settings.rowsPerPage.toString()}
+              onValueChange={(value) => updateSettings('rowsPerPage', parseInt(value))}
+            >
+              <SelectTrigger data-testid="select-rows-per-page">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="10">10</SelectItem>
+                <SelectItem value="20">20</SelectItem>
+                <SelectItem value="30">30</SelectItem>
+                <SelectItem value="50">50</SelectItem>
+                <SelectItem value="100">100</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div>
+            <Label htmlFor="seconds-per-page">Seconden per pagina</Label>
+            <Select
+              value={settings.secondsPerPage.toString()}
+              onValueChange={(value) => updateSettings('secondsPerPage', parseInt(value))}
+            >
+              <SelectTrigger data-testid="select-seconds-per-page">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="5">5 seconden</SelectItem>
+                <SelectItem value="10">10 seconden</SelectItem>
+                <SelectItem value="15">15 seconden</SelectItem>
+                <SelectItem value="20">20 seconden</SelectItem>
+                <SelectItem value="30">30 seconden</SelectItem>
+                <SelectItem value="60">1 minuut</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
 

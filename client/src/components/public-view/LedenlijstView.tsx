@@ -278,9 +278,6 @@ export function LedenlijstView({ config, members = [] }: LedenlijstViewProps) {
                 <p className="text-slate-600 text-base mt-2 font-medium">
                   {filteredMembers.length} leden weergegeven
                 </p>
-                <p className="text-slate-500 text-sm mt-1">
-                  15 seconden per pagina
-                </p>
               </div>
             </div>
           </div>

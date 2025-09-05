@@ -238,14 +238,22 @@ export function LedenlijstView({ config, members = [] }: LedenlijstViewProps) {
                         className="px-3 py-4 text-center"
                       >
                         <div
-                          className={`w-8 h-8 rounded-xl mx-auto transition-all duration-300 shadow-lg flex items-center justify-center ${
-                            status === 'betaald' ? 'bg-gradient-to-br from-emerald-400 to-emerald-500 border-2 border-emerald-300' :
-                            status === 'vervallen' ? 'bg-gradient-to-br from-red-400 to-red-500 border-2 border-red-300' :
-                            'bg-gradient-to-br from-slate-300 to-slate-400 border-2 border-slate-200'
-                          } hover:scale-110 hover:shadow-xl`}
-                          title={`${month}: ${status}`}
+                          className={`w-10 h-10 rounded-2xl mx-auto transition-all duration-300 shadow-md flex items-center justify-center relative ${
+                            status === 'betaald' ? 'bg-gradient-to-br from-emerald-500 to-emerald-600 border-2 border-emerald-400' :
+                            status === 'vervallen' ? 'bg-gradient-to-br from-red-500 to-red-600 border-2 border-red-400' :
+                            'bg-gradient-to-br from-gray-400 to-gray-500 border-2 border-gray-300'
+                          } hover:scale-105 hover:shadow-lg cursor-pointer`}
+                          title={`${month}: ${status === 'betaald' ? 'Betaald' : status === 'vervallen' ? 'Vervallen' : 'Open'}`}
                         >
-                          {getPaymentStatusIcon(status)}
+                          {status === 'betaald' && (
+                            <Check className="w-5 h-5 text-white font-bold" strokeWidth={3} />
+                          )}
+                          {status === 'vervallen' && (
+                            <X className="w-5 h-5 text-white font-bold" strokeWidth={3} />
+                          )}
+                          {status === 'open' && (
+                            <div className="w-2 h-2 bg-white rounded-full opacity-60"></div>
+                          )}
                         </div>
                       </td>
                     );

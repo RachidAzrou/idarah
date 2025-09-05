@@ -156,6 +156,7 @@ export interface IStorage {
     activeMembers: number;
     totalRevenue: number;
     outstanding: number;
+    monthlyIncome: number;
   }>;
 
   // Email Templates
@@ -667,6 +668,7 @@ export class DatabaseStorage implements IStorage {
     activeMembers: number;
     totalRevenue: number;
     outstanding: number;
+    monthlyIncome: number;
   }> {
     const cacheKey = `dashboard:stats:${tenantId}`;
     const cached = cache.get<{
@@ -674,6 +676,7 @@ export class DatabaseStorage implements IStorage {
       activeMembers: number;
       totalRevenue: number;
       outstanding: number;
+      monthlyIncome: number;
     }>(cacheKey);
     if (cached) return cached;
 
@@ -689,7 +692,12 @@ export class DatabaseStorage implements IStorage {
       fee_stats AS (
         SELECT 
           COALESCE(SUM(CASE WHEN status = 'PAID' THEN amount ELSE 0 END), 0) as total_revenue,
-          COALESCE(SUM(CASE WHEN status = 'OPEN' THEN amount ELSE 0 END), 0) as outstanding
+          COALESCE(SUM(CASE WHEN status = 'OPEN' THEN amount ELSE 0 END), 0) as outstanding,
+          COALESCE(SUM(CASE 
+            WHEN status = 'PAID' 
+            AND paid_at >= DATE_TRUNC('month', CURRENT_DATE) 
+            AND paid_at < DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month'
+            THEN amount ELSE 0 END), 0) as monthly_income
         FROM ${membershipFees} 
         WHERE tenant_id = ${tenantId}
       )
@@ -697,7 +705,8 @@ export class DatabaseStorage implements IStorage {
         m.total_members::int,
         m.active_members::int,
         f.total_revenue::numeric,
-        f.outstanding::numeric
+        f.outstanding::numeric,
+        f.monthly_income::numeric
       FROM member_stats m, fee_stats f
     `);
 
@@ -707,6 +716,7 @@ export class DatabaseStorage implements IStorage {
       activeMembers: parseInt(stats.active_members) || 0,
       totalRevenue: parseFloat(stats.total_revenue) || 0,
       outstanding: parseFloat(stats.outstanding) || 0,
+      monthlyIncome: parseFloat(stats.monthly_income) || 0,
     };
 
     cache.set(cacheKey, dashboardStats, 10000); // Cache for 10 seconds

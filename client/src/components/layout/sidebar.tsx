@@ -40,14 +40,14 @@ export default function Sidebar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const sidebarContent = (
-    <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-sidebar border-r border-sidebar-border">
+    <div className="flex grow flex-col gap-y-2 overflow-y-auto bg-sidebar border-r border-sidebar-border">
       {/* Logo */}
-      <div className="flex h-24 shrink-0 items-center justify-center px-4 pt-4" data-testid="logo">
+      <div className="flex h-28 shrink-0 items-center justify-center px-4 pt-4" data-testid="logo">
         <Link href="/dashboard" className="flex items-center justify-center w-full">
           <img 
             src={darahLogo} 
             alt="DARAH Logo" 
-            className="w-52 h-12 sm:w-56 sm:h-13 lg:w-60 lg:h-14 object-contain scale-150"
+            className="w-52 h-12 sm:w-56 sm:h-13 lg:w-60 lg:h-14 object-contain scale-[3]"
           />
         </Link>
       </div>

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 import { 
@@ -9,8 +10,14 @@ import {
   Settings,
   Building2,
   IdCard,
-  Mail
+  Mail,
+  Menu,
+  X,
+  LogOut,
+  User
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import darahLogo from "@assets/DARAH_1756909309495.png";
 import { getUserInitials } from "@/lib/auth";
 import { useAuth } from "@/hooks/use-auth";
@@ -29,74 +36,164 @@ const navigation = [
 
 export default function Sidebar() {
   const [location] = useLocation();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const sidebarContent = (
+    <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-sidebar border-r border-sidebar-border">
+      {/* Logo */}
+      <div className="flex h-16 shrink-0 items-center px-6" data-testid="logo">
+        <Link href="/dashboard" className="flex items-center">
+          <img 
+            src={darahLogo} 
+            alt="DARAH Logo" 
+            className="w-32 h-8 sm:w-36 sm:h-9 lg:w-40 lg:h-10 object-contain"
+          />
+        </Link>
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex flex-1 flex-col px-6">
+        <ul role="list" className="flex flex-1 flex-col gap-y-2">
+          <li>
+            <ul role="list" className="space-y-1">
+              {navigation.map((item) => {
+                const isActive = location === item.href || (item.href !== "/dashboard" && location.startsWith(item.href));
+                const Icon = item.icon;
+                
+                return (
+                  <li key={item.name}>
+                    <Link
+                      href={item.href}
+                      className={cn(
+                        "group relative flex gap-x-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-300 ease-out focus-ring",
+                        isActive
+                          ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-lg shadow-blue-500/20 scale-105 border border-blue-400/30"
+                          : "text-sidebar-foreground hover:text-sidebar-foreground hover:bg-sidebar-accent hover:shadow-md hover:scale-102 hover:-translate-y-0.5"
+                      )}
+                      data-testid={`nav-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      {isActive && (
+                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary rounded-r-full" />
+                      )}
+                      <Icon className={cn("h-5 w-5 shrink-0", isActive ? "text-sidebar-primary-foreground" : "")} />
+                      {item.name}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </li>
+        </ul>
+      </nav>
+
+      {/* User Section */}
+      {user && (
+        <div className="mt-auto border-t border-sidebar-border p-6">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="w-full justify-start gap-x-3 px-2 py-2 h-auto">
+                <div className="h-8 w-8 bg-sidebar-primary text-sidebar-primary-foreground rounded-full flex items-center justify-center text-sm font-medium" data-testid="user-avatar">
+                  {getUserInitials(user.name)}
+                </div>
+                <div className="min-w-0 flex-1 text-left">
+                  <p className="text-sm font-medium text-sidebar-foreground" data-testid="user-name">{user.name}</p>
+                  <p className="text-xs text-sidebar-foreground/70 font-medium" data-testid="user-role">{user.role}</p>
+                </div>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuItem>
+                <User className="mr-2 h-4 w-4" />
+                <span>Profiel</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={logout}>
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Uitloggen</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      )}
+    </div>
+  );
 
   return (
-    <aside className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-64 lg:flex-col sidebar">
-      <div className="flex grow flex-col gap-y-5 overflow-y-auto px-6 pb-4">
-        {/* Logo */}
-        <div className="flex h-16 shrink-0 items-center" data-testid="logo">
-          <div className="flex items-center space-x-3">
+    <>
+      {/* Desktop Sidebar */}
+      <aside className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-64 lg:flex-col">
+        {sidebarContent}
+      </aside>
+
+      {/* Mobile Header */}
+      <div className="sticky top-0 z-40 flex items-center gap-x-6 bg-sidebar px-4 py-4 shadow-sm sm:px-6 lg:hidden">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="-m-2.5 p-2.5"
+          onClick={() => setMobileMenuOpen(true)}
+          data-testid="mobile-menu-toggle"
+        >
+          <Menu className="h-6 w-6" />
+          <span className="sr-only">Menu openen</span>
+        </Button>
+        <div className="flex-1 text-sm font-semibold leading-6 text-sidebar-foreground">
+          <Link href="/dashboard">
             <img 
               src={darahLogo} 
               alt="DARAH Logo" 
-              className="w-32 h-8 sm:w-36 sm:h-9 lg:w-40 lg:h-10 object-contain"
+              className="h-8 object-contain"
             />
-          </div>
+          </Link>
         </div>
-
-        {/* Navigation */}
-        <nav className="flex flex-1 flex-col">
-          <ul role="list" className="flex flex-1 flex-col gap-y-2">
-            <li>
-              <ul role="list" className="space-y-1">
-                {navigation.map((item) => {
-                  const isActive = location === item.href || (item.href !== "/dashboard" && location.startsWith(item.href));
-                  const Icon = item.icon;
-                  
-                  return (
-                    <li key={item.name}>
-                      <Link
-                        href={item.href}
-                        className={cn(
-                          "group relative flex gap-x-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-300 ease-out focus-ring",
-                          isActive
-                            ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-lg shadow-blue-500/20 scale-105 border border-blue-400/30"
-                            : "text-sidebar-foreground hover:text-sidebar-foreground hover:bg-sidebar-accent hover:shadow-md hover:scale-102 hover:-translate-y-0.5"
-                        )}
-                        data-testid={`nav-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
-                      >
-                        {isActive && (
-                          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary rounded-r-full" />
-                        )}
-                        <Icon className={cn("h-5 w-5 shrink-0", isActive ? "text-sidebar-primary-foreground" : "")} />
-                        {item.name}
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            </li>
-          </ul>
-        </nav>
-
-        {/* User Profile */}
         {user && (
-          <div className="mt-auto pt-4 border-t border-sidebar-border">
-            <div className="flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-sidebar-accent cursor-pointer transition-all duration-300 ease-out hover:shadow-md hover:scale-102 hover:-translate-y-0.5" data-testid="user-profile">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg ring-2 ring-blue-400/20">
-                <span className="text-sm font-semibold text-white">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="h-8 w-8 rounded-full">
+                <div className="h-8 w-8 bg-sidebar-primary text-sidebar-primary-foreground rounded-full flex items-center justify-center text-sm font-medium">
                   {getUserInitials(user.name)}
-                </span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-sidebar-foreground truncate" data-testid="user-name">{user.name}</p>
-                <p className="text-xs text-sidebar-foreground/70 font-medium" data-testid="user-role">{user.role}</p>
-              </div>
-            </div>
-          </div>
+                </div>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuItem>
+                <User className="mr-2 h-4 w-4" />
+                <span>Profiel</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={logout}>
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Uitloggen</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         )}
       </div>
-    </aside>
+
+      {/* Mobile Sidebar */}
+      {mobileMenuOpen && (
+        <div className="relative z-50 lg:hidden">
+          <div className="fixed inset-0 bg-black/25" onClick={() => setMobileMenuOpen(false)} />
+          <div className="fixed inset-0 flex">
+            <div className="relative mr-16 flex w-full max-w-xs flex-1">
+              <div className="absolute left-full top-0 flex w-16 justify-center pt-5">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="-m-2.5 p-2.5"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <X className="h-6 w-6 text-white" />
+                  <span className="sr-only">Menu sluiten</span>
+                </Button>
+              </div>
+              {sidebarContent}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

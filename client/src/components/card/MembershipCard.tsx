@@ -332,72 +332,7 @@ export function MembershipCard({
               <h2 className="embossed-text text-[clamp(24px,2.8vmin,28px)] font-semibold uppercase tracking-wide leading-tight" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.9), -1px -1px 2px rgba(255,255,255,0.3), 0 0 8px rgba(255,255,255,0.1)', filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))'}}>
                 {cardData.firstName} {cardData.lastName}
               </h2>
-              {/* Status badges under name - Board Member takes priority */}
-              <div className="flex items-center gap-2 mt-2">
-                {isActiveBoardMember ? (
-                  <>
-                    <BoardMemberBadge 
-                      memberId={cardData.memberId || ''} 
-                      variant="embossed"
-                      size="md"
-                      className="text-yellow-400"
-                    />
-                    <span 
-                      className="embossed-text text-[clamp(14px,1.8vmin,16px)] uppercase tracking-wide font-medium"
-                      style={{
-                        color: '#FFD700',
-                        textShadow: `
-                          2px 2px 0 rgba(255,255,255,0.3),
-                          -2px -2px 0 rgba(0,0,0,0.8),
-                          -3px -3px 0 rgba(0,0,0,0.6),
-                          inset 2px 2px 4px rgba(0,0,0,0.6),
-                          0 0 8px rgba(255,215,0,0.4)
-                        `,
-                        filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.5))'
-                      }}
-                    >
-                      BESTUURSLID
-                    </span>
-                    {cardData.votingRights && (
-                      <span 
-                        className="embossed-text text-[clamp(12px,1.6vmin,14px)] uppercase tracking-wide font-medium ml-2"
-                        style={{
-                          color: '#C0C0C0',
-                          textShadow: `
-                            1px 1px 0 rgba(255,255,255,0.2),
-                            -1px -1px 0 rgba(0,0,0,0.7),
-                            -2px -2px 0 rgba(0,0,0,0.5),
-                            inset 2px 2px 4px rgba(0,0,0,0.6),
-                            0 0 6px rgba(192,192,192,0.3)
-                          `,
-                          filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.4))'
-                        }}
-                      >
-                        STEMGERECHTIGD
-                      </span>
-                    )}
-                  </>
-                ) : (
-                  cardData.votingRights && (
-                    <span 
-                      className="embossed-text text-[clamp(14px,1.8vmin,16px)] uppercase tracking-wide font-medium"
-                      style={{
-                        color: '#C0C0C0',
-                        textShadow: `
-                          1px 1px 0 rgba(255,255,255,0.2),
-                          -1px -1px 0 rgba(0,0,0,0.7),
-                          -2px -2px 0 rgba(0,0,0,0.5),
-                          inset 2px 2px 4px rgba(0,0,0,0.6),
-                          0 0 6px rgba(192,192,192,0.3)
-                        `,
-                        filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.4))'
-                      }}
-                    >
-                      STEMGERECHTIGD
-                    </span>
-                  )
-                )}
-              </div>
+              {/* No status badges under name anymore - moved to QR section */}
             </div>
 
             {/* Lidnummer and Category - side by side */}

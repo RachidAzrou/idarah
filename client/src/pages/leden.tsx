@@ -331,6 +331,16 @@ export default function Leden() {
 
   return (
     <div className="space-y-6">
+      {/* Page Header */}
+      <div className="border-b border-gray-200 pb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Ledenbeheer</h1>
+            <p className="text-gray-600 mt-1">Beheer alle leden van uw organisatie</p>
+          </div>
+        </div>
+      </div>
+
       <Toolbar 
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}

@@ -235,7 +235,7 @@ export function LedenlijstConfigStep({ data, onUpdate }: LedenlijstConfigStepPro
           <div>
             <Label htmlFor="seconds-per-page">Seconden per pagina</Label>
             <Select
-              value={settings.secondsPerPage.toString()}
+              value={(settings.secondsPerPage || 15).toString()}
               onValueChange={(value) => updateSettings('secondsPerPage', parseInt(value))}
             >
               <SelectTrigger data-testid="select-seconds-per-page">

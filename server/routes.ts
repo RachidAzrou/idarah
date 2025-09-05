@@ -1284,7 +1284,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get member category label
       const categoryLabels = {
         'STUDENT': 'Student',
-        'STANDAARD': 'Volwassene', 
+        'STANDAARD': 'Standaard', 
         'SENIOR': 'Senior'
       };
       const category = categoryLabels[member.category] || member.category;

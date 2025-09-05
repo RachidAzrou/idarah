@@ -238,7 +238,7 @@ export function LedenlijstView({ config, members = [] }: LedenlijstViewProps) {
                         className="px-3 py-4 text-center"
                       >
                         <div
-                          className={`w-10 h-10 rounded-2xl mx-auto transition-all duration-300 shadow-md flex items-center justify-center relative ${
+                          className={`w-10 h-10 rounded-full mx-auto transition-all duration-300 shadow-md flex items-center justify-center relative ${
                             status === 'betaald' ? 'bg-gradient-to-br from-emerald-500 to-emerald-600 border-2 border-emerald-400' :
                             status === 'vervallen' ? 'bg-gradient-to-br from-red-500 to-red-600 border-2 border-red-400' :
                             'bg-gradient-to-br from-gray-400 to-gray-500 border-2 border-gray-300'

@@ -1,0 +1,694 @@
+<html lang="nl-BE" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ledenbeheer - Moskee Management Systeem</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                borderRadius: {
+                    lg: "var(--radius)",
+                    md: "calc(var(--radius) - 2px)",
+                    sm: "calc(var(--radius) - 4px)",
+                },
+                colors: {
+                    background: "var(--background)",
+                    foreground: "var(--foreground)",
+                    card: {
+                        DEFAULT: "var(--card)",
+                        foreground: "var(--card-foreground)",
+                    },
+                    popover: {
+                        DEFAULT: "var(--popover)",
+                        foreground: "var(--popover-foreground)",
+                    },
+                    primary: {
+                        DEFAULT: "var(--primary)",
+                        foreground: "var(--primary-foreground)",
+                    },
+                    secondary: {
+                        DEFAULT: "var(--secondary)",
+                        foreground: "var(--secondary-foreground)",
+                    },
+                    muted: {
+                        DEFAULT: "var(--muted)",
+                        foreground: "var(--muted-foreground)",
+                    },
+                    accent: {
+                        DEFAULT: "var(--accent)",
+                        foreground: "var(--accent-foreground)",
+                    },
+                    destructive: {
+                        DEFAULT: "var(--destructive)",
+                        foreground: "var(--destructive-foreground)",
+                    },
+                    border: "var(--border)",
+                    input: "var(--input)",
+                    ring: "var(--ring)",
+                },
+                fontFamily: {
+                    sans: ["Inter", "var(--font-sans)"],
+                }
+            },
+        }
+    };
+    </script>
+    <style>
+        :root {
+            --background: hsl(0 0% 100%);
+            --foreground: hsl(222.2 84% 4.9%);
+            --card: hsl(0 0% 100%);
+            --card-foreground: hsl(222.2 84% 4.9%);
+            --popover: hsl(0 0% 100%);
+            --popover-foreground: hsl(222.2 84% 4.9%);
+            --primary: hsl(238 72% 59%);
+            --primary-foreground: hsl(210 40% 98%);
+            --secondary: hsl(210 40% 96%);
+            --secondary-foreground: hsl(222.2 84% 4.9%);
+            --muted: hsl(210 40% 96%);
+            --muted-foreground: hsl(215.4 16.3% 46.9%);
+            --accent: hsl(210 40% 96%);
+            --accent-foreground: hsl(222.2 84% 4.9%);
+            --destructive: hsl(0 84.2% 60.2%);
+            --destructive-foreground: hsl(210 40% 98%);
+            --border: hsl(214.3 31.8% 91.4%);
+            --input: hsl(214.3 31.8% 91.4%);
+            --ring: hsl(238 72% 59%);
+            --radius: 0.5rem;
+        }
+        
+        .dark {
+            --background: hsl(222.2 84% 4.9%);
+            --foreground: hsl(210 40% 98%);
+            --card: hsl(222.2 84% 4.9%);
+            --card-foreground: hsl(210 40% 98%);
+            --popover: hsl(222.2 84% 4.9%);
+            --popover-foreground: hsl(210 40% 98%);
+            --primary: hsl(238 72% 59%);
+            --primary-foreground: hsl(210 40% 98%);
+            --secondary: hsl(217.2 32.6% 17.5%);
+            --secondary-foreground: hsl(210 40% 98%);
+            --muted: hsl(217.2 32.6% 17.5%);
+            --muted-foreground: hsl(215 20.2% 65.1%);
+            --accent: hsl(217.2 32.6% 17.5%);
+            --accent-foreground: hsl(210 40% 98%);
+            --destructive: hsl(0 62.8% 30.6%);
+            --destructive-foreground: hsl(210 40% 98%);
+            --border: hsl(217.2 32.6% 17.5%);
+            --input: hsl(217.2 32.6% 17.5%);
+            --ring: hsl(238 72% 59%);
+        }
+
+        .glossy-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .glossy-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.8s;
+        }
+        
+        .glossy-card:hover::before {
+            left: 100%;
+        }
+        
+        .status-led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            box-shadow: 0 0 6px currentColor;
+        }
+        
+        .status-paid { color: #10b981; }
+        .status-pending { color: #f59e0b; }
+        .status-overdue { color: #ef4444; }
+        
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="h-full bg-background font-sans antialiased">
+    <div class="flex h-screen">
+        <!-- @COMPONENT: Sidebar Navigation -->
+        <!-- Sidebar -->
+        <div class="hidden lg:flex lg:w-64 lg:flex-col">
+            <div class="flex h-0 flex-1 flex-col border-r border-border bg-card">
+                <!-- Sidebar header -->
+                <div class="flex h-16 flex-shrink-0 items-center px-4 border-b border-border">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                            <i class="fas fa-mosque text-primary-foreground text-sm"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-lg font-semibold text-foreground">Ledenbeheer</h1>
+                            <p class="text-xs text-muted-foreground" data-mock="true">Al-Noor Moskee</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Navigation -->
+                <nav class="flex-1 space-y-1 px-2 py-4">
+                    <a href="#" class="bg-primary text-primary-foreground group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+                        <i class="fas fa-chart-pie mr-3 text-sm"></i>
+                        Dashboard
+                    </a>
+                    <a href="#" class="text-muted-foreground hover:bg-accent hover:text-accent-foreground group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+                        <i class="fas fa-users mr-3 text-sm"></i>
+                        Leden
+                    </a>
+                    <a href="#" class="text-muted-foreground hover:bg-accent hover:text-accent-foreground group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+                        <i class="fas fa-credit-card mr-3 text-sm"></i>
+                        Lidgelden
+                    </a>
+                    <a href="#" class="text-muted-foreground hover:bg-accent hover:text-accent-foreground group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+                        <i class="fas fa-chart-line mr-3 text-sm"></i>
+                        Financiën
+                    </a>
+                    <a href="#" class="text-muted-foreground hover:bg-accent hover:text-accent-foreground group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+                        <i class="fas fa-tv mr-3 text-sm"></i>
+                        Publieke Schermen
+                    </a>
+                    <a href="#" class="text-muted-foreground hover:bg-accent hover:text-accent-foreground group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+                        <i class="fas fa-cog mr-3 text-sm"></i>
+                        Instellingen
+                    </a>
+                    
+                    <div class="mt-8">
+                        <h3 class="px-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                            Snelle Acties
+                        </h3>
+                        <div class="mt-2 space-y-1">
+                            <a href="#" class="text-muted-foreground hover:bg-accent hover:text-accent-foreground group flex items-center px-2 py-2 text-sm rounded-md">
+                                <i class="fas fa-plus mr-3 text-sm"></i>
+                                Nieuw Lid
+                            </a>
+                            <a href="#" class="text-muted-foreground hover:bg-accent hover:text-accent-foreground group flex items-center px-2 py-2 text-sm rounded-md">
+                                <i class="fas fa-file-export mr-3 text-sm"></i>
+                                SEPA Export
+                            </a>
+                        </div>
+                    </div>
+                </nav>
+                
+                <!-- User profile -->
+                <div class="flex-shrink-0 border-t border-border p-4">
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 bg-secondary rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-secondary-foreground text-sm"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm font-medium text-foreground" data-mock="true">Ahmed Hassan</p>
+                            <p class="text-xs text-muted-foreground">Beheerder</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: Sidebar Navigation -->
+
+        <!-- Main content -->
+        <div class="flex flex-1 flex-col overflow-hidden">
+            <!-- @COMPONENT: Top Navigation Bar -->
+            <!-- Top navigation -->
+            <div class="border-b border-border bg-card px-4 py-3">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <button class="lg:hidden p-2 rounded-md hover:bg-accent">
+                            <i class="fas fa-bars text-foreground"></i>
+                        </button>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-search text-muted-foreground"></i>
+                            </div>
+                            <input class="block w-full pl-10 pr-3 py-2 border border-input rounded-md leading-5 bg-background placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent sm:text-sm" placeholder="Zoek leden, lidgelden..." type="search">
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        <!-- Notifications -->
+                        <button class="relative p-2 text-muted-foreground hover:text-foreground rounded-md hover:bg-accent">
+                            <i class="fas fa-bell"></i>
+                            <span class="absolute top-1 right-1 block h-2 w-2 rounded-full bg-destructive"></span>
+                        </button>
+                        
+                        <!-- Profile dropdown -->
+                        <div class="relative">
+                            <button class="flex items-center space-x-3 p-2 rounded-md hover:bg-accent">
+                                <div class="w-8 h-8 bg-secondary rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user text-secondary-foreground text-sm"></i>
+                                </div>
+                                <span class="hidden md:block text-sm font-medium text-foreground" data-mock="true">Ahmed Hassan</span>
+                                <i class="fas fa-chevron-down text-muted-foreground text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- @END_COMPONENT: Top Navigation Bar -->
+
+            <!-- @COMPONENT: Main Dashboard Content -->
+            <!-- Main content area -->
+            <main class="flex-1 overflow-y-auto bg-background">
+                <div class="p-6">
+                    <!-- Dashboard header -->
+                    <div class="mb-8">
+                        <h1 class="text-3xl font-bold text-foreground">Dashboard</h1>
+                        <p class="text-muted-foreground mt-2">Overzicht van uw moskee ledenbeheer</p>
+                    </div>
+
+                    <!-- KPI Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <!-- @MAP: kpiCards.map(card => ( -->
+                        <div class="bg-card p-6 rounded-lg border border-border shadow-sm">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0">
+                                    <div class="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-users text-primary"></i>
+                                    </div>
+                                </div>
+                                <div class="ml-5 w-0 flex-1">
+                                    <dl>
+                                        <dt class="text-sm font-medium text-muted-foreground truncate">Totaal Leden</dt>
+                                        <dd class="text-2xl font-bold text-foreground" data-mock="true">342</dd>
+                                    </dl>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <div class="flex items-center text-sm">
+                                    <span class="text-green-600 font-medium">+12%</span>
+                                    <span class="text-muted-foreground ml-2">vs vorige maand</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-card p-6 rounded-lg border border-border shadow-sm">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0">
+                                    <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-check-circle text-green-600"></i>
+                                    </div>
+                                </div>
+                                <div class="ml-5 w-0 flex-1">
+                                    <dl>
+                                        <dt class="text-sm font-medium text-muted-foreground truncate">Betaald 2025</dt>
+                                        <dd class="text-2xl font-bold text-foreground" data-mock="true">89%</dd>
+                                    </dl>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <div class="flex items-center text-sm">
+                                    <span class="text-green-600 font-medium">+5%</span>
+                                    <span class="text-muted-foreground ml-2">vs vorige jaar</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-card p-6 rounded-lg border border-border shadow-sm">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0">
+                                    <div class="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-euro-sign text-yellow-600"></i>
+                                    </div>
+                                </div>
+                                <div class="ml-5 w-0 flex-1">
+                                    <dl>
+                                        <dt class="text-sm font-medium text-muted-foreground truncate">Openstaand</dt>
+                                        <dd class="text-2xl font-bold text-foreground" data-mock="true">€8.240</dd>
+                                    </dl>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <div class="flex items-center text-sm">
+                                    <span class="text-red-600 font-medium">-3%</span>
+                                    <span class="text-muted-foreground ml-2">vs vorige maand</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-card p-6 rounded-lg border border-border shadow-sm">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0">
+                                    <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-vote-yea text-blue-600"></i>
+                                    </div>
+                                </div>
+                                <div class="ml-5 w-0 flex-1">
+                                    <dl>
+                                        <dt class="text-sm font-medium text-muted-foreground truncate">Stemgerechtigd</dt>
+                                        <dd class="text-2xl font-bold text-foreground" data-mock="true">267</dd>
+                                    </dl>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <div class="flex items-center text-sm">
+                                    <span class="text-blue-600 font-medium">78%</span>
+                                    <span class="text-muted-foreground ml-2">van alle leden</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- @END_MAP )) -->
+                    </div>
+
+                    <!-- Main dashboard grid -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Recent members -->
+                        <div class="lg:col-span-2">
+                            <div class="bg-card rounded-lg border border-border shadow-sm">
+                                <div class="p-6 border-b border-border">
+                                    <div class="flex items-center justify-between">
+                                        <h3 class="text-lg font-medium text-foreground">Recente Leden</h3>
+                                        <a href="#" class="text-primary hover:text-primary/80 text-sm font-medium">Bekijk alle</a>
+                                    </div>
+                                </div>
+                                <div class="overflow-hidden">
+                                    <table class="min-w-full divide-y divide-border">
+                                        <thead class="bg-muted/50">
+                                            <tr>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Lid</th>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Categorie</th>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Status</th>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Toegevoegd</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="bg-card divide-y divide-border">
+                                            <!-- @MAP: recentMembers.map(member => ( -->
+                                            <tr class="hover:bg-muted/30">
+                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                    <div class="flex items-center">
+                                                        <div class="w-8 h-8 bg-secondary rounded-full flex items-center justify-center">
+                                                            <span class="text-sm font-medium text-secondary-foreground" data-mock="true">MH</span>
+                                                        </div>
+                                                        <div class="ml-4">
+                                                            <div class="text-sm font-medium text-foreground" data-mock="true">Mohammed Hassan</div>
+                                                            <div class="text-sm text-muted-foreground" data-mock="true">#L2025001</div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800" data-mock="true">Volwassen</span>
+                                                </td>
+                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                    <div class="flex items-center">
+                                                        <div class="status-led status-paid"></div>
+                                                        <span class="ml-2 text-sm text-muted-foreground">Betaald</span>
+                                                    </div>
+                                                </td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground" data-mock="true">
+                                                    3 dagen geleden
+                                                </td>
+                                            </tr>
+
+                                            <tr class="hover:bg-muted/30">
+                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                    <div class="flex items-center">
+                                                        <div class="w-8 h-8 bg-secondary rounded-full flex items-center justify-center">
+                                                            <span class="text-sm font-medium text-secondary-foreground" data-mock="true">AK</span>
+                                                        </div>
+                                                        <div class="ml-4">
+                                                            <div class="text-sm font-medium text-foreground" data-mock="true">Amina Khalil</div>
+                                                            <div class="text-sm text-muted-foreground" data-mock="true">#L2025002</div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800" data-mock="true">Student</span>
+                                                </td>
+                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                    <div class="flex items-center">
+                                                        <div class="status-led status-pending"></div>
+                                                        <span class="ml-2 text-sm text-muted-foreground">Openstaand</span>
+                                                    </div>
+                                                </td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground" data-mock="true">
+                                                    1 week geleden
+                                                </td>
+                                            </tr>
+
+                                            <tr class="hover:bg-muted/30">
+                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                    <div class="flex items-center">
+                                                        <div class="w-8 h-8 bg-secondary rounded-full flex items-center justify-center">
+                                                            <span class="text-sm font-medium text-secondary-foreground" data-mock="true">YA</span>
+                                                        </div>
+                                                        <div class="ml-4">
+                                                            <div class="text-sm font-medium text-foreground" data-mock="true">Youssef Ahmad</div>
+                                                            <div class="text-sm text-muted-foreground" data-mock="true">#L2025003</div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800" data-mock="true">Senior</span>
+                                                </td>
+                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                    <div class="flex items-center">
+                                                        <div class="status-led status-overdue"></div>
+                                                        <span class="ml-2 text-sm text-muted-foreground">Achterstallig</span>
+                                                    </div>
+                                                </td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground" data-mock="true">
+                                                    2 weken geleden
+                                                </td>
+                                            </tr>
+                                            <!-- @END_MAP )) -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick actions & notifications -->
+                        <div class="space-y-6">
+                            <!-- Digital membership card preview -->
+                            <div class="bg-card rounded-lg border border-border shadow-sm p-6">
+                                <h3 class="text-lg font-medium text-foreground mb-4">Digitale Lidkaart Preview</h3>
+                                <div class="aspect-[1.6/1] w-full max-w-sm mx-auto">
+                                    <div class="glossy-card w-full h-full rounded-xl p-4 text-white relative">
+                                        <div class="flex justify-between items-start mb-4">
+                                            <div>
+                                                <h4 class="font-semibold text-lg" data-mock="true">Mohammed Hassan</h4>
+                                                <p class="text-sm opacity-90" data-mock="true">#L2025001</p>
+                                            </div>
+                                            <div class="flex items-center space-x-2">
+                                                <div class="status-led status-paid bg-green-400"></div>
+                                                <span class="text-xs">Geldig</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="flex justify-between items-end">
+                                            <div>
+                                                <div class="flex space-x-2 mb-2">
+                                                    <span class="bg-white/20 px-2 py-1 rounded text-xs">Betaald 2025</span>
+                                                    <span class="bg-white/20 px-2 py-1 rounded text-xs">Stemrecht</span>
+                                                </div>
+                                                <p class="text-xs opacity-75" data-mock="true">Geldig tot 31/12/2025</p>
+                                            </div>
+                                            
+                                            <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center cursor-pointer hover:bg-white/30 transition-colors">
+                                                <i class="fas fa-qrcode text-lg"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-4 text-center">
+                                    <button class="text-primary hover:text-primary/80 text-sm font-medium">
+                                        <i class="fas fa-external-link-alt mr-2"></i>Open Live Kaart
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Recent notifications -->
+                            <div class="bg-card rounded-lg border border-border shadow-sm">
+                                <div class="p-6 border-b border-border">
+                                    <h3 class="text-lg font-medium text-foreground">Recente Meldingen</h3>
+                                </div>
+                                <div class="p-6 space-y-4">
+                                    <!-- @MAP: notifications.map(notification => ( -->
+                                    <div class="flex items-start space-x-3">
+                                        <div class="w-2 h-2 bg-primary rounded-full mt-2"></div>
+                                        <div class="flex-1">
+                                            <p class="text-sm text-foreground" data-mock="true">Nieuwe SEPA batch gegenereerd</p>
+                                            <p class="text-xs text-muted-foreground" data-mock="true">15 betalingen, €2.340 totaal</p>
+                                            <p class="text-xs text-muted-foreground" data-mock="true">2 uur geleden</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-start space-x-3">
+                                        <div class="w-2 h-2 bg-yellow-500 rounded-full mt-2"></div>
+                                        <div class="flex-1">
+                                            <p class="text-sm text-foreground" data-mock="true">3 achterstallige betalingen</p>
+                                            <p class="text-xs text-muted-foreground" data-mock="true">Herinneringen verzonden</p>
+                                            <p class="text-xs text-muted-foreground" data-mock="true">Vandaag</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-start space-x-3">
+                                        <div class="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
+                                        <div class="flex-1">
+                                            <p class="text-sm text-foreground" data-mock="true">Maandelijks rapport beschikbaar</p>
+                                            <p class="text-xs text-muted-foreground" data-mock="true">December 2024 overzicht</p>
+                                            <p class="text-xs text-muted-foreground" data-mock="true">Gisteren</p>
+                                        </div>
+                                    </div>
+                                    <!-- @END_MAP )) -->
+                                </div>
+                                <div class="px-6 py-3 border-t border-border">
+                                    <a href="#" class="text-primary hover:text-primary/80 text-sm font-medium">Alle meldingen bekijken</a>
+                                </div>
+                            </div>
+
+                            <!-- Quick actions -->
+                            <div class="bg-card rounded-lg border border-border shadow-sm p-6">
+                                <h3 class="text-lg font-medium text-foreground mb-4">Snelle Acties</h3>
+                                <div class="space-y-3">
+                                    <button class="w-full flex items-center justify-center px-4 py-2 border border-border rounded-md text-sm font-medium text-foreground bg-background hover:bg-accent transition-colors">
+                                        <i class="fas fa-user-plus mr-2"></i>
+                                        Nieuw Lid Toevoegen
+                                    </button>
+                                    <button class="w-full flex items-center justify-center px-4 py-2 border border-border rounded-md text-sm font-medium text-foreground bg-background hover:bg-accent transition-colors">
+                                        <i class="fas fa-file-export mr-2"></i>
+                                        SEPA Export Genereren
+                                    </button>
+                                    <button class="w-full flex items-center justify-center px-4 py-2 border border-border rounded-md text-sm font-medium text-foreground bg-background hover:bg-accent transition-colors">
+                                        <i class="fas fa-chart-bar mr-2"></i>
+                                        Financieel Rapport
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Financial overview chart section -->
+                    <div class="mt-8">
+                        <div class="bg-card rounded-lg border border-border shadow-sm p-6">
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="text-lg font-medium text-foreground">Financieel Overzicht</h3>
+                                <div class="flex items-center space-x-4">
+                                    <select class="text-sm border border-input rounded-md px-3 py-1 bg-background text-foreground">
+                                        <option data-mock="true">2025</option>
+                                        <option data-mock="true">2024</option>
+                                    </select>
+                                    <div class="flex items-center space-x-2">
+                                        <div class="flex items-center space-x-1">
+                                            <div class="w-3 h-3 bg-primary rounded-full"></div>
+                                            <span class="text-sm text-muted-foreground">Inkomsten</span>
+                                        </div>
+                                        <div class="flex items-center space-x-1">
+                                            <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                                            <span class="text-sm text-muted-foreground">Uitgaven</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Mock chart area -->
+                            <div class="h-64 bg-muted/20 rounded-lg flex items-center justify-center border-2 border-dashed border-border">
+                                <div class="text-center">
+                                    <i class="fas fa-chart-line text-4xl text-muted-foreground mb-4"></i>
+                                    <p class="text-muted-foreground">
+                                        <!-- @FUNCTIONALITY: Financial chart showing income vs expenses over time using Recharts -->
+                                        Financiële grafiek wordt hier weergegeven
+                                    </p>
+                                    <p class="text-sm text-muted-foreground mt-2">Inkomsten vs Uitgaven per maand</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+            <!-- @END_COMPONENT: Main Dashboard Content -->
+        </div>
+    </div>
+
+    <!-- @COMPONENT: Modal Overlay (Hidden) -->
+    <!-- QR Code Modal (hidden by default) -->
+    <div id="qrModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+        <div class="bg-card rounded-lg p-6 max-w-sm w-full mx-4 border border-border">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-medium text-foreground">QR Code Lidkaart</h3>
+                <button class="text-muted-foreground hover:text-foreground">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="w-64 h-64 bg-muted/20 mx-auto rounded-lg border-2 border-dashed border-border flex items-center justify-center">
+                <div class="text-center">
+                    <i class="fas fa-qrcode text-6xl text-muted-foreground mb-2"></i>
+                    <p class="text-sm text-muted-foreground">QR Code voor verifiëring</p>
+                </div>
+            </div>
+            <p class="text-sm text-muted-foreground text-center mt-4" data-mock="true">
+                Scan voor verificatie van Mohammed Hassan (#L2025001)
+            </p>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: Modal Overlay -->
+
+    <script>
+        // TODO: Implement interactive functionality for:
+        // - Navigation state management
+        // - Real-time notifications
+        // - Chart data visualization with Recharts
+        // - Modal state management
+        // - QR code generation and verification
+        // - Search functionality
+        // - Member management CRUD operations
+        
+        (function() {
+            // Demo: Add some basic interactivity for the mockup
+            
+            // Mobile menu toggle
+            const mobileMenuButton = document.querySelector('button[class*="lg:hidden"]');
+            if (mobileMenuButton) {
+                mobileMenuButton.addEventListener('click', function() {
+                    console.log('Mobile menu toggle clicked');
+                    // TODO: Implement mobile sidebar toggle
+                });
+            }
+            
+            // QR code modal
+            const qrTrigger = document.querySelector('.glossy-card .fa-qrcode')?.parentElement;
+            const qrModal = document.getElementById('qrModal');
+            
+            if (qrTrigger && qrModal) {
+                qrTrigger.addEventListener('click', function() {
+                    qrModal.classList.remove('hidden');
+                    qrModal.classList.add('flex');
+                });
+                
+                qrModal.addEventListener('click', function(e) {
+                    if (e.target === qrModal || e.target.classList.contains('fa-times')) {
+                        qrModal.classList.add('hidden');
+                        qrModal.classList.remove('flex');
+                    }
+                });
+            }
+            
+            // Demo: Add hover effects to table rows
+            const tableRows = document.querySelectorAll('tbody tr');
+            tableRows.forEach(row => {
+                row.addEventListener('mouseenter', function() {
+                    this.style.backgroundColor = 'var(--muted)';
+                });
+                row.addEventListener('mouseleave', function() {
+                    this.style.backgroundColor = '';
+                });
+            });
+            
+            console.log('Ledenbeheer Dashboard initialized');
+        })();
+    </script>
+</body>
+</html>

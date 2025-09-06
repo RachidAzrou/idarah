@@ -1,0 +1,977 @@
+<html lang="nl-BE">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ledenbeheer - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                borderRadius: {
+                    lg: "var(--radius)",
+                    md: "calc(var(--radius) - 2px)",
+                    sm: "calc(var(--radius) - 4px)",
+                },
+                colors: {
+                    background: "var(--background)",
+                    foreground: "var(--foreground)",
+                    card: {
+                        DEFAULT: "var(--card)",
+                        foreground: "var(--card-foreground)",
+                    },
+                    primary: {
+                        DEFAULT: "var(--primary)",
+                        foreground: "var(--primary-foreground)",
+                    },
+                    secondary: {
+                        DEFAULT: "var(--secondary)",
+                        foreground: "var(--secondary-foreground)",
+                    },
+                    muted: {
+                        DEFAULT: "var(--muted)",
+                        foreground: "var(--muted-foreground)",
+                    },
+                    accent: {
+                        DEFAULT: "var(--accent)",
+                        foreground: "var(--accent-foreground)",
+                    },
+                    destructive: {
+                        DEFAULT: "var(--destructive)",
+                        foreground: "var(--destructive-foreground)",
+                    },
+                    success: {
+                        DEFAULT: "var(--success)",
+                        foreground: "var(--success-foreground)",
+                    },
+                    warning: {
+                        DEFAULT: "var(--warning)",
+                        foreground: "var(--warning-foreground)",
+                    },
+                    border: "var(--border)",
+                    input: "var(--input)",
+                    ring: "var(--ring)",
+                },
+                fontFamily: {
+                    sans: ["Poppins", "Inter", "system-ui", "sans-serif"],
+                }
+            },
+        }
+    };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/heroicons@2.0.18/24/outline/index.js" type="module"></script>
+    <script src="https://unpkg.com/heroicons@2.0.18/24/solid/index.js" type="module"></script>
+    <style>
+        :root {
+            --background: hsl(0 0% 100%);
+            --foreground: hsl(222 84% 4.9%);
+            --card: hsl(0 0% 100%);
+            --card-foreground: hsl(222 84% 4.9%);
+            --primary: hsl(221 83% 53%);
+            --primary-foreground: hsl(210 40% 98%);
+            --secondary: hsl(210 40% 96%);
+            --secondary-foreground: hsl(222.2 84% 4.9%);
+            --muted: hsl(210 40% 96%);
+            --muted-foreground: hsl(215.4 16.3% 46.9%);
+            --accent: hsl(210 40% 96%);
+            --accent-foreground: hsl(222.2 84% 4.9%);
+            --destructive: hsl(0 84.2% 60.2%);
+            --destructive-foreground: hsl(210 40% 98%);
+            --success: hsl(142 76% 36%);
+            --success-foreground: hsl(210 40% 98%);
+            --warning: hsl(38 92% 50%);
+            --warning-foreground: hsl(222 84% 4.9%);
+            --border: hsl(214.3 31.8% 91.4%);
+            --input: hsl(214.3 31.8% 91.4%);
+            --ring: hsl(221 83% 53%);
+            --radius: 0.75rem;
+        }
+        
+        .dark {
+            --background: hsl(222.2 84% 4.9%);
+            --foreground: hsl(210 40% 98%);
+            --card: hsl(222.2 84% 4.9%);
+            --card-foreground: hsl(210 40% 98%);
+            --primary: hsl(221 83% 53%);
+            --primary-foreground: hsl(210 40% 98%);
+            --secondary: hsl(217.2 32.6% 17.5%);
+            --secondary-foreground: hsl(210 40% 98%);
+            --muted: hsl(217.2 32.6% 17.5%);
+            --muted-foreground: hsl(215 20.2% 65.1%);
+            --accent: hsl(217.2 32.6% 17.5%);
+            --accent-foreground: hsl(210 40% 98%);
+            --destructive: hsl(0 62.8% 30.6%);
+            --destructive-foreground: hsl(210 40% 98%);
+            --border: hsl(217.2 32.6% 17.5%);
+            --input: hsl(217.2 32.6% 17.5%);
+            --ring: hsl(224.3 76.3% 94.1%);
+        }
+
+        .hero-icon {
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+
+        .hero-icon-sm {
+            width: 1rem;
+            height: 1rem;
+        }
+
+        .chart-container {
+            height: 300px;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .sidebar-nav {
+            transition: all 0.2s ease-in-out;
+        }
+
+        .sidebar-nav:hover {
+            background-color: hsl(var(--accent));
+        }
+
+        .table-row:hover {
+            background-color: hsl(var(--muted));
+        }
+
+        .shine-effect {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .shine-effect::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.6s ease-in-out;
+        }
+
+        .shine-effect:hover::after {
+            left: 100%;
+        }
+    </style>
+</head>
+<body class="bg-background text-foreground font-sans">
+    <!-- @COMPONENT: AppLayout [main layout wrapper] -->
+    <div class="flex h-screen bg-background">
+        <!-- Sidebar -->
+        <!-- @COMPONENT: Sidebar [navigation component] -->
+        <div class="w-64 bg-card border-r border-border flex flex-col">
+            <!-- Logo Section -->
+            <div class="p-6 border-b border-border">
+                <div class="flex items-center space-x-3">
+                    <!-- Mosque icon placeholder -->
+                    <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-primary-foreground" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2L2 12h3v8h14v-8h3L12 2zm0 2.83L18.17 11H17v7h-2v-6H9v6H7v-7H5.83L12 4.83z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-semibold" data-bind="tenant.name">Al-Noor Moskee</h1>
+                        <p class="text-xs text-muted-foreground">Ledenbeheer</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="flex-1 p-4 space-y-2">
+                <a href="/dashboard" class="sidebar-nav flex items-center space-x-3 px-3 py-2 rounded-lg bg-accent text-accent-foreground">
+                    <svg class="hero-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"/>
+                    </svg>
+                    <span class="font-medium">Dashboard</span>
+                </a>
+                
+                <a href="/leden" class="sidebar-nav flex items-center space-x-3 px-3 py-2 rounded-lg text-muted-foreground hover:text-foreground">
+                    <svg class="hero-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
+                    </svg>
+                    <span class="font-medium">Leden</span>
+                </a>
+
+                <a href="/lidgelden" class="sidebar-nav flex items-center space-x-3 px-3 py-2 rounded-lg text-muted-foreground hover:text-foreground">
+                    <svg class="hero-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                    </svg>
+                    <span class="font-medium">Lidgelden</span>
+                </a>
+
+                <a href="/financien" class="sidebar-nav flex items-center space-x-3 px-3 py-2 rounded-lg text-muted-foreground hover:text-foreground">
+                    <svg class="hero-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                    </svg>
+                    <span class="font-medium">Financiën</span>
+                </a>
+
+                <a href="/publieke-schermen" class="sidebar-nav flex items-center space-x-3 px-3 py-2 rounded-lg text-muted-foreground hover:text-foreground">
+                    <svg class="hero-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                    </svg>
+                    <span class="font-medium">Publieke Schermen</span>
+                </a>
+
+                <a href="/instellingen" class="sidebar-nav flex items-center space-x-3 px-3 py-2 rounded-lg text-muted-foreground hover:text-foreground">
+                    <svg class="hero-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    <span class="font-medium">Instellingen</span>
+                </a>
+            </nav>
+
+            <!-- User Profile Section -->
+            <div class="p-4 border-t border-border">
+                <div class="flex items-center space-x-3 px-3 py-2">
+                    <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                        <span class="text-sm font-medium text-primary-foreground" data-bind="user.initials">AK</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-foreground truncate" data-bind="user.name">Ahmed Khalil</p>
+                        <p class="text-xs text-muted-foreground" data-bind="user.role">Beheerder</p>
+                    </div>
+                    <button class="text-muted-foreground hover:text-foreground">
+                        <svg class="hero-icon-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: Sidebar -->
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- @COMPONENT: TopBar [search, notifications, profile] -->
+            <header class="bg-card border-b border-border px-6 py-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <h2 class="text-2xl font-semibold text-foreground">Dashboard</h2>
+                        <span class="text-sm text-muted-foreground">Overzicht van uw organisatie</span>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        <!-- Search -->
+                        <div class="relative">
+                            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 hero-icon-sm text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                            <input type="text" placeholder="Zoeken..." class="w-64 pl-10 pr-4 py-2 border border-input rounded-xl bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring">
+                        </div>
+
+                        <!-- Notifications -->
+                        <button class="relative p-2 text-muted-foreground hover:text-foreground rounded-xl hover:bg-accent">
+                            <svg class="hero-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM15 17H9a6 6 0 01-6-6V5a2 2 0 012-2h4.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293H15a2 2 0 012 2v8z"/>
+                            </svg>
+                            <span class="absolute -top-1 -right-1 w-5 h-5 bg-destructive text-destructive-foreground text-xs rounded-full flex items-center justify-center" data-bind="notifications.unread">3</span>
+                        </button>
+
+                        <!-- Profile Menu -->
+                        <button class="flex items-center space-x-2 p-2 rounded-xl hover:bg-accent">
+                            <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                                <span class="text-sm font-medium text-primary-foreground">AK</span>
+                            </div>
+                            <svg class="hero-icon-sm text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </header>
+            <!-- @END_COMPONENT: TopBar -->
+
+            <!-- Dashboard Content -->
+            <main class="flex-1 overflow-auto p-6">
+                <!-- @COMPONENT: DashboardContent [main dashboard view] -->
+                
+                <!-- KPI Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <!-- @MAP: kpis.map(kpi => ( -->
+                    <div class="bg-card rounded-2xl border border-border p-6 shadow-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-success/10 rounded-xl flex items-center justify-center">
+                                <svg class="w-6 h-6 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
+                                </svg>
+                            </div>
+                            <span class="text-xs text-success bg-success/10 px-2 py-1 rounded-lg">+5.2%</span>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-1" data-bind="stats.totalMembers">487</h3>
+                        <p class="text-sm text-muted-foreground">Totaal Leden</p>
+                    </div>
+
+                    <div class="bg-card rounded-2xl border border-border p-6 shadow-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+                                <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                </svg>
+                            </div>
+                            <span class="text-xs text-success bg-success/10 px-2 py-1 rounded-lg">+12.8%</span>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-1" data-bind="stats.totalReceived">€24.680</h3>
+                        <p class="text-sm text-muted-foreground">Ontvangen dit jaar</p>
+                    </div>
+
+                    <div class="bg-card rounded-2xl border border-border p-6 shadow-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-warning/10 rounded-xl flex items-center justify-center">
+                                <svg class="w-6 h-6 text-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                            <span class="text-xs text-warning bg-warning/10 px-2 py-1 rounded-lg">-2.1%</span>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-1" data-bind="stats.pendingAmount">€3.240</h3>
+                        <p class="text-sm text-muted-foreground">Openstaand</p>
+                    </div>
+
+                    <div class="bg-card rounded-2xl border border-border p-6 shadow-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-destructive/10 rounded-xl flex items-center justify-center">
+                                <svg class="w-6 h-6 text-destructive" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                </svg>
+                            </div>
+                            <span class="text-xs text-destructive bg-destructive/10 px-2 py-1 rounded-lg">+1 deze week</span>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-1" data-bind="stats.overdueCount">12</h3>
+                        <p class="text-sm text-muted-foreground">Achterstallig</p>
+                    </div>
+                    <!-- @END_MAP )) -->
+                </div>
+
+                <!-- Charts Row -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    <!-- Revenue Chart -->
+                    <div class="bg-card rounded-2xl border border-border p-6 shadow-sm">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-semibold">Inkomsten & Uitgaven</h3>
+                            <div class="flex items-center space-x-2">
+                                <select class="text-sm border border-input rounded-lg px-3 py-1 bg-background">
+                                    <option>Afgelopen 12 maanden</option>
+                                    <option>Dit jaar</option>
+                                    <option>Vorig jaar</option>
+                                </select>
+                            </div>
+                        </div>
+                        <!-- Chart placeholder -->
+                        <div class="chart-container bg-muted/20 rounded-xl flex items-center justify-center">
+                            <!-- @FUNCTIONALITY: Recharts Line Chart showing monthly income vs expenses -->
+                            <div class="text-center">
+                                <svg class="w-16 h-16 text-muted-foreground mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                                </svg>
+                                <p class="text-sm text-muted-foreground">Recharts Line Chart</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Status Distribution -->
+                    <div class="bg-card rounded-2xl border border-border p-6 shadow-sm">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-semibold">Betaalstatus Verdeling</h3>
+                            <span class="text-sm text-muted-foreground">December 2024</span>
+                        </div>
+                        <!-- Donut Chart placeholder -->
+                        <div class="chart-container bg-muted/20 rounded-xl flex items-center justify-center">
+                            <!-- @FUNCTIONALITY: Recharts Donut Chart showing payment status distribution -->
+                            <div class="text-center">
+                                <svg class="w-16 h-16 text-muted-foreground mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/>
+                                </svg>
+                                <p class="text-sm text-muted-foreground">Recharts Donut Chart</p>
+                            </div>
+                        </div>
+                        <!-- Legend -->
+                        <div class="flex justify-center space-x-6 mt-4">
+                            <div class="flex items-center space-x-2">
+                                <div class="status-indicator bg-success"></div>
+                                <span class="text-sm">Betaald (89%)</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div class="status-indicator bg-warning"></div>
+                                <span class="text-sm">Openstaand (8%)</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div class="status-indicator bg-destructive"></div>
+                                <span class="text-sm">Achterstallig (3%)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity & Quick Actions -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Recent Members -->
+                    <div class="lg:col-span-2 bg-card rounded-2xl border border-border shadow-sm">
+                        <div class="p-6 border-b border-border">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-lg font-semibold">Recente Leden</h3>
+                                <button class="text-sm text-primary hover:text-primary/80 font-medium">Alles bekijken</button>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="space-y-4">
+                                <!-- @MAP: recentMembers.map(member => ( -->
+                                <div class="table-row flex items-center justify-between p-4 rounded-xl border border-border">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="w-10 h-10 bg-muted rounded-full flex items-center justify-center">
+                                            <span class="text-sm font-medium" data-bind="member.initials">MH</span>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium" data-bind="member.fullName">Mohamed Hassan</p>
+                                            <p class="text-sm text-muted-foreground" data-bind="member.memberNumber">LID-2024-156</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center space-x-3">
+                                        <span class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-medium bg-success/10 text-success">
+                                            Volwassen
+                                        </span>
+                                        <button class="text-muted-foreground hover:text-foreground">
+                                            <svg class="hero-icon-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="table-row flex items-center justify-between p-4 rounded-xl border border-border">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="w-10 h-10 bg-muted rounded-full flex items-center justify-center">
+                                            <span class="text-sm font-medium">FA</span>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium">Fatima Al-Zahra</p>
+                                            <p class="text-sm text-muted-foreground">LID-2024-157</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center space-x-3">
+                                        <span class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-medium bg-primary/10 text-primary">
+                                            Student
+                                        </span>
+                                        <button class="text-muted-foreground hover:text-foreground">
+                                            <svg class="hero-icon-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="table-row flex items-center justify-between p-4 rounded-xl border border-border">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="w-10 h-10 bg-muted rounded-full flex items-center justify-center">
+                                            <span class="text-sm font-medium">OA</span>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium">Omar Abdullah</p>
+                                            <p class="text-sm text-muted-foreground">LID-2024-158</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center space-x-3">
+                                        <span class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-medium bg-warning/10 text-warning">
+                                            Senior
+                                        </span>
+                                        <button class="text-muted-foreground hover:text-foreground">
+                                            <svg class="hero-icon-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                <!-- @END_MAP )) -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="bg-card rounded-2xl border border-border shadow-sm">
+                        <div class="p-6 border-b border-border">
+                            <h3 class="text-lg font-semibold">Snelle Acties</h3>
+                        </div>
+                        <div class="p-6 space-y-4">
+                            <button class="shine-effect w-full flex items-center space-x-3 p-4 rounded-xl border border-border hover:border-primary/50 hover:bg-primary/5 transition-all duration-200" data-event="click:openNewMemberWizard">
+                                <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                    </svg>
+                                </div>
+                                <div class="text-left">
+                                    <p class="font-medium">Nieuw Lid</p>
+                                    <p class="text-sm text-muted-foreground">Voeg een lid toe</p>
+                                </div>
+                            </button>
+
+                            <button class="shine-effect w-full flex items-center space-x-3 p-4 rounded-xl border border-border hover:border-primary/50 hover:bg-primary/5 transition-all duration-200" data-event="click:openSEPAExport">
+                                <div class="w-10 h-10 bg-success rounded-xl flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-success-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"/>
+                                    </svg>
+                                </div>
+                                <div class="text-left">
+                                    <p class="font-medium">SEPA Export</p>
+                                    <p class="text-sm text-muted-foreground">Genereer betaalbestand</p>
+                                </div>
+                            </button>
+
+                            <button class="shine-effect w-full flex items-center space-x-3 p-4 rounded-xl border border-border hover:border-primary/50 hover:bg-primary/5 transition-all duration-200" data-event="click:openImportWizard">
+                                <div class="w-10 h-10 bg-warning rounded-xl flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-warning-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                                    </svg>
+                                </div>
+                                <div class="text-left">
+                                    <p class="font-medium">Import Betalingen</p>
+                                    <p class="text-sm text-muted-foreground">Bank transacties</p>
+                                </div>
+                            </button>
+
+                            <button class="shine-effect w-full flex items-center space-x-3 p-4 rounded-xl border border-border hover:border-primary/50 hover:bg-primary/5 transition-all duration-200" data-event="click:openPublicScreens">
+                                <div class="w-10 h-10 bg-accent rounded-xl flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-accent-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                    </svg>
+                                </div>
+                                <div class="text-left">
+                                    <p class="font-medium">Publiek Scherm</p>
+                                    <p class="text-sm text-muted-foreground">Beheer schermen</p>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Payments & Notifications -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    <!-- Recent Payments -->
+                    <div class="bg-card rounded-2xl border border-border shadow-sm">
+                        <div class="p-6 border-b border-border">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-lg font-semibold">Recente Betalingen</h3>
+                                <button class="text-sm text-primary hover:text-primary/80 font-medium">Alles bekijken</button>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="space-y-4">
+                                <!-- @MAP: recentPayments.map(payment => ( -->
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 bg-success/10 rounded-lg flex items-center justify-center">
+                                            <svg class="w-4 h-4 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-sm" data-bind="payment.memberName">Sarah Ahmed</p>
+                                            <p class="text-xs text-muted-foreground" data-bind="payment.period">December 2024</p>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="font-medium text-sm" data-bind="payment.amount">€50,00</p>
+                                        <p class="text-xs text-muted-foreground" data-bind="payment.date">Vandaag</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 bg-success/10 rounded-lg flex items-center justify-center">
+                                            <svg class="w-4 h-4 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-sm">Abdullah Yusuf</p>
+                                            <p class="text-xs text-muted-foreground">December 2024</p>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="font-medium text-sm">€25,00</p>
+                                        <p class="text-xs text-muted-foreground">Gisteren</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 bg-success/10 rounded-lg flex items-center justify-center">
+                                            <svg class="w-4 h-4 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-sm">Khadija Benali</p>
+                                            <p class="text-xs text-muted-foreground">November 2024</p>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="font-medium text-sm">€50,00</p>
+                                        <p class="text-xs text-muted-foreground">2 dagen geleden</p>
+                                    </div>
+                                </div>
+                                <!-- @END_MAP )) -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notifications & Alerts -->
+                    <div class="bg-card rounded-2xl border border-border shadow-sm">
+                        <div class="p-6 border-b border-border">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-lg font-semibold">Meldingen</h3>
+                                <span class="text-xs bg-destructive text-destructive-foreground px-2 py-1 rounded-lg" data-bind="notifications.unreadCount">3 nieuw</span>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="space-y-4">
+                                <!-- @MAP: notifications.map(notification => ( -->
+                                <div class="p-4 rounded-xl bg-destructive/5 border border-destructive/20">
+                                    <div class="flex items-start space-x-3">
+                                        <div class="w-8 h-8 bg-destructive/10 rounded-lg flex items-center justify-center mt-0.5">
+                                            <svg class="w-4 h-4 text-destructive" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                            </svg>
+                                        </div>
+                                        <div class="flex-1">
+                                            <p class="font-medium text-sm" data-bind="notification.title">12 leden hebben achterstallige betalingen</p>
+                                            <p class="text-xs text-muted-foreground mt-1" data-bind="notification.time">3 uur geleden</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="p-4 rounded-xl bg-primary/5 border border-primary/20">
+                                    <div class="flex items-start space-x-3">
+                                        <div class="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center mt-0.5">
+                                            <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
+                                        </div>
+                                        <div class="flex-1">
+                                            <p class="font-medium text-sm">SEPA export is gereed voor downloaden</p>
+                                            <p class="text-xs text-muted-foreground mt-1">1 dag geleden</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="p-4 rounded-xl bg-success/5 border border-success/20">
+                                    <div class="flex items-start space-x-3">
+                                        <div class="w-8 h-8 bg-success/10 rounded-lg flex items-center justify-center mt-0.5">
+                                            <svg class="w-4 h-4 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                            </svg>
+                                        </div>
+                                        <div class="flex-1">
+                                            <p class="font-medium text-sm">Maandelijkse lidgelden gegenereerd</p>
+                                            <p class="text-xs text-muted-foreground mt-1">2 dagen geleden</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- @END_MAP )) -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Digital Member Card Preview -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Member Card Demo -->
+                    <div class="bg-card rounded-2xl border border-border shadow-sm">
+                        <div class="p-6 border-b border-border">
+                            <h3 class="text-lg font-semibold">Digitale Lidkaart Preview</h3>
+                            <p class="text-sm text-muted-foreground mt-1">Live voorbeeld van lidkaart functionaliteit</p>
+                        </div>
+                        <div class="p-6">
+                            <!-- @COMPONENT: DigitalCard [member card component] -->
+                            <div class="relative">
+                                <!-- Card in landscape orientation -->
+                                <div class="glass-card rounded-2xl p-6 shadow-lg bg-gradient-to-br from-primary via-primary/90 to-primary/80 text-primary-foreground">
+                                    <div class="flex items-start justify-between mb-4">
+                                        <div>
+                                            <p class="text-sm opacity-90">Al-Noor Moskee</p>
+                                            <h4 class="text-xl font-bold" data-bind="member.fullName">Ahmed Khalil</h4>
+                                            <p class="text-sm opacity-75" data-bind="member.memberNumber">LID-2024-123</p>
+                                        </div>
+                                        <div class="flex items-center space-x-2">
+                                            <!-- Status LED -->
+                                            <div class="status-indicator bg-success shadow-lg shadow-success/50"></div>
+                                            <span class="text-xs bg-white/20 px-2 py-1 rounded-lg">Actief</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-center justify-between">
+                                        <div class="space-y-1">
+                                            <div class="flex items-center space-x-2">
+                                                <span class="text-xs bg-white/20 px-2 py-1 rounded-lg">Volwassen</span>
+                                                <span class="text-xs bg-success/30 px-2 py-1 rounded-lg">Betaald 2024</span>
+                                            </div>
+                                            <p class="text-xs opacity-75">Geldig tot 31/12/2024</p>
+                                        </div>
+                                        
+                                        <!-- QR Code placeholder -->
+                                        <div class="w-16 h-16 bg-white rounded-lg flex items-center justify-center cursor-pointer" data-event="click:showLargeQR">
+                                            <div class="w-12 h-12 bg-foreground rounded grid grid-cols-4 gap-0.5 p-1">
+                                                <!-- QR pattern simulation -->
+                                                <div class="bg-white rounded-sm"></div>
+                                                <div class="bg-foreground rounded-sm"></div>
+                                                <div class="bg-white rounded-sm"></div>
+                                                <div class="bg-foreground rounded-sm"></div>
+                                                <div class="bg-foreground rounded-sm"></div>
+                                                <div class="bg-white rounded-sm"></div>
+                                                <div class="bg-foreground rounded-sm"></div>
+                                                <div class="bg-white rounded-sm"></div>
+                                                <div class="bg-white rounded-sm"></div>
+                                                <div class="bg-foreground rounded-sm"></div>
+                                                <div class="bg-white rounded-sm"></div>
+                                                <div class="bg-foreground rounded-sm"></div>
+                                                <div class="bg-foreground rounded-sm"></div>
+                                                <div class="bg-white rounded-sm"></div>
+                                                <div class="bg-foreground rounded-sm"></div>
+                                                <div class="bg-white rounded-sm"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Refresh button -->
+                                <button class="absolute top-2 right-2 w-8 h-8 bg-white/10 backdrop-blur-sm rounded-lg flex items-center justify-center text-white hover:bg-white/20 transition-all duration-200" data-event="click:refreshCard">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <!-- @END_COMPONENT: DigitalCard -->
+
+                            <div class="mt-4 flex items-center justify-between text-sm">
+                                <span class="text-muted-foreground">Laatste update: nu</span>
+                                <button class="text-primary hover:text-primary/80 font-medium">Open PWA versie</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- System Status -->
+                    <div class="bg-card rounded-2xl border border-border shadow-sm">
+                        <div class="p-6 border-b border-border">
+                            <h3 class="text-lg font-semibold">Systeem Status</h3>
+                        </div>
+                        <div class="p-6 space-y-4">
+                            <div class="flex items-center justify-between p-3 rounded-xl bg-success/5">
+                                <div class="flex items-center space-x-3">
+                                    <div class="status-indicator bg-success"></div>
+                                    <span class="font-medium text-sm">Database Connectie</span>
+                                </div>
+                                <span class="text-xs text-success font-medium">Online</span>
+                            </div>
+
+                            <div class="flex items-center justify-between p-3 rounded-xl bg-success/5">
+                                <div class="flex items-center space-x-3">
+                                    <div class="status-indicator bg-success"></div>
+                                    <span class="font-medium text-sm">SEPA Service</span>
+                                </div>
+                                <span class="text-xs text-success font-medium">Actief</span>
+                            </div>
+
+                            <div class="flex items-center justify-between p-3 rounded-xl bg-warning/5">
+                                <div class="flex items-center space-x-3">
+                                    <div class="status-indicator bg-warning"></div>
+                                    <span class="font-medium text-sm">Email Service</span>
+                                </div>
+                                <span class="text-xs text-warning font-medium">Beperkt</span>
+                            </div>
+
+                            <div class="flex items-center justify-between p-3 rounded-xl bg-success/5">
+                                <div class="flex items-center space-x-3">
+                                    <div class="status-indicator bg-success"></div>
+                                    <span class="font-medium text-sm">Publieke Schermen</span>
+                                </div>
+                                <span class="text-xs text-success font-medium">2 actief</span>
+                            </div>
+
+                            <!-- System Actions -->
+                            <div class="pt-4 border-t border-border space-y-2">
+                                <button class="w-full flex items-center justify-between p-3 rounded-xl border border-border hover:bg-accent transition-colors">
+                                    <span class="font-medium text-sm">Backup Database</span>
+                                    <svg class="hero-icon-sm text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                                    </svg>
+                                </button>
+
+                                <button class="w-full flex items-center justify-between p-3 rounded-xl border border-border hover:bg-accent transition-colors">
+                                    <span class="font-medium text-sm">Evalueer Regels</span>
+                                    <svg class="hero-icon-sm text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- @END_COMPONENT: DashboardContent -->
+            </main>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: AppLayout -->
+
+    <!-- Modal Overlay for QR Code (Hidden by default) -->
+    <!-- @COMPONENT: QRModal [large QR code display] -->
+    <div id="qrModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden" data-event="click:closeModal">
+        <div class="bg-card rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl" onclick="event.stopPropagation()">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-semibold">QR Verificatie Code</h3>
+                <button class="text-muted-foreground hover:text-foreground" data-event="click:closeModal">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Large QR Code -->
+            <div class="w-80 h-80 bg-white rounded-2xl mx-auto flex items-center justify-center border border-border">
+                <div class="w-72 h-72 bg-foreground rounded-xl grid grid-cols-12 gap-1 p-4">
+                    <!-- @FUNCTIONALITY: Generate actual QR code using qrcode library -->
+                    <!-- QR pattern simulation for mockup -->
+                    <div class="aspect-square bg-white rounded-sm"></div>
+                    <div class="aspect-square bg-foreground rounded-sm"></div>
+                    <div class="aspect-square bg-white rounded-sm"></div>
+                    <div class="aspect-square bg-foreground rounded-sm"></div>
+                    <div class="aspect-square bg-white rounded-sm"></div>
+                    <div class="aspect-square bg-foreground rounded-sm"></div>
+                    <div class="aspect-square bg-white rounded-sm"></div>
+                    <div class="aspect-square bg-foreground rounded-sm"></div>
+                    <div class="aspect-square bg-white rounded-sm"></div>
+                    <div class="aspect-square bg-foreground rounded-sm"></div>
+                    <div class="aspect-square bg-white rounded-sm"></div>
+                    <div class="aspect-square bg-foreground rounded-sm"></div>
+                    <!-- Add more QR pattern elements as needed -->
+                </div>
+            </div>
+            
+            <div class="text-center mt-6">
+                <p class="text-sm text-muted-foreground mb-4">Scan voor lid verificatie</p>
+                <div class="bg-muted rounded-xl p-3">
+                    <p class="text-xs font-mono" data-bind="member.qrToken">QR-7A8B9C2D-E3F4-5G6H</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: QRModal -->
+
+    <!-- Toast Notification (Hidden by default) -->
+    <!-- @COMPONENT: Toast [notification toast] -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-card border border-border rounded-xl shadow-lg p-4 max-w-sm transform translate-y-full transition-transform duration-300 z-50">
+        <div class="flex items-start space-x-3">
+            <div class="w-6 h-6 bg-success rounded-lg flex items-center justify-center">
+                <svg class="w-4 h-4 text-success-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+            </div>
+            <div class="flex-1">
+                <p class="font-medium text-sm" data-bind="toast.title">Actie voltooid</p>
+                <p class="text-xs text-muted-foreground" data-bind="toast.message">Uw wijzigingen zijn opgeslagen</p>
+            </div>
+            <button class="text-muted-foreground hover:text-foreground" data-event="click:dismissToast">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: Toast -->
+
+    <script>
+        // Basic interaction handlers for mockup demonstration
+        (function() {
+            // QR Modal functionality
+            const qrModal = document.getElementById('qrModal');
+            const qrTrigger = document.querySelector('[data-event*="showLargeQR"]');
+            const closeModalBtns = document.querySelectorAll('[data-event*="closeModal"]');
+
+            if (qrTrigger) {
+                qrTrigger.addEventListener('click', () => {
+                    qrModal.classList.remove('hidden');
+                });
+            }
+
+            closeModalBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    qrModal.classList.add('hidden');
+                });
+            });
+
+            // Toast functionality
+            const toast = document.getElementById('toast');
+            let toastTimeout;
+
+            function showToast(title, message, type = 'success') {
+                const titleEl = toast.querySelector('[data-bind="toast.title"]');
+                const messageEl = toast.querySelector('[data-bind="toast.message"]');
+                
+                if (titleEl) titleEl.textContent = title;
+                if (messageEl) messageEl.textContent = message;
+                
+                toast.classList.remove('translate-y-full');
+                
+                clearTimeout(toastTimeout);
+                toastTimeout = setTimeout(() => {
+                    toast.classList.add('translate-y-full');
+                }, 4000);
+            }
+
+            // Demo interactions
+            document.querySelectorAll('[data-event*="click:"]').forEach(element => {
+                element.addEventListener('click', (e) => {
+                    const event = element.getAttribute('data-event');
+                    if (event.includes('openNewMemberWizard')) {
+                        showToast('Nieuw Lid Wizard', 'Opening wizard voor nieuw lid...');
+                    } else if (event.includes('openSEPAExport')) {
+                        showToast('SEPA Export', 'Voorbereiden van SEPA exportbestand...');
+                    } else if (event.includes('refreshCard')) {
+                        showToast('Lidkaart Vernieuwd', 'Lidkaart is bijgewerkt met laatste gegevens');
+                        // Add spin animation to refresh icon
+                        const icon = e.target.querySelector('svg') || e.target;
+                        icon.style.transform = 'rotate(360deg)';
+                        setTimeout(() => {
+                            icon.style.transform = 'rotate(0deg)';
+                        }, 600);
+                    }
+                });
+            });
+
+            // Dismiss toast
+            document.querySelector('[data-event*="dismissToast"]')?.addEventListener('click', () => {
+                toast.classList.add('translate-y-full');
+            });
+
+            // Add hover effects to interactive elements
+            document.querySelectorAll('.shine-effect').forEach(element => {
+                element.addEventListener('mouseenter', () => {
+                    // Shine effect is handled by CSS
+                });
+            });
+
+            // TODO: Implement tRPC calls for data fetching
+            // TODO: Implement NextAuth session management
+            // TODO: Implement real-time notifications
+            // TODO: Implement PWA service worker
+            // TODO: Implement RBAC middleware checks
+        })();
+    </script>
+</body>
+</html>

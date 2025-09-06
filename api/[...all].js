@@ -6,21 +6,29 @@ import { pathToFileURL, fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const app = express();
+const functionApp = express();
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+functionApp.use(express.json());
+functionApp.use(express.urlencoded({ extended: false }));
+
+// 👇 Belangrijk: zorg dat Express-routes altijd met /api/... binnenkomen
+functionApp.use((req, _res, next) => {
+  // Vercel kan req.url doorgeven als '/auth/login' i.p.v. '/api/auth/login'
+  if (!req.url.startsWith("/api/")) {
+    req.url = "/api" + (req.url.startsWith("/") ? req.url : `/${req.url}`);
+  }
+  next();
+});
 
 async function loadServer() {
   try {
-    // Absoluut pad naar jouw gebundelde Express app
+    // Absoluut pad naar jouw gebundelde Express-app
     const distIndex = path.join(process.cwd(), "dist", "index.js");
     const mod = await import(pathToFileURL(distIndex).href);
-
     if (typeof mod?.default !== "function") {
       throw new Error("dist/index.js mist default export (Express app).");
     }
-    return mod.default; // <- jouw Express app met ALLE /api routes
+    return mod.default; // jouw Express app met alle /api-routes
   } catch (err) {
     console.error("Kon dist/index.js niet importeren:", err);
     return null;
@@ -30,16 +38,16 @@ async function loadServer() {
 const realApp = await loadServer();
 
 if (realApp) {
-  // Laat de echte app alle requests afhandelen (incl. /api/auth/login)
-  app.use((req, res, next) => realApp(req, res, next));
+  // Geef alle requests door aan je echte app
+  functionApp.use((req, res, next) => realApp(req, res, next));
 } else {
-  // Fallback zodat je duidelijk ziet als dist/index.js niet geladen werd
-  app.get("/api/health", (_req, res) => {
+  // Fallback zodat het zichtbaar is als dist niet geladen is
+  functionApp.get("/api/health", (_req, res) => {
     res.status(503).json({ ok: false, message: "Server module niet geladen" });
   });
-  app.all("*", (_req, res) => {
+  functionApp.all("*", (_req, res) => {
     res.status(500).send("Server niet volledig geladen (fallback).");
   });
 }
 
-export default app;
+export default functionApp;

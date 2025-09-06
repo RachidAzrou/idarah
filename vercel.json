@@ -2,7 +2,7 @@
   "buildCommand": "npm run build && cp -r dist/public/* .",
   "functions": {
     "api/server.js": {
-      "runtime": "@vercel/node@3.0.0"
+      "runtime": "@vercel/node@2.0.0"
     }
   },
   "rewrites": [

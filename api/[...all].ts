@@ -1,24 +1,45 @@
-// api/[...all].ts
-import express, { type Request, type Response, type NextFunction } from "express";
+// api/[...all].js
+import express from "express";
 import path from "path";
-import { registerRoutes } from "../server/routes";
+import { pathToFileURL, fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// alleen nodig als je uploads serveert
-app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+async function loadServer() {
+  try {
+    // Absoluut pad naar jouw gebundelde Express app
+    const distIndex = path.join(process.cwd(), "dist", "index.js");
+    const mod = await import(pathToFileURL(distIndex).href);
 
-// jouw echte API-routes registreren (incl. /api/auth/login)
-await registerRoutes(app);
+    if (typeof mod?.default !== "function") {
+      throw new Error("dist/index.js mist default export (Express app).");
+    }
+    return mod.default; // <- jouw Express app met ALLE /api routes
+  } catch (err) {
+    console.error("Kon dist/index.js niet importeren:", err);
+    return null;
+  }
+}
 
-// uniforme error handler
-app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-  const status = err.status || err.statusCode || 500;
-  const message = err.message || "Internal Server Error";
-  res.status(status).json({ message });
-});
+const realApp = await loadServer();
+
+if (realApp) {
+  // Laat de echte app alle requests afhandelen (incl. /api/auth/login)
+  app.use((req, res, next) => realApp(req, res, next));
+} else {
+  // Fallback zodat je duidelijk ziet als dist/index.js niet geladen werd
+  app.get("/api/health", (_req, res) => {
+    res.status(503).json({ ok: false, message: "Server module niet geladen" });
+  });
+  app.all("*", (_req, res) => {
+    res.status(500).send("Server niet volledig geladen (fallback).");
+  });
+}
 
 export default app;

@@ -2,8 +2,9 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist/public",
   "functions": {
-    "api/[...all].ts": {
+    "api/[...all].js": {
       "runtime": "@vercel/node@2.0.0",
+      "includeFiles": "dist/**",
       "memory": 1024,
       "maxDuration": 10
     }
